@@ -2270,6 +2270,13 @@
     <!-- if citation contain text: render it. -->
     <xsl:apply-templates select="node()" mode="#current"/>
   </template>
+  
+  <template context="dbk:br
+                    |dbk:title/dbk:br
+                    |dbk:br[following-sibling::node()[1][self::dbk:br]]
+                    |dbk:phrase[@role eq 'cr']">
+    <rule name="tpBreak" type="cmd" break-after="1"/>
+  </template>
 
   <charmap ignore-imported-charmaps="true">
     <!--SOFT HYPHEN -->
