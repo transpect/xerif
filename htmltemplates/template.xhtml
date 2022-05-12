@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!DOCTYPE html SYSTEM "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+     <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!--        <link href="https://subversion.le-tex.de/common/htmltemplates/trunk/css/stylesheet.css" type="text/css" rel="stylesheet" />-->
+    <link href="../../htmltemplates/css/stylesheet.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+
+    <h2 class="documentation">Haupt-Template</h2>
+
+    <div id="book">
+      <!-- Inputs in this element are globally available -->
+      <!-- The number of quotes is needed in front and back templates. Therefore it has to be global. -->
+    
+      <!-- Body -->
+      <input title="footnote-heading-title_de" value="Fußnoten" />
+      <input title="footnote-heading-title_en" value="Notes" />
+      
+      <input title="footnote-heading-level" value="4"/>
+      
+      <input title="toc-heading-title_de" value="Inhaltsverzeichnis" />
+      <input title="toc-heading-title_en" value="Content" />
+      
+      <input title="imprint-heading-title_de" value="Impressum" />
+      <input title="imprint-heading-title_en" value="Copyright notice" />
+      
+      <input title="cover-heading-title_de" value="Cover" />
+      <input title="cover-heading-title_en" value="Cover" />
+      
+      <input title="titlepage-heading-title_de" value="Titel" />
+      <input title="titlepage-heading-title_en" value="Title" />
+      
+      <input title="book-heading-title_de" value="Zum Buch" />
+      <input title="book-heading-title_en" value="About the book" />
+      
+      <input title="motto-heading-title_de" value="Motto" />
+      <input title="motto-heading-title_en" value="Epigraph" />
+      
+      <input title="vita-heading-title" value="Vita" />
+      
+      <input title="dedication-heading-title_de" value="Widmung" />
+      <input title="dedication-heading-title_en" value="Dedication" />
+      
+      <input title="frontispiece-heading-title_de" value="Frontispiz" />
+      <input title="frontispiece-heading-title_en" value="Frontispiece" />
+      
+      <a rel="transclude" href="#cover"/>
+      <a rel="transclude" href="#title-page"/>
+      <a rel="transclude" href="#impress"/>
+<!--      <a rel="calc" name="frontispiece"/>
+      <a rel="calc" name="about-series"/>
+      <a rel="calc" name="about-book"/>
+      <a rel="calc" name="about-author"/>-->
+      <a rel="transclude" href="#toc"/>
+<!--      <a rel="calc" name="dedication"/>
+      <a rel="calc" name="motto"/>-->
+      <a rel="calc" name="htmlinput-body"></a>
+<!--      <a rel="transclude" href="#backmatter" class="block">Backmatter</a>  -->
+
+    </div>
+
+
+    <h3>Cover</h3>
+    
+    <div id="cover">
+      <a rel="calc" name="cover"/>
+    </div>  
+    
+    
+    <h3>Titelseite</h3>
+    
+    <div id="title-page">
+      <a rel="calc" name="title-page"/>
+    </div>  
+    
+    
+     
+    <h3>impress</h3>
+    
+    <div id="impress">
+      <a rel="calc" name="impress"/>
+    </div>
+    
+    
+    <h3 class="documentation">Inhaltsverzeichnis</h3>
+
+    <div id="toc">
+<!--      <nav class="toc" id="uv_toc"  xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc">-->
+        <!-- Die übergebene Überschrift überschreibt die vorher vorhandene Überschrift, der Input depth entsorgt reguliert 
+          die Hierarchietiefe. Bei depth = 3, werden alle Überschriften ab h4 nicht mehr im TOC angezeigt -->
+        <a rel="calc" name="toc">
+          <input title="depth" value="5" />
+        </a>
+      <!--</nav>-->
+    </div>
+
+
+  </body>
+</html>

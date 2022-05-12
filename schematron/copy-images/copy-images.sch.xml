@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+        xmlns:tr="http://transpect.io"
+        xmlns:c="http://www.w3.org/ns/xproc-step"
+        queryBinding="xslt2">
+
+  <ns prefix="idml2xml" uri="http://transpect.io/idml2xml"/>
+  <ns prefix="hub2tei" uri="http://transpect.io/hub2tei"/>
+  <ns prefix="dbk" uri="http://docbook.org/ns/docbook"/>
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="hub" uri="http://transpect.io/hub" />
+  <ns prefix="tr" uri="http://transpect.io" />
+  <ns prefix="c" uri="http://www.w3.org/ns/xproc-step" />
+  <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
+  
+  
+  <xsl:include href="http://customer.le-tex.de/adaptions/xsl/shared-variables.xsl"/>
+	<!-- for hub:same-scope determination -->
+  <xsl:include href="http://transpect.io/evolve-hub/xsl/hub-functions.xsl"/>
+	
+  <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
+
+  <pattern id="evolve-hub_common_01">
+    <rule context="dbk:para[dbk:informaltable]">
+      <assert test="every $n in node() satisfies ($n/self::dbk:informaltable)" id="text_around_table" role="warning"
+        diagnostics="text_around_table_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Text around table</span>
+        Unless it is a proper inline table, a table should have no other text around it (in the same paragraph).
+        <xsl:sequence select="schematron:general-documentation('en', '#Tabellen')"/></assert>
+    </rule>
+  </pattern>
+
+  <xsl:key name="hub:linking-item-by-id" match="*[@linkend]" use="@linkend" />
+  <xsl:key name="hub:linking-item-by-linkend" match="*[@*:id]" use="@*:id" />
+ 
+
+  <pattern id="wrong-heading">
+    <rule context="dbk:title">
+      <report test="exists(dbk:informaltable)" id="table_in_heading" role="warning" diagnostics="table_in_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Table in heading</span>
+        There is a table in the heading. This will probably lead to conversion errors. If it is really wanted, you can ignore this message. 
+        If the heading style around the table wasn't intended better use a normal paragraph style to surround the table.
+        <xsl:sequence select="schematron:general-documentation('en', '#Tabellen')"/></report>
+      <!--<report test="(matches(., '^\s*\d\s*') and .//text()[matches(., '^\s*\d+')][not(ancestor::*[self::dbk:phrase[@role = 'hub:identifier']])])" id="wrong_label" role="warning" diagnostics="wrong_label_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span> The numbers in this title are not (completely) inside a label.
+      </report>-->
+    </rule>
+  </pattern>
+
+  <xsl:key name="idml2xml:styles-by-name" match="css:rule" use="(@role, @name)[1]"/>
+
+  <pattern id="evolve-hub_images">
+    <rule context="dbk:imagedata">
+      <report test="@c:report[. = 'image-conversion-failed']" id="image-conversion-failed" diagnostics="image-conversion-failed_de" role="error">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, descendant-or-self::*[@srcpath][1]/@srcpath), '')"/></span>
+        
+        <span class="category">Images</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Image Conversion Error</span>
+        The image <xsl:value-of select="@fileref"/> wasn't converted correctly.
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_image-titles">
+    <rule context="dbk:para[matches(@role, concat($hub:figure-title-role-regex-x, '|', $hub:table-title-role-regex-x), 'x')]">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <let name="type" value="if (matches(@role, $hub:figure-title-role-regex-x, 'x')) then 'figure' else 'table'"/>
+      <let name="type-de" value="if (matches(@role, $hub:figure-title-role-regex-x, 'x')) then 'Abbildungs' else 'Tabellen'"/>
+      <report test="true()" diagnostics="not_converted_to_title_de" id="not_converted_to_title" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="$type"/> title not converted correctly</span>
+        This <value-of select="$type"/> title paragraph has not been converted into a title element. This means that it was not correctly put into a <value-of select="$type"/> environment.
+        Please check whether it is the correct style (table title style for tables, figure title style for figures).
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        Check for the correct order of the surrounding paras and so on.
+        <xsl:sequence select="schematron:general-documentation('en', '#Abbildungen-mit-Legenden')"/>
+      </report>
+    </rule>
+    <rule context="dbk:para[matches(@role, $hub:figure-title-role-regex-x)]">
+      <assert test="exists(/*//dbk:imagedata)" diagnostics="legend_without_image_de" id="legend_without_image" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, @srcpath), '')"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Figure titles without image</span>
+        Here is an image title placed, but there do not exist any images in the document (any more?). Perhaps they were not anchored or the image title format
+        was not used correctly. </assert>
+    </rule>
+  </pattern>
+
+  <diagnostics>
+    <diagnostic id="image-conversion-failed_de" xml:lang="de">
+      <span class="category">Abbildungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Konvertierunsfehler</span>
+      Das Bild <xsl:value-of select="@fileref"/> konnte nicht korrekt konvertiert werden.</diagnostic>
+   <diagnostic id="legend_without_image_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bildunterschrift aber keine Bilder</span>
+      Dieser Absatz hat das Format für Bildunter- oder überschriften, aber im Dokument gibt es
+      keine Bilder (mehr?).<br xmlns="http://www.w3.org/1999/xhtml"/> Eventuell waren die Bilder unverankert und wurden nicht
+      übernommen? <br xmlns="http://www.w3.org/1999/xhtml"/>Möglicherweise wurde auch das Format für die  Bildunter- oder überschriften falsch
+      verwendet. </diagnostic>
+    <diagnostic id="not_converted_to_title_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="$type-de"/>-Über-/Unterschrift nicht korrekt verarbeitet</span>
+      Diese <xsl:value-of select="$type-de"/>-Über-/Unterschrift konnte nicht korrekt zu einer Überschrift in einem entsprechenden <xsl:value-of select="$type-de"/>-Container konvertiert werden. Bitte prüfen Sie, ob der Typ des Formats korrekt ist (Tabellenunterschrift bei Tabellen, Abbildungsunterschrift bei Abbildungen).
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Außerdem muss die Reihenfolge der <xsl:value-of select="$type-de"/>-Bestandteile stimmen, entnehmen Sie Details dazu bitte der Dokumentation.
+      <xsl:sequence select="schematron:general-documentation('de', '#Abbildungen-mit-Legenden')"/>
+    </diagnostic>
+    <diagnostic id="text_around_table_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabelle mit Text drumherum</span>
+       In diesem Absatz steht eine Tabelle <b
+        xmlns="http://www.w3.org/1999/xhtml">und</b> Text. <br xmlns="http://www.w3.org/1999/xhtml"/> Falls hier nicht explizit eine Tabelle innerhalb des Absatzes gewünscht ist, sollte die Tabelle in einem Absatz für sich allein stehen, ohne Text drumherum. <br
+        xmlns="http://www.w3.org/1999/xhtml"/>Gefundener Text: '<value-of
+        select="string-join(node()[not(self::dbk:informaltable)]/descendant-or-self::text(), '')"/>'.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellen')"/>
+    </diagnostic>
+    <diagnostic id="table_in_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabelle in Überschrift</span>
+      In dieser Überschrift befindet sich eine Tabelle. Dies wird
+      höchstwahrscheinlich zu Fehlern bei der Konvertierung führen! 
+      Falls das Absatzformat des Absatzes, in welchen die Tabelle eingefügt wurde, aus Versehen ein Überschriftsformat hat, ändern Sie dies bitte in ein Standard-Absatzformat.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellen')"/>
+    </diagnostic>
+  </diagnostics>
+   
+</schema>

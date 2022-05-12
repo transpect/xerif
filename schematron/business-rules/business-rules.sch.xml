@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema queryBinding="xslt2" xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:tr="http://transpect.io"
+  xmlns:html="http://www.w3.org/1999/xhtml"
+  xmlns:c="http://www.w3.org/ns/xproc-step"
+  xmlns:css="http://www.w3.org/1996/css"
+  xml:lang="de">
+  
+  <xsl:import href="http://transpect.io/xslt-util/uri/xsl/uri.xsl"/>
+  
+  <xsl:param name="cascade-paths-regex"/>
+  
+  <!-- input is tei, currently -->
+  
+  <ns uri="http://www.tei-c.org/ns/1.0" prefix="tei"/>
+  <ns uri="http://transpect.io" prefix="tr"/>
+  <ns uri="http://www.w3.org/ns/xproc-step" prefix="c"/>
+  <ns uri="http://www.w3.org/1996/css" prefix="css"/>
+
+  <xsl:param name="customer-prefix" select="'ts'"/>  
+
+  <pattern id="rule">
+      
+    <rule context="/tei:TEI">
+      
+      <assert test="matches(@xml:base, $cascade-paths-regex)" role="error" id="Dateiname">
+        Der Dateiname entspricht nicht der Dateinamenskonvention.
+      </assert>
+      
+    </rule>
+    
+    <rule context="tei:p[@rend eq concat($customer-prefix, 'figurecaption')]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <assert test="false()" role="warning" id="Bild-Legende">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>        
+        Dieser Bild-Legende konnte keine Abbildung zugeordnet werden. 
+        Bitte prüfen Sie, ob der vorherige Absatz ein Bild enthält und 
+        das Absatzformat <html:code>ts_figure</html:code> trägt.
+      </assert>
+      
+    </rule>
+    
+    <rule context="tei:p[starts-with(@rend, concat($customer-prefix, 'figure'))]">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <assert test="not(normalize-space(.))" role="warning" id="Text-in-Bildabsatz">
+      <span class="srcpath"><xsl:value-of select="$srcpath"/></span>        
+        Es wurde der Text "<value-of select="."/>" in einem Bildabsatz gefunden. Absätze mit dem Format 
+        <html:code>ts_figure</html:code> dürfen nur Bilder enthalten.
+      </assert>
+      
+      <assert test="tei:graphic" role="warning" id="Bildabsatz-ohne-Bild">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Ein Absatz wurde mit dem Format <html:code>ts_figure</html:code> ausgezeichnet, 
+        enthält aber kein Bild.
+      </assert>
+      
+    </rule>
+
+    <rule context="tei:figure">
+      <let name="srcpath" value="(.//@srcpath[1], preceding-sibling::*[exists(.//@srcpath)][1]//@srcpath[1])[1]"/>
+     
+      <report test="empty(tei:graphic)" role="error" id="Bildabsatz-ohne-Bild2">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Ein Absatz wurde mit dem Format <html:code>ts_figure</html:code> ausgezeichnet, 
+        enthält aber kein Bild. Evt. befindet sich die Stelle nach dem Absatz mit der Fehlermeldung.
+      </report>
+      
+    </rule>
+
+    
+    <rule context="tei:ref[@target]">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <assert test="tr:is-uri-valid(@target)" role="error" id="URL-invalide">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        <span class="category">Business Rules</span>
+        Die URL "<value-of select="@target"/>" enthält nicht erlaubte Zeichen: 
+        "<value-of select="tr:uri-get-bad-chars(@target)"/>". Diese können eine 
+        korrekte Verarbeitung durch Web-Browser und andere Anwendungen verhindern.
+      </assert>
+      
+    </rule>
+    
+    <rule context="tei:table">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <assert test="not(.//tei:div)" role="error" id="Ueberschrift-in-Tabelle">
+      <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Überschriften in Tabellen sind nicht erlaubt. Bitte Überschrift 
+        über die Tabelle setzen.
+      </assert>
+      
+      <assert test="not(.//tei:*[matches(@role, 'glossary|literature')])
+                        or not(.//tei:bibl)" role="error" id="Verzeichnis-als-Tabelle">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Verzeichnisse dürfen nicht in Tabellen angelegt werden. 
+        Bitte setzen Sie Verzeichnisse als normale Absätze mit dem 
+        entsprechenden Absatzformat
+      </assert>
+      
+    </rule>
+    
+    <rule context="tei:graphic">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <assert test="not(matches(@url, '^https?://'))" role="error" id="Externe-Ressource">
+      <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Die Grafik mit der URL <value-of select="@url"/> verweist auf eine externe Ressource
+        und kann nicht verarbeitet werden.
+      </assert>
+    </rule>
+    
+    <rule context="tei:figure/tei:head">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <assert test="not(.//tei:graphic)" role="warning" id="Grafik-in-Titel">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Der Titel der Abbildung enthält eine Grafik. Das kann zu Problemen beim Rendering führen.
+      </assert>
+    </rule>
+    
+
+    <rule context="tei:p[matches(@rend, 'lineskip')]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <report test="matches(., '\S')" role="error" id="Inhalt-in-LZ-Format">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Absätze mit Leerzeilen-Format dürfen keinen Text enthalten.
+      </report>
+    </rule>
+
+  </pattern>
+
+  <pattern id="colors">
+    
+    <rule context="tei:seg[@css:color]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+      <assert test="not(@css:color eq '#FFFFFF')" id="Weiße-Vordergrundfarbe" role="warning">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Hier wurde Text mit weißer Vordergrundfarbe ausgezeichnet. Das kann zu Problemen beim Drucken und 
+        im Nachtmodus von EPUB-Readern führen.
+      </assert>
+      
+      <assert test="not(@css:color eq '#000000')" id="Schwarze-Vordergrundfarbe" role="warning">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        Hier wurde Text mit schwarzer Vordergrundfarbe ausgezeichnet. Das kann zu Problemen beim Drucken und 
+        im Nachtmodus von EPUB-Readern führen. Die Vordergrundfarbe Schwarz sollte nur via Absatz- und Zeichenformat
+        eingestellt werden.
+      </assert>
+      
+    </rule>
+    
+  </pattern>
+  
+</schema>

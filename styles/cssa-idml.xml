@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<css:rules xmlns:css="http://www.w3.org/1996/css">
+
+  <css:rule layout-type="para" native-name="ts_abstracts" name="tsabstracts"/>
+  <css:rule layout-type="para" native-name="ts_abstracts_heading" name="tsabstractsheading"/>
+
+  <css:rule layout-type="para" native-name="ts_author" name="tsauthor"/>
+  <css:rule layout-type="para" native-name="ts_author_name" name="tsauthorname" />
+  <css:rule layout-type="para" native-name="ts_author_description" name="tsauthordescription"/>
+  <css:rule layout-type="para" native-name="ts_body" name="tsbody"/>
+  <css:rule layout-type="para" native-name="ts_heading_part" name="tsheadingpart"/>
+  <css:rule layout-type="para" native-name="ts_heading_1" name="tsheading1" regex="^tsheading[1-5]"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_1" name="tsheadingenumerated1" regex="^tsheadingenumerated[1-5]"/>
+  <css:rule layout-type="para" native-name="ts_subheading_1" name="tssubheading1" regex="^tssubheading[1-5]"/>
+  <css:rule layout-type="para" native-name="ts_motto" name="tsmotto"/>
+  <css:rule layout-type="para" native-name="ts_motto_source" name="tsmottosource"/>
+  <css:rule layout-type="para" native-name="ts_figure" name="tsfigure"/>
+  <css:rule layout-type="para" native-name="ts_figure_caption" name="tsfigurecaption"/>
+  <css:rule layout-type="para" native-name="ts_figure_source" name="tsfiguresource"/>
+  <css:rule layout-type="para" native-name="ts_table" name="tstable"/>
+  <css:rule layout-type="para" native-name="ts_table_caption" name="tstablecaption"/>
+  <css:rule layout-type="para" native-name="ts_table_text" name="tstabletext"/>
+  <css:rule layout-type="para" native-name="ts_table_value" name="tstablevalue"/>
+  <css:rule layout-type="para" native-name="ts_head_word" name="tsheadword"/>
+  <css:rule layout-type="para" native-name="ts_index_name" name="tsindexname"/>
+  <css:rule layout-type="para" native-name="ts_list" name="tslist"/>
+  <css:rule layout-type="para" native-name="ts_list_of_tables_item" name="tslistoftablesitem"/>
+  <css:rule layout-type="para" native-name="ts_literature" name="tsliterature"/>
+  <css:rule layout-type="para" native-name="ts_annotation" name="tsannotation"/>
+  <css:rule layout-type="para" native-name="ts_quotation" name="tsquotation"/>
+  <css:rule layout-type="para" native-name="ts_quotation" name="tsdialogue"/>
+  <css:rule layout-type="para" native-name="ts_footnote" name="tsfootnote"/>
+  <css:rule layout-type="para" native-name="ts_ded" name="tsded"/>
+  <css:rule layout-type="para" native-name="ts_dedication" name="tsdedication"/>
+  <!--<css:rule layout-type="inline" native-name="footnote reference" name="Funotenzeichen"/>-->
+  <css:rule layout-type="inline" native-name="ts_superscript" name="tssuperscript"/>
+  <css:rule layout-type="inline" native-name="Hyperlink" name="Hyperlink"/>
+  <css:rule layout-type="object" native-name="ts_box_grey" name="tsboxgrey"/>
+  <css:rule layout-type="object" native-name="ts_figure" name="tsfigure"/>
+
+  <css:rule layout-type="para" native-name="ts_meta_keywords" name="tsmetakeywords"/>
+  <css:rule layout-type="para" native-name="ts_meta_keywords_heading" name="tsmetakeywordsheading"/>
+  <css:rule layout-type="para" native-name="ts_meta_alternative_headline" name="tsmetaalternativeheadline"/>
+  <css:rule layout-type="para" native-name="ts_meta_alternative_headline_heading" name="tsmetaalternativeheadlineheading"/>
+  <css:rule layout-type="para" native-name="ts_meta_doi" name="tsmetadoi"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_title" name="tsmetajournaltitle"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_year" name="tsmetajournalyear"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_issue" name="tsmetajournalissue"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_author_affiliation" name="tsmetacontributionauthoraffiliation"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_author_contact" name="tsmetacontributionauthorcontact"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_orcid" name="tsmetacontributionorcid"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_licence" name="tsmetacontributionlicence"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_year" name="tsmetacontributionyear"/>
+  <css:rule layout-type="para" native-name="ts_meta_chunk_doi" name="tsmetachunkdoi"/>
+  
+  <css:rule layout-type="inline" native-name="ts_superscript" name="tssuperscript"/>
+  <css:rule layout-type="inline" native-name="ts_subscript " name="tssubscript"/>
+  <css:rule layout-type="inline" native-name="ts_smallcaps" name="tssmallcaps "/>
+  <css:rule layout-type="inline" native-name="Hyperlink" name="Hyperlink"/>
+
+  <css:rule layout-type="object" native-name="ts_box_grey" name="tsboxgrey"/>
+  <css:rule layout-type="object" native-name="ts_figure" name="tsfigure"/>
+
+</css:rules>

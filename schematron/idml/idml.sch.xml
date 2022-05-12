@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:tr="http://transpect.io"
+  queryBinding="xslt2">
+
+  <ns prefix="aid" uri="http://ns.adobe.com/AdobeInDesign/4.0/" />
+  <ns prefix="aid5" uri="http://ns.adobe.com/AdobeInDesign/5.0/" />
+  <ns prefix="idPkg" uri="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" />
+  <ns prefix="idml2xml" uri="http://transpect.io/idml2xml" />
+  <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
+  
+  <xsl:include href="http://customer.le-tex.de/adaptions/xsl/shared-variables.xsl"/>
+  
+  <let name="content-element-names" value="('Content', 'TextVariableInstance')"/>
+
+  <xsl:variable name="top-level-frames" select="/Document/TextFrame/Story[
+      not(
+        (every $p in .//ParagraphStyleRange satisfies (matches($p/@AppliedParagraphStyle, concat($idml2xml:discard-para-regex, '|master_page_objects|title_continued'))))
+        or
+        (every $c in .//Content satisfies ($c/processing-instruction(ACE) = '18')) (: page number :)
+        or 
+        (every $c in .//*[name() = $content-element-names] satisfies (matches($c, '^\s*$'))) 
+      )   
+    ]/@Self" as="attribute(Self)*"/>
+  
+  <let name="multiple-top-level-frames" 
+    value="string(
+      if (string-join(/Document/XmlStory//Content, '') eq '&#xfeff;') (: default XmlStory without actual content :)
+      then count($top-level-frames) gt 1
+      else count($top-level-frames) ge 2
+    )"/>
+	
+	
+	<xsl:variable name="all-stories-content" select="for $frame in $top-level-frames return count(key('idml2xml:content-nodes-per-story', $frame)//Content)" as="xs:integer*"/>
+	<xsl:variable name="main-story" select="for $frame in $top-level-frames return $frame[count(key('idml2xml:content-nodes-per-story', .)//Content) = max($all-stories-content)]"/>
+
+	
+	<xsl:key name="idml2xml:content-nodes-per-story" match="/Document/TextFrame/Story" use="@Self"/>
+  <xsl:key name="idml2xml:spread-by-textframe" match="idml2xml:sidebar[@remap = 'Spread']" use="anchor/@Self"/> 
+	<xsl:key name="idml2xml:pages-by-spread" match="idml2xml:sidebar[@remap = 'Page']" use="@Self"/> 
+	
+	<xsl:key name="idml2xml:element-by-stylename" match="*" use="@AppliedParagraphStyle, @AppliedCharacterStyle, @AppliedCellStyle, @AppliedTableStyle"/>
+
+  <pattern id="idml_unanchored">
+    <rule context="/Document">
+      <report test="$multiple-top-level-frames eq 'true'" id="multiple_top_level_frames" role="warning" 
+        diagnostics="multiple_top_level_frames_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="count(TextFrame)"/> top level frames</span>
+        The document contains <value-of select="count(TextFrame)"/> top-level TextFrames. Please check anchoring.</report>
+    </rule>
+    <rule context="*[@AppliedConditions eq 'Condition/StoryID'][not(ancestor::idml2xml:backingstory)]">
+      <report test="true()" id="unreferenced_StoryID" role="warning" diagnostics="unreferenced_StoryID_de">
+        <span class="srcpath"><xsl:value-of select="ancestor-or-self::*[@srcpath][1]/@srcpath"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unreferenced StoryID condition</span>
+        There is a StoryID 
+        <xsl:choose>
+          <xsl:when test="exists(*:Content)">
+            ('<xsl:value-of select="*:Content"/>')
+          </xsl:when>
+          <xsl:otherwise>
+            around an element called ('<xsl:value-of select="*[1]/local-name()"/>')
+          </xsl:otherwise>
+        </xsl:choose>
+         but apparently this story couldn’t be anchored by its StoryID.
+        Is there another StoryID in the same story so that the concatenated ID doesn’t match a StoryRef any more?
+        <xsl:sequence select="schematron:general-documentation('en', '#StoryID-und-StoryRef')"/>
+      </report>
+    </rule>
+    
+    <rule context="*[@AppliedConditions eq 'Condition/StoryRef'][not(ancestor::idml2xml:backingstory)]">
+      <report test="true()" id="unresolved_StoryRef" role="warning"  diagnostics="unresolved_StoryRef_de">
+        <span class="srcpath"><xsl:value-of select="(ancestor::*[@srcpath])[1]/@srcpath"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unresolved StoryRef condition</span>
+        There is a StoryRef ('<xsl:value-of select="."/>') but apparently no story could be found with a matching StoryID.
+        Are there no or multiple StoryIDs in the story that should be referenced?
+        <xsl:sequence select="schematron:general-documentation('en', '#StoryID-und-StoryRef')"/>
+      </report>
+    </rule>
+    <rule context="*[@AppliedConditions eq 'Condition/StoryRef'][@idml2xml:reason = 'MULT_StoryID']">
+      <report test="true()" id="multiple_Stories_for_StoryRef" role="error" diagnostics="multiple_Stories_for_StoryRef_de">
+        <span class="srcpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multiple Stories for StoryRef Condition</span>
+        Multiple StoryIDs match (contain the same StoryID).
+        <xsl:sequence select="schematron:general-documentation('en', '#StoryID-und-StoryRef')"/>
+      </report>
+    </rule>
+    <rule context="HiddenText[@idml2xml:reason = 'MULT_StoryID']">
+      <report test="true()" id="multiple_StoryIDs" role="error" diagnostics="multiple_StoryIDs_de">
+        <span class="srcpath"><xsl:value-of select=".//*[@srcpath][1]/@srcpath"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Duplicate StoryID Condition</span>
+        This StoryID (<xsl:value-of select="descendant::*[@AppliedConditions = 'Condition/StoryID'][1]/Content"/>) is used in other stories, too. This is forbidden and causes errors. For example duplicate text.
+        <xsl:sequence select="schematron:general-documentation('en', '#StoryID-und-StoryRef')"/>
+      </report>
+    </rule>
+    <rule context="*[matches(@idml2xml:reason , 'KOMBI_Ref')]">
+      <report test="true()" id="Kombi_Ref" role="info" diagnostics="kombi_StoryIDs_de">
+        <span class="srcpath"><xsl:value-of select="(@srcpath,following-sibling::*[1]/descendant::*[@srcpath]/@srcpath, (ancestor::*[@srcpath])[1]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">StoryRef Condition with matching figure</span>
+        This StoryRef (<xsl:value-of select="replace(@idml2xml:reason,'KOMBI_Ref ','')"/>) has no matching story. Instead a matching figure
+        <xsl:value-of select="(descendant::*:KeyValuePair[@Key='letex:fileName']/@Value, following-sibling::*[1]/descendant::*:KeyValuePair[@Key='letex:fileName']/@Value)[1]"/> is anchored here.
+      </report>
+    </rule>
+    <rule context="*[matches(@idml2xml:reason , 'NO_Figure')]">
+      <report test="true()" id="no_figure" role="warning" diagnostics="NO_Figure_de">
+        <span class="srcpath"><xsl:value-of select="(@srcpath,following-sibling::*[1]/descendant::*[@srcpath]/@srcpath, (ancestor::*[@srcpath])[1]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">FigureRef Condition without matching figure</span>
+        This FigureRef (<xsl:value-of select="."/>) has no matching figure. Please check spelling or applied charcterstyle and overrides. 
+      Otherwise the image naming has changed from image export?</report>
+    </rule>
+  	<rule context="TextFrame[Story/@Self = $top-level-frames][Story/@Self != $main-story][.//*[name() = $content-element-names]][not(string-join(.//Content, '') = '&#xfeff;')]">
+<!--      <let name="srcpath" value=".//*[@srcpath][.//CharacterStyleRange[matches(., '\S')]][1]"/>-->
+    	<xsl:variable name="spread-pages" select="key('idml2xml:spread-by-textframe', @Self)/anchor[starts-with(@linkend, 'page_')]/@Self"/>
+      <report test="($multiple-top-level-frames eq 'true' and ./Story[@AppliedTOCStyle = 'n']) and not(every $elt in descendant::*[self::ParagraphStyleRange] satisfies ($elt[matches(@AppliedParagraphStyle, $idml2xml:discard-para-regex)]))" 
+        id="unanchored_frame" role="warning" diagnostics="unanchored_frame_de">
+        <span class="srcpath"><xsl:value-of select="(.//*[matches(., '\S')][@srcpath]/@srcpath)[1]"/>
+<!--          <xsl:value-of select="string-join(($srcpath/preceding-sibling::*([@srcpath][matches(., '\S')])[1]/@srcpath, $srcpath/@srcpath), ' ')"/>-->
+        </span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Frame unanchored</span>
+      	This frame is not anchored. The frame is located one of the following pages: 
+      	<xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/>
+        <xsl:sequence select="schematron:general-documentation('en', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+      </report>
+      <report test="$multiple-top-level-frames eq 'true' and ./Story[@AppliedTOCStyle ne 'n']" 
+        id="unanchored_toc" role="warning" diagnostics="unanchored_toc_de">
+        <span class="srcpath"><xsl:value-of select="(.//*[matches(., '\S')]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Table of Contents unanchored </span>
+        The ToC needs to be anchored using conditional text: In the ToC, there needs to be StoryID conditional 
+        text with an ID (e.g., “ToC”). In the story where the ToC should be inserted, there needs to
+        be StoryRef conditional text with the same ID. If the ToC already happens to be exported
+        at the right position, you may ignore this message.
+        <xsl:sequence select="schematron:general-documentation('en', '#StoryID-und-StoryRef')"/>
+      </report>
+    </rule>
+    <rule context="/Document/Group[@Self = $top-level-frames]">
+      <report test="$multiple-top-level-frames eq 'true'" id="unanchored_group" role="warning" diagnostics="unanchored_group_de">
+        <span class="srcpath"><xsl:value-of select="(.//*[matches(., '\S')]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Group unanchored</span>
+        This group is not anchored so it will not be rendered at the correct location in XML/EPUB. Perhaps it is even discarded later. Check the results and if needed anchor the group.
+        <xsl:sequence select="schematron:general-documentation('en', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+      </report>
+    </rule>
+  </pattern>
+
+  <pattern id="idml_groups">
+    <rule context="*[@idml2xml:reason = 'Group-threaded']">
+      <report test="true()" id="anchored_group_with_unanchored_textframe" diagnostics="anchored_group_with_unanchored_textframe_de" role="warning">
+        <span class="srcpath"><xsl:value-of select="(.//*[matches(., '\S')]/@srcpath)[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Textframe unanchored in Group</span>
+        This textframe is threaded with another textframe which is not part of the surrounding group. This will lead to conversion problems if the group is anchored. 
+        <xsl:sequence select="schematron:general-documentation('en', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="idml_hyperlink_without_destination">
+    <rule context="HyperlinkTextSource">
+      <let name="hyperlink" value="/Document/idml2xml:hyper/Hyperlink[@Source = current()/@Self]"/>
+      <assert test="exists($hyperlink)" id="hyperlink_non_existent" role="Info" diagnostics="hyperlink_non_existent_de">
+        <span class="srcpath"><xsl:value-of select="(ancestor::*[@srcpath][1]/@srcpath)[1]"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hyperlink not found</span>
+        There is no hyperlink for source '<value-of select="."/>'.</assert>
+      <report test="$hyperlink[Properties/Destination[not(@type = ('object', 'list'))]]" 
+        id="hyperlink_destination_not_object" role="warning" diagnostics="hyperlink_destination_not_object_de">
+        <!-- This ID is called 'hyperlink_destination_not_object' for historical reasons. List destinations
+          will be converted to file: URIs -->
+        <span class="srcpath"><xsl:value-of select="(if ($hyperlink) then ((ancestor-or-self::*[@srcpath][1]/@srcpath)[1]) else ((ancestor::*[@srcpath][1]/@srcpath)[1]))"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hyperlink destination not found</span>
+          This hyperlink’s destination cannot be determnined. Source text: '<value-of
+          select="."/>'. Destination type: '<value-of select="$hyperlink/Properties/Destination/@type"/>'. Destination content: '<value-of 
+            select="$hyperlink/Properties/Destination"/>'.</report>
+    </rule>
+    <rule context="ParagraphDestination[Properties[Label[KeyValuePair[@Key = 'px:Foot2EndnoteHyperlink']]]]">
+      <report test="(preceding-sibling::*[1][self::Content])" id="endnote_para_missing_paragraphsplitter" role="warning" diagnostics="endnote_para_missing_paragraphsplitter_de">
+        <span class="category">Export Problems</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Missing paragraph splitter</span>
+        <span class="srcpath"><xsl:value-of select="concat((ancestor::*[self::ParagraphStyleRange][@srcpath])[1]/@srcpath, ';n=', count(preceding-sibling::Br) + count(../preceding-sibling::*[self::CharacterStyleRange]/Br) + 2)"/></span>
+          In one of the next paragraphs a paragraph splitter seems to be lost and two paras are merged. There is no new paragraph before the anchor of the endnote paragraph:
+  <br xmlns="http://www.w3.org/1999/xhtml"/>
+  <br xmlns="http://www.w3.org/1999/xhtml"/>
+          <xsl:value-of select="string-join(following-sibling::*[1]/descendant-or-self::Content/text(), '')"></xsl:value-of>
+        </report>
+    </rule>
+  </pattern>
+	
+  <pattern id="idml_changemarkup">
+    <rule context="/Document">
+      <report test="descendant::*[self::Story][@TrackChanges = 'true']" 
+        id="track_changes" role="warning" diagnostics="track_changes_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Track changes badly supported</span>
+       In this document the track changes option was used. In some cases this leads to IDML export problems, such as nested Hyperlinks or split paras. If other strange errors occur, tr to export without this option set.
+      </report>
+    </rule>
+   </pattern>
+
+  <pattern id="idml_colors">
+    <rule context="Color">
+      <assert test="@Space = ('CMYK', 'RGB')" 
+        id="critical_colorspace" role="warning" diagnostics="critical_colorspace_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Colorspace</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Colorspace not supported</span>
+        A color definition uses colors that are neither in RGB or CMYK colorspace. The color '<value-of select="@Name"/>' is in colorspace '<value-of select="@Space"/>'. 
+        If it is a Pantone Coated Color it is mapped without guarantee. If it is of another type it may result in invalid color values.
+        <xsl:sequence select="schematron:general-documentation('en', '#Sonderfarben')"/>
+      </assert>
+    </rule>
+  	<rule context="/Document/idPkg:Styles/*/*/*/*[@*[local-name() = ('FillColor', 'Color')][starts-with(., 'MixedInk/')]]">
+  		<report test="exists(key('idml2xml:element-by-stylename', @Self))" 
+  			id="mixed_ink_color" role="warning" diagnostics="mixed_ink_color_de">
+  			<span class="srcpath">BC_orphans</span>
+  			<span class="category">Colorspace</span>
+  			<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mixed Inks not supported</span>
+  			A color definition uses colors that are neither RGB nor CMYK. Instead a Mixed Ink was used. The color '<xsl:value-of select="replace(@*[local-name() = ('FillColor', 'Color')][starts-with(., 'MixedInk/')][1], 'MixedInk/', '')"/>' cannot be converted to RGB and will be discarded. 
+  			<xsl:sequence select="schematron:general-documentation('en', '#Sonderfarben')"/>
+  		</report>
+  	</rule>
+  </pattern>
+  
+  <pattern id="idml_conditional_text">
+    <!--<rule context="HiddenText">
+      <assert test=".//*[@AppliedConditions][1]/@AppliedConditions
+        [. = ('Condition/StoryRef', 'Condition/StoryID', 'Condition/FigureRef', 'Condition/PageStart', 'Condition/PageEnd')]"
+        id="conditional_text_hidden" role="error" diagnostics="conditional_text_hidden_de">
+        <span class="srcpath"><xsl:value-of select="descendant-or-self::*[@srcpath and @AppliedConditions][1]/@srcpath"/></span>
+        <span class="issue" style="font-weight:bold; text-decoration:underline; display:inline-block; margin-bottom:1em;"  xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of
+          select="replace((descendant-or-self::*[@AppliedConditions])[1]/@AppliedConditions, '^Condition/', '')"/> Condition hidden:</span><br xmlns="http://www.w3.org/1999/xhtml"/>
+        On this element conditional text was hidden, that doesn't belong to the conditions that have to be hidden. The condition is '<xsl:value-of
+          select="replace((descendant-or-self::*[@AppliedConditions])[1]/@AppliedConditions, '^Condition/', '')"/>'.<br xmlns="http://www.w3.org/1999/xhtml"/>Allowed hidden conditions are: StoryRef, StoryID, FigureRef, PageStart, PageEnd.</assert>
+    </rule>-->
+    <!-- above is now checked with following rule -->
+    <rule context="/Document/idml2xml:cond/Condition[@Name = ('EOnly', 'EpubAlternative', 'PrintOnly')]">
+      <report test="@Visible = 'false'" role="error" id="hidden_condition" diagnostics="hidden_condition_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Conditional text</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Conditional text '<xsl:value-of select="@Name"/>' hidden</span>
+        The <value-of select="@Name"/>-condition must not be hidden for IDML export.
+        <xsl:sequence select="schematron:general-documentation('en', '#Bedingter-Text')"/>
+      </report>
+    </rule>
+    <rule context="/Document/idml2xml:cond/Condition[@Name = ('FigureRef', 'StoryRef', 'StoryID', 'PageStart', 'PageEnd')]">
+      <report test="@Visible = 'true'" role="error" id="visible_condition" diagnostics="visible_condition_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Conditional text</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Conditional text '<xsl:value-of select="@Name"/>' visible</span>
+        The <value-of select="@Name"/>-condition must be hidden for IDML export.
+        <xsl:sequence select="schematron:general-documentation('en', '#Bedingter-Text')"/>
+      </report>
+    </rule>
+    <rule context="*[@AppliedConditions][matches(@AppliedConditions, 'Condition/.+?Condition/')]">
+      <report test="true()"
+        id="several_conditional_texts" role="error" diagnostics="several_conditional_texts_de">
+        <span class="srcpath"><xsl:value-of select="(@srcpath, *[@srcpath][1]/@srcpath)[1]"/></span>
+        <span class="category">Conditional text</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multiple Conditions</span>
+        More than one condition (conditional text) are applied to this <xsl:value-of select="local-name(.)"/>. This will most probably lead to conversion problems.
+        <br xmlns="http://www.w3.org/1999/xhtml"/>Following conditions are applied to the text '<xsl:value-of select="string-join(descendant::Content, '')"/>': <br xmlns="http://www.w3.org/1999/xhtml"/>
+        '<xsl:value-of select="replace(string-join(tokenize(@AppliedConditions, ' Condition/'), ', '), '^Condition/', '')"/>'.
+        <xsl:sequence select="schematron:general-documentation('en', '#Bedingter-Text')"/>
+      </report>
+    </rule>
+    <rule context="*[@AppliedConditions][@AppliedConditions[matches(., '\S')]]">
+      <!-- It can happen that en empty attribute is created -->
+      <assert test="@AppliedConditions = ('Condition/StoryRef', 'Condition/StoryID', 'Condition/FigureRef', 'Condition/PageStart', 'Condition/PageEnd', 'Condition/EpubAlternative', 'Condition/PrintOnly', 'Condition/EOnly', 'Condition/EPDFOnly')"
+        id="unknown_conditional_text" role="warning" diagnostics="unknown_conditional_text_de">
+        <span class="srcpath"><xsl:value-of select="descendant-or-self::*[@srcpath][1]/@srcpath"/></span>
+        <span class="category">Conditional text</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">
+          Unknown Condition <xsl:value-of select="replace(descendant-or-self::*[@AppliedConditions][1]/@AppliedConditions, '(^|\s)Condition/', '')"/></span>
+        An undefined conditional text item was used. The name of the condition is: '<value-of
+          select="replace(descendant-or-self::*[@AppliedConditions][1]/@AppliedConditions, '(^|\s)Condition/', '')"/>'. If it has a special meaning please contact the technical project managers to implement those. 
+        To avoid problems these passages are discarded.<br xmlns="http://www.w3.org/1999/xhtml"/>Allowed Conditions are: StoryRef, StoryID, FigureRef, PageStart, PageEnd, EpubAlternative, PrintOnly, EOnly, EPDFOnly.
+        <xsl:sequence select="schematron:general-documentation('en', '#Bedingter-Text')"/>
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="idml_open_type_features">
+    <rule context="OpenTypeFeatures[ListItem]">
+      <report test="true()" id="open_type_list" role="warning" diagnostics="open_type_list_de">
+        <span class="srcpath"><xsl:value-of select="(ancestor::*[@srcpath][1])[1]/@srcpath"/></span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">OpenType features</span>
+        This element contains characters in OpenType (<xsl:value-of select="(ancestor::*[Content])[1]/Content"/>). This OpenType feature cannot be converted correctly.
+        <xsl:sequence select="schematron:general-documentation('en', '#Schriftkodierung')"/>
+      </report>
+    </rule>
+  </pattern>
+
+  <pattern id="idml_not_supported_object">
+    <rule context="MultiStateObject">
+      <report test="true()"
+        id="not_supported_multistateobject" role="warning" diagnostics="not_supported_multistateobject_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multi state object not supported</span>
+        A multi state object was used in InDesign. We do not support this interactivity feature.
+        <br xmlns="http://www.w3.org/1999/xhtml"/>Following links are defined as states inside: '<xsl:value-of select="string-join(.//Link/@LinkResourceURI, ', ')"/>'</report>
+    </rule>
+    <rule context="TableStyle[@StartRowStrokeCount or @StartColumnStrokeCount]">
+      <report test="@StartRowStrokeCount != '0' or @StartColumnStrokeCount != '0'"
+        id="not_supported_table-style-property" role="warning" diagnostics="not_supported_table-style-property_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Alternating row or column property not supported</span>
+        Table style »<xsl:value-of select="replace(@Name, '$ID/', '')"/>« has alternating row or column properties activated. transpect doesn't support this yet. 
+        Please make sure whether tables with this style or based on this style look ok. If not do not use the feature and style the cells/borders manually or via the cell styles.</report>
+    </rule>
+    <rule context="Table[@StartRowStrokeCount or @StartColumnStrokeCount]">
+      <report test="@StartRowStrokeCount != '0' or @StartColumnStrokeCount != '0'"
+        id="not_supported_table-property" role="warning" diagnostics="not_supported_table-property_de">
+        <span class="srcpath"><xsl:value-of select="(@srcpath, *[@srcpath][1]/@srcpath)[1]"/></span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Alternating row or column property not supported</span>
+        Table has alternating row or column properties activated. transpect doesn't support this yet. 
+        Please make sure whether the table looks ok. If not do not use the feature and style the cells/borders manually or via the cell styles.</report>
+    </rule>
+  </pattern>
+  
+  
+  <pattern id="idml_empty_textframe">
+    <rule context="ParagraphStyleRange[descendant::TextFrame[Story
+                                                                [every $p in ParagraphStyleRange satisfies 
+                                                                 $p[every $c in CharacterStyleRange satisfies 
+                                                                   $c[not(exists(*[self::Content or self::Table or self::Rectangle[Image]]))]]
+                                                                ]
+                                                             ]
+                                       ]">
+      <report test="true()"
+        id="anchored_textframe_without_content" role="warning" diagnostics="anchored_textframe_without_content_de">
+        <span class="srcpath"><xsl:value-of select="@srcpath"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Anchored Textframe without content</span>
+        In this paragraph exists an empty text frame. Whatever the intention was, it will be discarded. 
+        If it should represent a graphic, use a graphic instead. In any case check the conversion results converning this paragraph.
+        </report>
+    </rule>
+    <rule context="Document/TextFrame[node()]">
+      <report test="not(descendant::Content) and not(descendant::Rectangle[Image or PDF])"
+        id="unanchored_textframe_without_content" role="warning" diagnostics="unanchored_textframe_without_content_de">
+      	<xsl:variable name="spread-pages" select="key('idml2xml:spread-by-textframe', @Self)/anchor[starts-with(@linkend, 'page_')]/@Self"/>
+        <span class="srcpath"><xsl:value-of select="((descendant::*[@srcpath])[1]/@srcpath, 'BC_orphans')[1]"/></span>
+        <span class="category">Anchoring</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unanchored Textframe without content</span>
+      	Was placed on one of these pages: <xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/>. Delete it for a clean document.
+        </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="idml_index">
+    <rule context="Topic[count(ancestor::Topic) eq 3][matches(@Name, '\S')]">
+      <report test="count(tokenize(@Self, 'Topicn')) ge 5" id="indexentry-too-deeply-nested" diagnostics="indexentry-too-deeply-nested_de" role="warning">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Index</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Index entry too deeply nested</span>
+        The index entry »<xsl:value-of select="string-join(ancestor-or-self::Topic/@Name, ' → ')"/>« is too deeply nested to convert it properly.
+      </report>
+    </rule>
+    <rule context="Topic[CrossReference]">
+      <report test="count(ancestor::Topic) ge 1" id="index-see-entry-too-deep" role="warning" diagnostics="index-see-entry-too-deep_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Index</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Index see entry too deeply nested</span>
+        The index entry »<xsl:value-of select="string-join(ancestor-or-self::Topic/@Name, ' → ')"/>« has a see reference. Index entries of this kind may only be on the first level.
+      </report>
+    </rule>
+     <rule context="TextFrame//TextFrame//ParagraphStyleRange[.//PageReference]">
+    	<let name="spread-pages" value="key('idml2xml:spread-by-textframe', ancestor::*[self::TextFrame][1]/@Self)/anchor[starts-with(@linkend, 'page_')]/@Self"/>
+      <assert test="key('idml2xml:spread-by-textframe', (ancestor::*[self::Group][1], ancestor::*[self::TextFrame][1])[1]/@Self)[self::idml2xml:sidebar]"
+        id="anchored_index_entries" role="warning" diagnostics="anchored_index_entries_de">
+      	<!-- If the textframes are anchored with conditional text, they do NOT appear in the spread-sidebar element-->
+        <span class="srcpath"><xsl:value-of select="(@srcpath, ancestor-or-self::*[@srcpath]/@srcpath, descendant::*[@srcpath]/@srcpath)[1]"/></span>
+        <span class="category">Index</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Anchored index entry</span>
+       	On page <xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/> a textframe was anchored that contains index entries. 
+      	Please check in the index whether the correct page is displayed. If not anchor via StoryID/StoryRef. Ignore this message if the frame is anchored on the same page as the text frame is. 
+      	This is only a problem if the anchor point of the object is on the other page of the spread.
+        </assert>
+    </rule>
+  </pattern>
+  
+   <pattern id="idml_info">
+    <rule context="/">
+      <let name="images" value="//*[Properties[Label[KeyValuePair[@Key = 'letex:fileName']]]]"/>
+      <report test="count($images) gt 0" id="images-exported" diagnostics="images-exported_de" role="Info">
+        <span class="srcpath"><xsl:value-of select="'BC_orphans'"/></span>
+        <span class="category">General information</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Image export script used</span>
+          In this file the images were exported via the image export script.
+          <br xmlns="http://www.w3.org/1999/xhtml"/>
+          <table xmlns="http://www.w3.org/1999/xhtml">
+            <tr><th><b>original name</b></th><th><b>new name (bold = difference)</b></th></tr>
+            <xsl:for-each select="$images">
+              <xsl:sort select="Properties/Label/KeyValuePair[@Key = 'letex:fileName']/@Value" case-order="lower-first" data-type="text" order="ascending"/>
+              <xsl:variable name="orig-name" select="replace(descendant::*[@LinkResourceURI][1]/@LinkResourceURI, '^.+/([^/]+)$', '$1')"/>
+              <xsl:variable name="orig-base-name" select="replace($orig-name, '^(.+)\.[^\.]+$', '$1')"/>
+              <xsl:variable name="new-name" select="Properties/Label/KeyValuePair[@Key = 'letex:fileName']/@Value"/>
+              <xsl:variable name="new-base-name" select="replace($new-name, '^(.+)\.[^\.]+$', '$1')"/>
+              <tr><td><xsl:value-of select="$orig-name"/></td>
+              <td>
+                <xsl:choose>
+                  <xsl:when test="$orig-name = $new-name">
+                    <xsl:value-of select="$new-name"/>
+                  </xsl:when>
+                  <xsl:when test="$orig-base-name = $new-base-name">
+                    <xsl:value-of select="$new-base-name"/><b><xsl:value-of select="replace($new-name, '^(.+)(\.[^\.]+)$', '$2')"/></b>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <b><xsl:value-of select="$new-name"/></b>
+                  </xsl:otherwise>
+                </xsl:choose>
+            </td></tr>
+            </xsl:for-each>
+          </table>
+       </report>
+    </rule>
+  </pattern>
+  
+  <diagnostics>
+    <diagnostic id="not_supported_table-style-property_de" xml:lang="de">
+        <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">abwechselnde Zeilen- oder Spaltenmuster in Tabellenformatoptionen nicht unterstützt</span>
+        Das Tabellenformat »<xsl:value-of select="replace(@Name, '$ID/', '')"/>« hat abwechselnde Zeilen- oder Spaltenmuster in den Tabellenformatoptionen eingestellt. transpect unterstützt dieses Feature bisher nicht.
+         Bitte prüfen Sie, ob Tabellen mit diesem Format oder darauf basierenden Formaten ok aussehen. Falls nicht, verwenden Sie bitte nicht diese Einstellung, sondern weisen manuell oder über das Zellenformat
+          die entsprechenden Linien- oder Zelleneigenschaften zu.</diagnostic>
+    <diagnostic id="not_supported_table-property_de" xml:lang="de">
+        <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">abwechselnde Zeilen- oder Spaltenmuster in Tabellen nicht unterstützt</span>
+        Die Tabellen hat abwechselnde Zeilen- oder Spaltenmuster in den Tabellenformatoptionen eingestellt. transpect unterstützt dieses Feature bisher nicht.
+         Bitte prüfen Sie, ob die Tabelle ok aussieht. Falls nicht, verwenden Sie bitte nicht diese Einstellung, sondern weisen manuell oder über das Zellenformat
+          die entsprechenden Linien- oder Zelleneigenschaften zu.</diagnostic>
+    <diagnostic id="track_changes_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      In Ihrem Dokument wurde mit Änderungsverfolgung gearbeitet. Dieses Feature unterstützt transpect nur mäßig. Sollten im Report viele Fehler auftauchen, die Sie auf keine anderen Ursachen zurückführen können 
+      (verschachtelte Absätze oder Links), exprtieren Sie besser eine IDML-Datei ohne die Änderungsverfolgung.
+    </diagnostic>
+    <diagnostic id="endnote_para_missing_paragraphsplitter_de" xml:lang="de">
+      <span class="category">Exportfehler</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Absatzmarke in Endnotenabsatz verschwunden</span>
+      Beim Export nach IDML ist vor diesem Absatz eine Absatzmarke verloren gegangen. Das passiert in bisher ungeklärten Fällen vor Endnotenabsatzankern. 
+      Für die Konvertierung wird dieses Problem gelöst. Bitte achten Sie aber darauf, dass nicht mit der IDML-Datei weitergearbeitet wird, damit nicht im Print zwei Endnoten zu einer verschmelzen. 
+      Arbeiten Sie immer nur in Ihrer InDesign-Datei und nutzen den IDML-Export nur zur Konvertierung und zum Sichern.
+      Sollte es aus irgendwelchen Gründen unerlässlich sein mit der IDML-Datei weiterzuarbeiten, dann können Sie im vorherigen Absatz der InDesign-Datei ein Leerzeichen vor die Absatzmarke einfügen 
+      (also an das Ende des vorherigen Absatzes), das verhindert das Verschwinden der Absatzmarke.
+  <br xmlns="http://www.w3.org/1999/xhtml"/>
+  <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Falls die Meldung an einer nicht aussagekräftigen Stelle erscheint steht hier zum Finden der Text des Absatzes, welcher mit dem vorherigen Absatzes verschmilzt:
+  <br xmlns="http://www.w3.org/1999/xhtml"/>
+    <xsl:value-of select="string-join(following-sibling::*[1]/descendant-or-self::Content/text(), '')"></xsl:value-of>
+    </diagnostic>
+    <diagnostic id="images-exported_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bildexportskript wurde verwendet</span>
+      <span class="category">Generelle Informationen</span>
+      In dieser InDesign-Datei wurde das Bildexportskript verwendet, wodurch sich gegebenfalls Bildnamen geändert haben.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      <table xmlns="http://www.w3.org/1999/xhtml">
+        <tr><th><b>Originalname</b></th><th><b>Neuer Name (fett = Änderung)</b></th></tr>
+        <xsl:for-each select="$images">
+          <xsl:sort select="Properties/Label/KeyValuePair[@Key = 'letex:fileName']/@Value" case-order="lower-first" data-type="text" order="ascending"/>
+           <xsl:variable name="orig-name" select="replace(descendant::*[@LinkResourceURI][1]/@LinkResourceURI, '^.+/([^/]+)$', '$1')"/>
+           <xsl:variable name="orig-base-name" select="replace($orig-name, '^(.+)\.[^\.]+$', '$1')"/>
+           <xsl:variable name="new-name" select="Properties/Label/KeyValuePair[@Key = 'letex:fileName']/@Value"/>
+           <xsl:variable name="new-base-name" select="replace($new-name, '^(.+)\.[^\.]+$', '$1')"/>
+          <tr><td><xsl:value-of select="$orig-name"/></td><td>
+            <xsl:choose>
+              <xsl:when test="$orig-name = $new-name">
+                <xsl:value-of select="$new-name"/>
+              </xsl:when>
+              <xsl:when test="$orig-base-name = $new-base-name">
+                <xsl:value-of select="$new-base-name"/><b><xsl:value-of select="replace($new-name, '^(.+)(\.[^\.]+)$', '$2')"/></b>
+              </xsl:when>
+              <xsl:otherwise>
+                <b><xsl:value-of select="$new-name"/></b>
+              </xsl:otherwise>
+            </xsl:choose>
+        </td></tr>
+        </xsl:for-each>
+      </table>
+    </diagnostic>
+    <diagnostic  id="anchored_index_entries_de" xml:lang="de">
+      <span class="category">Index</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Verankerter Rahmen mit Indexeintrag</span>
+      Auf dem Druckbogen mit Seiten <xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/> 
+      befindet sich ein verankerter Textrahmen, der Indexeinträge enthält.
+      Wenn der Textrahmen auf derselben Seite verankert wurde, auf der er liegt, können Sie diese Meldung ignorieren. 
+      Wurde der Textrahmen jedoch auf der anderen Seite des Druckbogens verankert, wird die Seitenzahl im Register falsch ausgegeben. 
+      Bitte überprüfen Sie, ob die Seitenzahl dort korrekt ist. Wenn nicht, verankern Sie mit StoryID/StoryRef oder verankern den Textrahmen auf der Seite, auf der er steht.
+    </diagnostic>
+    <diagnostic id="unanchored_textframe_without_content_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unverankerter Rahmen ohne Inhalt</span>
+    	<xsl:variable name="spread-pages" select="key('idml2xml:spread-by-textframe', @Self)/anchor[starts-with(@linkend, 'page_')]/@Self"/>
+    	Auf einer der Seiten <xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/> befindet sich ein unverankerter Textrahmen ohne Inhalt. Bitte entfernen Sie diesen.
+    </diagnostic>
+    <diagnostic id="indexentry-too-deeply-nested_de" xml:lang="de">
+      <span class="category">Index</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Indexeintrag zu tief verschachtelt</span>
+      Der Indexeintrag »<xsl:value-of select="string-join(ancestor-or-self::Topic/@Name, ' → ')"/>« wurde zu tief verschachtelt Dies kann während der Konvertierung momentan nicht korrekt übernommen werden.
+    </diagnostic>
+    <diagnostic id="index-see-entry-too-deep_de" xml:lang="de">
+      <span class="category">Index</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Indexeintrag mit Siehe-Verweis wurde verschachtelt</span>
+      Der Indexeintrag »<xsl:value-of select="string-join(ancestor-or-self::Topic/@Name, ' → ')"/>« hat einen Siehe-Verweis. Dies kann nur verarbeitet werden, wenn sich der Eintrag auf der obersten Themenstufe befindet.
+    </diagnostic>
+    <diagnostic id="anchored_textframe_without_content_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leerer Textrahmen verankert</span>
+      In diesem Absatz wurde ein leerer Textrahmen verankert. Dieser wird entfernt. Falls der Rahmen benutzt wurde, um eine Grafikelement zu simulieren, nutzen Sie stattdessen eine echte Grafik.
+      In jedem Fall müssen Sie überprüfen, ob die Konvertierungsergebnisse hinsichtlich dieses Absatzes korrekt sind.
+    </diagnostic>
+    <diagnostic id="critical_colorspace_de" xml:lang="de">
+      <span class="category">Farbraum</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Farbraum nicht unterstützt</span>
+      Eine Farbfeld-Definition benutzt Farbwerte, die weder auf CMYK, noch auf RGB basieren. Die Farbe '<value-of select="@Name"/>' wurde stattdessen im Farbraum '<value-of select="@Space"/>' definiert. 
+      Falls es sich um eine Pantone-Coated-Farbe handelt, wird diese nach RGB gemappt, jedoch ohne Gewähr auf Korrektheit. Falls es sich um eine andere Volltonfarbe oder eine Farbe in einem anderen Farbraum handelt, wird der Wert 
+      nicht korrekt übernommen.
+      Das kann zu ungültigen Farbwerten und damit Schemaverletzungen, sowie Darstellungsfehlern führen.
+      <br xmlns="http://www.w3.org/1999/xhtml"/> <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Sie können solche Farben für den Export entweder nach RGB oder CMYK umwandeln.
+      <xsl:sequence select="schematron:general-documentation('de', '#Sonderfarben')"/>
+    </diagnostic>
+  	<diagnostic id="mixed_ink_color_de" xml:lang="de">
+  		<span class="category">Farbraum</span>
+	  	<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mischdruckfarben nicht unterstützt</span>
+  		Eine Farbfeld-Definition benutzt Farbwerte, die weder auf CMYK, noch auf RGB basieren. Stattdessen wurde ein Mischdruckfarbe namens 
+  		'<xsl:value-of select="replace(@*[local-name() = ('FillColor', 'Color')][starts-with(., 'MixedInk/')][1], 'MixedInk/', '')"/>' verwendet, 
+  		die nicht sinnvoll nach RGB umgerechnet werden kann und deswegen entfernt wird. 
+  			<xsl:sequence select="schematron:general-documentation('de', '#Sonderfarben')"/>
+  	</diagnostic>
+    <diagnostic id="not_supported_multistateobject_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Feature »Multi state object« nicht unterstützt</span>
+      In InDesign wurde ein Multi-State-Objekt verwendet (siehe Fenster → Interaktivität → Objektstatus). Interaktivitätsfeatures werden zur Zeit nicht unterstützt. <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Folgende Verknüpfungen sind darin als Zustände definiert: '<xsl:value-of select="string-join(.//Links/@LinkResourceURI, ', ')"/>'.
+    </diagnostic>
+    <diagnostic id="several_conditional_texts_de" xml:lang="de">
+      <span class="category">Bedingter Text</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mehrere Bedingungen zugewiesen</span>
+      Diesem <xsl:value-of select="local-name(.)"/> wurden mehr als eine Bedingung (Instanzen von bedingtem Text) zugewiesen. Dies wird höchstwahrscheinlich zu Konvertierungsproblemen führen.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>Folgende Bedingungen wurden dem Text '<xsl:value-of select="string-join(descendant::Content, '')"/>' zugewiesen: <br xmlns="http://www.w3.org/1999/xhtml"/>
+      '<xsl:value-of select="replace(string-join(tokenize(@AppliedConditions, ' Condition/'), ', '), '^Condition/', '')"/>'.
+      <xsl:sequence select="schematron:general-documentation('de', '#Bedingter-Text')"/>
+    </diagnostic>
+    <diagnostic id="unanchored_group_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Gruppierung nicht verankert</span>
+      Diese Gruppe/Gruppierung ist unverankert und wird deswegen nicht an der richtigen Stelle im XML/EPUB erscheinen, wenn nicht sogar entfernt werden. 
+      Unverankerte Objekte werden an willkürliche Positionen exportiert, bitte überprüfen Sie den Verbleib dieser Gruppe!
+      <xsl:sequence select="schematron:general-documentation('de', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+    </diagnostic>
+    <diagnostic id="anchored_group_with_unanchored_textframe_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Gruppierung mit verkettetem Textrahmen außerhalb der Gruppe</span>
+      Dieser Textrahmen ist mit einem anderen Textrahmen verkettet, der außerhalb einer Gruppe steht.
+      Dies wird bei der Konvertierung nicht berücksichtigt und wird vor allem dann zu Fehlern führen, wenn die Gruppe verankert ist.
+      <xsl:sequence select="schematron:general-documentation('de', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+    </diagnostic>
+    <diagnostic id="conditional_text_hidden_de" xml:lang="de">
+      <span class="category">Bedingter Text</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">
+        Bedingung <xsl:value-of select="replace(.//*[@AppliedConditions][1]/@AppliedConditions, '^Condition/', '')"/> ausgeblendet</span>
+      An diesem ausgeblendeten Element wurde bedingter Text benutzt, der nicht ausgeblendet werden darf. Die Bedingung ist '<xsl:value-of
+        select="replace((descendant-or-self::*[@AppliedConditions])[1]/@AppliedConditions, '^Condition/', '')"/>'. Bedingungen, die ausgeblendet sein dürfen, sind: StoryRef, StoryID, FigureRef, PageStart, PageEnd. Andere ausgeblendete Elemente können bei der Konvertierung Probleme verursachen.
+      <xsl:sequence select="schematron:general-documentation('de', '#Bedingter-Text')"/>
+    </diagnostic>
+    <diagnostic id="unknown_conditional_text_de" xml:lang="de">
+      <span class="category">Bedingter Text</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">
+      Unbekannte Bedingung <xsl:value-of select="replace(descendant-or-self::*[@AppliedConditions][1]/@AppliedConditions, '(^|\s)Condition/', '')"/></span>
+      Bedingter Text, der nicht den Namenskonventionen entspricht wurde hier verwendet. Der Name der Bedingung ist: '<xsl:value-of select="replace(descendant-or-self::*[@AppliedConditions][1]/@AppliedConditions, '(^|\s)Condition/', '')"/>'. Falls dieser Text eine bestimmte Funktion erfüllt oder erfüllen soll, kontaktieren Sie bitte den technischen Projektmanager, 
+      damit er diese implementieren kann. Da aus unbekanntem, wie auch aus eingeblendetem bedingtem Text teilweise Probleme entstehen können, wurde diese Passage aufgelöst.<br xmlns="http://www.w3.org/1999/xhtml"/>
+      Erlaubte Bedingungen sind: StoryRef, StoryID, FigureRef, PageStart, PageEnd, EpubAlternative, PrintOnly, EOnly, EPDFOnly.
+      <xsl:sequence select="schematron:general-documentation('de', '#Bedingter-Text')"/>
+    </diagnostic>
+    <diagnostic id="multiple_Stories_for_StoryRef_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Doppelte StoryID-Bedingungen</span>
+      Mehrere identische StoryIDs wurden gefunden. Also wurde in mehreren Textabschnitten demselben Text die Bedingung StoryID zugewiesen. Dadurch wird eine sinnvolle Referenzierung auf jeden Fall scheitern!
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic> 
+    <diagnostic id="multiple_StoryIDs_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">StoryID-Bedingung in unterschiedlichen Textrahmen</span>
+      Diese StoryID (<xsl:value-of select="descendant::*[@AppliedConditions = 'Condition/StoryID'][1]/Content"/>) kommt noch in weiteren Textrahmen vor.
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic> 
+    <diagnostic id="kombi_StoryIDs_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">StoryRef-Bedingung mit passender Abbildung</span>
+      Diese StoryRef (<xsl:value-of select="replace(@idml2xml:reason,'KOMBI_Ref ','')"/>) hat keine passende StoryID, stattdessen wurde
+      die passende Abbildung <xsl:value-of select="(descendant::*:KeyValuePair[@Key='letex:fileName']/@Value, following-sibling::*[1]/descendant::*:KeyValuePair[@Key='letex:fileName']/@Value)[1]"/> platziert.
+      <xsl:value-of select="replace(@idml2xml:reason,'KOMBI_Ref ',''), (@srcpath,following-sibling::*[1]/descendant::*[@srcpath]/@srcpath)[1]"/>
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic>
+    <diagnostic id="unreferenced_StoryID_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Nicht referenzierte StoryID-Bedingung</span>
+      Es existiert ein bedingter Text StoryID 
+      <xsl:choose>
+        <xsl:when test="*:Content">
+          ('<xsl:value-of select="*:Content"/>'), aber der Textrahmen konnte nicht anhand seiner StoryID verankert werden. Möglicherweise existiert eine weitere StoryID 
+          im selben Textrahmen? Durch ein Aneinanderhängen der IDs kann dann die entsprechende StoryRef nicht mehr gefunden werden.
+        </xsl:when>
+        <xsl:otherwise>
+          um ein Element namens ('<xsl:value-of select="*[1]/local-name()"/>'). Ist die Bedingung aus Versehen um einen Link, eine Ankermarke etc., 
+          eingefügt worden? transpect erwartet textuelle Inhalte.
+        </xsl:otherwise>
+      </xsl:choose>
+      
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/></diagnostic>
+    <diagnostic id="unresolved_StoryRef_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">StoryRef-Bedingung ohne passende StoryID-Bedingung</span>
+      Es existiert ein bedingter Text StoryRef ('<xsl:value-of select="."/>'), aber es konnte keine zugehöriger Textrahmen mit einer entsprechenden StoryID gefunden werden. 
+        Möglicherweise fehlt die entsprechende StoryID oder es existieren mehrere StoryIDs in dem Textrahmen, der referenziert werden soll. (Dann würden diese aneinandergehängt.). Prüfen Sie im Zweilfelsfall auch, ob sich nicht ungewollte Leerzeichen eingeschlichen haben.
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic>
+    <diagnostic id="NO_Figure_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">FigureRef-Bedingung ohne passendes Bild</span>
+      Es existiert ein bedingter Text FigureRef ('<xsl:value-of select="."/>'), aber es konnte kein zugehöriges Bild mit einer entsprechenden Benennung gefunden werden. 
+      Prüfen Sie auf Zeichenformate oder manuelle Overrides in der Bedingung und im Zweilfelsfall auch, ob sich nicht ungewollte Leerzeichen eingeschlichen haben. Vielleicht hat
+      sich auch der Bildnamen durch das Bildexport-Skript geändert (bspw. bei Gruppierungen)? 
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic>
+    <diagnostic id="multiple_top_level_frames_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="count(TextFrame)"/> Rahmen auf oberster Ebene</span>
+      Dieses Dokument enthält '<value-of select="count(TextFrame)"/>' Textrahmen auf oberster Ebene. Bitte überprüfen Sie, ob die Rahmen nicht verankert werden
+      sollten. Nicht verankerte Rahmen werden beim Export ans Ende des Dokumentes gestellt und sind im XML und eBook dann nicht korrekt eingeordnet. Diese Meldung schließt Rahmen mit Kolumnentiteln und automatischer Seitenzählung aus, 
+      sofern die festgelegten Absatzformate für diese Elemente korrekt verwendet wurden.
+      <xsl:sequence select="schematron:general-documentation('de', '#StoryID-und-StoryRef')"/>
+    </diagnostic>
+    <diagnostic id="unanchored_frame_de" xml:lang="de">
+    	<xsl:variable name="spread-pages" select="key('idml2xml:spread-by-textframe', @Self)/anchor[starts-with(@linkend, 'page_')]/@Self"/>
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Textrahmen nicht verankert</span>
+      Dieser Textrahmen ist unverankert. Sie können diese Meldung ignorieren, wenn es sich um den Haupt-Textabschnitt handelt. 
+      Der Rahmen befindet sich im InDesign auf einer der folgenden Seiten: <xsl:sequence select="string-join(key('idml2xml:pages-by-spread', $spread-pages)/@pos-in-book, ' / ')"/>.
+      <xsl:sequence select="schematron:general-documentation('de', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+    </diagnostic>
+    <diagnostic id="unanchored_toc_de" xml:lang="de">
+      <span class="category">Verankerungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Inhaltsverzeichnis nicht verankert</span>
+      Das Inhaltsverzeichnis sollte mit bedingtem Text verankert werden: Innerhalb des Textrahmens, in welchem das Inhaltsverzeichnis erzeugt wurde, 
+      müssen Sie einen Text mit der Bedingung StoryID markieren (z.B. 'IHV'). Dieser ist dann die 
+      ID dieses Textabschnittes. In dem Textabschnitt, in dem das Inhaltsverzeichnis so »verankert« werden soll,
+      muss mit bedingtem Text [StoryRef] dieselbe ID vergeben werden, die auch im Inhaltsverzeichnisrahmen als StoryID eingetragen wurde. Sollte das Inhaltsverzeichnis bereits an die
+      richtige Position exportiert werden, könnnen Sie diese Meldung ignorieren.
+      <xsl:sequence select="schematron:general-documentation('de', '#Korrekte-Lesereihenfolge-sicherstellenVerankern')"/>
+    </diagnostic>
+    <diagnostic id="hyperlink_destination_not_object_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hyperlinkziel nicht gefunden</span>
+      Das Ziel des Hyperlinks um den Text '<value-of select="."/>' kann nicht bestimmt werden. Zieltyp (Destination/@type): '<value-of 
+        select="$hyperlink/Properties/Destination/@type"/>'. Zielinhalt: '<value-of 
+        select="$hyperlink/Properties/Destination"/>'.
+    </diagnostic>
+    <diagnostic id="hyperlink_non_existent_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Kein Hyperlink zu Linkquelle gefunden</span>
+      Es gibt in der Indesign-Datei keinen Hyperlink (kein internes oder externes Linkziel) zum Text '<value-of select="."/>', der
+      aber als Quelle eines Linkes in InDesign hinterlegt ist.
+    </diagnostic>
+    <diagnostic id="open_type_list_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">OpenType-Feature nicht unterstützt</span>
+      Dieses Element enthält mindestens eine OpenType-Auszeichnung (<xsl:value-of select="(ancestor::*[Content])[1]/Content"/>). Da diese OpenType-Eigenschaft nicht verarbeitet werden kann, wird es nicht korrekt dargestellt werden. 
+      Beispiel: Kontext-bedingte OpenType-Varianten wie Ornamente, die die gleiche Unicode-Codierung wie andere Zeichen, z.B. Ziffern, haben. 
+      Wahrscheinlich wird anstatt der alternativen Darstellung das Grundzeichen verwendet, prüfen Sie die Repräsentation im EPUB.
+      <xsl:sequence select="schematron:general-documentation('de', '#Schriftkodierung')"/>
+    </diagnostic>
+    <diagnostic id="hidden_condition_de" xml:lang="de">
+      <span class="category">Bedingter Text</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bedingter Text '<xsl:value-of select="@Name"/>' ausgeblendet</span>
+      Die Bedingung '<value-of select="@Name"/>' ist im Dokument ausgeblendet. EpubAlternative, EOnly und PrintOnly müssen aber eingeblendet sein.
+      <xsl:sequence select="schematron:general-documentation('de', '#Bedingter-Text')"/>
+    </diagnostic>
+    <diagnostic id="visible_condition_de" xml:lang="de">
+      <span class="category">Bedingter Text</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bedingter Text '<xsl:value-of select="@Name"/>' eingeblendet</span>
+      Die Bedingung '<value-of select="@Name"/>' ist im Dokument eingeblendet. StoryRef, StoryID, FigureRef, PageStart, PageEnd müssen jedoch ausgeblendet sein.
+      <xsl:sequence select="schematron:general-documentation('de', '#Bedingter-Text')"/>
+    </diagnostic>
+  </diagnostics>
+
+</schema>

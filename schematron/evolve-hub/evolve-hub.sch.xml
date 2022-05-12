@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+        xmlns:tr="http://transpect.io"
+        queryBinding="xslt2">
+
+  <ns prefix="idml2xml" uri="http://transpect.io/idml2xml"/>
+  <ns prefix="hub2tei" uri="http://transpect.io/hub2tei"/>
+  <ns prefix="dbk" uri="http://docbook.org/ns/docbook"/>
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="hub" uri="http://transpect.io/hub" />
+  <ns prefix="tr" uri="http://transpect.io" />
+  <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
+  
+  
+  <xsl:include href="http://customer.le-tex.de/adaptions/xsl/shared-variables.xsl"/>
+	<!-- for hub:same-scope determination -->
+  <xsl:include href="http://transpect.io/evolve-hub/xsl/hub-functions.xsl"/>
+	
+  <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
+
+  <pattern id="evolve-hub_common_01">
+    <rule context="dbk:hub | dbk:book">
+      <report test="every $a in ./* satisfies local-name($a) = 'info'" id="no_content" role="error" diagnostics="no_content_de">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, ancestor::*[@srcpath][1]/@srcpath), '')"/></span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">No content (anymore?)</span>
+        No content exists in the evolved HUB document. Please check the structure of the document. Are there headings and paras? 
+        Especially the headings have to be properly tagged!</report>
+    </rule>
+    <rule context="dbk:para[dbk:informaltable]">
+      <assert test="every $n in node() satisfies ($n/self::dbk:informaltable)" id="text_around_table" role="warning"
+        diagnostics="text_around_table_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Text around table</span>
+        Unless it is a proper inline table, a table should have no other text around it (in the same paragraph).
+        <xsl:sequence select="schematron:general-documentation('en', '#Tabellen')"/></assert>
+    </rule>
+  </pattern>
+
+  <xsl:key name="hub:linking-item-by-id" match="*[@linkend]" use="@linkend" />
+  <xsl:key name="hub:linking-item-by-linkend" match="*[@*:id]" use="@*:id" />
+  
+  <pattern id="evolve-hub_endnotes">   
+    <rule context="dbk:para[matches(@role, $hub:endnote-style-regex)]/dbk:anchor[not(matches(@xml:id, 'page_'))][@xml:id][1]">
+      <assert test="(key('hub:linking-item-by-id', @xml:id)[self::dbk:link])"
+        role="error" id="missing_endnote_link" diagnostics="missing_endnote_link_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (.//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Missing link to endnote</span>
+        There exists an endnote para with a text anchor (<value-of select="@annotations"/>) but without a link referencing it. Please check.
+        <xsl:sequence select="schematron:general-documentation('en', '#Endnotenskript-Version-3')"/>
+      </assert>
+    </rule>
+  	<rule context="dbk:para[matches(@role, $hub:endnote-style-regex)][not(matches(@role, '_(-_folge|2)', 'i'))][*[1][not(self::dbk:anchor[@xml:id]) and not(self::dbk:phrase[*[1][self::dbk:anchor[@xml:id]]])]]">
+      <assert test="(key('hub:linking-item-by-id', @xml:id)[self::dbk:link])"
+        role="error" id="missing_endnote_anchor" diagnostics="missing_endnote_anchor_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (.//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Missing endnote anchor</span>
+        There exists an endnote para without an anchor that could be linked. Please check.
+        <xsl:sequence select="schematron:general-documentation('en', '#Endnotenskript-Version-3')"/>
+      </assert>
+    </rule>
+    <rule context="dbk:link[@linkend][@remap = 'ParagraphDestination']
+                           [parent::*[self::dbk:phrase][matches(@role, $hub:endnote-marker-style-regex)] or dbk:phrase[matches(@role, $hub:endnote-marker-style-regex)]]">
+      <assert test="key('hub:linking-item-by-linkend', @linkend)[self::dbk:anchor[ancestor::dbk:para[matches(@role, $hub:endnote-style-regex)]]
+                                                                                  [matches(@xml:id, 'DUK|id_ParagraphDestination_(Anker|Anchor)')][not(preceding-sibling::node()[matches(., '\p{L}+')])]]"
+        role="error" id="missing_endnote" diagnostics="missing_endnote_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (.//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Missing endnote?</span>
+        This link with endnote marker character style has no matching target or a paragraph ending was lost so its anchor is not at the beginning of the paragraph.
+        <xsl:sequence select="schematron:general-documentation('en', '#Endnotenskript-Version-32')"/>
+      </assert>
+    </rule>
+    <rule context="dbk:phrase[matches(@role, $hub:endnote-marker-style-regex)]">
+      <assert test="(parent::*[self::dbk:link] or descendant::*[self::dbk:link])"
+        role="error" id="endnote_marker_unlinked_to_endnote" diagnostics="endnote_marker_unlinked_to_endnote_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (descendant-or-self::*[@srcpath][1]/@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Linking</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">No link between endnote marker and endnote</span>
+        This endnote marker is not linked. Please use the endnote script properly that puts anchors to endnote paragraphs.
+        <xsl:sequence select="schematron:general-documentation('en', '#Endnotenskript-Version-32')"/>
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_index">
+    <rule context="dbk:index[dbk:para]">
+      <assert test="//dbk:anchor[starts-with(@xml:id, 'page_')]"
+              role="error" id="missing_page_anchor_script" diagnostics="missing_page_anchor_script_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, descendant::*[@srcpath][1]/@srcpath)"/></span>
+        <span class="category">Export Issues</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Index but no page anchors</span>
+        There exists an index which cannot be dynamically generated. To ensure the linking of the pagenumbers the page anchors have to be set. 
+        <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>This can be done with the help of a pagenumber script.
+        <xsl:sequence select="schematron:general-documentation('en', '#Register-Index')"/>
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_pseudo-heading">
+    <rule context="dbk:title">
+      <report test="matches(., '^\s+$') and matches(@role, $hub:general-heading-main-name-regex)" id="empty_heading" role="warning"
+        diagnostics="empty_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Empty heading paragraph</span>
+        Empty para with heading style used. This will create problems. Style: 
+        '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'.
+        <xsl:sequence select="schematron:general-documentation('en', '#Leerzeilen')"/>
+      </report>
+    </rule>
+    <rule context="dbk:para[not(matches(@role, $hub:title-start-regex))] |dbk:phrase[not(matches(../@role, $hub:title-start-regex))][not(..[self::dbk:title])]">
+      <report test="@css:font-weight = 'bold' and number(replace((@css:font-size, '0pt')[1], 'pt$', '')) gt 12"
+        id="pseudo_heading" role="warning" diagnostics="pseudo_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Pseudo heading?</span>
+        Pseudo-heading? Style override bold,
+        font size '<value-of select="@css:font-size"/>'.</report>
+    </rule>
+  </pattern>
+
+  <pattern id="wrong-heading">
+    <rule context="dbk:title">
+      <!--<report test="matches(., 'Vorwort') and not(matches(@role, $hub:frontmatter-style-name-regex, 'x'))" id="wrong_vorwort_heading"
+        role="warning" diagnostics="wrong_foreword_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Foreword heading style</span>
+        If this is a foreword heading, it has
+        the wrong style applied. It's style is: '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' 
+        but it should be a frontmatter headline format!
+      </report>-->
+      <!--<report test="matches(., 'Anhang') and not(matches(@role, '(p_h_part_title|p_h_subhead|p_h\d_appendix_title|
+                                                                  Ueberschrift_Zwiti_Titel|Ueberschrift_Teil_Titel)', 'x'))" id="wrong_app_heading"
+        role="warning" diagnostics="wrong_app_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Appendix heading style</span>
+        If this is a heading for an appendix, it has the wrong style applied. Its style is: 
+        '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' and it should be an appendix headline
+        format!</report>-->
+      <report test="exists(dbk:informaltable)" id="table_in_heading" role="warning" diagnostics="table_in_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Table in heading</span>
+        There is a table in the heading. This will probably lead to conversion errors. If it is really wanted, you can ignore this message. 
+        If the heading style around the table wasn't intended better use a normal paragraph style to surround the table.
+        <xsl:sequence select="schematron:general-documentation('en', '#Tabellen')"/></report>
+      <!--<report test="(matches(., '^\s*\d\s*') and .//text()[matches(., '^\s*\d+')][not(ancestor::*[self::dbk:phrase[@role = 'hub:identifier']])])" id="wrong_label" role="warning" diagnostics="wrong_label_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span> The numbers in this title are not (completely) inside a label.
+      </report>-->
+    </rule>
+  	<rule context="dbk:para[matches(@role, $hub:anonymous-chapter-regex)]">
+  		<report test="following-sibling::*[self::dbk:para][1][matches(@role, $hub:chapter-preface-role)]" id="anonymous_heading_followed_by_prefaces" role="warning" diagnostics="anonymous_heading_followed_by_prefaces_de">
+  			<span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+  			<span class="category">Styles usage</span>
+  			<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Anonymous chapter heading followed by heading like styles</span>
+  			Directly after an anonymous chapter heading no styles are allowed that are supposed to be used to precede a heading.</report>
+  	</rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_toc">  
+    <rule context="dbk:para[matches(@role, $hub:toc-para-style-regex)]">
+      <report test="true()" id="surviving_toc_line" role="error" diagnostics="surviving_toc_line_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">TOC paras still in document</span>
+        There are still paragraphs with style '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'? 
+        Those should have been discarded. Perhaps the correct heading is missing. It should be a frontmatter heading style.</report>
+    </rule>
+  </pattern>
+
+  <xsl:key name="idml2xml:styles-by-name" match="css:rule" use="(@role, @name)[1]"/>
+
+  <pattern id="evolve-hub_linebreaks">
+    <rule context="dbk:para[not(local-name(..) = ('listitem', 'entry', 'poetry'))]
+                           [not(ancestor::*/local-name() = ('glossary', 'entry', 'dedication', 'motto'))]
+                           [not(matches(@role, '_-_SPLIT'))]
+                           [matches(., '^\s*\p{Ll}')]
+                           [not(matches(., '^\s*(www\.|(mailto|https?|ftp):)'))]
+                           [not(matches(@role, concat('(', $hub:impress-para-regex, '|', '_-_SPLIT|', $hub:poetry-role-regex, ')')))]">
+      <let name="srcpaths" value="for $sp in tokenize((@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1], '\s+')
+        return concat($base-dir, $sp)"/>
+      <report test=".[not(node()[1]/@css:font-variant eq 'small-caps')]
+                     [not(@css:font-variant eq 'small-caps')]
+                     [not(key('idml2xml:styles-by-name', node()[1]/@role)[@css:font-variant eq 'small-caps'])]
+                     [not(key('idml2xml:styles-by-name', @role)[@css:font-variant eq 'small-caps'])]"
+        id="hard_line_break_in_paragraph" role="warning" diagnostics="hard_line_break_in_paragraph_de">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Para split?</span>
+        Is there a paragraph break inside the sentence? If it is only for layouting reasons, perhaps use soft hyphenation. 
+        This warning appears because the paragraph starts with a small letter. This can of course happen in poems or impress paras but usually it indicates that a paragraph was split.</report>
+    </rule>
+  	
+  </pattern>
+	
+	<pattern id="evolve-hub_linebreaks2">
+		<!-- doesn't match if contained in previous pattern-->
+		<rule context="dbk:br[preceding-sibling::node()[1][matches(., '-\p{Zs}*$')]]">
+			<let name="srcpath" value="(ancestor::*[@srcpath][1]/@srcpath)[1]"/>
+			<assert test="preceding-sibling::node()[1][self::dbk:phrase[@role][matches(@role, '_-_DISCARD')][matches(., '-\p{Zs}*$')]] or 
+				preceding-sibling::node()[1][self::text()[parent::*[@role][matches(@role, '_-_DISCARD')]][matches(., '-\p{Zs}*$')]]" 
+				diagnostics="hard_line_break_de" id="hard_line_break" role="warning">
+				<span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+				<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hard line break?</span>
+				<span class="category">Typography</span>
+				There is a break preceded by a hyphen. If the hyphen shall disappear in print, use a special character style to dissolve it.
+			</assert>
+		</rule>
+	</pattern>
+		
+  <pattern id="evolve-hub_lists">
+    <rule context="dbk:listitem/dbk:para | dbk:listitem[not(dbk:para)]/text()">
+      <report test="matches(., '^\s+$')" diagnostics="empty_listitem_de" id="empty_listitem" role="warning">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Empty list item</span>
+        There exists a paragraph with the list style: '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'. 
+        This creates a list symbol without content following. Ususally this case should have been prevented by transpect, if it occurs though please contact the technical maintainers.</report>
+    </rule>
+  </pattern>
+
+  <pattern id="evolve-hub_images">
+    <rule context="dbk:book | dbk:hub">
+      <let name="images" value=".//dbk:imagedata/@fileref"/>
+      <report test="true()" id="picture_count" role="Info" diagnostics="picture_count_de">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">General information</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Image quantity in later conversion stadium</span>
+        <p xmlns="http://www.w3.org/1999/xhtml">Number of images in document: <xsl:value-of
+            select="count(.//dbk:imagedata[not(ancestor::*[@role = 'bc_ignore'])])"/></p>
+        <p xmlns="http://www.w3.org/1999/xhtml">Paths: </p>
+        <xsl:if test="exists($images)">
+          <ul xmlns="http://www.w3.org/1999/xhtml">
+            <xsl:for-each select="$images">
+              <li title="{.}">
+                <xsl:value-of select="replace(., '^.+/', '')"/>
+              </li>
+            </xsl:for-each>
+          </ul>
+        </xsl:if>
+      </report>
+<!--      <assert test="count(/*//dbk:imagedata) eq count(/*//dbk:figure/dbk:title[matches(@role, $hub:figure-title-role-regex-x)])"
+        diagnostics="wrong_legend_number_de" id="wrong_legend_number" role="Info">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, @srcpath), '')"/></span>
+        <span class="category">images</span> The number of images and
+        image legends is not the same. There are <xsl:value-of select="count(//dbk:figure/dbk:title[matches(@role, $hub:figure-title-role-regex-x)])"/> image
+        legends and <xsl:value-of select="count(//dbk:imagedata)"/> images in this title. </assert>-->
+    </rule>
+  </pattern>
+  <pattern id="evolve-hub_image-titles">
+    <rule context="dbk:para[matches(@role, concat($hub:figure-title-role-regex-x, '|', $hub:table-title-role-regex-x), 'x')]">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
+      <let name="type" value="if (matches(@role, $hub:figure-title-role-regex-x, 'x')) then 'figure' else 'table'"/>
+      <let name="type-de" value="if (matches(@role, $hub:figure-title-role-regex-x, 'x')) then 'Abbildungs' else 'Tabellen'"/>
+      <report test="true()" diagnostics="not_converted_to_title_de" id="not_converted_to_title" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="$type"/> title not converted correctly</span>
+        This <value-of select="$type"/> title paragraph has not been converted into a title element. This means that it was not correctly put into a <value-of select="$type"/> environment.
+        Please check whether it is the correct style (table title style for tables, figure title style for figures).
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        Check for the correct order of the surrounding paras and so on.
+        <xsl:sequence select="schematron:general-documentation('en', '#Abbildungen-mit-Legenden')"/>
+      </report>
+    </rule>
+    <rule context="dbk:para[matches(@role, $hub:figure-title-role-regex-x)]">
+      <assert test="exists(/*//dbk:imagedata)" diagnostics="legend_without_image_de" id="legend_without_image" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, @srcpath), '')"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Figure titles without image</span>
+        Here is an image title placed, but there do not exist any images in the document (any more?). Perhaps they were not anchored or the image title format
+        was not used correctly. </assert>
+    </rule>
+  </pattern>
+
+ <pattern id="evolve-hub-hub_spaces">
+    <rule context="dbk:para[not(ancestor::*[self::dbk:info])]">
+      <report test="matches(string-join(descendant::text()[ancestor::dbk:para[1] is current()], ''), '(\w|\p{P})[             ][             ]+(\w|\p{P})')" role="Info"
+        diagnostics="several_spaces_de" id="several_spaces">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Typography</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Several spaces in succession</span>
+        <br xmlns="http://www.w3.org/1999/xhtml"/>There is more than one space character in line somewhere in this paragraph, please check! </report>
+    </rule>
+    <rule context="*[not(ancestor::*[self::dbk:info])]">
+      <report
+        test="exists(
+                            dbk:tab[
+                                    preceding-sibling::node()[self::text()][matches(., '[             ]$')] or 
+                                    following-sibling::node()[self::text()][matches(., '^[             ]')]
+                            ]
+                    )"
+                    role="warning" diagnostics="several_spaces_with_tab_de" id="several_spaces_with_tab">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Typography</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tab and whitespace in succession</span>
+        There is a tab directly next to a space character, please check! </report>
+    </rule>
+  </pattern>
+  
+  <xsl:function name="tr:inverse-tokenize" as="xs:string*">
+    <xsl:param name="input" as="xs:string"/>
+    <xsl:param name="regex" as="xs:string"/>
+    <xsl:variable name="prelim" as="xs:string*">
+      <xsl:analyze-string select="$input" regex="{$regex}">
+        <xsl:matching-substring>
+          <xsl:sequence select="."/>
+        </xsl:matching-substring> 
+      </xsl:analyze-string>      
+    </xsl:variable>
+    <xsl:sequence select="$prelim"/>
+  </xsl:function>
+
+  <pattern id="arrows">
+    <rule context="*[some $t in text() satisfies (matches($t, '[\p{Pd}=]+&gt;'))]">
+      <let name="srcpaths" value="for $sp in tokenize((@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1], '\s+')
+                                  return concat($base-dir, $sp)"/>
+      <let name="arrows" value="string-join(
+                                  for $a in distinct-values(tr:inverse-tokenize(., '[\p{Pd}=]+&gt;'))
+                                  return concat('''', $a, ''''),
+                                  ', '
+                                )"/>
+      <report test="true()" role="warning" id="pseudo-arrows" diagnostics="pseudo-arrows_de">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typography</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Pseudo Arrows</span>
+        Found pseudo arrow(s): <xsl:value-of select="$arrows"/>. Shouldn&#x2019;t this
+        be like '&#x2192;' or '&#x21d2;'?</report>
+    </rule>
+  </pattern>
+
+  <let name="title_2" value="//*[not(matches(@role,'bc_ignore'))][not(self::dbk:appendix)][dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])]][parent::*/dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])]]"/>
+  <pattern id="evolve-hub_headings">   
+    <rule context="*[dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])][following-sibling::*[1]/dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])]]]">
+      <let name="title" value="../*[dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])][following-sibling::*[1]/dbk:title[1][not(parent::*[self::dbk:figure|dbk:table])]]]"/>
+      <report test="count($title) = count($title_2)"
+        role="warning" id="headings" diagnostics="headings_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (.//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Headings of same hierarchy in succession</span>
+        Probably, there are consecutive headings which should be merged. Please check. Example: Heading '1' is followed by
+        heading 'text'. In this case, the heading should be '1 text' or the special number styles should be applied.
+      </report>
+    </rule>
+    <rule context="dbk:subtitle">
+      <assert test="preceding-sibling::*[1][self::dbk:title]"
+        role="error" id="subtitle_hierarchy" diagnostics="subtitle_hierarchy_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (@srcpath)[1])"/></span>
+        <span class="category">Document structure</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Subtitle must be preceded by title</span>
+        A subtitle must always be preceded by a title otherwise it will result in invalid XML.<br xmlns="http://www.w3.org/1999/xhtml"/>
+        The preceding element's name is »<xsl:value-of select="local-name(preceding-sibling::*[1])"/>« and contains:<br xmlns="http://www.w3.org/1999/xhtml"/> 
+        <xsl:value-of select="preceding-sibling::*[1]"/>.<br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+        Its style is »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="(preceding-sibling::*[1]/@role, '')[1]"/></xsl:call-template>«.
+      </assert>
+    </rule>
+    <rule context="dbk:title[matches(@role, $hub:general-heading-main-name-regex)][ancestor::dbk:entry | ancestor::dbk:poetry | ancestor::dbk:linegroup]">
+      <report test="true()"
+        role="error" id="headings_in_container" diagnostics="headings_in_container_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (.//@srcpath[1], ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Real headings not allowed here</span>
+        You have use a style for a heading inside of table, poem or other container. This is not allowed. There are pseudo headings for this special cases.
+        <br xmlns="http://www.w3.org/1999/xhtml"/>
+        Its style is »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>«.
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_marginal">
+    <rule context="*[local-name() = ('para', 'table', 'mediaobject')][matches(@role, $hub:marginalia-role-regex-x)]">
+      <assert test="exists(ancestor::*[self::dbk:sidebar[matches(@role, $hub:marginal-note-container-style-regex)]])" id="marginal_container" diagnostics="marginal_container_de" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, descendant-or-self::*[@srcpath][1]/@srcpath), '')"/></span>
+        
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Marginal container style missing</span>
+        This <xsl:value-of select="local-name()"/> of marginal style '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' has no container around.
+        Please check whether a correct object style has been applied.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="evolve-hub_frontmatter-parts">   
+    <rule context="*[local-name() = ('section', 'chapter', 'part')]/dbk:para[matches(@role, $hub:title-start-regex)]">
+      <report test="true()" role="error" id="frontmatter_para_in_mainmatter" diagnostics="frontmatter_para_in_mainmatter_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (descendant-or-self::*[@srcpath][1]/@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Frontmatter paragraph in body/mainmatter</span>
+        Here a frontmatter style ('<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>') was used, although the 
+        <xsl:value-of select="parent::*/name()"/> above is no frontmatter <xsl:value-of select="parent::*/name()"/>.
+      </report>
+    </rule>
+  </pattern>
+
+  <pattern id="evolve-hub_drama">
+    <rule context="dbk:phrase[matches(@role, $hub2tei:drama-speaker-phrase-style-role-regex)]">
+      <assert test="parent::*[self::dbk:para[matches(@role, $hub2tei:drama-speaker-style-role-regex)]]" id="speaker" diagnostics="speaker_de" role="warning">
+        <span class="srcpath"><xsl:value-of select="string-join(($base-dir, descendant-or-self::*[@srcpath][1]/@srcpath), '')"/></span>
+        
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Speaker style not in speech paragraph</span>
+        A speaker phrase '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' has no paragraph with speech-style as parent.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <diagnostics>
+    <diagnostic id="speaker_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Sprecher-Zeichenformat ohne Dialog</span>
+      Das Sprecher-Zeichenformat »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>« wurde verwendet, obwohl es nicht in einem Dialog-Absatz steht.</diagnostic>
+  	<diagnostic id="anonymous_heading_followed_by_prefaces_de" xml:lang="de">
+  		<span class="category">Formatvorlagenverwendung</span>
+  		<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Vorspann/Abstract-Texte nach anonymem Kapitelanfang</span>
+  		Direkt nach einem anonymen Kapitelanfang wurden Formate verwendet, die mit der folgenden Überschrift zusammengefasst werden sollen. 
+  		Das ergibt strukturell wenig Sinn und wir nicht korrekt konvertiert. Verwenden Sie nach einem anonymen Kapitelanfang Grundtext-Formate.</diagnostic>
+    <diagnostic id="headings_in_container_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Echte Überschrift hier nicht erlaubt</span>
+      Sie haben eine echte Überschrift an einer Stelle verwendet, wo das Dokument nicht in Abschnitte unterteilt werden sollte. Dies betrifft z.B. Tabellenzellen, Gedichte, Boxen. Für diese Umgebungen gibt es eigene Pseudoüberschriften.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Das Format ist: »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>«.
+    </diagnostic>
+    <diagnostic id="subtitle_hierarchy_de" xml:lang="de">
+      <span class="category">Dokumentstruktur</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Untertitel muss nach Titel stehen</span>
+      Ein Untertitel muss zwingend nach einem Titel stehen, sonst wird ungültiges XML erzeugt.<br xmlns="http://www.w3.org/1999/xhtml"/> 
+      Das Element vor dem Untertitel heißt »<xsl:value-of select="local-name(preceding-sibling::*[1])"/>« and beinhaltet:<br xmlns="http://www.w3.org/1999/xhtml"/>
+      <xsl:value-of select="preceding-sibling::*[1]"/>.<br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+      Das verwendete Format ist »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="(preceding-sibling::*[1]/@role, '')[1]"/></xsl:call-template>«.
+    </diagnostic>
+    <diagnostic id="pseudo-arrows_de" xml:lang="de">
+      <span class="category">Typografie</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Pseudo-Pfeil</span>
+      Pseudopfeil(e) gefunden: <xsl:value-of select="$arrows"/>. Sollte das nicht besser mit '&#x2192;' oder '&#x21d2;' dargestellt werden?
+    </diagnostic>
+    <diagnostic id="not_converted_to_title_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="$type-de"/>-Über-/Unterschrift nicht korrekt verarbeitet</span>
+      Diese <xsl:value-of select="$type-de"/>-Über-/Unterschrift konnte nicht korrekt zu einer Überschrift in einem entsprechenden <xsl:value-of select="$type-de"/>-Container konvertiert werden. Bitte prüfen Sie, ob der Typ des Formats korrekt ist (Tabellenunterschrift bei Tabellen, Abbildungsunterschrift bei Abbildungen).
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Außerdem muss die Reihenfolge der <xsl:value-of select="$type-de"/>-Bestandteile stimmen, entnehmen Sie Details dazu bitte der Dokumentation.
+      <xsl:sequence select="schematron:general-documentation('de', '#Abbildungen-mit-Legenden')"/>
+    </diagnostic>
+    <diagnostic id="marginal_container_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Marginalien-Container fehlt</span>
+      Dieses <xsl:value-of select="local-name()"/>-Element mit Marginalienabsatzformat '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' hat keinen umgebenden Container. Eventuell wurde kein entsprechendes Objektformat verwendet.
+    </diagnostic>
+    <diagnostic id="frontmatter_para_in_mainmatter_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Frontmatter Absatz in Hauptteil</span>
+      Hier wurde ein Frontmatter-Format ('<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>') benutzt, 
+      obwohl es sich beim Elternelement scheinbar um kein Frontmatter-Element, sondern um ein <xsl:value-of select="parent::*/name()"/>-Element handelt.
+    </diagnostic>
+    <!--<diagnostic id="wrong_label_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Falsches Label</span>
+      Die Ziffern in dieser Überschrift sind nicht (alle) in einem Label-Element, werden also möglicherweise nicht korrekt bündig angezeigt.
+    </diagnostic>-->
+    <diagnostic id="endnote_marker_unlinked_to_endnote_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Endnotenmarker ohne Verweis zu Endnotenabsatz</span>
+      Dieser Endnotenmarker hat keinen Link zu einem Endnotenabsatz. Ein solcher wird normalerweise erstellt, wenn ein Endnotenabsatz mithilfe des Endnotenskriptes einen Textanker erhält. Dies scheint nicht geschehen zu sein. 
+      <xsl:sequence select="schematron:general-documentation('de', '#Endnotenskript-Version-32')"/>
+    </diagnostic>
+  	    <diagnostic id="missing_endnote_anchor_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Anker in Endnotenabsatz fehlt</span>
+      Dieser Absatz mit Endnoten-Format besitzt kein Sprungziel, worauf ein Endnotenmarker verweisen könnte. Bitte überprüfen Sie dies. 
+      um eine ordnungsgemäße Verlinkung zu gewährleisten!
+      <xsl:sequence select="schematron:general-documentation('de', '#Endnotenskript-Version-32')"/>
+    </diagnostic>
+    <diagnostic id="missing_endnote_link_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Link zu Endnotenanker fehlt</span>
+      Dieser Absatz mit Endnoten-Format hat einen Anker (Sprungziel »<value-of select="@annotations"/>«), der aber keinen enstprechenden Verweis mit Endnoten-Zeichenformat im Text hat. Bitte überprüfen Sie dies, 
+      um eine ordnungsgemäße Verlinkung zu gewährleisten!
+      <xsl:sequence select="schematron:general-documentation('de', '#Endnotenskript-Version-32')"/>
+    </diagnostic>
+    <diagnostic id="missing_endnote_de" xml:lang="de">
+      <span class="category">Verlinkungen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Endnotenabsatz fehlt</span>
+      Dieser Querverweis mit Endnoten-Zeichenformat hat kein entsprechendes Ziel (Absatz mit Endnotenformat und Anker) ODER das Ziel steht nicht am Anfang eines Anmerkungsabsatzes. 
+      In seltenen Fällen verschwinden Absatzmarken und Endnoten werden im InDesign zusammengefügt. Bitte prüfen Sie Ihre IDML-Datei daraufhin und legen Sie notfalls die Fußnote neu an, falls der Endnotenanker nicht mehr auffindbar ist.
+      <xsl:sequence select="schematron:general-documentation('de', '#Endnotenskript-Version-32')"/>
+    </diagnostic>
+    <diagnostic id="hard_line_break_de" xml:lang="de">
+    	<span class="category">Typografie</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Harter Zeilenumbruch?</span>
+      In diesem Absatz existiert ein Zeilenumbruch mit voranstehendem Divis. Falls diese harte Trennung nur für die Printversion von Bedeutung ist, 
+      versehen Sie beides mit einem entsprechenden Zeichenformat zum Entfernen. Sonst bleibt der Divis in XML und EPUB erhalten.
+    </diagnostic>
+    <diagnostic id="several_spaces_with_tab_de" xml:lang="de">
+      <span class="category">Typografie</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabulator neben Leerzeichen</span>
+      In diesem Absatz wurde ein Leerzeichen (oder Geviert etc.) direkt vor oder nach einem Tabulator gesetzt. </diagnostic>
+    <diagnostic id="several_spaces_de" xml:lang="de">
+      <span class="category">Typografie</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mehrere Leerzeichen in Folge benutzt</span>
+      Irgendwo innerhalb dieses Absatzes wurden mehrere Whitespaces hintereinander benutzt. Diese Meldung berücksichtigt alle möglichen Leerzeichen (Gevierte, geschützte Leerzeichen, Thinspaces etc.).</diagnostic>
+    <diagnostic id="legend_without_image_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bildunterschrift aber keine Bilder</span>
+      Dieser Absatz hat das Format für Bildunter- oder überschriften, aber im Dokument gibt es
+      keine Bilder (mehr?).<br xmlns="http://www.w3.org/1999/xhtml"/> Eventuell waren die Bilder unverankert und wurden nicht
+      übernommen? <br xmlns="http://www.w3.org/1999/xhtml"/>Möglicherweise wurde auch das Format für die  Bildunter- oder überschriften falsch
+      verwendet. </diagnostic>
+<!--    <diagnostic id="wrong_legend_number_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Bildunterschriften und Bilderanzahl stimmt nicht überein</span>
+      Die Anzahl der Bilder (<xsl:value-of select="count(//dbk:imagedata)"/>)
+      und der Bildlegenden (<xsl:value-of select="count(//dbk:figure/dbk:title[matches(@role, $hub:figure-title-role-regex-x)])"/>) stimmt nicht überein. </diagnostic>-->
+    <diagnostic id="no_content_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Keine Inhalte (mehr?)</span>
+      Bitte prüfen Sie, ob die Struktur des Dokumentes korrekt ist (gibt es Überschriften und Absätze…) oder eventuell kein textueller Inhalt im Dokument auftaucht. Dies kann beispielsweise passieren, wenn nur PDFs plaziert wurden.
+      Diese Meldung erscheint, weil auf einem Zwischenformat der Konvertierung keine Inhalte mehr vorhanden sind. Eventuell ist dies ein Folgefehler aus anderen Fehlern, die vorher behoben werden können. Besonders Formatvorlagenverwendung oder
+      Platzierung der Textrahmen im InDesign-Dokument. Bitte beachten Sie, dass nur Rahmen exportiert werden, die sich auf einer Seite befinden. Sollte sich der Anfangsrahmen des Haupttextflusses außerhalb der
+      Seite befinden, wird ggf. kein Inhalt exportiert.
+      Wenn keine anderen Fehler erkennbar, geht die Konvertierung aus anderen Gründen schief, bitte wenden Sie sich diesbezüglich an die technischen Ansprechpartner.</diagnostic>
+    <diagnostic id="picture_count_de" xml:lang="de">
+      <span class="category">Generelle Informationen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="count(.//dbk:imagedata)"/> Bilder im Dokument in fortgeschrittenem Konvertierungsstadium</span>
+      <p xmlns="http://www.w3.org/1999/xhtml">Anzahl der Bilder im Dokument nach der Hierarchisierung: <xsl:value-of select="count(.//dbk:imagedata)"/></p>
+      <p xmlns="http://www.w3.org/1999/xhtml">Pfade: </p>
+      <xsl:if test="exists($images)">
+        <ul xmlns="http://www.w3.org/1999/xhtml">
+          <xsl:for-each select="$images">
+            <li title="{.}">
+              <xsl:value-of select="replace(., '^.+/', '')"/>
+            </li>
+          </xsl:for-each>
+        </ul>
+      </xsl:if>
+    </diagnostic>
+    <diagnostic id="text_around_table_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabelle mit Text drumherum</span>
+       In diesem Absatz steht eine Tabelle <b
+        xmlns="http://www.w3.org/1999/xhtml">und</b> Text. <br xmlns="http://www.w3.org/1999/xhtml"/> Falls hier nicht explizit eine Tabelle innerhalb des Absatzes gewünscht ist, sollte die Tabelle in einem Absatz für sich allein stehen, ohne Text drumherum. <br
+        xmlns="http://www.w3.org/1999/xhtml"/>Gefundener Text: '<value-of
+        select="string-join(node()[not(self::dbk:informaltable)]/descendant-or-self::text(), '')"/>'.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellen')"/>
+    </diagnostic>
+    <diagnostic id="hard_line_break_in_paragraph_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Absatz durch Eingabetaste hart getrennt?</span>
+      Der Absatz beginnt nicht mit einer Versalie. <br xmlns="http://www.w3.org/1999/xhtml"/>Wurde innerhalb dieses Absatzes ein harter Zeilenumbruch benutzt? Falls das aus
+      layout-technischen Gründen geschah, sollte besser ein bedingte Trennung erfolgen. Andernfalls ist eine korrekte
+      Darstellung im E-Book unwahrscheinlich. Diese Warnung wird generiert, weil ein Absatz mit einem Kleinbuchstaben beginnt.</diagnostic>
+    <diagnostic id="table_in_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabelle in Überschrift</span>
+      In dieser Überschrift befindet sich eine Tabelle. Dies wird
+      höchstwahrscheinlich zu Fehlern bei der Konvertierung führen! 
+      Falls das Absatzformat des Absatzes, in welchen die Tabelle eingefügt wurde, aus Versehen ein Überschriftsformat hat, ändern Sie dies bitte in ein Standard-Absatzformat.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellen')"/>
+    </diagnostic>
+    <diagnostic id="surviving_toc_line_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Inhaltsverzeichnisabsätze nicht entfernt</span>
+      Es existieren noch Absätze mit der Formatvorlage 
+      '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'.
+      <br xmlns="http://www.w3.org/1999/xhtml"/> Diese hätten eigentlich entsorgt werden müssen.
+      Wurde eine korrekte Frontmatter-Überschrift verwendet? Haben alle Absätze im IHV ein IHV-Format?</diagnostic>
+    <diagnostic id="empty_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leere Überschrift</span>
+      Leerer Absatz mit Überschriftsformat? Formatname: 
+      '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'. 
+    </diagnostic>
+    <diagnostic id="pseudo_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Kein Überschriftenformat angewendet?</span>
+      Ein Absatz wurde typografisch wie eine Überschrift ausgezeichnet. Sofern es sich um eine richtige Überschrift handelt, verwenden
+      Sie bitte die entsprechende Formatvorlage. Falls es sich nicht um eine Überschrift handelt, können Sie diese Meldung ignorieren.
+      Erkannte Eigenschaften: Fetter Schriftschnitt, Schriftgröße <value-of select="@css:font-size"/>.
+    </diagnostic>
+    <!--<diagnostic id="wrong_foreword_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Falsches Format der Vorwort-Überschrift?</span>
+      Falls es sich hier um eine Überschrift eines Vorwortes handelt,
+      sollte ein Frontmatter-Überschriftenformat zugewiesen werden. Aktuelles Format ist: 
+      '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'. 
+      Für eine genaue Strukturierung des Dokumentes ist es besser, wenn Abschnitte, die im XML in das Frontmatter einsortiert werden sollen, das richtige Format tragen. Die Konvertierung funktioniert auch mit Hauptteil-Formaten und ist nicht fehlerhaft.</diagnostic>-->
+    <!--<diagnostic id="wrong_app_heading_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Falsches Format der Anhang-Überschrift?</span>
+      Falls es sich hier um eine Überschrift eines Anhanges handelt, sollte
+      ein Anhang-Überschriftenformat zugewiesen werden. Aktuelles Format ist: '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'. 
+      Für eine ordentliche Strukturierung des Dokumentes ist es besser, wenn Abschnitte, die im XML in das Backmatter einsortiert werden sollen, das richtige Format tragen.</diagnostic>-->
+    <diagnostic id="empty_listitem_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leerer Absatz mit Listenformat</span>
+      Leerer Absatz mit Listen-Absatzformat: 
+      '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>'.
+      Daraus entsteht ein Listenpunkt mit Listensymbol ohne Inhalt danach. </diagnostic>
+    <diagnostic id="headings_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Zwei gleichartige Überschriften nacheinander</span>
+      Bitte prüfen Sie, ob direkt aufeinanderfolgende Überschriften 
+      nicht zu einer einzigen Überschrift zusammengefasst werden können. Beispiel: Auf die Überschrift '1' folgt eine Überschrift mit 
+      'Text'. In diesem Fall ist es wahrscheinlich, dass die Überschrift '1 Text' lauten sollte.</diagnostic>
+    <diagnostic id="missing_page_anchor_script_de" xml:lang="de">
+      <span class="category">Exportfehler</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Register, aber kein Seitenankerskript</span>
+      Hier existiert ein Register, welches scheinbar anhand fehlender echter Indexeinträge nicht dynamisch erzeugt werden kann.
+      <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+      Um die Registereinträge dennoch sinnvoll verlinken zu können, muss ein Skript über das Dokument laufen, welches Seitenanker setzt.
+      <xsl:sequence select="schematron:general-documentation('de', '#Register-Index')"/>
+    </diagnostic>
+    </diagnostics>
+   
+</schema>

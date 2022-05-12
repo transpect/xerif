@@ -1,0 +1,432 @@
+%%
+%% This is file `transpect-common.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% transpect.dtx  (with options: `common')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from transpect-common.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file transpect.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\fileversion{0.1.7}%
+\def\filedate{2021-04-21}%
+%%
+%% module for le-tex transpect.cls that provides some commonly used base macros.
+%%
+%% Maintainer: p.schulz@le-tex.de
+%%
+%% lualatex  -  texlive > 2019
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{transpect-common}
+    [\filedate \fileversion le-tex transpect common module]
+\RequirePackage{iftex}
+\def\tp@str@default{default}
+\def\tp@str@table{table}
+\def\tp@str@figure{figure}
+\def\afterfi#1\fi{\fi#1}
+\def\tp@topstrut{\vrule\@width\z@\@height\topskip\@depth\dimexpr\baselineskip-\topskip\relax}
+\def\@afterbox{%
+  \everypar{%
+    \if@nobreak
+      \@nobreakfalse
+      \clubpenalty \@M
+      \if@afterindent \else
+        {\setbox\z@\lastbox}%
+        \everypar{}%
+      \fi
+    \else
+      \clubpenalty \@clubpenalty
+      {\setbox\z@\lastbox}%
+      \everypar{}%
+    \fi}}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\DeclareGraphicsRule{.EPS}{eps}{.EPS}{}
+\def\CalcRatio#1#2{\strip@pt\dimexpr\number\numexpr\number\dimexpr#1\relax*65536/\number\dimexpr#2\relax\relax sp}
+\newcount\tpModulo
+\def\CalcModulo#1#2{\tpModulo=\numexpr#1-(#1/#2)*#2\relax}
+\newbox\tp@tempboxa
+\newbox\tp@tempboxb
+\newskip\tp@tempskipa
+\long\def\@gobbleopt{\@ifnextchar[\@@gobbleopt{\@@gobbleopt[]}}%]
+\long\def\@@gobbleopt[#1]#2{}%
+\def\tpGobble{%
+  \renewcommand\footnote[2][\the\c@footnote]{\def\@thefnmark{##1}\@makefnmark}%
+  \renewcommand\index[2][]{}%
+  \renewcommand\marginpar[2][]{}%
+  \renewcommand\glossary[2][]{}%
+  \let\label\@gobble
+}%
+\long\def\tp@iterate#1#2#3#4{%
+  \advance#1\@ne\relax
+  #1=#2\relax%
+  \expandafter\ifnum#1>#3\relax%
+  \else
+    #4%
+    \tp@iterate{#1}{\the#1}{#3}{#4}%
+  \fi}%
+%% \section{Hooks}
+%% In this part we provide the facility to utilize Hooks to patch code
+%% into different parts of the package depending on options and loaded
+%% packages.
+\RequirePackage{etoolbox}
+\def\tpDeclareHook#1{\expandafter\global\expandafter\let\csname tp@hook@\tp@namespace @#1\endcsname\@empty}
+\def\tpAddToHook{\@ifnextchar [{\tp@add@to@hook}{\tp@add@to@hook[\tp@namespace]}}%]
+\def\tp@add@to@hook[#1]#2#3{%
+  \expandafter\ifx\csname tp@hook@\tp@namespace @#1\endcsname\relax
+    \tpDeclareHook{#1@#2}%
+  \fi
+  \csgappto{tp@hook@#1@#2}{#3}%
+}
+\def\tpUseHook#1{\expandafter\ifx\csname tp@hook@\tp@namespace @#1\endcsname\relax\else\csname tp@hook@\tp@namespace @#1\endcsname\fi}
+\def\tpProvideComp#1#2#3#4{%
+  \ltx@LocalExpandAfter\global\expandafter\let\csname tp@\tp@namespace @#4\endcsname\relax
+  \expandafter\long\expandafter\def\csname #1\endcsname##1{%
+    #2\expandafter\long\expandafter\def\csname tp@\tp@namespace @#4\endcsname{##1}\ignorespaces#3}%
+}
+\def\tpNamespace#1{\def\tp@namespace{#1}}
+\def\tpProvideCountedComp#1#2#3#4#5#6{%
+  \tpProvideComp{#1}
+    {\bgroup#5\expandafter\global}
+    {\def\@tempa{{@tp@reset@components}}%
+     \edef\@tempb{%
+       \noexpand\ltx@LocalExpandAfter\noexpand\global\noexpand\expandafter\noexpand\let
+         \noexpand\csname tp@\noexpand\tp@namespace @#2-\the#4\noexpand\endcsname
+         \noexpand\relax}%
+     \expandafter\expandafter\expandafter\csgappto\expandafter\@tempa\expandafter{\@tempb}%
+     \egroup}
+    {#2-\the#4}%
+  #6\expandafter\long\expandafter\def\csname tp@\tp@namespace @#3\endcsname{\csname tp@\tp@namespace @#2-\the#4\endcsname}%
+  \csgappto{@tp@reset@components}{\csname tp@\tp@namespace @#3\endcsname}%
+}
+\long\protected\def\tpSetComp#1#2{%
+  \expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\relax
+    \ifx\tp@is@counted\relax
+      \tpProvideCountedComp{tp#1}{\tp@cnt@grp-#1}{#1}{\csname \tp@cnt@grp-Cnt\endcsname}{}{}%
+    \else
+      \tpProvideComp{tp#1}{}{}{#1}%
+    \fi
+  \fi
+  \csname tp#1\endcsname{#2}%
+}
+\def\tpUseComp#1{\csname tp@\tp@namespace @#1\endcsname}
+\def\tpGetComp#1{\tpIfComp{#1}{\tpUseComp{#1}\par}{}}
+\long\def\tpIfComp#1#2#3{\expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\relax#3\else#2\fi}
+\long\def\tpIfCompEmpty#1#2#3{\long\def\@tempa{}\expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\@tempa#2\else#3\fi}
+\def\tp@check@empty{\@ifnextchar[\@tp@check@empty{\@tp@check@empty[]}}%]
+\def\@tp@check@empty[#1]#2#3#4{%
+  \tpIfComp{#4#3}
+    {\tpIfCompEmpty{#4#3}
+      {\expandafter\global\expandafter\let\csname tp@#2@#4#3\endcsname\relax}
+      {}}
+    {\tpIfComp{#1#3}
+      {\expandafter\expandafter\expandafter\let\expandafter\csname tp@#2@#4#3\expandafter\endcsname\csname tp@#2@#1#3\endcsname}
+      {}}}
+\long\def\tpToggleCountedCond{%
+  \let\tp@is@counted\relax
+  \long\protected\def\tpIfComp##1##2##3{%
+    \expandafter\let\expandafter\@tempa\csname tp@\tp@namespace @##1\endcsname\relax
+    \expandafter\expandafter\expandafter\ifx\@tempa\relax##3\else##2\fi}%
+  \long\protected\def\tpIfCompEmpty##1##2##3{%
+    \long\def\@tempa{}%
+    \expandafter\let\expandafter\@tempb\csname tp@\tp@namespace @##1\endcsname\relax
+    \expandafter\expandafter\expandafter\ifx\@tempb\@tempa ##2\else ##3\fi}}
+\begingroup
+\catcode`"=12
+\gdef\tpParseAttributes#1#2{%
+  \if!#1!\else
+    \if!#2!\else
+      \def\tp@cur@node{#1}%
+      \@tp@parse@attributes #2,,\@nil
+    \fi\fi}
+\gdef\tp@parse@kv#1=#2=#3\@nil{%
+  \edef\@argii{#2}%
+  \ifx\@argii\@empty
+    \expandafter\let\csname tp@\tp@cur@node @attr@#1\endcsname\@empty%
+  \else
+    \ifx #2 =\else
+      \expandafter\def\csname tp@\tp@cur@node @attr@#1\endcsname{#2}%
+    \fi
+  \fi}
+\gdef\@tp@parse@attributes #1,#2,\@nil{%
+  \if!#1!\else
+    \tp@parse@kv#1==\@nil
+    \if!#2!\else
+      \@tp@parse@attributes#2,\@nil
+    \fi\fi}
+\endgroup
+\DeclareRobustCommand{\tpSetProperty}[2]{\expandafter\long\expandafter\protect\expandafter\def\csname tp@\tp@namespace @#1\endcsname{#2}}
+\DeclareRobustCommand{\tpSetValProp}[2]{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
+\DeclareRobustCommand{\tpSetPropertyX}[2]{\expandafter\long\expandafter\protect\expandafter\edef\csname tp@\tp@namespace @#1\endcsname{#2}}
+\def\tpUseProperty#1{\csname tp@\tp@namespace @#1\endcsname}
+\DeclareRobustCommand{\tpIfProp}[3]{\long\def\@tempa{}%
+  \expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\@tempa#3\else#2\fi\ignorespaces}
+\DeclareRobustCommand{\tpIfPropVal}[4]{\long\def\@tempa{#2}%
+  \expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\@tempa\relax#3\else#4\fi\ignorespaces}
+\DeclareRobustCommand{\tpAddToDefault}[2]{\csgappto{tp@#1@default}{#2}}
+\def\tpCascadeProps#1#2{%
+  \csname tp@#2@default\endcsname
+  \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
+    \expandafter\tp@inherit@props\expandafter{\csname tp@#2@#1@parent\endcsname}{#2}%
+  \fi
+  \csname tp@#2@#1@properties\endcsname
+}
+\def\tp@inherit@props#1#2{%
+  \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
+    \edef\@tempa{\csname tp@#2@#1@parent\endcsname}%
+    \expandafter\tp@inherit@props\expandafter{\@tempa}{#2}%
+  \fi
+  \csname tp@#2@#1@properties\endcsname
+}
+\long\def\tpDeclareClass{\@ifnextchar [{\@tp@set@class}{\@tp@set@class[default]}}%]
+\long\def\@tp@set@class[#1]#2{\@ifnextchar [{\tp@set@class[#1]{#2}}{\tp@set@class[#1]{#2}[]}}%]
+\long\gdef\tp@default@class@default{}
+\long\def\tp@set@class[#1]#2[#3]#4{%
+  \def\@argii{#2}\ifx\@argii\@empty\let\@argii\tp@str@default\fi%
+  \if!#3!\else
+    \expandafter\long\expandafter\def\csname tp@#1@class@\@argii @parent\endcsname{#3}%
+  \fi
+  \expandafter\long\expandafter\def\csname tp@#1@class@\@argii\endcsname{#4}%
+}
+\def\tpUseClass#1#2{%
+  \expandafter\ifx\csname tp@#2@class@#1\endcsname\relax
+    \expandafter\ifx\csname tp@default@class@#1\endcsname\relax
+      \PackageError{transpect.cls}{Class `#1' with scope `#2' not defined!}{Please declare the class `#1'!}%
+    \fi
+  \fi
+  \csname tp@default@class@#1\endcsname%
+  \expandafter\ifx\csname tp@#2@class@#1@parent\endcsname\relax\else
+    \expandafter\tpUseClass\expandafter{\csname tp@#2@class@#1@parent\endcsname}{#2}%
+  \fi
+  \csname tp@#2@class@#1\endcsname}
+\def\@xminusvskip{%
+  \ifdim\lastskip<\@tempskipb
+  \else
+    \ifdim\@tempskipb<\z@
+      \ifdim\lastskip<\z@
+      \else
+        \advance\@tempskipb\lastskip
+        \vskip-\lastskip
+        \vskip \@tempskipb
+      \fi
+    \fi
+  \fi}
+\def\minusvspace#1{%
+  \ifvmode
+     \if@minipage\else
+       \ifdim \lastskip =\z@
+         \ifx\@vspace@calcify\@undefined
+           \vskip #1\relax
+         \else
+           \@vspace@calcify{#1}%
+         \fi
+       \else
+       \setlength\@tempskipb{#1}%
+         \@xminusvskip
+       \fi
+     \fi
+  \else
+    \@noitemerr
+  \fi}
+\let\hack\@firstofone
+\let\Hack\@firstofone
+\let\hackfor\@gobble
+\let\Hackfor\@gobble
+\def\the@tp@thispage{}%
+\newcount\tp@abspage \tp@abspage\z@ \def\thetp@abspage{\the\tp@abspage}
+\newif\if@tp@odd \@tp@oddtrue
+\AtBeginDocument{%
+  \global\tp@abspage=\c@page\relax%
+  \g@addto@macro\@outputpage{\global\tp@abspage\c@page}%
+}
+\def\tp@test@page{%
+  \expandafter\ifx\csname the@tp@thispage\endcsname\@empty
+    \gdef\the@tp@atthispage{1}%
+  \else
+    \expandafter\ifnum \the@tp@thispage=\tp@abspage%
+      \begingroup
+        \@tempcnta\the@tp@atthispage\relax
+        \advance\@tempcnta\@ne\relax
+        \xdef\the@tp@atthispage{\the\@tempcnta}%
+      \endgroup
+    \else
+      \gdef\@tp@atthispage{1}%
+    \fi
+  \fi
+  \xdef\the@tp@thispage{\the\tp@abspage}%
+  \let\@tp@currpage\relax
+  \expandafter\ifx\csname \tp@namespace-\the@tp@thispage-\the@tp@atthispage\endcsname\relax
+    \ifodd\tp@abspage\relax\@tp@oddtrue\else\@tp@oddfalse\fi
+  \else
+    \edef\@tp@currpage{\expandafter\expandafter\expandafter\@firstofone\csname \tp@namespace-\the@tp@thispage-\the@tp@atthispage\endcsname}%
+    \ifodd\@tp@currpage\relax\@tp@oddtrue\else\@tp@oddfalse\fi
+  \fi
+}
+\def\tp@save@page{%
+  \protected@write\@auxout{\def\the@tp@namespace{\tp@namespace}\let\thetp@abspage\relax}{%
+    \string\expandafter\string\gdef\string\csname\space \tp@namespace-\the@tp@thispage-\the@tp@atthispage\string\endcsname{\thetp@abspage}}%
+}
+\def\tp@restore@init#1#2{%
+  \AtBeginDocument{%
+    \expandafter\ifx\csname tp-#1-#2\endcsname\relax\else
+      \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-#1-#2\string\endcsname{\csname tp-#1-#2\endcsname}}%
+    \fi}}
+\DeclareRobustCommand{\tpBreak}{\hfill\break}
+\def\tp@init@l@{\@ifnextchar[\@tp@init@l@{\@tp@init@l@[]}}%]
+\def\@tp@init@l@[#1]#2#3#4{%
+  \expandafter\ifx\csname c@#2depth\endcsname\relax
+    \expandafter\global\expandafter\newcount\csname c@#2depth\endcsname
+    \expandafter\global\csname c@#2depth\endcsname=0\relax
+  \fi
+  \expandafter\tp@restore@init\expandafter{\tp@namespace}{#1\if!#1!#2\fi-number-#3-maxwd}%
+  \expandafter\tp@restore@init\expandafter{\tp@namespace}{#1\if!#1!#2\fi-number-#3-indent}%
+  \expandafter\ifx\csname tp@#2@extract@data\endcsname\relax
+    \expandafter\let\csname tp@#2@extract@data\endcsname\tp@extract@generic
+  \fi
+  \expandafter\ifx\csname tp@#2@print@entry\endcsname\relax
+    \expandafter\let\csname tp@#2@print@entry\endcsname\tp@print@generic
+  \fi
+  \expandafter\long\expandafter\gdef\csname l@#4\endcsname##1##2{%
+    \ifLuaTeX\suppresslongerror=1\fi
+    \expandafter\ifnum \csname c@#2depth\endcsname<#3\relax
+    \else
+      \bgroup
+        \long\def\tpTocLink####1{\hyper@linkstart{link}{\Hy@tocdestname}{####1}\hyper@linkend}%
+        \csname tp@#2@extract@data\endcsname{#3}{#4}{##1}{##2}%
+        \csname tp@#2@print@entry\endcsname{#4}%
+      \egroup
+    \fi
+    \ifLuaTeX\suppresslongerror=0\fi
+  }}
+\def\tp@extract@generic#1#2#3#4{%
+}
+\def\tp@print@generic#1{%
+}
+\def\tp@expand@l@contents#1#2#3#4{%
+  \sbox\z@{\def\numberline##1{\expandafter\gdef\csname tp@#2@#3Number\endcsname{##1}}#1}%
+  \ifdim\wd\z@>\z@
+    \let\numberline\@gobble%
+    \expandafter\xdef\csname tp@#2@#3#4\endcsname{#1}%
+  \else
+    #1%
+  \fi}
+\def\tp@format@number#1#2#3{%
+  \tpSetProperty{#1formatted-number}{}%
+  \tpIfComp{#2Number}{%
+    \tpSetProperty{#1formatted-number}{%
+      \bgroup
+        \tpUseProperty{#1title-format}%
+        \tpUseProperty{#1number-format}%
+        \tpUseComp{#2Number}%
+        \tpUseProperty{#1number-sep}%
+      \egroup}%
+    \sbox\z@{\tpUseProperty{#1formatted-number}}%
+  }{%
+    \sbox\z@{}%
+  }%
+  \tp@store@maxwd{#1number-#3-maxwd}{\the\wd\z@}%
+  \tpSetValProp{#1number-width-level-max}{\csname tp-heading-#1number-#3-maxwd\endcsname}%
+  \tp@store@maxwd{#1number-maxwd}{\the\wd\z@}%
+  \tpSetValProp{#1number-width-max}{\csname tp-heading-#1number-#3-maxwd\endcsname}%
+  \tpSetValProp{#1number-width}{\the\wd\z@}%
+  \tp@get@indent{#1}{#3}%
+  \tp@set@hang{#1}%
+}
+\def\tp@set@hang#1{%
+  \tpSetProperty{#1hang-number}{\tpUseProperty{#1formatted-number}}%
+  \tpIfProp{#1indent}
+    {\ifdim\tpUseProperty{#1indent}<\z@
+        \tpSetProperty{#1hang-number}{%
+          \hskip\tpUseProperty{#1indent}%
+          \hbox to -\tpUseProperty{#1indent}{%
+            \tpIfPropVal{#1number-align}{left}{}{\hss}%
+            \tpUseProperty{#1formatted-number}%
+            \tpIfPropVal{#1number-align}{right}{}{\hss}}}%
+      \fi}{}}
+\def\tp@det@prev@indent#1#2{%
+  \@tempcnta\numexpr#2-1\relax
+  \ifdim\tpUseProperty{#1indent}<\z@\relax
+    \@tempdimb=-\tpUseProperty{#1indent}\relax
+  \else
+    \@tempdimb=\tpUseProperty{#1indent}\relax
+  \fi
+  \expandafter\ifx\csname tp-\tp@namespace-#1\the\@tempcnta-indent\endcsname\relax
+    \@tempdima=\@tempdimb\relax%
+  \else
+    \@tempdima\dimexpr \csname tp-\tp@namespace-#1\the\@tempcnta-indent\endcsname+\@tempdimb\relax
+  \fi
+  \tp@store@maxwd{#1#2-indent}{\the\@tempdima}%
+  \tpSetProperty{#1margin-left}{\csname tp-\tp@namespace-#1#2-indent\endcsname}}
+\def\tp@store@maxwd#1#2{%
+  \expandafter\ifx\csname tp-\tp@namespace-#1\endcsname\relax
+    \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@namespace-#1\string\endcsname{#2}}
+    \expandafter\xdef\csname tp-\tp@namespace-#1\endcsname{#2}%
+  \else
+    \expandafter\ifdim\csname tp-\tp@namespace-#1\endcsname<#2\relax
+      \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@namespace-#1\string\endcsname{#2}}%
+      \expandafter\xdef\csname tp-\tp@namespace-#1\endcsname{#2}%
+    \fi
+  \fi}
+\def\tp@get@indent#1#2{%
+  \tpSetPropertyX{int-#1margin-left}{\tpUseProperty{#1margin-left}}%
+  \tpSetPropertyX{int-#1indent}{\tpUseProperty{#1indent}}%
+  \expandafter\let\expandafter\tp@tmp@numwd\csname tp-\tp@namespace-#1number-#2-maxwd\endcsname\relax
+  \tpIfPropVal{int-#1margin-left}{auto-global}
+    {\tpSetProperty{#1indent}{-\csname tp-\tp@namespace-#1number-maxwd\endcsname}%
+     \tpSetProperty{#1margin-left}{\csname tp-\tp@namespace-#1number-maxwd\endcsname}}
+    {\tpIfPropVal{int-#1margin-left}{auto}
+       {\tpIfPropVal{int-#1indent}{auto}
+          {\tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+          {\tpIfProp{int-#1indent}
+             {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}}
+             {\tpSetProperty{#1indent}{\z@}}}%
+        \tp@det@prev@indent{#1}{#2}}
+       {\tpIfProp{int-#1margin-left}
+          {\tpIfPropVal{int-#1indent}{auto}
+            {\tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+            {\tpIfProp{int-#1indent}
+               {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}}
+               {\tpSetProperty{#1indent}{\z@}}}}
+         {\tpIfPropVal{int-#1indent}{auto}
+            {\tpSetProperty{#1margin-left}{\tp@tmp@numwd}%
+             \tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+            {\tpIfProp{int-#1indent}
+               {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}%
+                \tpSetProperty{#1margin-left}{\z@}}
+               {\tpSetProperty{#1indent}{\z@}%
+                \tpSetProperty{#1margin-left}{\z@}}}}}}%
+    }
+\def\tp@str@german{german}
+\def\tp@str@english{english}
+\def\tpSetBabelLabel#1#2#3{%
+  \def\@lang{#1}%
+  \expandafter\def\expandafter\@tempa\expandafter{\expandafter\def\csname #2name\endcsname{#3}}%
+  \ifx\@lang\tp@str@german
+    \expandafter\addto\expandafter\captionsgerman\expandafter{\@tempa}%
+    \expandafter\addto\expandafter\captionsngerman\expandafter{\@tempa}%
+  \else
+    \ifx\@lang\tp@str@english
+      \expandafter\addto\expandafter\captionsbritish\expandafter{\@tempa}%
+      \expandafter\addto\expandafter\captionsUKenglish\expandafter{\@tempa}%
+      \expandafter\addto\expandafter\captionsenglish\expandafter{\@tempa}%
+      \expandafter\addto\expandafter\captionsamerican\expandafter{\@tempa}%
+      \expandafter\addto\expandafter\captionsUSenglish\expandafter{\@tempa}%
+    \else
+    \fi
+  \fi}
+\endinput
+%%
+%% End of file `transpect-common.sty'.

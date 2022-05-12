@@ -1,0 +1,656 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:tr="http://transpect.io"
+  queryBinding="xslt2" xml:lang="en">
+
+  <ns prefix="idml2xml" uri="http://transpect.io/idml2xml" />
+  <ns prefix="dbk" uri="http://docbook.org/ns/docbook" />
+  <ns prefix="css" uri="http://www.w3.org/1996/css"/>
+  <ns prefix="hub" uri="http://transpect.io/hub" />
+  <ns prefix="tei" uri="http://www.tei-c.org/ns/1.0" />
+  <ns prefix="tr" uri="http://transpect.io" />
+  
+  <xsl:include href="http://customer.le-tex.de/adaptions/xsl/shared-variables.xsl"/>
+
+  <title>Flat Hub XML after Style Mapping</title>
+  <title xml:lang="de">Flaches Hub-XML nach Formatvorlagen-Mapping</title>
+
+  <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
+  <let name="fake-table-invisible-footnote" value="'Tabellenfussnote_ZifferUnsichbar'"/>
+  <let name="fake-table-manual-footnote-in-table" value="'Tabellenfussnote_unecht'"/>
+  <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
+
+  <pattern id="flat-hub_multi_para_captions">
+    <rule context="dbk:para[matches(@role, $hub:figure-title-role-regex-x)]
+      [following-sibling::*[1]/self::dbk:para or preceding-sibling::*[1]/self::dbk:para]
+      [descendant::*[self::dbk:mediaobject]]">
+      <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
+      <report test="following-sibling::*[1][self::dbk:para][matches(@role, $role)] or
+                     preceding-sibling::*[1][self::dbk:para][matches(@role, $role)]" id="multi_para_caption_with_image" role="error"
+        diagnostics="multi_para_caption_with_image_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Several caption paras and image contained</span>
+        In this paragraph with caption style is an image contained. Normally it is pulled out of that para during conversion. Unfortunately, there is another paragraph with this style directly before 
+        or after this paragraph. Several captions paras are merged in the same step. Both actions cannot be executed simultaneously and errors in the order of the images will occur.</report>
+    </rule>
+    <rule context="dbk:para[matches(@role, $hub:figure-title-role-regex-x)][following-sibling::*[1]/self::dbk:para]">
+     <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
+    <report test="replace(following-sibling::*[1]/self::dbk:para[node()]/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multi_para_caption" role="Info"
+        diagnostics="multi_para_caption_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Caption with several paras</span>
+        Is there a paragraph break within the caption? There is exactly one caption para expected in XML, following ones will be merged. Those other paras will be extracted 
+        again in EPUB, but make sure that the XML is valid, because there might occur problems in the merged sequences.</report>
+    </rule>
+  </pattern>
+  
+  <pattern id="flat-hub_multi_para_heading">  
+    <rule context="dbk:para[matches(@role, $hub:general-heading-main-name-regex)][not(matches(., '^\s*$'))]">
+      <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
+      <report test="replace(following-sibling::*[1]/self::dbk:para/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multi_para_heading" role="error"
+        diagnostics="multi_para_heading_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath, ' ', $base-dir, following-sibling::*[1]/@srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multiple paragraph heading</span>
+        If this is a heading with more than one paragraphs please use a linebreak instead of a newline. Otherwise two headings are created.</report>
+    </rule>
+    <rule context="dbk:para[matches(@role, $hub:subtitle-role-regex)][node()]">
+      <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
+      <report test="replace(following-sibling::*[1]/self::dbk:para/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multiple_subtitles" role="error"
+        diagnostics="multiple_subtitles_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath, ' ', $base-dir, following-sibling::*[1]/@srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Several subtitles in succession</span>
+        After this subtitle another para with subtitle style exists. This is not allowed because there may only be ONE subtitle in XML. Perhaps use a normal para format with a tilde instead.</report>
+    </rule>
+  </pattern>
+  
+ <!-- <pattern id="flat-hub_image_count">
+    <rule context="dbk:hub">
+      <let name="images" value=".//dbk:imagedata/@fileref"/>
+      <report test="true()" id="picture_count" role="Info" diagnostics="picture_count_de" >
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">General information</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Image quantity</span>
+        <p xmlns="http://www.w3.org/1999/xhtml">Number of images in document: <xsl:value-of select="count(.//dbk:imagedata)"/></p>
+        <p xmlns="http://www.w3.org/1999/xhtml">Paths: </p>
+        <xsl:if test="exists($images)">
+          <ul xmlns="http://www.w3.org/1999/xhtml">
+            <xsl:for-each select="$images">
+              <li title="{.}" style="margin-top:0.5em;">
+                <xsl:value-of select="replace(., '^.+/', '')"/>
+              </li>
+            </xsl:for-each>
+          </ul>
+        </xsl:if>
+      </report>
+    </rule>
+  </pattern>-->
+  
+  <pattern id="non-unicode-fonts">
+    <rule context="*[@css:font-family = ('Zapf Dingbats', 'Wingdings', 'Symbol', 'Sonata', 'Astrology Pi', 'Audio Pi', 'Decoration Pi', 'Game Pi', 'Holiday Pi', 'Mathematical Pi', 'Warning Pi', 'Sean’s Symbols', 'Wood Type Ornaments') or 
+                                @role = /*//css:rule[@css:font-family = ('Zapf Dingbats', 'Wingdings', 'Symbol', 'Sonata', 'Astrology Pi', 'Audio Pi', 'Decoration Pi', 'Game Pi', 'Holiday Pi', 'Mathematical Pi', 'Warning Pi', 'Sean’s Symbols', 'Wood Type Ornaments')]/@name ][not(self::css:rule)]">
+      <report test="true()" id="symbol_font" role="warning" diagnostics="symbol_font_de">
+        <span class="srcpath"><xsl:value-of select="if (matches(ancestor::dbk:para[1]/@role, 'Anhang|Index|[rR]egister')) then 
+          ($base-dir) else (concat($base-dir, @srcpath))"/></span>
+      	<span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Symbol font used</span>
+        There's a symbol font used here that will most likely not be correctly mapped. Please use fonts that have Unicode support or make sure the used font is mapped. As a workaround also single characters can be replaced by a Unicode supporting font to transport correct encoding to XML.
+        <xsl:sequence select="schematron:general-documentation('en', '#Schriftkodierung')"/>
+      </report>
+    </rule>
+  </pattern>
+  
+<!--  <pattern id="flat-hub_empty_paras">
+    <rule context="dbk:para[not(node())]">
+      <let name="srcpath" value="(@srcpath[1], ancestor::*[@srcpath][last()]/@srcpath)[1]"/>
+      <assert test="parent::*[self::dbk:entry] or matches(@role, $hub:empty-para-role-regex-x)" role="Info" id="empty_para" diagnostics="empty_para_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Empty paragraph</span>
+        This paragraph with style (<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>) contains no text (and also not an image, a table or a box). It will probably be discarded. If it is used for layouting reasons use proper styles or local margin overrides instead.
+        <xsl:sequence select="schematron:general-documentation('en', '#Leerzeilen')"/></assert>
+    </rule>
+  </pattern>-->
+  
+  <pattern id="flat-hub_tabs">
+    <rule context="dbk:tab[not(parent::dbk:tabs)]">
+      <let name="srcpaths" value="string-join(
+                                    for $s in tokenize(
+                                      (@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1],
+                                      '\s+'
+                                    ) 
+                                    return concat($base-dir, $s),
+                                    ' '
+                                  )"/>
+      <report test="exists(
+                      preceding-sibling::node()[self::dbk:phrase[not(@role = 'hub:identifier')] 
+                                                or (self::text() and matches(., '\S'))
+                                                ] or
+                      (not(preceding-sibling::node() and . is ..[self::dbk:phrase]
+                      																	[preceding-sibling::node()[self::dbk:phrase[not(@role = 'hub:identifier')] 
+                                                				or (self::text() and matches(., '\S'))]
+                                                				]/node()[1]))
+                    ) 
+                    and ancestor::dbk:para[1][not(matches(@role, $hub:tabs-are-allowed-in-this-para))] 
+                    and exists(following-sibling::node()[self::dbk:phrase or self::text()])" 
+              role="warning" 
+              diagnostics="tabs_within_line_de" id="tabs_within_line">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tab in para</span>
+        This tab is located within a paragraph (not as first element for indentation reasons). Please check whether it is correctly processed. Tabs are only allowed in special paragraphs such as headings, 
+        lists etc. where they are specially processed and create new XML elements.
+      </report>
+      <report test="exists(preceding-sibling::dbk:tab)
+                    and ancestor::dbk:para[1][not(matches(@role, $hub:tabs-are-allowed-in-this-para))] 
+                    and exists(following-sibling::node()[self::dbk:phrase or self::text()])" role="warning" diagnostics="multiple_tabs_de" id="multiple_tabs">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Multiple tabs</span>
+        This tab is preceded by another tab. Please check whether it is correctly processed. Only a single tab is allowed per paragraph.
+      </report>
+      <report test="@role = 'indent-to-here'" role="warning" diagnostics="tabs_indent_to_here_de" id="tabs_indent_to_here">
+        <span class="srcpath"><xsl:value-of select="$srcpaths"/></span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Indent-to-here not supported</span>
+        In this paragraph an indent-to-here feature was used. transpect doesn't support this feature until now. It will be ignored. Please check whether the results are ok.
+      </report>
+    </rule>
+  </pattern>
+  
+  <pattern id="flat-hub_masterpage">
+    <rule context="dbk:para[not(matches(@role, $hub:discard-para-regex))][.//dbk:phrase[@role = 'hub_page-number']][matches(string-join(.//text(), ''), '\S')]">
+      <report test="true()" role="warning" diagnostics="column_title_wrong_format_de" id="column_title_wrong_format">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Page count not in column style para</span>
+        In this para exists an automated page count. If this is a column title it should be tagged with the column title style.
+      </report>
+    </rule>
+  </pattern>
+
+  <pattern id="flat-hub_lists">
+    <rule context="dbk:para[/dbk:hub/dbk:info/css:rules/css:rule[@name = current()/@role][@css:display = 'list-item']]
+      [@css:display = 'block'][@css:display]">
+      <report test=".//dbk:tab" role="warning" diagnostics="disabled_list_item_has_tab_de" id="disabled_list_item_has_tab">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">List style disabled</span>
+        This paragraph originally had a list style, but this was disabled. Nevertheless, it has (at least) a tab,
+        indicating that it is manually typeset as a list. A construct such as this will most probably not converted
+        correctly. Why is it no list-item proper? 
+      </report>
+    </rule>
+    <rule context="dbk:para[/dbk:hub/dbk:info/css:rules/css:rule[@name = current()/@role][not(@css:display = 'list-item')]]
+      [@css:display = 'list-item'][@css:display]">
+      <report test="true()" role="warning" diagnostics="manually_overridden_list_de" id="manually_overridden_list">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Manually added list properties</span>
+        This paragraph originally has no list style, but list properties were added manually as override. A construct such as this will most probably not converted
+        correctly. Please use the list settings in the paragraph style. 
+      </report>
+    </rule>
+    <rule context="dbk:para[not(matches(css:text-indent, '^-'))]
+                           [not(matches(css:margin-left, '^0(pt|mm|px|cm)'))]
+                           [matches(@role, $hub:list-role-regex)]
+                           [/dbk:hub/dbk:info/css:rules/css:rule[@name = current()/@role]
+                                                                  (: no indent, no margin :)
+                                                                [(  matches(@css:text-indent, '^0(pt|mm|px|cm)') and matches(@css:margin-left, '^0(pt|mm|px|cm)'))
+                                                                 or
+                                                                  (: no indent, no positive margin-left :)
+                                                                 (  matches(@css:text-indent, '^0(pt|mm|px|cm)') and not(matches(@css:margin-left, '^(0[\.,]|[1-9])')))
+                                                                 or
+                                                                  (: positive indent :)
+                                                                   matches(css:text-indent, '^(0[\.,]|[1-9])')
+                                                                 ]
+                           ]">
+      <assert test="matches(@role, 'Zeittafel|Glossar|timetable', 'i')" role="warning" diagnostics="list_para_without_indent_de" id="list_para_without_indent">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">No negative indent in list para</span>
+        This paragraph has a list style format. But it has no negative indent in its paragraph style definition. This will most likely prevent creating a real list. So the indentation and list symbols in EPUB will look strange. 
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="flat-hub_tables">
+    <!-- fake table footnotes-->
+    <rule context="dbk:entry/dbk:para/*[self::dbk:phrase or self::dbk:superscript][matches(@role, $fake-table-invisible-footnote)]">
+      <let name="srcpath" value="(.//@srcpath[1], ancestor::*[@srcpath][last()]/@srcpath)[1]"/>
+      <report test="true()" id="wrong_style_for_fake_table_real_footnote_invisible" role="error" diagnostics="wrong_style_for_fake_table_real_footnote_invisible_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Wrong style for faked table footnote inside table</span>
+        It seems that a fake footnote should be created. But the character style '<xsl:value-of select="$fake-table-invisible-footnote"/>' has to be used outside of tables only for invisible real footnote numbers.
+        Manually created footnote numbers inside the table need the style '<xsl:value-of select="$fake-table-manual-footnote-in-table"/>'.
+        <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+        Perhaps only the character style was mixed up with the style that is used outside tables?
+      </report>
+    </rule>
+    <rule context="dbk:para/*[self::dbk:phrase or self::dbk:superscript][matches(@role, $fake-table-manual-footnote-in-table)]">
+      <let name="srcpath" value="(.//@srcpath[1], ancestor::*[@srcpath][last()]/@srcpath)[1]"/>
+      <assert test="(ancestor::*[self::dbk:entry] and not(ancestor::*[self::dbk:sidebar]))" id="wrong_style_for_fake_table_footnote_number" role="error" diagnostics="wrong_style_for_fake_table_footnote_number_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Wrong style for faked table footnote out of table</span>
+        It seems that a fake footnote should be created. But the character style '<xsl:value-of select="$fake-table-manual-footnote-in-table"/>' has to be used inside tables only for manually fake footnote numbers.
+        Real and invisible footnote numbers outside the table need the style '<xsl:value-of select="$fake-table-invisible-footnote"/>'.
+        <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+        Perhaps only the character style was mixed up with the style that is used inside tables?
+      </assert>
+    </rule>
+    <rule context="dbk:para[@role][matches(@role, $hub:table-para-style-role-regex)]">
+      <let name="srcpath" value="(@srcpath[1], ancestor::*[@srcpath][last()]/@srcpath)[1]"/>
+      <assert test="exists(ancestor::*[self::dbk:informaltable]
+      																[
+      																	every $para in descendant::dbk:body[1]//dbk:row/dbk:entry/dbk:para satisfies $para[not(matches(@role, $tei:box-type-role))]
+      																]
+      										 )" 
+              role="warning" id="table-para-style-outside-table" diagnostics="table-para-style-outside-table_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+      	<span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Table para style outside of real table</span>
+        This para has a style applied ('<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>') that was defined for usage inside tables. 
+      	It was used outside a table though. Please check whether the style is correctly applied..</assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="flat-hub_forbidden_elements">
+    <rule context="dbk:*[@role = 'hub:foreign']">
+      <report test="true()" role="error" id="forbidden_element" diagnostics="forbidden_element_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (ancestor::*[self::dbk:para[.//text()]][1]/@srcpath, ancestor::*[self::dbk:para[.//text()]]/following-sibling::*[1]/@srcpath,  ancestor::*[self::dbk:para[.//text()]]/preceding-sibling::*[1]/@srcpath)[1])"/></span>
+        <span class="category">Unsupported feature</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unknown typesetting software specific feature</span>
+        Near this element a »Word« specific feature was used that can not be reconstructed via transpect. If it is a »Word« drawing, use a proper image instead.</report>
+    </rule>
+  </pattern>
+  
+<!--  <pattern id="flat-hub_boxes">
+
+  	<rule context="dbk:sidebar[@role][@remap = 'TextFrame'][dbk:para[matches(@role, $hub:title-start-regex)]]/dbk:para[1]">
+  		<let name="srcpath" value="(@srcpath[1], ancestor::*[@srcpath][last()]/@srcpath)[1]"/>
+  		<report test="true()" role="warning" id="title_para_in_named_frame" diagnostics="title_para_in_named_frame_de">
+  			<span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+  			<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Title page paragraph in text frame with object style</span>
+  			This paragraph is located in a text frame that has the object style '<xsl:value-of select="../@role"/>' applied. Using an object style avoids that the text frame is dissolved. This can lead to wrong structuring of the frontmatter parts.</report>
+  	</rule>
+  </pattern>-->
+  
+  <pattern id="flat-hub_groups">
+    <rule context="dbk:sidebar[@remap = 'Group'][@role][dbk:sidebar]">
+      <let name="srcpath" value="(descendant::dbk:para[@srcpath]/@srcpath[1], descendant::dbk:*[@srcpath][1]/@srcpath)[1]"/>
+      <report test="(every $frame in dbk:sidebar/@role satisfies ($frame[. = current()/@role]))" 
+              role="Info" id="group_object_style_inherited " diagnostics="group_object_style_inherited_de">
+        <span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Object style of group is the same as the grouped object's style</span>
+        This group has an object style (»<xsl:value-of select="replace(key('tr:rule-definition-in-document', current()/@role)[1]/@native-name, ':', '/')"/>«) applied. Contained frames have the same style applied. 
+        If this behaviour is wanted, ignore this message. But as it may appear that applying 
+        an object style to a group results in the inheritance of that style for the grouped objects.</report>
+    </rule>
+  </pattern>
+
+  <pattern id="sch_style-name">
+    
+    <rule context="css:rule">
+      <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath)[1]"/>
+      <assert test="not(matches(@native-name, '^\s+') or matches(@native-name, '\s+$'))" id="whitespace_style_name" diagnostics="whitespace_style_name_de" role="warning">
+        <span class="srcpath">BC_orphans</span>
+        <span class="category">Style names</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Whitespace in style name</span>
+        <span class="style-name">Style name starts or ends with whitespace'</span><xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@name"/></xsl:call-template><span class="style-name">'.</span>
+      </assert>
+    	<report test="matches(@native-name, ':.*?~.*?:')" id="tilde_in_style_group_name" diagnostics="tilde_in_style_group_name_de" role="warning">
+    		<span class="srcpath">BC_orphans</span>
+    		<span class="category">Style names</span>
+    		<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tilde in style group name</span>
+    		The style name '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@name"/></xsl:call-template> contains a tilde in the name of one of the folders (<xsl:value-of select="replace(@native-name, '^(.+?):(.*?~.*?):(.+)$', '$2')"/>). This is not allowed.
+    	</report>
+    </rule>
+  	<rule context="dbk:para[matches(@role, $hub:container-styles)]">
+  		<let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath)[1]"/>
+  		<report test="(matches(string-join((text()[not(parent::*[@condition = 'StoryID'])], dbk:phrase[not(@condition = 'StoryID')]/text()), ''), '\S'))" id="text_in_container_para" diagnostics="text_in_container_para_de" role="warning">
+  			<span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+  			<span class="category">Styles usage</span>
+  			<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Container para with text</span>
+  			The name of this paragraph's style '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' suggests that it is a container for a table or image.
+  			If so, the paragraph should not contain text. Use the correct table or figure title or note paras for the text instead. 
+  		</report>
+  	</rule>
+  </pattern>
+  
+	<pattern id="sch_rule_definitions">
+		
+		<rule context="css:rule[@css:text-decoration-line]">
+			<report test="count(tokenize(@css:text-decoration-line, '\s')) gt 1" id="css_text_decoration" diagnostics="css_text_decoration_de" role="error">
+				<span class="srcpath">BC_orphans</span>
+				<span class="category">Unsupported feature</span>
+				<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Too many line definitions in style</span>
+				The style name definition of the style 
+				<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>' has 
+					<xsl:value-of select="string-join(tokenize(@css:text-decoration-line, '\s'), ' and ')"/> line definitions. 
+					This cannot be transported in CSS and will therefore lead to validation error. 
+					Perhaps you can solve the problem by adding one of the line properties to the para and another to a character style?
+			</report>
+		</rule>
+		<rule context="dbk:para[@css:text-decoration-line] | dbk:phrase[@css:text-decoration-line]">
+			<let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath)[1]"/>
+			<report test="count(tokenize(@css:text-decoration-line, '\s')) gt 1" id="css_text_decoration_element" diagnostics="css_text_decoration_element_de" role="error">
+			<span class="srcpath"><xsl:value-of select="string-join(for $s in tokenize($srcpath, '\s+') return concat($base-dir, $s), ' ')"/></span>
+			<span class="category">Unsupported feature</span>
+			<span class="issue" xmlns="http://www.w3.org/1999/xhtml">Too many line definitions applied to this element</span>
+				This <xsl:value-of select="name()"/>  has 
+				<xsl:value-of select="string-join(tokenize(@css:text-decoration-line, '\s'), ' and ')"/> line definitions. 
+				This cannot be transported in CSS and will therefor lead to validation error. 
+				Perhaps you can solve the problem by adding one of the line properties to the para and another to a character style?
+				</report>
+		</rule>
+	</pattern>
+  
+  <pattern id="flat-hub_split_elements">
+    <rule context="dbk:*[not(self::dbk:para)][matches(@role, '_-_SPLIT')]">
+      <assert test="(following-sibling::*[1][name() eq current()/name()]) 
+                      or
+                      (not(following-sibling::*) and self::dbk:entry and parent::*/following-sibling::*[1][dbk:entry])
+                      or 
+                    (following-sibling::*[2][name() eq current()/name()]
+                       and 
+                       following-sibling::*[1]
+                                            [self::dbk:para]
+                                            [not(matches(., '\S'))]
+                                            [every $elt in * satisfies $elt[self::dbk:anchor]]
+                       )" role="warning" id="illegal_use_of_split_element" diagnostics="illegal_use_of_split_element_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (descendant-or-self::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Following element can't be merged</span>
+        This '<xsl:value-of select="local-name(.)"/>' element has a ~SPLIT instruction applied, but the next element is not of the same type. 
+        <xsl:value-of select="if (following-sibling::*[1]/local-name()) 
+                              then concat(' The next element is a »', following-sibling::*[1]/local-name(), ' element') 
+                              else 'There is no following element in this context.'"/>
+      </assert>
+      <assert test="self::dbk:sidebar or self::dbk:entry" role="warning" id="split_at_wrong_element" diagnostics="split_at_wrong_element_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, (descendant-or-self::*[@srcpath][1]/@srcpath)[1])"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">~SPLIT instruction on wrong element applied</span>
+        This '<xsl:value-of select="local-name(.)"/>' element has a ~SPLIT instruction applied, but that instruction can only be interpreted on table cells and text frames. 
+      </assert>
+    </rule>
+    <rule context="dbk:para[matches(@role, '_-_SPLIT')]">
+      <assert test="parent::*[self::dbk:entry or self::dbk:sidebar][matches(@role, '_-_SPLIT')]" role="warning" id="split_para_without_split_container" diagnostics="split_para_without_split_container_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Para with ~SPLIT instruction without ~SPLIT container</span>
+        This para has a ~SPLIT instruction style. Paras with this instruction can only be merged with the next one when also the containers (like table cell or text frame) are merged with the ~SPLIT instruction. 
+      </assert>
+      <assert test="not(following-sibling::*)" role="warning"  id="illegal_use_of_split_para" diagnostics="illegal_use_of_split_para_de">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Para with ~SPLIT instruction is not last element in parent container</span>
+        This para has a ~SPLIT instruction style. Paras with this instruction have to be the last element in the elment it is surrounded by. 
+        But a '<xsl:value-of select="following-sibling::*[1]/local-name()"/>' element is following.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="flat-hub_separators">
+    <rule context="dbk:*[processing-instruction()[local-name() eq 'idml2xml' and . eq 'paragraph-separator']]">
+      <report test="true()" id="paragraph_separator" diagnostics="paragraph_separator_de" role="Warning">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Export Issues</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Character U+2029 (Paragraph Separator) at the end of this 
+          paragraph was replaced with a regular paragraph mark.</span>
+        InDesign versions prior to CS 6.0 drop occasionally regular paragraph marks during IDML export and replace them with 
+        <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.fileformat.info/info/unicode/char/2029/index.htm">U+2029</a> characters (Paragraph Separator). In contrast to the INDD file, the paragraph is no longer visible in IDML. During conversion,
+        this issue is circumvented by restoring the paragraph in XML. For typesetting, you should always stay with the INDD file and use the 
+        IDML file just for conversion.
+      </report>
+    </rule>
+  </pattern>
+
+  <diagnostics>
+    <diagnostic id="group_object_style_inherited_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Objektformat der Gruppierung an gruppierte Rahmen vererbt</span>
+      Das Objektformat dieser Gruppierung (»<xsl:value-of select="replace(key('tr:rule-definition-in-document', current()/@role)[1]/@native-name, ':', '/')"/>«) stimmt mit mindestens einem Format eines gruppierten Rahmens überein.
+      Falls dies gewollt ist, ignorieren Sie diese Meldung einfach. Da das Zuweisen von Objektformaten zu Gruppen dazu führt, dass das Format (ungewollt) an die enthaltenen Rahmen vererbt wird, ist eine Prüfung jedoch sinnvoll.
+    </diagnostic>
+    <diagnostic id="table-para-style-outside-table_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Absatzformat für Tabellen außerhalb von Tabelle verwendet</span>
+      Das Format dieses Absatzes ('<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>') ist für die Benutzung innerhalb echter Tabellen gedacht. In diesem Fall wurde es außerhalb einer Tabelle verwendet.
+      Bitte überprüfen Sie die korrekte Verwendung des Formatvorlagennamens.
+    </diagnostic>
+    <diagnostic id="tilde_in_style_group_name_de" xml:lang="de">
+      <span class="category">Formatvorlagennamen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tilde in Formatgruppenname</span>
+      Das Format '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@name"/></xsl:call-template> enthält eine Tilde in der Formatgruppe (Ordnername:  (<xsl:value-of select="replace(@native-name, '^(.+?):(.*?~.*?):(.+)$', '$2')"/>). Dies ist nicht vorgesehen.
+    </diagnostic>
+    <diagnostic  id="text_in_container_para_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Container para with text</span>
+      Die Formatvorlage dieses Absatzes ('<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>') deutet darauf hin, dass es sich um ein Containerformat
+      handelt, dass nur zur Einbettung von Bildern oder Tabellen benutzt werden sollte. Es enthält aber auch Text. Kann es sein, dass der Text eigentlich eher als Note oder BU/TU ausgezeichnet werden sollte?
+    </diagnostic>
+    <diagnostic id="title_para_in_named_frame_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Titelei-Absatz in Rahmen mit Objektformat</span>
+      Dieser Absatz befindet sich in einem Textrahmen, der ein Objektformat ('<xsl:value-of select="../@role"/>') zugewiesen hat. Dadurch wird der Textrahmen nicht aufgelöst. 
+      Für die Aufteilung der Frontmatter/Titelei-Abschnitte ist eine Auflösung der Rahmen jedoch erfoderlich. Sollte der Rahmen nicht absichtlich dieses Objektformat tragen, entfernen Sie es bitte.
+    </diagnostic>
+    <diagnostic id="css_text_decoration_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Zu viele Liniendefinitionen im Format</span>
+      Das Format '<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@name"/></xsl:call-template>' hat 
+      <xsl:value-of select="string-join(tokenize(@css:text-decoration-line, '\s'), ' und ')"/> als Linieneinstellungen. 
+      Im CSS kann nur eine dieser Eigenschaften pro Format transportiert werden. Dadurch kommt es zu Validierungsfehlern. 
+      Vielleicht können Sie das Problem lösen, wenn Sie eine Linieneigenschaft dem Absatzformat zuweisen, die andere einem Zeichenformat?
+    </diagnostic>
+    <diagnostic id="css_text_decoration_element_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Zu viele Liniendefinitionen</span>
+      An diese<xsl:value-of select="if (matches(name(), 'para')) then 'm Absatz ' else 'r Zeichenkette '"/>wurden die Linieneigenschaften	<xsl:value-of select="string-join(tokenize(@css:text-decoration-line, '\s'), ' und ')"/>benutzt. 
+      Im CSS kann aber nur eine der Eigenschaft pro Element vergeben sein. Dadurch kommt es zu Validierungsfehlern.
+      Vielleicht können Sie das Problem lösen, wenn Sie eine Linieneigenschaft dem Absatzformat zuweisen die andere einem Zeichenformat?
+    </diagnostic>
+    <diagnostic id="illegal_use_of_split_element_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Folgendes Element kann nicht zusammengefügt werden</span>
+      Dieses '<xsl:value-of select="local-name(.)"/>'-Element hat ~SPLIT im Formatnamen, soll also mit dem folgenden zusammengefügt werden. Das folgende Element ist jedoch nicht vom selben Typ, sondern 
+      <xsl:value-of select="if (following-sibling::*[1]/local-name()) 
+        then concat('vom Typ »', following-sibling::*[1]/local-name(), '«.') 
+        else 'es gibt kein folgendes Element in diesem Kontext.'"/>
+    </diagnostic>
+    <diagnostic id="split_at_wrong_element_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">~SPLIT an falschem Element</span>
+      Dieses '<xsl:value-of select="local-name(.)"/>'-Element hat ~SPLIT im Formatnamen, aber es können nur Tabellenzellen und Textrahmen mit Objektformat zusammengefügt werden, sowie Absätze innerhalb dieser Elmente.
+    </diagnostic>
+    <diagnostic id="split_para_without_split_container_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">~SPLIT-Absatz ohne umgebendes ~SPLIT-Element</span>
+      Dieser Absatz hat ~SPLIT im Formatnamen. Um ihn mit dem folgenden Absatz zusammenfügen zu können, muss auch das umgebende Element mit ~SPLIT ausgezeichnet werden (Tabellenzelle/Textrahmen mit Objektformat). 
+    </diagnostic>
+    <diagnostic id="illegal_use_of_split_para_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Auf ~SPLIT-Absatz folgen weitere Elemente</span>
+      Absätze mit ~SPLIT im Formatnamen müssen das jeweils letzte Element im umgebenden Element sein, damit ein korrektes Zusammenfügen erfolgen kann. Nach diesem Absatz folgt jedoch ein
+      '<xsl:value-of select="following-sibling::*[1]/local-name()"/>'-Element.
+    </diagnostic>
+    <diagnostic id="wrong_heading_style_after_num_style_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hierarchie des Überschriftennummerierungsformates stimmt nicht</span>
+      Dieser Absatz hat das Format »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>« zugewiesen. Daraus folgt, dass der nächste Absatz 
+      »<xsl:value-of select="replace(current()/@role, $hub:heading-number-regex, '$2$3')"/>« enthalten muss. Tatsächlich ist das Absatzformat des folgenden Absatzes aber »<xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="following-sibling::*[1]/@role"/></xsl:call-template>«. 
+      Das sind unterschiedliche Hierarchieebenen, deren Teile nicht zusammengefügt werden können. Für ein korrektes Konvertierungsergebnis müssen Sie entweder das Nummerierungsformat oder das eigentliche Überschriftenformat an die gewünschte Ebene anpassen. 
+    </diagnostic>
+    <diagnostic id="tabs_indent_to_here_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Einzug-bis-hierhin nicht unterstützt</span>
+      In diesem Absatz wurde das InDesign-Feature »Einzug bis hierhin« verwendet, was transpect zur Zeit noch nicht unterstützt. Es wird bei der Konvertierung vernachlässigt. Bitte prüfen Sie, ob die Konvertierungsergebnisse dennoch ok sind.</diagnostic>
+    <diagnostic id="list_para_without_indent_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Negativer Einzug in Listenformat fehlt</span>
+      Dieser Absatz wurde mit einem Listenabsatzformat ausgezeichnet. Er hat aber in den Abatzformateinstellungen weder einen negativen Erstzeileneinzug noch einen Abstand links. 
+      transpect schachtelt nur Listen (die ein Listenformat haben), anhand ihres Abstandes links und des negativen Erstzeileneinzug. 
+      Ist dies nicht gegeben, wird die korrekte Listenumsetzung wahrscheinlich scheitern.</diagnostic>
+    <diagnostic id="empty_para_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leerer Absatz</span>
+      Dieser Absatz (Format <xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template>) enthält weder Text noch andere Elemente wie Bilder oder Tabellen. Dieser leere Absatz wird wahrscheinlich während der Konvertierung entsorgt.
+      Falls er zum Layouten benutzt wurde und die Abstandsinformationen ins EPUB/XML mitgenommen werden sollen, muss entweder: 
+      <ul xmlns="http://www.w3.org/1999/xhtml">
+        <li style="list-style-type:disc; margin-top:0.5em; margin-left:1em;">ein eigenes Absatzformat benutzt werden, aus dessen Definition ine Leerzeile hervorgeht oder</li>
+        <li style="list-style-type:disc; margin-top:0.5em; margin-left:1em;">ein spezielles Absatzformat für erwünschte Leerzeilen (meist in der Produktion aus DOCX) oder</li>
+        <li style="list-style-type:disc; margin-top:0.5em; margin-left:1em;">händisch Abstand an Absätzen mit Textinhalt eingestellt werden (sofern die Übernahme solcher Abweichungen vom Verlag erwünscht ist).</li>
+      </ul>
+      <xsl:sequence select="schematron:general-documentation('de', '#Leerzeilen')"/></diagnostic>
+    <diagnostic id="wrong_style_for_fake_table_real_footnote_invisible_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Falsches Format für unechte Tabellenfußnoten in der Tabelle</span>
+      Sofern hier eine falsche Tabellenfussnote erzeugt werden sollte, wurde das falsche Format verwendet. Das Zeichenformat '<xsl:value-of select="$fake-table-invisible-footnote"/>' darf nur außerhalb von Tabellen verwendet werden, um 
+      dort eine echte Fußnote einzufügen. Die entsprechende Fußnotenziffer muss mit diesem Zeichenformat ausgezeichnet werden.
+      Manuell erstellte Fußnotenziffern innerhalb der Tabelle benötigen das Zeichenformat '<xsl:value-of select="$fake-table-manual-footnote-in-table"/>'.
+      <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+      Vielleicht wurden die beiden Zeichenformate nur verwechselt?
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellenfußnoten')"/>
+    </diagnostic>
+    <diagnostic id="wrong_style_for_fake_table_footnote_number_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Falsches Format für unechte Tabellenfußnoten außerhalb der Tabelle</span>
+      Sofern hier eine falsche Tabellenfussnote erzeugt werden sollte, wurde das falsche Format verwendet. Das Zeichenformat '<xsl:value-of select="$fake-table-manual-footnote-in-table"/>' darf nur innerhalb von Tabellenzellen verwendet 
+      werden, für händisch eingefügte Fußnotenzeichen.
+      Unsichtbare Fußnotenziffern außerhalb der Tabelle, die eine echte Fußnote erzeugen, benötigen das Format '<xsl:value-of select="$fake-table-invisible-footnote"/>'. Diese können z.B. in Absätzen vor oder nach der Tabelle erzeugt werden.
+      <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
+      Vielleicht wurden die beiden Zeichenformate nur verwechselt? 
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabellenfußnoten')"/>
+    </diagnostic>  
+    <diagnostic id="forbidden_element_de" xml:lang="de">
+      <span class="category">Nichtunterstützte Optionen des Satzprogramms</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Microsoft Word spezifisches Feature nicht unterstützt</span>
+      In der Nähe dieses Elements wurde ein MS-Word-spezifisches Feature benutzt, welches transpect nicht weiterverarbeiten kann. Falls es sich um eine Wordzeichnung handelt, 
+      verwenden Sie stattdessen ein echtes Bild.
+    </diagnostic>
+    <diagnostic id="symbol_font_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Symbolfont</span>
+      Es wurde ein Symbol-Font verwendet, dessen Zeichen höchstwahrscheinlich nicht korrekt dargestellt werden können. 
+      Bitte verwenden Sie stattdessen einen Font, dessen Zeichen auf korrekte Unicode-Zeichen gemappt werden.
+      <xsl:sequence select="schematron:general-documentation('de', '#Schriftkodierung')"/>
+    </diagnostic>
+    <diagnostic id="tabs_within_line_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Tabulator in Absatz</span>
+      In diesem Absatz wurde ein Tabulator verwendet. Tabulatoren können generell im XML und EPUB nicht wie im Satzprogramm wiedergegeben werden. 
+      In einigen Absatztypen wie Überschriften, Listen, Glossaren etc. kann mit Tabulatoren gearbeitet werden, da dieser den Absatz dann in neue Elemente unterteilt. Z.B. in Glossarbegriff und Glossarerklärung.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Entsprechende Absatztypen sind von dieser Regel ausgenommen. Im verwendeten Absatzformat ist eine Verwendung momentan nicht unterstützt.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Bitte prüfen Sie deshalb, ob die Darstellung ok ist.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabulatoren')"/>
+    </diagnostic>
+    <diagnostic id="multiple_tabs_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mehrere Tabulatoren</span>
+      In diesem Absatz kommen mehrere Tabulatoren vor. Es darf höchstens einer verwendet werden, und auch nur zu dem Zweck, Kapitelnummer, Listenmarker etc. vom Inhalt zu trennen.
+      <xsl:sequence select="schematron:general-documentation('de', '#Tabulatoren')"/>
+    </diagnostic>
+    <!--    <diagnostic id="no_page_anchors_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Keine Seitenanker</span>
+      Es existieren keine Seitenanker. Wenn im EPUB eine Pagemap erstellt werden soll, die mit den Seitenzahlen des Printproduktes übereistimmt,
+      müssen die Seitenanker eingefügt werden. Dazu kann das Skript PageNamesToStory_ConditionalText.jsx benutz werden.
+      </diagnostic>-->
+    <!--    <diagnostic id="page_anchor_number_de" xml:lang="de">
+      <span class="category">Generelle Informationen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="count(.//*[dbk:anchor[matches(@xml:id, '^page_\d+$')]])"/> Seitenanker im Dokument</span>
+      Nach der Verwendung eines Skriptes zum Setzen von Seitenankern, befinden sich nun <br xmlns="http://www.w3.org/1999/xhtml"/>
+      '<xsl:value-of select="count(.//*[dbk:anchor[matches(@xml:id, '^page_\d+$')]])"/>' Seitenanker im Dokument. Mitilfe dieser Information können Sie prüfen, 
+      ob die Anzahl ungefähr mit der Printseitenzahl übereinstimmt.
+      </diagnostic>-->
+    <diagnostic id="disabled_list_item_has_tab_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Händisch deaktivierte Listeneigenschaften</span>
+      Ursprünglich hatte dieser Absatz ein Listenformat, dessen Listeneigenschaft jedoch deaktiviert wurde.
+      Trotzdem gibt es in diesem Absatz mindestens ein explizites Tab, was darauf hindeutet, dass dennoch
+      eine Listendarstellung gewünscht wurde. Ein solches Konstrukt kann möglicherweise nicht nicht richtig
+      konvertiert werden, bitte überprüfen Sie die Darstellung. Sinnvoller ist die Benutzung eines Absatzformates, 
+      welches genau Ihren Bedürfnissen entspricht, z.B. eine Tildenvariante. 
+      So können konkurrierende Information in Absatzformat und Absatz vermieden werden.
+    </diagnostic>
+    <diagnostic id="manually_overridden_list_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Händisch hinzugefügte Listeneigenschaften</span>
+      Ursprünglich hatte dieser Absatz keine Listenformat-Eigenschaften im Absatzformat definiert. Dafür wurde eine händische Einstellung 
+      angewendet, der ihn zu einer Liste macht. Ein solches Konstrukt wird eventuell nicht richtig
+      konvertiert. Bitte legen Sie Listeneigenschaften im Absatzformat fest oder kontrollieren Sie die Ergebnisse im EPUB.
+    </diagnostic>
+    <diagnostic id="column_title_wrong_format_de" xml:lang="de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Absatz mit Paginierung ohne Kolumnentitelformat</span>
+      In diesem Absatz existiert eine automatische Seitenzählung. Falls es sich bei diesem Absatz um einen Kolumnentitel handelt, verwenden Sie bitte das korrekte Absatzformat für Kolumnentitel. 
+    </diagnostic>
+    <!--    <diagnostic id="picture_count_de" xml:lang="de">
+      <span class="category">Generelle Informationen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="count(.//dbk:imagedata)"/> Bilder im Dokument</span>
+      <p xmlns="http://www.w3.org/1999/xhtml">Anzahl Bilder im Body: <xsl:value-of select="count(.//dbk:imagedata)"/></p>
+      <p xmlns="http://www.w3.org/1999/xhtml">Pfade: </p>
+      <xsl:if test="exists($images)">
+      <ul xmlns="http://www.w3.org/1999/xhtml">
+      <xsl:for-each select="$images">
+      <li title="{.}" style="margin-top:0.5em;">
+      <xsl:value-of select="replace(., '^.+/', '')"/>
+      </li>
+      </xsl:for-each>
+      </ul>
+      </xsl:if>
+      </diagnostic>-->
+    <diagnostic id="multi_para_caption_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Abbildungsüber-, bzw. Unterschrift besteht aus mehreren Absätzen</span>
+      Besteht die Bildunter/überschrift aus mehreren Absätzen? Im XML darf es nur einen Absatz geben, der zur Abbildungsüberschrift wird. 
+      Deswegen werden bei der Konvertierung die folgenden Absätze in den ersten BU-Absatz gezogen und für das EPUB wieder getrennt. Sollte 
+      das XML dadurch invalide werden (RNG-TEI-Fehler an dieser Stelle), dann verwenden Sie entweder einen Zeilenumbruch oder erwägen die Verwendung von 
+      anderen Formaten wie BU_Note etc. für mehr Zusatzinformationen.
+    </diagnostic>
+    <diagnostic xml:lang="de" id="multi_para_caption_with_image_de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mehrere Bildlegendenabsätze mit enthaltenem Bild</span>
+      In diesem Absatz mit Bildlegendenformat ist ein Bild enthalten. Normalerweise würde das Bild einfach aus dem Absatz herausgezogen und davor gestellt. Da aber auch der Absatz davor oder danach ein Bildlegendenformat hat, kommt es zu Problemen. Im selben Konvertierungsschritt 
+      werden nämlich auch hintereinanderfolgende Legendenabsätze zu einem zusammengefügt, um valides XML zu erhalten. Beide Aktionen behindern sich gegenseitig und  die Bildreihenfolge kann nicht mehr klar erkannt werden.
+      Bitte ändern Sie entsprechend das Absatzformat um das Bild in das Format, welches Bilder enthalten darf. Ist keines definiert, dann nehmen Sie »einfacher Absatz«.
+    </diagnostic>
+    <diagnostic id="multi_para_heading_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Überschrift aus mehreren Absätzen/ 2 Überschriften derselben Hierarchiestufe hintereinander</span>
+      Besteht die Überschrift aus mehreren Absätzen? Bitte ggf. harten Zeilenumbruch verwenden, da sonst zwei Überschriften hintereinander generiert werden, die z.B. 
+      jeweils als eigener Eintrag in das Inhaltsverzeichnis des EPUBs übernommen werden.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Falls es sich um verschiedene Überschriftenbestandteile handelt, wie Untertitel, Autor oder eine alleinstehende Kapitelnummer, 
+      sollte unbedingt auf die dafür zur Verfügung gestellten Formate zurückgegriffen werden.
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      <br xmlns="http://www.w3.org/1999/xhtml"/>
+      Sind es wirklich zwei eigenständige Überschriften, die an der Fehlerstelle mit gleichem Format auftreten, überdenken Sie bitte die Struktur. Es ist in den meisten Fällen nicht sinnvoll, 
+      wenn ein Abschnitt im XML nur aus einer Überschrift besteht. Wählen Sie für die zweite Hierarchiestufe also eventuell besser eine niedrigere Stufe (also z.B. U2 statt U1). 
+    </diagnostic>
+    <diagnostic id="multiple_subtitles_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Mehrere Untertitel nacheinander</span>
+      Nach diesem Absatz mit Untertitel-Format folgt ein weiterer Untertitel-Absatz. Jeder Absatz mit Untertitel-Format, wird im XML zu einem Untertitel. Dort darf es aber nur ein Untertitel-Element geben. Wenn es sich wirklich um 
+      einen Unter-Untertitel handelt, sollte eventuell besser ein Grundtext-Format mit Tilde verwendet werden.
+    </diagnostic>
+    <diagnostic id="whitespace_style_name_de" xml:lang="de">
+      <span class="category">Formatvorlagennamen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Leerzeichen in Formatvorlagennamen</span>
+      Der Formatvorlagenname beginnt oder endet mit einem Leerzeichen 
+      '<span class="style-name"><xsl:call-template name="tr:role-for-schematron"><xsl:with-param name="role" select="@role"/></xsl:call-template></span>'.
+      Aus einem Leerzeichen generiert transpect einen Unterstrich, das weicht dann von den definierten Formatvorlagennamen ab und kann zu Konvertierungsfehlern führen.
+      <xsl:sequence select="schematron:general-documentation('de', '#Formatvorlagen')"/>
+    </diagnostic>
+    <diagnostic id="paragraph_separator_de" xml:lang="de">
+      <span class="category">Exportfehler</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Zeichen U+2029 (Paragraph Separator) am Ende des Absatzes wurde automatisch durch eine reguläre Absatzmarke ersetzt.</span>
+      Bei InDesign-Versionen vor CS 6.0 kann es beim IDML-Export dazu kommen, dass in der erzeugten IDML-Datei reguläre Absatzmarken 
+      mit dem Unicode-Zeichen <a xmlns="http://www.w3.org/1999/xhtml" href="http://www.fileformat.info/info/unicode/char/2029/index.htm">U+2029</a> (Paragraph Separator) ersetzt werden und nicht mehr als Absatz erkennbar sind. Dieses Problem 
+      wird automatisch bei der Konvertierung behoben, indem das Zeichen durch einen regulären Absatz ersetzt wird. Für den Satz sollte man dennoch die 
+      INDD-Datei bevorzugen und die IDML nur zur Konvertierung verwenden.
+    </diagnostic>
+  </diagnostics>
+</schema>

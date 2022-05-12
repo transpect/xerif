@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="../../../xml2idml/schema/mapping.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mapping-instructions 
+  xmlns="http://transpect.io/xml2idml"
+  xmlns:xml2idml="http://transpect.io/xml2idml"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:htmltable="http://transpect.io/htmltable"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:dbk="http://docbook.org/ns/docbook"
+  xpath-default-namespace="http://www.w3.org/1999/xhtml"
+  retain-tagging="false">
+  
+  <import href="http://transpect.io/htmltables/xsl/html-tables.xsl" />
+  
+  <inline>
+    <xsl:template match="link/@href[matches(., '^#')]" mode="xml2idml:Discard">
+      <xsl:attribute name="href" select="replace(., '^#', '')"/>
+    </xsl:template>
+    
+    <xml2idml:OtherMappingConfiguration>
+
+      <Stories>
+        <mapping-instruction>
+          <path>*:hub/*[not(self::*:colophon)]</path>
+          <name>main</name>
+        </mapping-instruction>
+        <mapping-instruction>
+          <path>*:colophon</path>
+          <name>title</name>
+        </mapping-instruction>
+      </Stories>
+    </xml2idml:OtherMappingConfiguration>
+    
+  </inline>
+  
+  <xslt-pipeline>
+    <step mode="htmltable:tables-add-atts" before="xml2idml:CellStyles"/>
+  </xslt-pipeline>
+  
+  <Pages>
+    <Spread PageCount="1" BindingLocation="0" MasterPageName="B-Auftakt" Repeat="1" MainStoryName="title" MainStoryXPath="*:hub//*:colophon"/>
+    <Spread MasterPageName="A-Fließtext" Repeat="20" MainStoryContinued="true" MainStoryName="main" MainStoryXPath="*:hub"/>
+  </Pages> 
+  
+  <ParaStyles>
+    <mapping-instruction>
+      <path>*:para | *:bibliomixed | *:title</path>
+      <xpath>(/*:hub/*:info/css:rules/css:rule[@name = current()/@role]/@native-name, @role)[1]</xpath>
+    </mapping-instruction>    
+  </ParaStyles>
+  
+  <InlineStyles>
+    
+<!--    <mapping-instruction is-indexterm-level="1">
+      <path>*:phrase[matches(@role, 'indexterm')][not(parent::*:phrase[matches(@role, 'indexterm')])]</path>
+    </mapping-instruction>
+    
+    <mapping-instruction is-indexterm-level="2">
+      <path>*:phrase[matches(@role, 'indexterm')][not(parent::*:phrase[matches(@role, 'indexterm')])]/*:phrase[matches(@role, 'indexterm')]</path>
+    </mapping-instruction>-->
+    
+    <mapping-instruction>
+      <path>*:phrase[not(ancestor::*:link)][not(matches(@role, 'indexterm'))]</path>
+      <xpath>@role</xpath>
+    </mapping-instruction>
+    
+    <mapping-instruction is-footnote="true">
+      <path priority="2">*:phrase[p[matches(@role, 'Fussnote')]]</path>
+      <xpath>@role</xpath>
+    </mapping-instruction>
+    
+    <mapping-instruction>
+      <path priority="2">*:phrase[@role eq 'footnote-marker']</path>
+      <insert-special-char method="replace" name="footnote-symbol"/>
+    </mapping-instruction>
+    
+    <mapping-instruction>
+      <path priority="2">*:phrase[@role eq 'tabulator']</path>
+      <insert-special-char method="replace" name="tabulator"/>
+    </mapping-instruction>
+    
+    <mapping-instruction hyperlink-source="@href">
+      <path>*:link[@linkend]</path>
+      <xpath>*:phrase/@role</xpath>
+    </mapping-instruction>
+    
+    <mapping-instruction hyperlink-dest="@id">
+      <path>*:link[@id]</path>
+    </mapping-instruction>
+    
+  </InlineStyles>
+  
+  <TableStyles>
+    <mapping-instruction>
+      <path>*:table</path>
+      <xpath>@role</xpath>
+    </mapping-instruction>
+  </TableStyles>
+  
+  <CellStyles>
+    <mapping-instruction>
+      <path>*:entry</path>
+      <xpath>@role</xpath>
+    </mapping-instruction>
+  </CellStyles>
+
+  <ObjectStyles>
+    <mapping-instruction>
+      <anchoring type="empty-para"/>
+      <path>*:div[contains(@role, 'box')]</path>
+      <xpath>@role</xpath>
+    </mapping-instruction>
+  </ObjectStyles>
+
+  
+    <Discard>
+
+    <mapping-instruction>
+      <path>*:hub/*:info/*[not(self::css:rules)]</path>
+    </mapping-instruction>
+      
+    </Discard>
+  
+    <Dissolve>
+    <mapping-instruction>
+      <path>*[local-name() = ('section', 'poetry', 'chapter', 'info', 'part', 'caption') or self::*:div[not(contains(@role, 'box'))]]</path>
+    </mapping-instruction>
+    </Dissolve>
+  
+</mapping-instructions>
