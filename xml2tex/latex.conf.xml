@@ -2271,6 +2271,8 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </template>
   
+  <!-- overwrite \newline from docx2tex with \tpBreak -->
+  
   <template context="dbk:br
                     |dbk:title/dbk:br
                     |dbk:br[following-sibling::node()[1][self::dbk:br]]
