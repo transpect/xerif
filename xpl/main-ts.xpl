@@ -205,7 +205,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
     <p:with-option name="mathtype2mml" select="'yes'"/>
-    <p:with-option name="remove-biblioentry-paragraphs" select="'no'"/>
+    <p:with-option name="remove-biblioentry-paragraphs" select="'yes'"/>
   </docx2hub:convert>
   
   <tr:check-styles name="check-styles">
