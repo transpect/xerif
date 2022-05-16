@@ -1009,7 +1009,7 @@
       </xsl:when>
       <xsl:when test="not($remove-newline eq true()) and ancestor::*:tr">
         <!-- in HTML tables-->
-        <xsl:text>\linebreak&#xa;</xsl:text>
+        <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>\newline&#xa;</xsl:text>
@@ -1630,7 +1630,10 @@
     </rule>
   </template>
 
-  <template context="dbk:para[matches(@role, $letter-spacing-para-style)][following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
+  <template context="dbk:para[matches(@role, $letter-spacing-para-style)]
+                             [following-sibling::*[1]
+                                                  [self::dbk:para[matches(@role, $letter-spacing-para-style)]]
+                             ]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
       <text/>
@@ -1682,8 +1685,18 @@
     </rule>
   </template>
   
-  <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]] 
-                   |dbk:para[matches(@role, $letter-para-style)][following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
+  <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]]">
+    <rule break-after="1" break-before="1">
+      <text/>
+      <xsl:if test="following-sibling::*[1][self::dbk:para[matches(@role, $letter-para-style)]]">
+        <text>\\</text>
+      </xsl:if>
+    </rule>
+    <!-- do not create item because margin is generated via letter-environment. handle as normal letter para -->
+  </template>
+
+  <template context="dbk:para[matches(@role, $letter-para-style)]
+                             [following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
     <rule break-after="1">
       <text/>
     </rule>
@@ -2272,14 +2285,12 @@
   </template>
   
   <!-- overwrite \newline from docx2tex with \tpBreak -->
-  
-  <template context="dbk:br
-                    |dbk:title/dbk:br
-                    |dbk:br[following-sibling::node()[1][self::dbk:br]]
+  <!-- -normal dbk:br are handled above with case differentiation -->
+  <template context="dbk:br[following-sibling::node()[1][self::dbk:br]]
                     |dbk:phrase[@role eq 'cr']">
     <rule name="tpBreak" type="cmd" break-after="1"/>
   </template>
-
+  
   <charmap ignore-imported-charmaps="true">
     <!--SOFT HYPHEN -->
     <char character="&#xad;" string="\-"/>
