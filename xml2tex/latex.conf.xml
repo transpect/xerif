@@ -522,7 +522,13 @@
     <xsl:text>}</xsl:text>
   </xsl:template>
 
-
+  <xsl:template match="dbk:superscript | dbk:subscript" mode="strip-meta" priority="6">
+    <xsl:value-of select="if(self::dbk:superscript) 
+                          then '\textsuperscript{' 
+                          else '\textsubscript{'"/>
+    <xsl:next-match/>
+    <xsl:text>}</xsl:text>
+  </xsl:template>
 
   <xsl:template match="text()[..[self::dbk:keyword[matches(., 'file:|http|www')]]]" mode="escape-bad-chars" priority="300">
     <!-- prevent filename replacement in keywords -->
