@@ -570,8 +570,14 @@
     </xsl:if>
   </template>
 
-  <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')] | self::dbk:appendix | dbk:preface] | 
-                     /dbk:hub/*[self::dbk:part | self::dbk:chapter[@renderas='subhead']]/*[self::dbk:chapter | self::dbk:appendix | dbk:preface | self::dbk:section]" priority="300">
+  <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
+                               |self::dbk:appendix
+                               |dbk:preface]
+                    |/dbk:hub/*[self::dbk:part
+                               |self::dbk:chapter[@renderas='subhead']]/*[self::dbk:chapter
+                                                                         |self::dbk:appendix
+                                                                         |dbk:preface
+                                                                         |self::dbk:section]" priority="300">
     <xsl:next-match/>
     <xsl:call-template name="create-printnotes">
       <xsl:with-param name="context" as="element(*)" select="."/>
@@ -595,7 +601,7 @@
         <!-- kapitelweise Endnoten -->
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="if ($context[self::dbk:chapter]) then 'section' else tr:heading-level($context)"/>
-          <text select="concat('\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
+          <text select="concat('&#xa;\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
         </rule>
         <rule name="printnotes" type="cmd" break-before="1"/>
       </xsl:when>
