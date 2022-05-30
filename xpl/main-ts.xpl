@@ -219,6 +219,17 @@
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </tr:check-styles>     
   
+  <tx:insert-meta name="insert-meta">
+    <p:input port="meta">
+      <p:pipe port="result" step="load-meta-wrapper"/>
+    </p:input>
+    <p:input port="params">
+      <p:pipe port="result" step="get-paths"/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </tx:insert-meta>
+
   <tx:evolve-hub name="evolve-hub-dyn">
     <p:input port="parameters">
       <p:pipe port="result" step="get-paths"/> 
@@ -235,17 +246,6 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tx:copy-images>
-  
-  <tx:insert-meta name="insert-meta">
-    <p:input port="meta">
-      <p:pipe port="result" step="load-meta-wrapper"/>
-    </p:input>
-    <p:input port="params">
-      <p:pipe port="result" step="get-paths"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-  </tx:insert-meta>
   
   <tx:xml2tex name="hub2tex">
     <p:input port="params">
