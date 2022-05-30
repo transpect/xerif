@@ -471,6 +471,20 @@
   
   <xsl:template match="anchor[@role = ('start', 'end')][not(@xml:id = $refs)]" mode="hub:split-at-tab"/>
   
+  <!-- move anchors inside of footnote -->
+  
+  <!-- place footnote anchors inside of the footnote -->
+  
+  <xsl:template match="anchor[following-sibling::node()[1][self::footnote]]" mode="custom-1"/>
+  
+  <xsl:template match="footnote[preceding-sibling::node()[1][self::anchor]]" mode="custom-1">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:copy-of select="preceding-sibling::node()[1][self::anchor]"/>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <!-- the two template below apply only to figures with multiple images, created in hub:split-at-tab -->
   
   <xsl:template match="figure[following-sibling::*[1]
