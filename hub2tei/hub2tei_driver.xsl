@@ -205,7 +205,10 @@
             <xsl:message select="translate(key('natives', @role)/@native-name, '_', '-')"></xsl:message>
             <xsl:attribute name="key" select="if (key('natives', @role)[self::css:rule]) 
                                               then replace(translate(key('natives', @role)/@native-name, '_', '-'), '^[a-z]{1,3}[-_]?meta[-_]?', '')
-                                              else replace(@role, '^[a-z]{1,3}[-_]?meta[-_]?', '')"/>
+                                              else 
+                                                  if (@otherclass) 
+                                                  then @otherclass 
+                                                  else replace(@role, '^[a-z]{1,3}[-_]?meta[-_]?', '')"/>
           </xsl:if>
           <xsl:if test="@xml:lang">
             <xsl:attribute name="xml:lang" select="@xml:lang"/>
