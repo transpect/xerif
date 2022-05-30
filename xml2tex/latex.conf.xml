@@ -2174,7 +2174,7 @@
     <xsl:choose>
       <xsl:when test="$as-title-param"><xsl:value-of select="concat('label=', $label)"/></xsl:when>
       <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]"/>
-      <xsl:otherwise><xsl:value-of select="concat('\label{', $label, '}')"/></xsl:otherwise>
+      <xsl:otherwise><xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/></xsl:otherwise>
     </xsl:choose>
   </template>
   
@@ -2204,10 +2204,10 @@
                           select="$footnote-anchor/ancestor::dbk:chapter//dbk:anchor[@role eq 'start' or not(@role)]
                                                                                     [@xml:id = $link-refs]
                                                                                     [following-sibling::*[1][self::dbk:footnote]]/@xml:id"/>            
-            <xsl:value-of select="concat('{\hyperref[', $ref, ']{', index-of($anchor-ids-in-chapter, $linkend),  '}}')"/>
+            <xsl:value-of select="concat('{\hyperlink[', $ref, ']{', index-of($anchor-ids-in-chapter, $linkend),  '}}')"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat('{\hyperref[', $ref, ']{', string-join(.//text(), ' '), '}}')"/>
+            <xsl:value-of select="concat('{\hyperlink[', $ref, ']{', string-join(.//text(), ' '), '}}')"/>
           </xsl:otherwise>
         </xsl:choose>  
       </xsl:when>
