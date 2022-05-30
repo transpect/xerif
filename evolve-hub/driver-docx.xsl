@@ -1514,7 +1514,7 @@
     
   <xsl:template match="text()[normalize-space()]
                              [matches(., '-')]
-                             [not(ancestor::*[self::*:link|self::keywordset])]
+                             [not(ancestor::*[self::*:link|self::keywordset|self::biblioset[@role = 'chunk-metadata']])]
                              [not(exists(ancestor::*[matches(@role, $hub:prevent-normalization-style-regex)]))]" mode="preprocess-hyphens">
     <xsl:value-of select="hub:replace-hyphens(.)"/>
   </xsl:template>
