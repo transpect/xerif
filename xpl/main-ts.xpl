@@ -265,7 +265,7 @@
       </p:output>
       <hub2tei:hub2tei name="gen-tei">
         <p:input port="source">
-          <p:pipe port="result" step="insert-meta"/> 
+          <p:pipe port="result" step="copy-images-and-patch-filerefs"/> 
         </p:input>
         <p:input port="paths">
           <p:pipe port="result" step="get-paths"/> 
@@ -279,7 +279,7 @@
       <p:output port="result" primary="true"/>   
       <p:xslt name="added-sourcepath">
         <p:input port="source">
-          <p:pipe port="result" step="insert-meta"/> 
+          <p:pipe port="result" step="copy-images-and-patch-filerefs"/> 
         </p:input>
         <p:input port="parameters">
           <p:empty/>
