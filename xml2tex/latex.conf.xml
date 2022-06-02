@@ -1787,7 +1787,6 @@
   
   <template context="  dbk:bibliography[not(@role eq 'Citavi')][not(parent::dbk:bibliography)] 
                      | dbk:bibliodiv">
-    <xsl:if test="not(self::dbk:bibliodiv[..[self::dbk:bibliography]])"><xsl:text>&#xa;\FloatBarrier</xsl:text></xsl:if>
     <xsl:apply-templates select="dbk:info" mode="#current"/>
     <xsl:choose>
       <xsl:when test="(./dbk:bibliodiv or ./dbk:bibliolist) and dbk:bibliomixed">
