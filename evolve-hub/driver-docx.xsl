@@ -1291,8 +1291,8 @@
   <xsl:template match="section[@role = 'keywords']" mode="hub:process-meta-sidebar">
   <xsl:variable name="keyword-role" as="xs:string?" select="if (title) 
                                                          then replace(normalize-space(title), ':\s?$', '') 
-                                                         else replace(descendant-or-self::para[matches(@role, $hub:article-keywords-role-regex)][1], '^(Schlüssel(wörter|begriffe)|Key\s?words|Mots[-]clés):.+$', '$1')"/>
-      <keywordset role="{if (matches($keyword-role, '^(Schlüssel(wörter|begriffe)|Key\s?words|Mots[-]clés)')) then $keyword-role else 'Keywords'}">
+                                                         else replace(descendant-or-self::para[matches(@role, $hub:article-keywords-role-regex)][1], '^(.+):.+$', '$1')"/>
+      <keywordset role="{if ($keyword-role[normalize-space()]) then $keyword-role else 'Keywords'}">
         <xsl:apply-templates select="descendant-or-self::para[matches(@role, $hub:article-keywords-role-regex)]" mode="#current">
           <xsl:with-param name="process-meta" tunnel="yes" as="xs:boolean?" select="true()"/>
         </xsl:apply-templates>
