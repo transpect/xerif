@@ -54,6 +54,10 @@
   <p:output port="htmlreport" primary="false">
     <p:pipe port="result" step="htmlreport"/>
   </p:output>
+  
+  <p:output port="xmp" primary="false">
+    <p:pipe port="result" step="generate-xmp-wrapper"/>
+  </p:output>
 
   <p:serialization port="tex" method="text" media-type="text/plain" encoding="utf8"/>
   <p:serialization port="result" indent="true"/>
@@ -162,6 +166,7 @@
   <p:import href="insert-meta.xpl"/>
   <p:import href="load-meta.xpl"/>
   <p:import href="hub2epub.xpl"/>
+  <p:import href="generate-xmp.xpl"/>
   
 
   <p:string-replace name="start-msg-replace" match="file">
@@ -436,8 +441,21 @@
           </p:inline>
         </p:input>
       </p:identity>
-      <p:sink  name="s4"/>
+      <p:sink name="s4"/>
     </p:otherwise>  
   </p:choose>
+  
+  <tx:generate-xmp name="generate-xmp-wrapper">
+    <p:input port="source">
+      <p:pipe port="result" step="load-meta-wrapper"/>
+    </p:input>
+    <p:input port="params">
+      <p:pipe port="result" step="get-paths"/> 
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>    
+  </tx:generate-xmp>
 
+  <p:sink/>
+  
 </p:declare-step>
