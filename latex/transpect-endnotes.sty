@@ -121,6 +121,40 @@
     }%
   }%
 }
+\long\def\text@command #1{%
+  \def \reserved@a {#1}%
+  \ifx \reserved@a \@empty
+    \let \check@icl \@empty
+    \let \check@icr \@empty
+  \else
+    \ifx \reserved@a \space
+      \let \check@icl \@empty
+      \let \check@icr \@empty
+    \else
+      \check@nocorr@ #1\nocorr\@nil
+    \fi
+  \fi
+}
+\long\def\check@nocorr@ #1#2\nocorr#3\@nil {%
+  \let \check@icl \maybe@ic
+  \def \check@icr {\ifvmode \else \aftergroup \maybe@ic \fi}%
+  \def \reserved@a {\nocorr}%
+  \def \reserved@b {#1}%
+  \def \reserved@c {#3}%
+  \ifx \reserved@a \reserved@b
+    \ifx \reserved@c \@empty
+      \let \check@icl \@empty
+    \else
+      \let \check@icl \@empty
+      \let \check@icr \@empty
+    \fi
+  \else
+    \ifx \reserved@c \@empty
+    \else
+      \let \check@icr \@empty
+    \fi
+  \fi
+}
 \endinput
 %%
 %% End of file `transpect-endnotes.sty'.
