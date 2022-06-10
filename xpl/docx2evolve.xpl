@@ -19,9 +19,7 @@
   
   <p:input port="meta" primary="false" sequence="true"/>
   
-  <p:output port="result" primary="true">
-    <p:pipe port="result" step="insert-meta"/>
-  </p:output>
+  <p:output port="result" primary="true"/>
   
   <p:output port="hub-flat" primary="false">
     <p:pipe port="result" step="docx2hub"/>
@@ -63,6 +61,17 @@
     <p:with-option name="remove-biblioentry-paragraphs" select="'yes'"/>
   </docx2hub:convert>
   
+  <tx:insert-meta name="insert-meta">
+    <p:input port="meta">
+      <p:pipe port="meta" step="docx2evolve"/>
+    </p:input>
+    <p:input port="params">
+      <p:pipe port="source" step="docx2evolve"/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </tx:insert-meta>
+  
   <tr:check-styles name="check-styles">
     <p:input port="parameters">
       <p:pipe port="source" step="docx2evolve"/>
@@ -90,16 +99,5 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tx:copy-images>
-  
-  <tx:insert-meta name="insert-meta">
-    <p:input port="meta">
-      <p:pipe port="meta" step="docx2evolve"/>
-    </p:input>
-    <p:input port="params">
-      <p:pipe port="source" step="docx2evolve"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-  </tx:insert-meta>
   
 </p:declare-step>
