@@ -44,6 +44,8 @@
   <!-- person metadata -->
   <xsl:variable name="editors" as="element(dbk:keyword)*" 
                 select="$metadata/dbk:keyword[@role eq 'Herausgeber']"/>
+  <xsl:variable name="series-editors" as="element(dbk:keyword)*" 
+                select="$metadata/dbk:keyword[@role eq 'Reihenherausgeber']"/>
   <xsl:variable name="authors" as="element(dbk:keyword)*" 
                 select="$metadata/dbk:keyword[@role eq 'Autor']"/>
   <xsl:variable name="author-info" as="element(dbk:keyword)*"
@@ -209,6 +211,11 @@
       <xsl:text>&#xa;\begin{tpEditor}</xsl:text>
       <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc, '}')"/>
       <xsl:text>\end{tpEditor}&#xa;</xsl:text>
+    </xsl:for-each>
+    <xsl:for-each select="$series-editors">
+      <xsl:text>&#xa;\begin{tpSeriesEditor}</xsl:text>
+      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc, '}')"/>
+      <xsl:text>\end{tpSeriesEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:if test="normalize-space($title) or normalize-space($title-for-running-head)">
       <xsl:value-of select="concat('&#xa;\tpTitle{', ($title, $title-for-running-head)[1], '}&#xa;')"/>
