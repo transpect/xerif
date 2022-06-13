@@ -48,7 +48,7 @@
     <p:with-option name="indent" select="true()"/>
   </tr:store-debug>
   
-  <!--<p:viewport match="dbk:imagedata[@fileref]" name="single-image-scope">
+  <p:viewport match="dbk:imagedata[@fileref]" name="single-image-scope">
     
     <cx:message name="msg">
       <p:with-option name="message" select="'[info] ', dbk:imagedata[@fileref]/@fileref, ' => ', $outdir"/>
@@ -78,7 +78,7 @@
       <p:group>
         <p:variable name="image-href" select="/c:result/@local-href"/>
       
-        <!-\- check resolution -\->
+        <!-- check resolution -->
         
         <tr:image-identify name="identify">
           <p:with-option name="href" select="$image-href"/>
@@ -137,7 +137,7 @@
                                      replace(/c:result/@local-href, '^.+/(.+?)\.[a-z]+$', '$1', 'i'),
                                      '.', 
                                      $format)"/>
-    	    <!-\- davomat replaces some uncommon characters due to encoding issues -\->
+    	    <!-- davomat replaces some uncommon characters due to encoding issues -->
     	    <p:variable name="output-path-normalized" select="translate($output-path, '&#x2010;', '-')"/> 
           
           <cx:message>
@@ -173,7 +173,7 @@
       </p:catch>
     </p:try>
     
-  </p:viewport>-->
+  </p:viewport>  
   
   <tr:store-debug name="debug-after-copy-images" pipeline-step="copy-images/04_copy-images">
     <p:with-option name="active" select="$debug"/>
