@@ -713,7 +713,10 @@
   
   <xsl:template match="*[not(self::bibliography 
                             |self::bibliodiv
-                            |self::bibliolist)][bibliomixed]
+                            |self::bibliolist)]
+                        [not(title[matches(@role, $index-heading-regex)])]
+                        [not(info/title[matches(@role, $index-heading-regex)])]
+                        [bibliomixed]
                         [count(distinct-values(*[not(self::title
                                                     |self::bridgehead
                                                     |self::abbrev
@@ -954,7 +957,7 @@
                         |self::section
                         |self::appendix]
                         [info/title[matches(@role, $index-heading-regex)]
-                        |title[matches(@role, $index-heading-regex)]]" mode="custom-1">
+                        |title[matches(@role, $index-heading-regex)]]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
     <index>
