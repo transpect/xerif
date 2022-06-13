@@ -1097,8 +1097,8 @@
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="translate(upper-case(substring(normalize-space(primaryie), 1, 1)), 
-                                                          'ÄÖÜÈÉ', 
-                                                          'AOUEE')">
+                                                          'ÄÅÃÀÁÂÆÖÒÓÔÕØÜÛÚÙÈÉÊËŽÇÌÍÎÏÐÑÝŸ', 
+                                                          'AAAAAAAOOOOOOUUUUEEEEZCIIIIDNYY')">
               <indexdiv>
                 <title><xsl:value-of select="current-grouping-key()"/></title>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
