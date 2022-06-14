@@ -2319,6 +2319,7 @@
     <!-- TILDE -->
     <char character="&#x7e;" string="${\sim}$"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
+    <char character="&#x2c6f;" string="$\forall$"/>
     <char character="&#xe4;" string="ä"/>
     <char character="&#xf6;" string="ö"/>
     <char character="&#xfc;" string="ü"/>
