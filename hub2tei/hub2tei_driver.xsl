@@ -187,7 +187,16 @@
           <xsl:if test="@xml:lang">
             <xsl:attribute name="xml:lang" select="@xml:lang"/>
           </xsl:if>
-          <xsl:value-of select="."/>
+          <xsl:choose>
+            <xsl:when test="dbk:para">
+              <xsl:for-each select="dbk:para">
+                <seg type="remap-para"><xsl:apply-templates select="node()" mode="#current"/></seg>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </xsl:otherwise>
+          </xsl:choose>
         </term>
       </xsl:for-each>
     </keywords>
