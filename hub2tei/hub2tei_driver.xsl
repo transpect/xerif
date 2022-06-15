@@ -202,7 +202,7 @@
     </keywords>
   </xsl:template>
 
-  <xsl:template match="dbk:biblioset[@role = 'chunk-metadata']" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:biblioset[@role = 'chunk-metadata'][not(../..[self::dbk:section])]" mode="hub2tei:dbk2tei">
     <keywords rendition="chunk-meta">
       <xsl:if test="@xml:lang">
         <xsl:apply-templates select="@xml:lang" mode="#current"/>
