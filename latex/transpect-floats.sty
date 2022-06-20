@@ -437,7 +437,9 @@
   \tp@make@outer@caption{top}%
   \ifnum\tpSubFloatCnt=\z@\relax
     \bgroup\advance\hsize-\tp@flt@marg@l
+      \tpIfPropVal{float-align}{left}{}{\hfill}%
       \tpUseProperty{float-render}%
+      \tpIfPropVal{float-align}{right}{}{\hfill}%
     \egroup
   \else
     \let\tp@is@subflt\relax
@@ -649,7 +651,7 @@
     \def\@igopts{width=\hsize}%
   \fi
   \if!#1!\else
-    \def\@igopts{#1,width=\hsize}%
+    \edef\@igopts{width=\hsize,#1}%
   \fi
   \gdef\@tp@fig@path{#2}%
   \expandafter\tpltx@includegraphics\expandafter[\@igopts]{#2}%
@@ -749,6 +751,7 @@
   \tpSetProperty{margin-left}{\z@}%% left margin
   \tpSetProperty{margin-right}{\z@}%% right margin
   \tpSetProperty{before-float}{\parindent\z@}%% executed before content is evaluated
+  \tpSetProperty{float-align}{center}%% horizontal alignment of float content. Values: left, right, center
   \tpSetProperty{float-handler}{\tpGenericHandler}% Alias for the caption type specific content handler
   \tpSetProperty{subfloat-handler}{\tpSubGenericHandler}% Alias for the caption type specific content handler
   \tpSetProperty{float-render}{\tpGenericRender}% Alias for the caption type specific content printer
