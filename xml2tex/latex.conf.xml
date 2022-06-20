@@ -438,7 +438,8 @@
   <back>
     <xsl:if test="    $notes-type eq 'endnotes' 
                   and not($notes-per-chapter eq 'yes')
-                  and not(//*[self::dbk:para | self::dbk:title][matches(@role, $endnotes-heading-style)])">
+                  and not(//*[self::dbk:para|self::dbk:title]
+                             [matches(@role, $endnotes-heading-style)])">
       <xsl:call-template name="create-printnotes">
         <xsl:with-param name="context" as="element(*)" select="/*"/>
       </xsl:call-template>
@@ -600,27 +601,37 @@
     <xsl:param name="context" as="element(*)"/>
     <!-- https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Endnotes -->
     <xsl:choose>
-      <xsl:when test="($context[self::dbk:chapter] or $context[self::dbk:appendix | self::dbk:preface][not(ancestor::*[self::dbk:chapter])])
-                        and 
-                        ($context[$notes-type eq 'endnotes' and $notes-per-chapter eq 'yes']
-                        [.//dbk:footnote]
-                        [not(.//dbk:para[matches(@role, $endnotes-heading-style)])])">
-        <!-- kapitelweise Endnoten -->
+      <!-- kapitelweise Endnoten -->
+      <xsl:when test="(   $context[self::dbk:chapter] 
+                       or $context[self::dbk:appendix|self::dbk:preface]
+                                  [not(ancestor::*[self::dbk:chapter])]
+                      )
+                      and 
+                      ($context[$notes-type eq 'endnotes' and $notes-per-chapter eq 'yes']
+                               [.//dbk:footnote]
+                               [not(.//dbk:para[matches(@role, $endnotes-heading-style)])]
+                      )">
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="if ($context[self::dbk:chapter]) then 'section' else tr:heading-level($context)"/>
           <text select="concat('&#xa;\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
         </rule>
         <rule name="printnotes" type="cmd" break-before="1"/>
       </xsl:when>
+      <!-- Endnoten am Buchende -->
       <xsl:when test="$context[. is /*]
                               [$notes-type eq 'endnotes' and $notes-per-chapter ne 'yes']
                               [.//dbk:footnote]">
-        <!-- Endnoten am Buchende -->
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="'chapter'"/>
           <text select="concat('\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
         </rule>
         <rule name="printnotes" type="cmd" break-before="1"/>
+      </xsl:when>
+      <!-- Endnoten an der Position des Absatzes mit Endnotenüberschrift -->
+      <xsl:when test="$context[self::dbk:chapter
+                              |self::dbk:section]
+                              [matches(dbk:info/dbk:title/@role, $endnotes-heading-style)]">
+        <rule name="printnotes" type="cmd" break-before="1"/>                              
       </xsl:when>
     </xsl:choose>
   </template>
