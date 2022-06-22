@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <css:rules xmlns:css="http://www.w3.org/1996/css">
-  <css:rule layout-type="para" native-name="ts_abstracts" name="tsabstracts"/>
-  <css:rule layout-type="para" native-name="ts_author" name="tsauthor"/>
-  <css:rule layout-type="para" native-name="ts_author_name" name="tsauthorname"/>
-  <css:rule layout-type="para" native-name="ts_author_description" name="tsauthordescription"/>
-  <css:rule layout-type="para" native-name="ts_heading_short" name="tsheadingshort"/>
+  <css:rule layout-type="para" native-name="ts_abstracts" name="abstracts" regex="^[a-z]{1,3}abstracts$"/>
+  <css:rule layout-type="para" native-name="ts_author" name="tsauthor"  regex="^[a-z]{1,3}author$"/>
+  <css:rule layout-type="para" native-name="ts_author_name" name="tsauthorname" regex="^[a-z]{1,3}authorname$"/>
+  <css:rule layout-type="para" native-name="ts_author_description" name="tsauthordescription" regex="^[a-z]{1,3}authordescription$"/>
+  <css:rule layout-type="para" native-name="ts_heading_short" name="tsheadingshort" regex="^[a-z]{1,3}headingshort$"/>
   <css:rule layout-type="para" native-name="ts_headlineright" name="tsheadlineright" regex="^tsheadline(left|right|short|author)?$"/>
   <css:rule layout-type="para" native-name="ts_heading_part" name="tsheadingpart"/>
   <css:rule layout-type="para" native-name="ts_heading_1" name="tsheading1" regex="^tsheading1(notoc|nobm)?$"/>
@@ -12,83 +12,83 @@
   <css:rule layout-type="para" native-name="ts_heading_3" name="tsheading3" regex="^tsheading3(notoc|nobm)?$"/>
   <css:rule layout-type="para" native-name="ts_heading_4" name="tsheading4" regex="^tsheading4(notoc|nobm)?$"/>
   <css:rule layout-type="para" native-name="ts_heading_5" name="tsheading5" regex="^tsheading5(notoc|nobm)?$"/>
-  <css:rule layout-type="para" native-name="ts_heading_enumerated_1" name="tsheadingenumerated1"/>
-  <css:rule layout-type="para" native-name="ts_heading_enumerated_2" name="tsheadingenumerated2"/>
-  <css:rule layout-type="para" native-name="ts_heading_enumerated_3" name="tsheadingenumerated3"/>
-  <css:rule layout-type="para" native-name="ts_heading_enumerated_4" name="tsheadingenumerated4"/>
-  <css:rule layout-type="para" native-name="ts_heading_enumerated_5" name="tsheadingenumerated5"/>
-  <css:rule layout-type="para" native-name="ts_subheading_1" name="tssubheading1"/>
-  <css:rule layout-type="para" native-name="ts_subheading_2" name="tssubheading2"/>
-  <css:rule layout-type="para" native-name="ts_subheading_3" name="tssubheading3"/>
-  <css:rule layout-type="para" native-name="ts_subheading_4" name="tssubheading4"/>
-  <css:rule layout-type="para" native-name="ts_subheading_5" name="tssubheading5"/>
-  <css:rule layout-type="para" native-name="ts_motto" name="tsmotto"/>
-  <css:rule layout-type="para" native-name="ts_motto_source" name="tsmottosource"/>
-  <css:rule layout-type="para" native-name="ts_figure" name="tsfigure" regex="tsfigure([A-Z]\d)?"/>
-  <css:rule layout-type="para" native-name="ts_figure_caption" name="tsfigurecaption"/>
-  <css:rule layout-type="para" native-name="ts_figure_source" name="tsfiguresource"/>
-  <css:rule layout-type="para" native-name="ts_box_border_start" name="tsboxborderstart"/>
-  <css:rule layout-type="para" native-name="ts_box_border_end" name="tsboxborderend"/>
-  <css:rule layout-type="para" native-name="ts_box_grey_start" name="tsboxgreystart"/>
-  <css:rule layout-type="para" native-name="ts_box_grey_end" name="tsboxgreyend"/>
-  <css:rule layout-type="para" native-name="ts_table" name="tstable"/>
-  <css:rule layout-type="para" native-name="ts_table_caption" name="tstablecaption"/>
-  <css:rule layout-type="para" native-name="ts_table_source" name="tstablesource"/>
-  <css:rule layout-type="para" native-name="ts_table_text" name="tstabletext"/>
-  <css:rule layout-type="para" native-name="ts_table_value" name="tstablevalue"/>
-  <css:rule layout-type="para" native-name="ts_head_word" name="tsheadword"/>
-  <css:rule layout-type="para" native-name="ts_index_name" name="tsindexname"/>
-  <css:rule layout-type="para" native-name="ts_list" name="tslist"/>
-  <css:rule layout-type="para" native-name="ts_list_of_tables_item" name="tslistoftablesitem"/>
-  <css:rule layout-type="para" native-name="ts_literature" name="tsliterature"/>
-  <css:rule layout-type="para" native-name="ts_annotation" name="tsannotation"/>
-  <css:rule layout-type="para" native-name="ts_quotation" name="tsquotation"/>
-  <css:rule layout-type="para" native-name="ts_dialogue" name="tsdialogue"/>
-  <css:rule layout-type="para" native-name="ts_footnote" name="tsfootnote"/>
-  <css:rule layout-type="para" native-name="ts_ded" name="tsded"/>
-  <css:rule layout-type="para" native-name="ts_dedication" name="tsdedication"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_1" name="tsheadingenumerated1" regex="^[a-z]{1,3}headingenumerated1$"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_2" name="tsheadingenumerated2" regex="^[a-z]{1,3}headingenumerated2$"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_3" name="tsheadingenumerated3" regex="^[a-z]{1,3}headingenumerated3$"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_4" name="tsheadingenumerated4" regex="^[a-z]{1,3}headingenumerated4$"/>
+  <css:rule layout-type="para" native-name="ts_heading_enumerated_5" name="tsheadingenumerated5" regex="^[a-z]{1,3}headingenumerated5$"/>
+  <css:rule layout-type="para" native-name="ts_subheading_1" name="tssubheading1" regex="^[a-z]{1,3}subheading1$"/>
+  <css:rule layout-type="para" native-name="ts_subheading_2" name="tssubheading2" regex="^[a-z]{1,3}subheading2$"/>
+  <css:rule layout-type="para" native-name="ts_subheading_3" name="tssubheading3" regex="^[a-z]{1,3}subheading3$"/>
+  <css:rule layout-type="para" native-name="ts_subheading_4" name="tssubheading4" regex="^[a-z]{1,3}subheading4$"/>
+  <css:rule layout-type="para" native-name="ts_subheading_5" name="tssubheading5" regex="^[a-z]{1,3}subheading5$"/>
+  <css:rule layout-type="para" native-name="ts_motto" name="tsmotto" regex="^[a-z]{1,3}motto$"/>
+  <css:rule layout-type="para" native-name="ts_motto_source" name="tsmottosource" regex="^[a-z]{1,3}mottosource$"/>
+  <css:rule layout-type="para" native-name="ts_figure" name="tsfigure" regex="^[a-z]{1,3}figure([A-Z]\d)?"/>
+  <css:rule layout-type="para" native-name="ts_figure_caption" name="tsfigurecaption" regex="^[a-z]{1,3}figurecaption$"/>
+  <css:rule layout-type="para" native-name="ts_figure_source" name="tsfiguresource" regex="^[a-z]{1,3}figuresource$"/>
+  <css:rule layout-type="para" native-name="ts_box_border_start" name="tsboxborderstart" regex="^[a-z]{1,3}boxborderstart$"/>
+  <css:rule layout-type="para" native-name="ts_box_border_end" name="tsboxborderend" regex="^[a-z]{1,3}boxborderend$"/>
+  <css:rule layout-type="para" native-name="ts_box_grey_start" name="tsboxgreystart" regex="^[a-z]{1,3}boxgreystart$"/>
+  <css:rule layout-type="para" native-name="ts_box_grey_end" name="tsboxgreyend" regex="^[a-z]{1,3}boxgreyend$"/>
+  <css:rule layout-type="para" native-name="ts_table" name="tstable" regex="^[a-z]{1,3}table$"/>
+  <css:rule layout-type="para" native-name="ts_table_caption" name="tstablecaption" regex="^[a-z]{1,3}tablecaption$"/>
+  <css:rule layout-type="para" native-name="ts_table_source" name="tstablesource" regex="^[a-z]{1,3}tablesource$"/>
+  <css:rule layout-type="para" native-name="ts_table_text" name="tstabletext" regex="^[a-z]{1,3}tabletext$"/>
+  <css:rule layout-type="para" native-name="ts_table_value" name="tstablevalue" regex="^[a-z]{1,3}tablevalue$"/>
+  <css:rule layout-type="para" native-name="ts_head_word" name="tsheadword" regex="^[a-z]{1,3}headword$"/>
+  <css:rule layout-type="para" native-name="ts_index_name" name="tsindexname" regex="^[a-z]{1,3}indexname$"/>
+  <css:rule layout-type="para" native-name="ts_list" name="tslist" regex="^[a-z]{1,3}list$"/>
+  <css:rule layout-type="para" native-name="ts_list_of_tables_item" name="tslistoftablesitem" regex="^[a-z]{1,3}listoftablesitem$"/>
+  <css:rule layout-type="para" native-name="ts_literature" name="tsliterature" regex="^[a-z]{1,3}literature$"/>
+  <css:rule layout-type="para" native-name="ts_annotation" name="tsannotation" regex="^[a-z]{1,3}annotation$"/>
+  <css:rule layout-type="para" native-name="ts_quotation" name="tsquotation" regex="^[a-z]{1,3}quotation$"/>
+  <css:rule layout-type="para" native-name="ts_dialogue" name="tsdialogue" regex="^[a-z]{1,3}dialogue$"/>
+  <css:rule layout-type="para" native-name="ts_footnote" name="tsfootnote" regex="^[a-z]{1,3}footnote$"/>
+  <css:rule layout-type="para" native-name="ts_ded" name="tsded" regex="^[a-z]{1,3}ded$"/>
+  <css:rule layout-type="para" native-name="ts_dedication" name="tsdedication" regex="^[a-z]{1,3}dedication$"/>
   
 
-  <css:rule layout-type="para" native-name="ts_meta_keywords" name="tsmetakeywords"/>
-  <css:rule layout-type="para" native-name="ts_meta_doi" name="tsmetadoi"/>
-  <css:rule layout-type="para" native-name="ts_meta_book_title" name="tsmetabooktitle"/>
-  <css:rule layout-type="para" native-name="ts_meta_journal_title" name="tsmetajournaltitle"/>
-  <css:rule layout-type="para" native-name="ts_meta_journal_year" name="tsmetajournalyear"/>
-  <css:rule layout-type="para" native-name="ts_meta_journal_issue" name="tsmetajournalissue"/>
-  <css:rule layout-type="para" native-name="ts_meta_contribution_author_affiliation" name="tsmetacontributionauthoraffiliation"/>
-  <css:rule layout-type="para" native-name="ts_meta_contribution_author_contact" name="tsmetacontributionauthorcontact"/>
-  <css:rule layout-type="para" native-name="ts_meta_contribution_orcid" name="tsmetacontributionorcid"/>
-  <css:rule layout-type="para" native-name="ts_meta_contribution_licence" name="tsmetacontributionlicence"/>
-  <css:rule layout-type="para" native-name="ts_meta_contribution_year" name="tsmetacontributionyear"/>
-  <css:rule layout-type="para" native-name="ts_meta_chunk_doi" name="tsmetachunkdoi"/>
+  <css:rule layout-type="para" native-name="ts_meta_keywords" name="tsmetakeywords" regex="^[a-z]{1,3}metakeywords$"/>
+  <css:rule layout-type="para" native-name="ts_meta_doi" name="tsmetadoi" regex="^[a-z]{1,3}metadoi$"/>
+  <css:rule layout-type="para" native-name="ts_meta_book_title" name="tsmetabooktitle" regex="^[a-z]{1,3}metabooktitle$"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_title" name="tsmetajournaltitle" regex="^[a-z]{1,3}metajournaltitle$"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_year" name="tsmetajournalyear" regex="^[a-z]{1,3}metajournalyear$"/>
+  <css:rule layout-type="para" native-name="ts_meta_journal_issue" name="tsmetajournalissue" regex="^[a-z]{1,3}metajournalissue$"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_author_affiliation" name="tsmetacontributionauthoraffiliation" regex="^[a-z]{1,3}metacontributionauthoraffiliation$"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_author_contact" name="tsmetacontributionauthorcontact" regex="^[a-z]{1,3}metacontributionauthorcontact$"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_orcid" name="tsmetacontributionorcid" regex="^[a-z]{1,3}metacontributionorcid$"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_licence" name="tsmetacontributionlicence" regex="^[a-z]{1,3}metacontributionlicence$"/>
+  <css:rule layout-type="para" native-name="ts_meta_contribution_year" name="tsmetacontributionyear" regex="^[a-z]{1,3}metacontributionyear$"/>
+  <css:rule layout-type="para" native-name="ts_meta_chunk_doi" name="tsmetachunkdoi" regex="^[a-z]{1,3}metachunkdoi$"/>
 
 
-  <css:rule layout-type="para" native-name="ts_media_url" name="tsmediaurl"/>
-  <css:rule layout-type="para" native-name="ts_media_source" name="tsmediasource"/>
-  <css:rule layout-type="para" native-name="ts_media_caption" name="tsmediacaption"/>
+  <css:rule layout-type="para" native-name="ts_media_url" name="tsmediaurl" regex="^[a-z]{1,3}mediaurl$"/>
+  <css:rule layout-type="para" native-name="ts_media_source" name="tsmediasource" regex="^[a-z]{1,3}mediasource$"/>
+  <css:rule layout-type="para" native-name="ts_media_caption" name="tsmediacaption" regex="^[a-z]{1,3}mediacaption$"/>
 
  <!-- new styles for utb publications, https://redmine.le-tex.de/issues/11832 -->
 
-  <css:rule layout-type="para" native-name="ts_quotation_source" name="tsquotationsource"/>
-  <css:rule layout-type="para" native-name="ts_heading_2_keywords" name="tsheading2keywords" regex="tsheading2(keywords|orientation|exercise|summary|leadingquestions|learningoutcome|literature)?$"/>
+  <css:rule layout-type="para" native-name="ts_quotation_source" name="tsquotationsource" regex="^[a-z]{1,3}quotationsource$"/>
+  <css:rule layout-type="para" native-name="ts_heading_2_keywords" name="tsheading2keywords" regex="^[a-z]{1,3}heading2(keywords|orientation|exercise|summary|leadingquestions|learningoutcome|literature)?$"/>
 <!--  <css:rule layout-type="para" native-name="ts_heading_2_orientation" name="tsheading2orientation"/>
   <css:rule layout-type="para" native-name="ts_heading_2_exercise" name="tsheading2exercise"/>
   <css:rule layout-type="para" native-name="ts_heading_2_summary" name="tsheading2summary"/>
   <css:rule layout-type="para" native-name="ts_heading_2_leading_questions" name="tsheading2leadingquestions"/>
-  <css:rule layout-type="para" native-name="ts_heading_2_learning_outcome" name="tsheading2learningoutcome"/>-->
-  <css:rule layout-type="para" native-name="ts_orientation" name="tsorientation"/>
-  <css:rule layout-type="para" native-name="ts_definition" name="tsdefinition"/>
-  <css:rule layout-type="para" native-name="ts_gist" name="tsgist"/>
-  <css:rule layout-type="para" native-name="ts_examples" name="tsexamples"/>
-  <css:rule layout-type="para" native-name="ts_summary" name="tssummary"/>
-  <css:rule layout-type="para" native-name="ts_exercise_type_1" name="tsexercisetype1" regex="tsexercisetype[1-3](first)?$"/>
-  <css:rule layout-type="para" native-name="ts_glossary_name_utb" name="tsglossarynameutb"/>
-  <css:rule layout-type="para" native-name="ts_leading_questions" name="tsleadingquestions"/>
-  <css:rule layout-type="para" native-name="ts_learning_outcome" name="tslearningoutcome"/>
-  <css:rule layout-type="para" native-name="ts_literature_comment" name="tsliteraturecomment"/>
+  <css:rule layout-type="para" native-name="ts_heading_2_learning_outcome" name="tsheading2learningoutcome" regex="^[a-z]{1,3}heading2learningoutcome$"/>-->
+  <css:rule layout-type="para" native-name="ts_orientation" name="tsorientation" regex="^[a-z]{1,3}orientation$"/>
+  <css:rule layout-type="para" native-name="ts_definition" name="tsdefinition" regex="^[a-z]{1,3}definition$"/>
+  <css:rule layout-type="para" native-name="ts_gist" name="tsgist" regex="^[a-z]{1,3}gist$"/>
+  <css:rule layout-type="para" native-name="ts_examples" name="tsexamples" regex="^[a-z]{1,3}examples$"/>
+  <css:rule layout-type="para" native-name="ts_summary" name="tssummary" regex="^[a-z]{1,3}summary$"/>
+  <css:rule layout-type="para" native-name="ts_exercise_type_1" name="tsexercisetype1" regex="^[a-z]{1,3}exercisetype[1-3](first)?$"/>
+  <css:rule layout-type="para" native-name="ts_glossary_name_utb" name="tsglossarynameutb" regex="^[a-z]{1,3}glossarynameutb$"/>
+  <css:rule layout-type="para" native-name="ts_leading_questions" name="tsleadingquestions" regex="^[a-z]{1,3}leadingquestions$"/>
+  <css:rule layout-type="para" native-name="ts_learning_outcome" name="tslearningoutcome" regex="^[a-z]{1,3}learningoutcome$"/>
+  <css:rule layout-type="para" native-name="ts_literature_comment" name="tsliteraturecomment" regex="^[a-z]{1,3}literaturecomment$"/>
 
-  <css:rule layout-type="inline" native-name="ts_italic" name="tsitalic"/>
-  <css:rule layout-type="inline" native-name="ts_bold" name="tsbold"/>
+  <css:rule layout-type="inline" native-name="ts_italic" name="tsitalic" regex="^[a-z]{1,3}italic$"/>
+  <css:rule layout-type="inline" native-name="ts_bold" name="tsbold" regex="^[a-z]{1,3}bold$"/>
   <css:rule layout-type="inline" native-name="footnote reference" name="Funotenzeichen"/>
   <css:rule layout-type="inline" native-name="Hyperlink" name="Hyperlink"/>
 </css:rules>
