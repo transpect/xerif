@@ -1471,7 +1471,7 @@
   
   <template context="dbk:imagedata[@fileref]">
     <rule name="includegraphics" type="cmd">
-      <option select="'width=\textwidth'"/>
+     <!--<option select="'width=\hsize'"/> https://mattermost.le-tex.de/letexml/pl/xtzwz7qu4bbjix89jhg3m185je -->
       <param select="replace(@fileref, '^.+/(.+?)$', concat($image-dir, '$1'))"/>
     </rule>
   </template>
