@@ -65,7 +65,6 @@
       <p:documentation>Adds some changes to the HTML (metatags, chunk base-uris etc.)</p:documentation>
       <p:input port="source">
         <p:pipe port="source" step="export-chunks"/>
-        <p:pipe port="tei" step="export-chunks"><p:documentation>add TEI to extract meta informations more easily</p:documentation></p:pipe>
       </p:input>
       <p:input port="stylesheet">
         <p:pipe port="result" step="html-postprocess-stylesheet"/>
