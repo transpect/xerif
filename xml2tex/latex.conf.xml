@@ -807,6 +807,13 @@
     </xsl:next-match>
   </template>
   
+  <template context="dbk:indexentry" priority="500">
+    <xsl:param name="remove-indexterm" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="not($remove-indexterm)">
+      <xsl:next-match/>
+    </xsl:if>
+  </template>
+
   <template context="dbk:abbrev//dbk:indexterm
                     |dbk:titleabbrev//dbk:indexterm"/>
 
@@ -824,25 +831,28 @@
           <param select="$runtitle-para/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
       </xsl:when>
-      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br]]">
+      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
         <rule name="tpRunTitle" type="cmd" break-before="1">
           <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
       </xsl:when>
     </xsl:choose>
     <!-- optional: include running title authors  -->
-   <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br]]">
+   <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
      <xsl:if test="dbk:author">
       <rule name="tpRunAuthor" type="cmd" break-before="1">
          <param select="dbk:author/dbk:personname/dbk:othername">
           <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
     </xsl:if>
@@ -861,6 +871,7 @@
                          else dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')][1]/node()">
            <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
            <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
     </xsl:if>
@@ -877,11 +888,12 @@
       <xsl:when test="$create-customer-toctitles">
         <xsl:call-template name="customer-toctitles"/>
       </xsl:when>
-      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br]]">
+      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
         <rule name="tpTocTitle" type="cmd" break-before="1">
           <param select="node()[not(@role = ('identifier', 'hub:identifier'))]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
         <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
@@ -889,6 +901,7 @@
             <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/text()">
               <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
               <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
             </param>
           </rule>
         </xsl:if>
@@ -901,6 +914,7 @@
       <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
         <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
         <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
+        <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
       </param>
     </rule>
     <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
@@ -908,6 +922,7 @@
         <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/text()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -916,6 +931,7 @@
         <param select="dbk:subtitle/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -924,6 +940,7 @@
         <param select="dbk:author/dbk:personname/dbk:othername">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
