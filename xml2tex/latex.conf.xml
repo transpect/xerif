@@ -807,7 +807,7 @@
     </xsl:next-match>
   </template>
   
-  <template context="dbk:indexentry" priority="500">
+  <template context="dbk:indexterm" priority="500">
     <xsl:param name="remove-indexterm" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="not($remove-indexterm)">
       <xsl:next-match/>
