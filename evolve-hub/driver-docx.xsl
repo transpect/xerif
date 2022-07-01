@@ -153,6 +153,15 @@
     <xsl:if test="not($discard-child-lang)"><xsl:next-match/></xsl:if>    
   </xsl:template>
   
+  <!-- expand xml:lang attributes from styles -->
+
+  <xsl:template match="*[not(@xml:lang)]
+                        [key('hub:style-by-role', @role)[@xml:lang]]/@srcpath
+                        " mode="hub:dissolve-sidebars-without-purpose">
+    <xsl:next-match/>
+    <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang" mode="#current"/>
+  </xsl:template>
+
   <!-- remove redundant language tagging from ms word -->
   
   <xsl:template match="para[@xml:lang]
@@ -160,7 +169,7 @@
                            [every $i in *[not(self::tab|self::footnote|self::anchor)]
                             satisfies $i[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang]]
                            [  string-length(normalize-space(string-join(for $n in node()[not(self::tab|self::footnote|self::anchor)] return $n))) 
-                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:dissolve-sidebars-without-purpose">
+                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:reorder-marginal-notes">
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current">
         <xsl:with-param name="remove-lang" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -168,7 +177,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:dissolve-sidebars-without-purpose">
+  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:reorder-marginal-notes">
     <xsl:param name="remove-lang" as="xs:boolean?" tunnel="yes"/>
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang,
@@ -177,13 +186,13 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:dissolve-sidebars-without-purpose">
+  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:reorder-marginal-notes">
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:dissolve-sidebars-without-purpose"/>
+  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:reorder-marginal-notes"/>
   
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
@@ -987,6 +996,8 @@
     </xsl:copy>
   </xsl:template>
   
+  <xsl:template match="indexterm[empty(*)]" priority="3" mode="custom-2"/>
+
   <!-- (2) create index entries from phrases with specific character style -->
   
   <xsl:template match="phrase[matches(@role, $index-mark-regex)]
