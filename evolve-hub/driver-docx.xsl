@@ -169,7 +169,7 @@
                            [every $i in *[not(self::tab|self::footnote|self::anchor)]
                             satisfies $i[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang]]
                            [  string-length(normalize-space(string-join(for $n in node()[not(self::tab|self::footnote|self::anchor)] return $n))) 
-                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:reorder-marginal-notes">
+                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:prerocess-hierarchy">
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current">
         <xsl:with-param name="remove-lang" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -177,7 +177,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:reorder-marginal-notes">
+  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:prerocess-hierarchy">
     <xsl:param name="remove-lang" as="xs:boolean?" tunnel="yes"/>
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang,
@@ -186,13 +186,13 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:reorder-marginal-notes">
+  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:prerocess-hierarchy">
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:reorder-marginal-notes"/>
+  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:prerocess-hierarchy"/>
   
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
