@@ -132,6 +132,7 @@
           <xsl:apply-templates select="@*" mode="#current"/>
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
+          <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
           <xsl:sequence select="hub:renderas-from-role-suffix(@renderas, title/@role)"/>
           <xsl:if test="$chapter-info">
             <info>
@@ -165,19 +166,20 @@
   <!-- remove redundant language tagging from ms word -->
   
   <xsl:template match="para[@xml:lang]
-                           [*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang]]
+                           [*[(@xml:lang eq $doc-lang) or (@xml:lang ne ../@xml:lang)]]
                            [every $i in *[not(self::tab|self::footnote|self::anchor)]
-                            satisfies $i[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang]]
+                            satisfies $i[@xml:lang eq $doc-lang or (@xml:lang ne ../@xml:lang)]]
                            [  string-length(normalize-space(string-join(for $n in node()[not(self::tab|self::footnote|self::anchor)] return $n))) 
-                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:prerocess-hierarchy">
+                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:preprocess-hierarchy">
     <xsl:copy>
+      <!-- discard lang on para if every child has another lang. -->
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current">
         <xsl:with-param name="remove-lang" select="true()" as="xs:boolean?" tunnel="yes"/>
       </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:prerocess-hierarchy">
+  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:preprocess-hierarchy">
     <xsl:param name="remove-lang" as="xs:boolean?" tunnel="yes"/>
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang,
@@ -186,13 +188,13 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:prerocess-hierarchy">
+  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:preprocess-hierarchy">
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:prerocess-hierarchy"/>
+  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:preprocess-hierarchy"/>
   
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
@@ -221,6 +223,7 @@
           <xsl:apply-templates select="@*" mode="#current"/>
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
+          <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
           <xsl:sequence select="hub:renderas-from-role-suffix(@renderas, title/@role)"/>
           <xsl:if test="$sec-info">
             <info>
@@ -241,7 +244,12 @@
     <!-- later in tex \selectlanguage{} will be generated -->
     <xsl:param name="sec" as="element()"/>
     <xsl:param name="first-lang" as="xs:string?"/>
-    <xsl:sequence select="every $p in $sec/descendant::*[self::para[not(..[self::footnote])] | self::title] satisfies($p[descendant::text()[..[@xml:lang=$first-lang]]])"/>
+    <xsl:sequence select="every $p 
+                          in $sec/descendant::*[self::para[not(..[self::footnote])] | self::title] 
+                          satisfies($p[descendant::text()[..[@xml:lang=$first-lang or self::phrase[@role = 'hub:identifier']]]
+                                                         [hub:same-scope(., $p)]
+                                       ]
+                                    )"/>
   </xsl:function>
   
   <xsl:template match="para[matches(@role, '^[a-z]{1,3}headword$')]" mode="hub:hierarchy">
