@@ -437,9 +437,13 @@
   \tp@make@outer@caption{top}%
   \ifnum\tpSubFloatCnt=\z@\relax
     \bgroup\advance\hsize-\tp@flt@marg@l
-      %\tpIfPropVal{float-align}{left}{}{\hfill}% TODO: auf vmode testen!
-      \tpUseProperty{float-render}%
-      %\tpIfPropVal{float-align}{right}{}{\hfill}% TODO: auf vmode testen!
+      \ifvmode
+        \tpIfPropVal{float-align}{left}{}{\hfill}
+        \tpUseProperty{float-render}%
+        \tpIfPropVal{float-align}{right}{}{\hfill}
+      \else
+        \tpUseProperty{float-render}%
+      \fi
     \egroup
   \else
     \let\tp@is@subflt\relax
