@@ -44,7 +44,6 @@
   \expandafter\protect\expandafter\def\csname tp@heading@#3@properties\endcsname{#4}%
   \tp@init@hooks{#3}%
   \tp@init@l@{toc}{#2}{#3}%
-  \tp@init@cnt{#2}{#3}%
   \tp@restore@init{heading}{number-#2-maxwd}%
   %
   %
@@ -92,10 +91,11 @@
   \tpDeclareHook{toc-after-hook-#1}%
   \tpDeclareHook{before-hook-#1}%
 }
-\def\tp@init@cnt#1#2{\tpIfPropVal{numbering}{auto}{\@definecounter{#2}}{}}
+\def\tp@init@cnt#1{\@definecounter{#1}}
 \def\tp@auto@number#1#2{%#1 level #2 name
   \tpIfPropVal{numbering}{auto}
     {%
+     \expandafter\ifx\csname c@#2\endcsname\relax\tp@init@cnt{#2}\fi
      \expandafter\ifx\csname tp@heading@attr@nonumber\endcsname\@empty
      \else
        \tpIfComp{Number}

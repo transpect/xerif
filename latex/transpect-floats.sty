@@ -438,9 +438,9 @@
   \ifnum\tpSubFloatCnt=\z@\relax
     \bgroup\advance\hsize-\tp@flt@marg@l
       \ifvmode
-        \tpIfPropVal{float-align}{left}{}{\hfill}
+        \tpIfPropVal{float-align}{left}{}{\hfill}% TODO: auf vmode testen!
         \tpUseProperty{float-render}%
-        \tpIfPropVal{float-align}{right}{}{\hfill}
+        \tpIfPropVal{float-align}{right}{}{\hfill}% TODO: auf vmode testen!
       \else
         \tpUseProperty{float-render}%
       \fi
