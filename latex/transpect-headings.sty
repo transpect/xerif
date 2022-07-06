@@ -104,6 +104,7 @@
             \refstepcounter{#2}%
             \edef\@tempa{\csname the#2\endcsname}%
             \expandafter\tpNumber\expandafter{\@tempa}%
+            \leavevmode% Ohne \leavevmode wird/werden bei Autonumbering die letzte(n) Zeile(n) vor der Überschrift auf die nächste Seite gezogen, obwohl die Seite noch nicht voll ist.
           \fi}%
      \fi}{}
 }
