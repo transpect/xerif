@@ -82,12 +82,14 @@
       \global\advance\realchap\@ne
       \global\c@endnote\z@
       \def\tp@par@title{\tpIfComp{TocTitle}{\tpUseComp{TocTitle}}{\tpUseComp{Title}}}%
+      \def\tp@par@runtitle{\tpIfComp{RunTitle}{\tpUseComp{RunTitle}}{\tpUseComp{Title}}}%
       \addtoendnotes{%
         \noexpand\expandafter\noexpand\ifx\noexpand\csname enotes@in@\the\realchap\noexpand\endcsname\noexpand\@empty
           \bgroup
             \noexpand\leftskip\noexpand\z@
             \noexpand\begin{heading}\ifx\tp@ennotoc\relax[notoc]\fi{section}%
               \noexpand\tpTitle{\tp@par@title}%
+              \noexpand\tpRunTitle{\tp@par@runtitle}%
             \noexpand\end{heading}%
           \egroup
         \noexpand\fi}%
@@ -121,6 +123,32 @@
     }%
   }%
 }
+\def\fn@getmark@i#1[#2]{%
+  \sbox\z@{\@tempcnta0#2\relax}%
+  \ifdim\wd\z@>0\p@\relax
+    \def\thempfn{#2}%
+    \fn@getmark@iii%
+  \else
+    \csname c@\@mpfn\endcsname#2%
+    \fn@getmark@ii%
+  \fi
+}
+\def\fn@getmark@iii#1{%
+  \unrestored@protected@xdef\@thefnmark{\thempfn}%
+  \endgroup%
+  #1%
+}
+\def\@xfootnote[#1]{%
+   \begingroup
+     \sbox\z@{\@tempcnta0#1\relax}%
+     \ifdim\wd\z@>0\p@\relax
+       \unrestored@protected@xdef\@thefnmark{#1}%
+     \else
+       \csname c@\@mpfn\endcsname #1\relax
+       \unrestored@protected@xdef\@thefnmark{\thempfn}%
+     \fi
+   \endgroup
+   \@footnotemark\@footnotetext}
 \long\def\text@command #1{%
   \def \reserved@a {#1}%
   \ifx \reserved@a \@empty
