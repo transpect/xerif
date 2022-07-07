@@ -2349,6 +2349,14 @@
     <char character="&#x7e;" string="${\sim}$"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
     <char character="&#x2c6f;" string="$\forall$"/>
+    <char character="&#x2200;" string="$\forall$"/>
+
+    <char character="&#x2229;" string="$\cap$"/>
+    <char character="&#x21d2;" string="$\Rightarrow$"/>
+    <char character="&#x2208;" string="$\in$"/>
+    <char character="&#x220a;" string="$\in$"/>
+    <char character="&#x2115;" string="$\mathbb{N}$"/>
+
     <char character="&#xe4;" string="ä"/>
     <char character="&#xf6;" string="ö"/>
     <char character="&#xfc;" string="ü"/>
