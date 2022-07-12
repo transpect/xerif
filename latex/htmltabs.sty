@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2022-05-12}%
+\def\fileversion{0.2.7}%
+\def\filedate{2022-07-12}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -545,7 +545,7 @@
 \def\@ht@parse@transform@rotate #1{%
   \ht@debugmsg{prop}{transform rotates by "#1".}%
   \def\ht@tempa{\ht@apply@prop{internal-rotate}}%
-  \expandafter\ht@tempa\expandafter{\ht@strip@deg#1\@@}%
+  \expandafter\ht@tempa\expandafter{\ht@strip@deg-#1\@@}%
 }
 \def\@ht@parse@transform@scale #1{%
   \ht@debugmsg{prop}{transform scales by "#1".}%
