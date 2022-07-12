@@ -1018,15 +1018,19 @@
       <xsl:when test="$heading/local-name() = ('section', 'bibliography') and count($heading/ancestor::*:section) eq 2">
         <xsl:sequence select="'subsubsection'"/>
       </xsl:when>
-      <xsl:when test="$heading/local-name() = ('section', 'bibliography') and count($heading/ancestor::*:section) gt 2">
+      <xsl:when test="$heading/local-name() = ('section', 'bibliography') and count($heading/ancestor::*:section) eq 3">
         <xsl:sequence select="'paragraph'"/>
+      </xsl:when>
+      <xsl:when test="$heading/local-name() = ('section', 'bibliography') and count($heading/ancestor::*:section) gt 3">
+        <xsl:sequence select="'subparagraph'"/>
       </xsl:when>
       <xsl:when test="$heading/local-name() = ('bibliodiv')">
         <xsl:variable name="level" select="count($heading/ancestor::dbk:bibliography)" as="xs:integer"/>
         <xsl:sequence select="     if($level eq 1) then 'section'
                               else if($level eq 2) then 'subsection'
                               else if($level eq 3) then 'subsubsection'
-                              else                      'paragraph'"/>
+                              else if($level eq 4) then 'paragraph'
+                              else                      'subparagraph'"/>
       </xsl:when>
     </xsl:choose>
   </xsl:function>
@@ -1081,12 +1085,6 @@
       </rule>
 <!--     <xsl:next-match/>-->
     </xsl:if>
-  </template>
-  
-  <template context="dbk:bridgehead">
-    <rule name="subparagraph" type="cmd" break-after="2" break-before="2">
-      <param/>
-    </rule>
   </template>
   
   <xsl:variable name="col-head-right-style" select="'^[a-z]{1,3}headlineright$'" as="xs:string"/>
