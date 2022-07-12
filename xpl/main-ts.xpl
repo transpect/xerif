@@ -120,7 +120,7 @@
     </p:documentation>
   </p:option>
 
-  <p:option name="running-headers" select="'no'">
+  <p:option name="running-header" select="'no'">
     <p:documentation>
       Whether to render running headers. Permitted values: 'yes' or 'no'.
     </p:documentation>
