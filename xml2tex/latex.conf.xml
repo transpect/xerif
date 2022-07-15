@@ -1897,6 +1897,8 @@
     </rule>
   </template>
   
+  <template context="dbk:bibliography[@role = ('Citavi', 'CSL')]"/>
+  
   <template context="dbk:citation">
     <rule>
       <text/>
