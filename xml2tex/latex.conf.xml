@@ -573,7 +573,11 @@
   <template context="*[not(self::dbk:book | self::dbk:hub | self::dbk:figure)][dbk:info][@xml:lang][@xml:lang ne /*/@xml:lang][not(../@xml:lang = current()/@xml:lang)]" priority="800">
     <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
     <xsl:next-match/>
-    <xsl:if test="following-sibling::*[1][not(@xml:lang) or @xml:lang eq /*/@xml:lang]">
+    <xsl:if test="following-sibling::*[1][not(@xml:lang) 
+                                          or 
+                                          @xml:lang eq /*/@xml:lang]
+                  or 
+                  not(following-sibling::*)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(/*/@xml:lang), '}')"/>
     </xsl:if>
   </template>
