@@ -2372,6 +2372,11 @@
     <char character="&#x201a;" string=","/>
     <!-- FULLWIDTH COMMA -->
     <char character="&#xff0c;" string=","/>
+    <!-- * 
+         * special processing instructions for common 
+         * -->
+    <!-- SPECIAL PAGE BREAK THAT FILLS THE LINE -->
+    <char character="&#x21a1;" string="\vadjust{\newpage}&#xa;" context="dbk:phrase[matches(@role, '^[a-z]{1,3}pi$')]"/>
   </charmap>
   
 </set>

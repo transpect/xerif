@@ -1532,6 +1532,12 @@
   <xsl:template match="text()[normalize-space()][matches(., '\s\s')]" mode="preprocess-whitespaces">
     <xsl:value-of select="hub:gentle-normalize(.)"/>
   </xsl:template>
+  
+  <xsl:template match="dbk:phrase[matches(@role, '^[a-z]{1,3}pi$')]" mode="custom-2">
+    <xsl:copy>
+      <xsl:apply-templates select="@role, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
 
   <xsl:function name="hub:gentle-normalize" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
