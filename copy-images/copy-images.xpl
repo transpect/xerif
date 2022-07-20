@@ -122,7 +122,7 @@
           <p:with-option name="href" select="/c:result/@local-href"/>
           <p:with-option name="outdir" select="$outdir"/>
           <p:with-option name="format" select="$format"/>
-          <p:with-option name="imagemagick-options" select="'-colorspace rgb'"/>
+          <p:with-option name="imagemagick-options" select="'-colorspace rgb -background white -flatten'"/>
           <p:with-option name="debug" select="$debug"/>
           <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
           <p:with-option name="fail-on-error" select="$fail-on-error"/>	    
