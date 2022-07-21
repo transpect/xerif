@@ -215,18 +215,19 @@
 \def\@xminusvskip{%
   \ifdim\lastskip<\@tempskipb
   \else
-    \ifdim\@tempskipb<\z@
-      \ifdim\lastskip<\z@
-      \else
+    \ifdim\lastskip<\z@
+    \else
+      \ifdim\@tempskipb<\z@
         \advance\@tempskipb\lastskip
-        \vskip-\lastskip
-        \vskip \@tempskipb
       \fi
+      \vskip-\lastskip
+      \vskip \@tempskipb
     \fi
   \fi}
 \def\minusvspace#1{%
   \ifvmode
      \if@minipage\else
+         \ifx\doSTopp\relax\showthe\lastskip\fi
        \ifdim \lastskip =\z@
          \ifx\@vspace@calcify\@undefined
            \vskip #1\relax
