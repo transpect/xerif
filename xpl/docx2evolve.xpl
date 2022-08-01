@@ -58,7 +58,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
     <p:with-option name="mathtype2mml" select="'yes'"/>
-    <p:with-option name="remove-biblioentry-paragraphs" select="'yes'"/>
+    <p:with-option name="remove-biblioentry-paragraphs" select="'no-in-div-wrapped'"/>
   </docx2hub:convert>
   
   <tx:insert-meta name="insert-meta">

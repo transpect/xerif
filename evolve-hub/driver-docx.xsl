@@ -717,13 +717,21 @@
                         [title]
                         [bibliomixed]
                         [every $i in *[not(self::title|self::bridgehead|self::abbrev)]
-                         satisfies $i/local-name() eq 'bibliomixed']" 
+                         satisfies $i/local-name() eq 'bibliomixed']
+                      |*[local-name() = ('chapter', 'section')]
+                        [div[@role eq 'docx2hub:formatted-bibliography']]" 
                 mode="custom-1" priority="5">
     <bibliography>
       <xsl:next-match>
         <xsl:with-param name="remove-wrapper" as="xs:boolean" select="true()"/>
       </xsl:next-match>
     </bibliography>
+  </xsl:template>
+  
+  <!-- remove wrapper of CSL/Citavi Bibiographies -->
+  
+  <xsl:template match="div[@role eq 'docx2hub:formatted-bibliography']" mode="custom-1">
+    <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
   <!-- mixed bibliographies -->
