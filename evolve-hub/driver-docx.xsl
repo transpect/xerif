@@ -170,7 +170,8 @@
                            [every $i in *[not(self::tab|self::footnote|self::anchor)]
                             satisfies $i[@xml:lang eq $doc-lang or (@xml:lang ne ../@xml:lang)]]
                            [  string-length(normalize-space(string-join(for $n in node()[not(self::tab|self::footnote|self::anchor)] return $n))) 
-                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" mode="hub:preprocess-hierarchy">
+                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" 
+                mode="hub:preprocess-hierarchy" priority="3">
     <xsl:copy>
       <!-- discard lang on para if every child has another lang. -->
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current">
@@ -188,13 +189,18 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]" mode="hub:preprocess-hierarchy">
+  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())] | 
+                       para[@xml:lang][(ancestor::*[@xml:lang])[1][@xml:lang = current()/@xml:lang]] " mode="hub:preprocess-hierarchy">
     <xsl:copy>
+      <!-- discard lang on paras without text, discard lang on para whose ancestor has same lang -->
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="para[@xml:lang eq $doc-lang]/@xml:lang" mode="hub:preprocess-hierarchy"/>
+  <xsl:template match="para[@xml:lang eq $doc-lang]
+                           [not((ancestor::*[@xml:lang])[1][@xml:lang ne $doc-lang])]/@xml:lang" mode="hub:preprocess-hierarchy">
+    <!-- discard lang on para if it is the same as doc lang. except if ancestor has another language. -->
+  </xsl:template>
   
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
@@ -246,7 +252,7 @@
     <xsl:param name="first-lang" as="xs:string?"/>
     <xsl:sequence select="every $p 
                           in $sec/descendant::*[self::para[not(..[self::footnote])] | self::title] 
-                          satisfies($p[descendant::text()[..[@xml:lang=$first-lang or self::phrase[@role = 'hub:identifier']]]
+                          satisfies($p[descendant::text()[..[@xml:lang=$first-lang or self::phrase[starts-with(@role,'hub:')]]]
                                                          [hub:same-scope(., $p)]
                                        ]
                                     )"/>
@@ -1184,6 +1190,8 @@
     <xsl:value-of select="replace(., '\p{Zs}+$', '')"/>
   </xsl:template>
   
+  <xsl:template match="bibliography[@role = ('Citavi', 'CSL', 'CSL-formatted')]" mode="hub:clean-hub"/>
+
 <!-- group meta infos for same structure as in IDML-->
  <xsl:template match="*[*[starts-with(@role, 'tsmeta') and not(matches(@role, 'tsmeta((chunk)?keyword|alternativeheadline)'))]]" mode="hub:meta-infos-to-sidebar">
     <xsl:copy copy-namespaces="no">
