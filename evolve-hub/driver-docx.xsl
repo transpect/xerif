@@ -414,6 +414,10 @@
                                 then 'figure' 
                                 else 'informalfigure'}">
               <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex)][1]/@role" mode="figure-role-type"/>
+              <xsl:if test="some $p in current-group()[matches(@role, concat($figure-image-role-regex, '|', $figure-source-role-regex))] 
+                            satisfies $p[node()[1][self::tab]]">
+                <xsl:attribute name="remap" select="'list'"/>
+              </xsl:if>
               <xsl:if test="$one-caption-for-multiple-images">
                 <xsl:apply-templates select="current-group()[matches(@role, $figure-caption-role-regex)]" mode="figures"/>
               </xsl:if>
@@ -480,6 +484,20 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
+  <xsl:template match="*[self::figure | self::informalfigure]
+                        [@remap = 'list']
+                        [preceding-sibling::*[1][matches(@role, concat('[lL]ist|', $variable-list-role-regex))]]" mode="hub:dissolve-sidebars-without-purpose">
+    <para>
+      <xsl:copy-of select="preceding-sibling::*[1][matches(@role, concat('[lL]ist|', $variable-list-role-regex))]/@*[not(name() = 'srcpath')]"></xsl:copy-of>
+      <xsl:next-match/>
+    </para>
+    <!-- https://redmine.le-tex.de/issues/13152 -->
+  </xsl:template>
+
+  <xsl:template match="*[self::figure | self::informalfigure]/@remap[. = 'list'] | 
+                       *[self::figure | self::informalfigure][@remap = 'list']/*/node()[1][self::tab] | 
+                       *[self::figure | self::informalfigure][@remap = 'list']/*/tab[every $p in preceding-sibling::node() satisfies $p[self::tab]]" mode="hub:dissolve-sidebars-without-purpose"/>
+
   <!-- remove paras and phrases that interfere with caption evaluation -->
   
   <xsl:template match="para[preceding-sibling::*[1][self::para][mediaobject]][not(normalize-space())]
