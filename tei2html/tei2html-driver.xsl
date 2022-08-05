@@ -19,6 +19,8 @@
   <xsl:import href="http://transpect.io/tei2html/xsl/tei2html.xsl"/>
   <xsl:import href="http://this.transpect.io/a9s/common/xsl/shared-variables.xsl"/>
   
-  <xsl:template match="head[matches(@type, 'titleabbrev')]" mode="tei2html"/>
+  <xsl:template match="head[matches(@type, 'titleabbrev')] | note[@type = 'comment']" mode="tei2html">
+    <!--https://redmine.le-tex.de/issues/13166-->
+  </xsl:template>
   
 </xsl:stylesheet>
