@@ -168,10 +168,12 @@
       \@tp@parse@attributes#2,\@nil
     \fi\fi}
 \endgroup
+\DeclareRobustCommand\tpPI[2]{\ifcsdef{tp@#1@active}{#2}{}}
 \DeclareRobustCommand{\tpSetProperty}[2]{\expandafter\long\expandafter\protect\expandafter\def\csname tp@\tp@namespace @#1\endcsname{#2}}
 \DeclareRobustCommand{\tpSetValProp}[2]{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
 \DeclareRobustCommand{\tpSetPropertyX}[2]{\expandafter\long\expandafter\protect\expandafter\edef\csname tp@\tp@namespace @#1\endcsname{#2}}
 \def\tpUseProperty#1{\csname tp@\tp@namespace @#1\endcsname}
+\def\tpUsePropEnv#1{\cslet{tp@#1@active}{\relax}\tpUseProperty{#1}\csundef{tp@#1@active}}
 \DeclareRobustCommand{\tpIfProp}[3]{\long\def\@tempa{}%
   \expandafter\ifx\csname tp@\tp@namespace @#1\endcsname\@tempa#3\else#2\fi\ignorespaces}
 \DeclareRobustCommand{\tpIfPropVal}[4]{\long\def\@tempa{#2}%
