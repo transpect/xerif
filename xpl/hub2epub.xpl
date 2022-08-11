@@ -119,7 +119,7 @@
           <p:pipe port="result" step="hub2bits"/>
         </p:input>
       </p:identity>
-      <p:delete match="@css:* | *:custom-meta-group"/>
+      <p:delete match="@css:* | *:custom-meta-group | @srcpath | @c:report"/>
     </p:when>
     <p:otherwise>
       <p:output port="result"/>

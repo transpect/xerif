@@ -100,10 +100,10 @@
       <p:output port="result" primary="true" />
       <p:output port="reports" sequence="true">
         <p:pipe port="report" step="validate-bits-schema"/>
-<!--        <p:pipe port="reports" step="validate-business-rules"/>-->
+        <p:pipe port="report" step="validate-bits-business-rules"/>
       </p:output>
       
-      <p:delete match="@css:* | css:rules"/>
+      <p:delete match="@css:* | css:rules | @srcpath | @c:*"/>
       
        <tr:validate-with-rng-svrl name="validate-bits-schema">
         <p:input port="schema">
@@ -114,20 +114,20 @@
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
       </tr:validate-with-rng-svrl>
       
-      <!--<tr:validate-with-schematron name="validate-business-rules">
+      <tr:validate-with-schematron name="validate-bits-business-rules">
         <p:input port="parameters">
           <p:pipe port="paths" step="validate"/>
         </p:input>
         <p:input port="html-in">
           <p:empty/>
         </p:input>
-        <p:with-param name="family" select="'business-rules'"/>
-        <p:with-param name="step-name" select="'validate-business-rules'"/>
+        <p:with-param name="family" select="'bits-business-rules'"/>
+        <p:with-param name="step-name" select="'validate-bits-business-rules'"/>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
         <p:with-option name="schematron-rule-msg" select="'yes'"/>
-      </tr:validate-with-schematron>-->
+      </tr:validate-with-schematron>
     </p:when>
     <p:otherwise>
       <p:output port="result" primary="true" />
