@@ -1399,17 +1399,17 @@
   
   <template context="dbk:figure/dbk:title | *:table/dbk:title">
     <xsl:call-template name="create-caption">
-      <xsl:with-param name="context-nodes" select="dbk:phrase[@role = ('hub:identifier', 'caption-number')]" as="node()*"/>
+      <xsl:with-param name="context-nodes" select="dbk:phrase[@role = ('hub:identifier', 'hub:caption-number')]" as="node()*"/>
     </xsl:call-template>
-    <xsl:if test="matches(string-join(node()[not(self::*:phrase[@role = ('hub:identifier', 'caption-number')])], ''), '\S')
+    <xsl:if test="matches(string-join(node()[not(self::*:phrase[@role = ('hub:identifier', 'hub:caption-number')])], ''), '\S')
                    or  
                   $xml2tex:create-empty-captions">
       <rule name="tpCaption" type="cmd" break-before="1" break-after="0">
-        <param select="node()[not(@role = ('hub:identifier', 'caption-number', 'caption-numtext-separator'))]"/>
+        <param select="node()[not(@role = ('hub:identifier', 'hub:caption-number', 'hub:caption-numtext-separator'))]"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote">
         <rule name="tpListofCaption" type="cmd" break-before="1" break-after="0">
-          <param select="node()[not(@role = ('hub:identifier', 'caption-number', 'caption-numtext-separator'))]">
+          <param select="node()[not(@role = ('hub:identifier', 'hub:caption-number', 'caption-numtext-separator'))]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           </param>
         </rule>
@@ -1422,7 +1422,7 @@
     <xsl:param name="context-nodes" as="node()*"/>
     <xsl:if test="$context-nodes[self::dbk:phrase]">
       <rule name="tpNumber" type="cmd" break-before="1">
-        <param select="$context-nodes"/>
+        <param select="replace($context-nodes,'\.$','')"/>
       </rule>
     </xsl:if>
   </template>  
