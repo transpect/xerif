@@ -209,12 +209,12 @@
     </xsl:for-each>
     <xsl:for-each select="$editors">
       <xsl:text>&#xa;\begin{tpEditor}</xsl:text>
-      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc, '}')"/>
+      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
       <xsl:text>\end{tpEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:for-each select="$series-editors">
       <xsl:text>&#xa;\begin{tpSeriesEditor}</xsl:text>
-      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc, '}')"/>
+      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
       <xsl:text>\end{tpSeriesEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:if test="normalize-space($title) or normalize-space($title-for-running-head)">
@@ -498,8 +498,38 @@
     <xsl:variable name="content" as="node()*"><xsl:apply-templates select="$context" mode="strip-meta"/></xsl:variable>
     <xsl:value-of select="normalize-space(string-join($content))"/>
   </xsl:function>
+  
+  <xsl:function name="xml2tex:meta2tex" as="xs:string?">
+    <xsl:param name="meta"/>
+    <xsl:param name="env" as="xs:string?"/>
+    <xsl:param name="tex" as="xs:string"/>
+    <xsl:variable name="result" as="xs:string*">
+      <xsl:if test="normalize-space(string-join($meta))">
+        <xsl:sequence select="if($tex eq 'env')
+                              then concat('&#xa;\begin{', $tex, '}&#xa;') 
+                              else concat('&#xa;\', $tex, '{')"/>
+        <xsl:choose>
+          <xsl:when test="$meta instance of element()">
+            <xsl:sequence select="xml2tex:meta-remove-links-etc($meta)"/>
+          </xsl:when>
+          <xsl:when test="empty($env) or $env eq 'cmd'">
+            <xsl:sequence select="normalize-space(string-join($meta))"/>
+          </xsl:when>
+        </xsl:choose>
+        <xsl:sequence select="if($tex eq 'env')
+                              then concat('&#xa;\end{', $tex, '}&#xa;') 
+                              else '}'"/>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:sequence select="string-join($result)"/>
+  </xsl:function>
 
-  <xsl:template match="@* | comment() | processing-instruction" mode="strip-meta" priority="1"/>
+  <xsl:template match="@* | comment()" mode="strip-meta" priority="1"/>
+  
+  <xsl:template match="processing-instruction()" mode="strip-meta">
+    <xsl:value-of select="."/>
+  </xsl:template>
+  
   <xsl:template match="dbk:footnote | dbk:index" mode="strip-meta" priority="5"/>
   
   <xsl:template match="/ | *" mode="strip-meta" priority="4">
