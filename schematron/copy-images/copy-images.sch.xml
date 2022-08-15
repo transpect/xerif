@@ -92,7 +92,25 @@
     </rule>
   </pattern>
 
+  <pattern id="identifier">
+    <rule context="dbk:info/dbk:title//dbk:phrase[@role='hub:identifier'][following-sibling::*[1][self::dbk:tab]]">
+      <report test="string-length(normalize-space(.)) gt 15" role="warning" diagnostics="suspiciously_long_identifier_de" id="suspiciously_long_identifier">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, @srcpath)"/></span>
+        <span class="category">Typesetting convention</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Long Text before tab</span>
+        In this heading is a tab with a lot of text preceding it: <b xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="normalize-space(.)"/></b>. This text will be inserted in a number makro in TeX 
+        and may result in strange margins inside headings.
+      </report>
+    </rule>
+  </pattern>
+
   <diagnostics>
+    <diagnostic id="suspiciously_long_identifier_de" xml:lang="de">
+      <span class="category">Satzkonventionen</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Viel Text vor Tabulator</span>
+      In dieser Überschrift gibt es einen Tabulator mit ziemlich viel Text davor: <b xmlns="http://www.w3.org/1999/xhtml"><xsl:value-of select="normalize-space(.)"/></b>. 
+      Dieser Text wird im TeX in ein Nummern-Makro überführt
+      und könnte dafür sorgen, dass die Abstände zwischen Numer und Text zu groß sind. Bitte prüfen Sie, ob hier wirklich nur eine Kapitel/Abschnittsnummer vor dem Tabulator steht. </diagnostic>
     <diagnostic id="image-conversion-failed_de" xml:lang="de">
       <span class="category">Abbildungen</span>
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Konvertierunsfehler</span>
