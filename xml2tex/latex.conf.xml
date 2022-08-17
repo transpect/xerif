@@ -568,7 +568,7 @@
     <xsl:text>}</xsl:text>
   </xsl:template>
 
-  <xsl:template match="text()[..[self::dbk:keyword[matches(., 'file:|http|www')]]]" mode="escape-bad-chars" priority="300">
+  <xsl:template match="text()[..[self::dbk:keyword[matches(., 'file:|http|www|(\.(png|PNG|jpe?g|pdf|JPE?G|PDF|eps|EPS)\p{Zs}*$)')] ]]" mode="escape-bad-chars" priority="300">
     <!-- prevent filename replacement in keywords -->
     <xsl:value-of select="."/>
   </xsl:template>
