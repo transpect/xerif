@@ -415,7 +415,7 @@
                                 else 'informalfigure'}">
               <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex)][1]/@role" mode="figure-role-type"/>
               <xsl:if test="some $p in current-group()[matches(@role, concat($figure-image-role-regex, '|', $figure-source-role-regex))] 
-                            satisfies $p[node()[1][self::tab]]">
+                            satisfies $p[node()[1][descendant-or-self::tab]]">
                 <xsl:attribute name="remap" select="'list'"/>
               </xsl:if>
               <xsl:if test="$one-caption-for-multiple-images">
@@ -495,7 +495,7 @@
   </xsl:template>
 
   <xsl:template match="*[self::figure | self::informalfigure]/@remap[. = 'list'] | 
-                       *[self::figure | self::informalfigure][@remap = 'list']/*/node()[1][self::tab] | 
+                       *[self::figure | self::informalfigure][@remap = 'list']/*/node()[1][self::tab or self::phrase[every $n in node() satisfies $n[self::tab]]] | 
                        *[self::figure | self::informalfigure][@remap = 'list']/*/tab[every $p in preceding-sibling::node() satisfies $p[self::tab]]" mode="hub:dissolve-sidebars-without-purpose"/>
 
   <!-- remove paras and phrases that interfere with caption evaluation -->
