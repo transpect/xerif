@@ -1237,6 +1237,7 @@
         * -->
   
   <template context="dbk:part/dbk:title/dbk:tab
+                    |dbk:part/dbk:info/dbk:title/dbk:tab
                     |dbk:chapter/dbk:title/dbk:tab
                     |dbk:chapter/dbk:info/dbk:title/dbk:tab
                     |dbk:section/dbk:info/dbk:title/dbk:tab
