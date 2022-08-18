@@ -1821,7 +1821,6 @@
   <!--  *
         * author list
         * -->
-  <xsl:variable name="author-desc-style" select="'^[a-z]{1,3}authordescription'" as="xs:string"/>
   
   <template context="dbk:para[matches(@role, $author-desc-style)]">
     <rule name="authorbio" break-after="1" break-before="1" type="env">

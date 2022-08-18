@@ -111,6 +111,9 @@
   <xsl:variable name="info-author-role" as="xs:string"
                 select="'^[a-z]{1,3}(author)$'"/>
   
+  <xsl:variable name="author-desc-style" as="xs:string"
+                select="'^[a-z]{1,3}authordescription'" />
+  
   <xsl:variable name="info-subtitle-role" as="xs:string"
                 select="'^[a-z]{1,3}(subheading\d|journalreviewsubheading)$'"/>
   
