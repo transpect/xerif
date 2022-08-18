@@ -38,15 +38,17 @@
   <!-- https://redmine.le-tex.de/issues/12115 
        fix issue where list of tables was wrapped inside the section of list of figures -->
   
-  <xsl:template match="hub/section[matches(@role,  '^[a-z]{1,3}headingpart$')]" mode="hub:postprocess-hierarchy">
+  <xsl:variable name="part-heading-role-regex" select=" '^[a-z]{1,3}headingpart$'"/>
+  
+  <xsl:template match="hub/section[matches(@role, $part-heading-role-regex)]" mode="hub:postprocess-hierarchy">
     <part>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </part>
   </xsl:template>
   
   <xsl:template match="hub/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1|journalreviewheading)$')]
-                      |hub/section[matches(@role, '^[a-z]{1,3}headingpart$')]/section[matches(@role, '^[a-z]{1,3}heading(enumerated)?1$')]
-                      |hub/section[not(matches(@role, '^[a-z]{1,3}headingpart$'))]" 
+                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}heading(enumerated)?1$')]
+                      |hub/section[not(matches(@role, $part-heading-role-regex))]" 
                 mode="hub:postprocess-hierarchy">
     <chapter>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
