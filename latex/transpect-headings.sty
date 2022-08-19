@@ -113,12 +113,12 @@
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
   \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
-    \tpIfComp{Number}{%
-      \edef\@tempa{\expandonce{\tp@heading@Number}}%
-      \let\@currentlabel\@tempa\relax
-      \let\@currentlabelname\tp@heading@Title
-      \expandafter\tpltx@label\expandafter{\tp@heading@attr@label}%
-    }{}%
+    \tpIfComp{Number}
+      {\edef\@tempa{\expandonce{\tp@heading@Number}}%
+       \let\@currentlabel\@tempa\relax
+       \let\@currentlabelname\tp@heading@Title}
+      {\phantomsection}%
+    \expandafter\tpltx@label\expandafter{\tp@heading@attr@label}%
   \fi
   \global\let\label\tpltx@label}
 \def\tp@make@toc{%
