@@ -78,25 +78,7 @@
   </p:template>
   
   <p:sink/>
-  
-  <tr:dynamic-transformation-pipeline name="load-epub-config" 
-                                      load="epub/load-epub-config"
-                                      fallback-xpl="http://this.transpect.io/a9s/common/epub/load-epub-config.xpl" cx:depends-on="load-epub-config-options-input">
-    <p:input port="source">
-      <p:pipe port="meta" step="tx-tei2epub"/>
-    </p:input>
-    <p:input port="paths">
-      <p:pipe port="params" step="tx-tei2epub"/>
-    </p:input>
-    <p:input port="options">
-      <p:pipe port="result" step="load-epub-config-options-input"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-  </tr:dynamic-transformation-pipeline>
-  
-  <p:sink/>
-  
+
   <p:group name="create-epub" cx:depends-on="load-epub-config">
     <p:output port="html">
       <p:pipe port="result" step="htmltemplates"/>
@@ -111,7 +93,6 @@
         <p:pipe port="result" step="tei2html"/>
       </p:input>
       <p:input port="meta">
-        <p:pipe port="result" step="load-epub-config"/>
         <p:pipe port="meta" step="tx-tei2epub"/>
       </p:input>
       <p:input port="paths">
@@ -126,13 +107,62 @@
       <p:with-option name="replace" select="concat('''', $epub-path, '''')"/>
     </p:string-replace>
     
-    <p:delete match="*:header[@class='chunk-meta-sec'] | *:p[matches(@class, 'tsmedia(caption|source|url)')]"/>
-
+    <p:delete match="*:header[@class='chunk-meta-sec'] | *:p[matches(@class, 'tsmedia(caption|source|url)')]" name="delete-header"/>
+     
+   <p:wrap wrapper="cx:document" match="/"/>
+   <p:add-attribute name="wrap-htmltemplates" attribute-name="port" attribute-value="htmltemplates" match="/*"/>
+   
     <cx:message>
       <p:with-option name="message" select="'[info] epub path: ', $epub-path"/>
     </cx:message>
     
+  <p:sink/>
+
+    <tr:dynamic-transformation-pipeline name="load-epub-config" 
+      load="epub/load-epub-config"
+      fallback-xpl="http://this.transpect.io/a9s/common/epub/load-epub-config.xpl" cx:depends-on="wrap-htmltemplates">
+      <p:input port="source">
+        <p:pipe port="meta" step="tx-tei2epub"/>
+      </p:input>
+      <p:input port="paths">
+        <p:pipe port="params" step="tx-tei2epub"/>
+      </p:input>
+      <p:input port="options">
+        <p:pipe port="result" step="load-epub-config-options-input"/>
+      </p:input>
+      <p:input port="additional-inputs">
+        <p:pipe port="result" step="wrap-htmltemplates"/>
+      </p:input>
+      <p:with-option name="debug" select="$debug"/>
+      <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    </tr:dynamic-transformation-pipeline>
+  
+    <p:sink/>
+    
+    <p:identity cx:depends-on="load-epub-config" name="id-cover">
+      <p:input port="source">
+        <p:pipe port="result" step="delete-header"/>
+      </p:input>
+    </p:identity>
+
+  
+    <p:add-attribute attribute-name="src" match="/html:html/html:body/html:div[@id = 'epub-cover-image-container']/html:img" name="replace-cover-href">
+      <p:with-option name="attribute-value" select="/*:epub-config/*:cover/@href">
+        <p:pipe port="result" step="load-epub-config"/>
+      </p:with-option>
+    </p:add-attribute>
+
+    <tr:store-debug pipeline-step="htmltemplates/99_with_cover">
+      <p:with-option name="active" select="$debug"/>
+      <p:with-option name="base-uri" select="$debug-dir-uri"/>
+    </tr:store-debug>
+
+    <p:sink/>
+
     <epub:convert name="epub-convert">
+      <p:input port="source">
+        <p:pipe port="result" step="replace-cover-href"/>
+      </p:input>
       <p:input port="meta">
         <p:pipe port="result" step="load-epub-config"/>
       </p:input>
