@@ -1614,7 +1614,7 @@
   
   <xsl:function name="hub:replace-hyphens" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="regex" as="xs:string" select="'([\p{L}](-)[\),/\]\d])|((-).(-))|(\s(-)\p{L})|((^|\s)[\p{L}&#120576;-&#120777;]{1,2}(-)\p{L})|((^|[\p{L}‹«\d\)])(-)([\p{L}\s»›]|$))|(\s[\(\[]?\d+(-)\d+)|((\s-)\s)'"/>
+    <xsl:variable name="regex" as="xs:string" select="'([\p{L}](-)[\),/\]\d])|((-).(-))|(\s(-)\p{L})|((^|\s)[\p{L}&#120576;-&#120777;]{1,2}(-)\p{L})|((^|[\p{L}‹«\d\)])(-)([\p{L}\s»›]|$))|(\p{Zs}*[\(\[]?\d+(-)\d+)|((\s-)\s)'"/>
     <xsl:variable name="tokens" as="text()+">
       <xsl:analyze-string select="$text" regex="{$regex}">
         <xsl:matching-substring>
