@@ -1614,7 +1614,7 @@
   
   <xsl:function name="hub:replace-hyphens" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
-    <xsl:variable name="regex" as="xs:string" select="'([\p{L}](-)[\),/\]\d])|((-).(-))|(\s(-)\p{L})|((^|\s)[\p{L}&#120576;-&#120777;]{1,2}(-)\p{L})|((^|[\p{L}‹«\d\)])(-)([\p{L}\s»›]|$))|(\p{Zs}*[\(\[]?\d+(-)\d+)|((\s-)\s)'"/>
+    <xsl:variable name="regex" as="xs:string" select="'([\p{L}](-)[\),/\]\d])|((-).(-))|(\s(-)\p{L})|((^|\s)[\p{L}&#120576;-&#120777;]{1,2}(-)\p{L})|((^|[\p{L}‹«\d\)])(-)([\p{L}\s»›]|$))|((\p{Zs}|^)[\(\[]?\d+(-)\d+([^-]|$))|((\s-)\s)'"/>
     <xsl:variable name="tokens" as="text()+">
       <xsl:analyze-string select="$text" regex="{$regex}">
         <xsl:matching-substring>
@@ -1629,9 +1629,9 @@
           <!--case 6, 7, 8, 9, 11, 13, 12, 15, 17: ((^|[\p{L})(-)[\p{L}\s]) -->
           <xsl:if test="regex-group(11)"><xsl:value-of select="replace(regex-group(11), regex-group(13), '‐')"/></xsl:if>
            <!--case 18: (\s[\(\[]?\d+(-)\d+) -->
-          <xsl:if test="regex-group(15)"><xsl:value-of select="replace(regex-group(15), regex-group(16), '–')"/></xsl:if>
+          <xsl:if test="regex-group(15)"><xsl:value-of select="replace(regex-group(15), regex-group(17), '–')"/></xsl:if>
           <!--case 19: ((\s-)\s) -->
-          <xsl:if test="regex-group(17)"><xsl:value-of select="replace(regex-group(17), regex-group(18), '&#160;–')"/></xsl:if>
+          <xsl:if test="regex-group(19)"><xsl:value-of select="replace(regex-group(19), regex-group(20), '&#160;–')"/></xsl:if>
         </xsl:matching-substring>
         <xsl:non-matching-substring>
           <xsl:value-of select="."/>
