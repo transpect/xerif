@@ -1435,14 +1435,19 @@
     <xsl:if test="matches(string-join(node()[not(self::*:phrase[@role = ('hub:identifier', 'hub:caption-number', 'identifier', 'caption-number')])], ''), '\S')
                    or  
                   $xml2tex:create-empty-captions">
+      <xsl:variable name="caption-nodes-without-num" select="node()[not(@role = ('hub:identifier', 'hub:caption-number', 'hub:caption-numtext-separator', 
+                                                                   'identifier', 'caption-number', 'caption-numtext-separator'))
+                                                                    and 
+                                                                    not(self::dbk:tab[preceding-sibling::node()[1][self::dbk:tab or @role = ('hub:identifier', 'hub:caption-number', 
+                                                                                                                                            'hub:caption-numtext-separator', 'identifier', 
+                                                                                                                                            'caption-number', 'caption-numtext-separator')]])]" 
+                      as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="0">
-        <param select="node()[not(@role = ('hub:identifier', 'hub:caption-number', 'hub:caption-numtext-separator', 
-                                           'identifier', 'caption-number', 'caption-numtext-separator'))]"/>
+        <param select="$caption-nodes-without-num"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote">
         <rule name="tpListofCaption" type="cmd" break-before="1" break-after="0">
-          <param select="node()[not(@role = ('hub:identifier', 'hub:caption-number', 'hub:caption-numtext-separator',
-                                             'identifier', 'caption-number', 'caption-numtext-separator'))]">
+          <param select="$caption-nodes-without-num">
             <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           </param>
         </rule>
