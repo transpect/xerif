@@ -98,6 +98,15 @@
         <xsl:sequence select="schematron:general-documentation('en', '#Register-Index')"/>
       </assert>
     </rule>
+    <rule context="dbk:chapter[dbk:indexentry or dbk:indexterm]">
+      <assert test="false()" id="no_index_wrapper" diagnostics="no_index_wrapper_de" role="error">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir, descendant::*[@srcpath][1]/@srcpath)"/></span>
+        <span class="category">Styles usage</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Chapter contains index list but not a corresponding 
+          index wrapper. This issue could be caused by using the wrong style for the index heading. 
+        </span>
+      </assert>
+    </rule>
   </pattern>
   
   <pattern id="evolve-hub_pseudo-heading">
@@ -612,6 +621,12 @@
       <br xmlns="http://www.w3.org/1999/xhtml"/><br xmlns="http://www.w3.org/1999/xhtml"/>
       Um die Registereinträge dennoch sinnvoll verlinken zu können, muss ein Skript über das Dokument laufen, welches Seitenanker setzt.
       <xsl:sequence select="schematron:general-documentation('de', '#Register-Index')"/>
+    </diagnostic>
+    <diagnostic id="no_index_wrapper_de">
+      <span class="category">Formatvorlagenverwendung</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Registereinträge in einem normalen Kapitel gefunden. Grund für diesen Fehler
+        kann ein falsches Absatzformat für die Indexüberschrift sein.
+      </span>
     </diagnostic>
     </diagnostics>
    
