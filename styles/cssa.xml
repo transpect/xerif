@@ -38,6 +38,7 @@
   <css:rule layout-type="para" native-name="ts_table_value" name="tstablevalue" regex="^[a-z]{1,3}tablevalue$"/>
   <css:rule layout-type="para" native-name="ts_head_word" name="tsheadword" regex="^[a-z]{1,3}headword$"/>
   <css:rule layout-type="para" native-name="ts_index_name" name="tsindexname" regex="^[a-z]{1,3}indexname$"/>
+  <css:rule layout-type="para" native-name="ts_index_static" name="tsindexstatic" regex="^[a-z]{1,3}indexstatic$"/>
   <css:rule layout-type="para" native-name="ts_list" name="tslist" regex="^[a-z]{1,3}list$"/>
   <css:rule layout-type="para" native-name="ts_list_of_tables_item" name="tslistoftablesitem" regex="^[a-z]{1,3}listoftablesitem$"/>
   <css:rule layout-type="para" native-name="ts_literature" name="tsliterature" regex="^[a-z]{1,3}literature$"/>
