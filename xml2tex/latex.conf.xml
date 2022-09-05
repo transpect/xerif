@@ -590,7 +590,7 @@
                     |/dbk:*/dbk:dedication">
     <xsl:param name="keep" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$keep">
-      <rule name="tpDedication" type="cmd" break-after="2" break-before="2">
+      <rule name="tpDedication" type="env" break-after="2" break-before="2">
         <param/>
       </rule>
     </xsl:if>
