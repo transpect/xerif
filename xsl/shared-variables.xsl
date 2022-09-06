@@ -43,7 +43,7 @@
                 select="'^([a-z]{1,3}tablecaption)$'" as="xs:string"/>
   
   <xsl:variable name="hub:figure-caption-start-regex" as="xs:string" 
-                select="'^(Fig\.?(ure)?|Abb\.?(ildung)?|Tafel|Bild|.+?)\s'"/>
+                select="'[^\p{Zs}]+'"/>
   
   <xsl:variable name="hub:caption-sep-regex" as="xs:string" 
                 select="'[&#x20;&#x2002;&#xa0;&#x202F; \p{Zs}]+'"/>
@@ -151,7 +151,7 @@
 
   <xsl:variable name="table-header-style-regex" select="'^[a-z]{1,3}tableheader$'" as="xs:string"/>
   
-  <xsl:variable name="endnotes-heading-style" select="'^[a-z]{1,3}endnotesheading$'" as="xs:string"/>
+  <xsl:variable name="endnotes-heading-style" select="'^[a-z]{1,3}listofendnotes$'" as="xs:string"/>
 
   <xsl:variable name="hub:article-keywords-role-regex" as="xs:string" select="'tsmeta(chunk)?keywords?'"/>
 
