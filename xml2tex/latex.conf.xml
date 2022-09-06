@@ -536,11 +536,6 @@
     <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="dbk:para[not(position() eq last())]" mode="strip-meta" priority="4">
-    <xsl:apply-templates mode="#current"/>
-    <xsl:text>{\tpBreak}</xsl:text>
-  </xsl:template>
-  
   <xsl:template match="text()" mode="strip-meta" priority="4">
     <xsl:value-of select="."/>
   </xsl:template>
