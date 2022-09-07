@@ -1476,10 +1476,10 @@
     </rule>
   </template>
   
-   <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][position() ne 1] | 
-                      *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][position() ne 1] (:htmltable:) |
-                      dbk:figure/dbk:info/dbk:legalnotice/dbk:para[[position() ne 1]] | 
-                      *:table/dbk:info/dbk:legalnotice/dbk:para[position() ne 1]">
+   <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][not(position() = 1)] | 
+                      *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][not(position() = 1)] (:htmltable:) |
+                      dbk:figure/dbk:info/dbk:legalnotice/dbk:para[[not(position() = 1)]] | 
+                      *:table/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]">
      <xsl:param name="already-merged" as="xs:boolean?" tunnel="yes"/>
      <xsl:if test="$already-merged">
        <xsl:text>&#xa;\tpBreak </xsl:text>
