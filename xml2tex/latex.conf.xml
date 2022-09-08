@@ -2018,7 +2018,7 @@
     </rule>
   </regex>
   
-  <regex regex="([&#x590;-&#x5ff;]+)">
+  <regex regex="([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)">
     <rule name="foreignlanguage" type="cmd">
       <param>hebrew</param>
       <param regex-group="1"/>
