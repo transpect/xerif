@@ -887,6 +887,10 @@
     <xsl:processing-instruction name="latex" select="'&#xa;\end{tabularx}&#xa;'"/>
   </xsl:template>
   
+  <xsl:template match="para[matches(@role, '^[a-z]{1,3}listofendnotes$')]" mode="hub:split-at-tab" priority="15">
+    <xsl:processing-instruction name="latex" select="'\printnotes'"/>
+  </xsl:template>
+
   <xsl:template match="phrase[@css:background-color eq '#FFFFFF']/@css:background-color" mode="custom-2"/>
   <xsl:template match="phrase[@css:background-color eq '#FFFFFF'][count(@*) eq 2] " mode="custom-2" priority="4">
     <xsl:apply-templates mode="#current"/>
