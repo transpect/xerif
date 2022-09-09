@@ -439,7 +439,8 @@
     <xsl:if test="    $notes-type eq 'endnotes' 
                   and not($notes-per-chapter eq 'yes')
                   and not(//*[self::dbk:para|self::dbk:title]
-                             [matches(@role, $endnotes-heading-style)])">
+                             [matches(@role, $endnotes-heading-style)])
+                  and not(//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])">
       <xsl:call-template name="create-printnotes">
         <xsl:with-param name="context" as="element(*)" select="/*"/>
       </xsl:call-template>
@@ -664,7 +665,7 @@
       <!-- Endnoten an der Position des Absatzes mit Endnotenüberschrift -->
       <xsl:when test="$context[self::dbk:chapter
                               |self::dbk:section]
-                              [matches(dbk:info/dbk:title/@role, $endnotes-heading-style)]">
+                              [matches(dbk:info/dbk:title/@role, $endnotes-heading-style) ]">
         <rule name="printnotes" type="cmd" break-before="1"/>                              
       </xsl:when>
     </xsl:choose>
