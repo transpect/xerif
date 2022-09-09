@@ -1478,7 +1478,7 @@
   
    <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][not(position() = 1)] | 
                       *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][not(position() = 1)] (:htmltable:) |
-                      dbk:figure/dbk:info/dbk:legalnotice/dbk:para[[not(position() = 1)]] | 
+                      dbk:figure/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)] | 
                       *:table/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]">
      <xsl:param name="already-merged" as="xs:boolean?" tunnel="yes"/>
      <xsl:if test="$already-merged">
@@ -2194,7 +2194,9 @@
   
   <xsl:template match="text()" mode="copy" priority="100">
     <xsl:param name="replace-linktext" as="xs:boolean?" tunnel="yes"/>
-    <xsl:value-of select="if ($replace-linktext) then xml2tex:add-tactical-break-chars-in-linktext(.) else ."/>
+    <xsl:value-of select="if ($replace-linktext) 
+                          then xml2tex:add-tactical-break-chars-in-linktext(.) 
+                          else ."/>
   </xsl:template>
 
   <xsl:template mode="copy" match="dbk:indexterm | dbk:footnote" priority="2">
@@ -2207,16 +2209,16 @@
   <xsl:function name="xml2tex:add-tactical-break-chars-in-linktext">
     <xsl:param name="text" as="xs:string"/>
      <xsl:value-of select="replace(
-                             replace(
-                                     replace($text,
-                                             '([-%_./=?])([^-%_./=?]{3,})',
-                                             concat('$1',$tactical-break-character-for-urls, '$2')
-                                             ),
-                                     '\\?(&amp;)',
-                                     concat($tactical-break-character-for-urls, '\\$1')
-                                     ), 
-                             '\\?_', '\\_'
-                             )"/>
+                              replace(
+                                      replace($text,
+                                              '([-%_./=?])([^-%_./=?]{3,})',
+                                              concat('$1',$tactical-break-character-for-urls, '$2')
+                                              ),
+                                      '\\?(&amp;)',
+                                      concat($tactical-break-character-for-urls, '\\$1')
+                                      ), 
+                              '\\?_', '\\_')
+                          "/>
   </xsl:function>
   
   <template context="dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
@@ -2387,7 +2389,9 @@
                                                       |dbk:link"/>
     
     <!-- TILDE -->
-    <char character="&#x7e;" string="${\sim}$"/>
+
+    <char character="&#x7e;" string="{\string~}"/>
+    <char character="&#x7e;" string="${\sim}$" context="*[not(self::dbk:link|self::dbk:ulink)]"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
     <char character="&#x2c6f;" string="$\forall$"/>
     <char character="&#x2200;" string="$\forall$"/>
