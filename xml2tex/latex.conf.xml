@@ -645,6 +645,7 @@
                       ($context[$notes-type eq 'endnotes' and $notes-per-chapter eq 'yes']
                                [.//dbk:footnote]
                                [not(.//dbk:para[matches(@role, $endnotes-heading-style)])]
+                               [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]
                       )">
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="if ($context[self::dbk:chapter]) then 'section' else tr:heading-level($context)"/>
