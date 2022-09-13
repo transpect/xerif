@@ -3,7 +3,8 @@
 <set xmlns="http://transpect.io/xml2tex" 
      xmlns:xml2tex="http://transpect.io/xml2tex" 
      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-     xmlns:tr="http://transpect.io">
+     xmlns:tr="http://transpect.io" 
+     table-model="htmltabs">
   
   <xsl:import href="http://transpect.io/xslt-util/functx/Sequences/Sorting-and-Grouping/sort.xsl"/>
   <xsl:import href="http://this.transpect.io/a9s/common/xsl/shared-variables.xsl"/>

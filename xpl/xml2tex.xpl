@@ -55,7 +55,6 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-    <p:with-option name="table-model" select="'htmltabs'"/>
     <p:with-option name="collect-all-xsl" select="(/c:param-set/c:param[@name eq 'collect-all-xsl']/@value, 'yes')[1]">
       <p:pipe port="params" step="tx-xml2tex"/>
       <p:documentation>collect all xsl templates from config. important if you work with several modes for the same elements. 
