@@ -2213,7 +2213,7 @@
      <xsl:value-of select="replace(
                               replace(
                                       replace($text,
-                                              '([-%_./=?])([^-%_./=?]{3,})',
+                                              '([-%_./=?#])([^-%_./=?]{3})',
                                               concat('$1',$tactical-break-character-for-urls, '$2')
                                               ),
                                       '\\?(&amp;)',
