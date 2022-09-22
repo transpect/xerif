@@ -141,6 +141,7 @@
   <xsl:variable name="index-static-regex" as="xs:string" 
                 select="'^[a-z]{1,3}indexstatic'"/>
   
+  <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
                 select="'^(.+?)\s(see|siehe)\s(.+?)$'"/>
   

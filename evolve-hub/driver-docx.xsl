@@ -1106,17 +1106,23 @@
                   select="matches(., $index-see-regex)"/>
     <indexentry>
       <primaryie>
-        <xsl:apply-templates mode="#current"/>
+        <xsl:choose>
+          <xsl:when test="$see-exists">
+            <xsl:analyze-string select="." regex="{$index-see-regex}">
+              <xsl:matching-substring>
+                <xsl:value-of select="regex-group(1)"/>
+                <xsl:text>&#x20;</xsl:text>
+                <seeie xreflabel="{regex-group(2)}">
+                  <xsl:value-of select="regex-group(3)"/>
+                </seeie>
+              </xsl:matching-substring>
+            </xsl:analyze-string>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </primaryie>
-      <xsl:if test="exists($see-exists)">
-        <xsl:analyze-string select="." regex="{$index-see-regex}">
-          <xsl:matching-substring>
-            <seeie xreflabel="{regex-group(2)}">
-              <xsl:value-of select="regex-group(3)"/>
-            </seeie>
-          </xsl:matching-substring>
-        </xsl:analyze-string>
-      </xsl:if>
     </indexentry>
   </xsl:template>
   
