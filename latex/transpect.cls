@@ -37,6 +37,7 @@
 \PassOptionsToPackage{cmyk}{xcolor}
 \RequirePackage{transpect-common}
 \DeclareOptionX{main}{\PassOptionsToPackage{\CurrentOption}{babel}}
+\DeclareOption{es-noindentfirst}{\PassOptionsToPackage{es-noindentfirst}{babel}}
 \PassOptionsToPackage{shorthands=off}{babel}
 \DeclareOptionX{ennotoc}{\PassOptionsToPackage{\CurrentOption}{transpect-endnotes}}
 \DeclareOptionX{endnotes}{\PassOptionsToPackage{\CurrentOption}{transpect-endnotes}}
