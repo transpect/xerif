@@ -180,7 +180,7 @@
                           $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
     <xsl:value-of select="concat('\documentclass[',
                                  string-join(($babel-langs[position() ne 1],
-                                              $babel-langs[1]), (: 1st lang is main lang and comes last :)
+                                              replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst')), (: 1st lang is main lang and comes last :)
                                  ','),
                                  $pubtype-value, 
                                  xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
