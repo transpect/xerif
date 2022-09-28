@@ -49,7 +49,6 @@
           </dc:title>
           <dc:creator>
             <rdf:Seq>
-              <xsl:message select="'---', ONIXmessage"></xsl:message>
               <xsl:for-each select="ONIXmessage/product/contributor[b035 eq 'A32']">
                 <rdf:li>
                   <xsl:value-of select="b036"/>
