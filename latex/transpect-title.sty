@@ -220,9 +220,14 @@
     \tp@create@editor@string{#1}%
   }}%
 \def\tp@create@editor@string#1{%
-  \def\@tempa{Author}\def\@argi{#1}%
-  \ifx\@tempa\@argi\else
-    \expandafter\ifx\csname tp@\tp@namespace @#1NameList\endcsname\relax\else
+  \def\@tempa{Author}%
+  \edef\@argi{#1}%
+  \ifx\@tempa\@argi\relax\else
+    % Name lists need further expansion to detect \relax or non-existing list correctly.
+    \expandafter\expandafter\expandafter\ifx\csname tp@\tp@namespace @#1NameList\endcsname\relax%
+      % This assignment is needed for \tpIfComp{#1NameList}{…}{…} to work correctly for non-existing NameLists.
+      \global\expandafter\let\csname tp@\tp@namespace @#1NameList\endcsname\relax
+    \else
       \expandafter\xdef\csname tp@\tp@namespace @#1NameList\endcsname{%
         \tpUseComp{#1NameList}%
         \tpUseProperty{editor-suffix}%
