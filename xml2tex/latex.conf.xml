@@ -35,6 +35,7 @@
   <xsl:variable name="image-dir" as="xs:string?" 
                 select="if($run-local eq 'yes') then () else '../../images/'"/>
   <xsl:variable name="clientname" as="xs:string*"/>
+  <xsl:variable name="client-options" as="xs:string*"/>
   <xsl:variable name="secnumdepth" as="xs:string" 
                 select="xs:string(xs:integer($numbering-depth) - 1)"/>
 
@@ -175,12 +176,11 @@
   <xsl:variable name="format-value" as="xs:string?"  select="if ($format) then concat('format=', $format)  else ()"/>
   
   <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Dokumentaufbau-->
-  <preamble>%
-    <xsl:message select="'&#xa;&#xa;Layout: ', $layout, '&#xa;Publikationstyp: ', $pubtype, '&#xa;Format: ', $format, '&#xa;Notentyp: ', $notes-type, '&#xa;Kapitelweise Endnoten: ', 
-                          $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
+  
+  <xsl:variable name="preamble" as="xs:string*">
     <xsl:value-of select="concat('\documentclass[',
                                  string-join(($babel-langs[position() ne 1],
-                                              replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst')), (: 1st lang is main lang and comes last :)
+                                 replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst')), (: 1st lang is main lang and comes last :)
                                  ','),
                                  $pubtype-value, 
                                  xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
@@ -189,15 +189,21 @@
                                  ',withcoltitles'[$running-header eq 'yes'],
                                  ']{transpect}&#xa;')"/>
     <xsl:text>\usepackage{htmltabs}&#xa;</xsl:text>
-  <!--  <xsl:value-of select="concat('\usepackage[main=', xml2tex:lang-to-babel-lang($main-lang), ',bidi=basic,silent]{babel}&#xa;')"/>-->
+    <!--  <xsl:value-of select="concat('\usepackage[main=', xml2tex:lang-to-babel-lang($main-lang), ',bidi=basic,silent]{babel}&#xa;')"/>-->
     <!--<xsl:for-each select="$babel-langs[. ne xml2tex:lang-to-babel-lang($main-lang)]"><xsl:value-of select="concat('\babelprovide[import]{', ., '}&#xa;')"/></xsl:for-each>-->
     <xsl:for-each select="xml2tex:rgb-to-tex-color( $colors)">
-        <xsl:value-of select="concat('\define', ., '&#xa;')"/>
+      <xsl:value-of select="concat('\define', ., '&#xa;')"/>
     </xsl:for-each>
     <xsl:if test="$langs = 'zh'">
       <xsl:value-of select="'\usepackage{CJK}&#xa;'"/>
     </xsl:if>
-    <xsl:value-of select="concat('\usepackage[',string-join(($format-value,$layout-value), ','),']{',$clientname,'}&#xa;')"/>
+    <xsl:value-of select="concat('\usepackage[',
+                                 string-join(($format-value,
+                                              $layout-value,
+                                              $client-options), ','),
+                                 ']{',
+                                 $clientname,
+                                 '}&#xa;')"/>
     <xsl:text>&#xa;\begin{tpMeta}&#xa;</xsl:text>
     <!-- authors -->
     <xsl:for-each select="$authors">
@@ -308,9 +314,9 @@
     </xsl:if>
     <xsl:if test="normalize-space($biblio-info)">
       <xsl:value-of select="concat('&#xA;\tpBiblio{', 
-        string-join(for $line in tokenize($biblio-info, '\n')[normalize-space()]
-        return normalize-space($line), '\\&#xa;'),
-        '}&#xA;')"/>
+                                   string-join(for $line in tokenize($biblio-info, '\n')[normalize-space()]
+                                   return normalize-space($line), '\\&#xa;'),
+                                   '}&#xA;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($print-note)">
       <xsl:value-of select="concat('&#xa;\tpPrintNote{', $print-note, '}&#xa;')"/>
@@ -359,7 +365,7 @@
     <xsl:if test="normalize-space($license-text)">
       <xsl:value-of select="concat('&#xA;\tpLicenceText{', 
                                    string-join(for $line in tokenize($license-text, '\n')[normalize-space()]
-                                               return normalize-space($line), '\\&#xa;'),
+                                   return normalize-space($line), '\\&#xa;'),
                                    '}&#xA;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($license-link)">
@@ -396,8 +402,8 @@
       <xsl:value-of select="concat('\newindex{', $index-index, '}{', $index-index, '_idx}{', $index-index, '_ind}{', normalize-space((dbk:title, dbk:info/dbk:title)[1]), '}&#xa;')"/>
     </xsl:for-each>
     <xsl:if test="$toc-depth">
-     <!-- chapter 0 ist und section 1, part (normalerweise) -1, subsection 2 usw. If subparts are used, they would be -1, whereas parts would bei -2 in that case-->
-     <xsl:value-of select="concat('\setcounter{tocdepth}{', 
+      <!-- chapter 0 ist und section 1, part (normalerweise) -1, subsection 2 usw. If subparts are used, they would be -1, whereas parts would bei -2 in that case-->
+      <xsl:value-of select="concat('\setcounter{tocdepth}{', 
                                    if(//dbk:part) 
                                    then xs:string(xs:integer($toc-depth) - 2)
                                    else xs:string(xs:integer($toc-depth) - 1),
@@ -405,10 +411,14 @@
     </xsl:if>
     <!-- no numbering: -99, -9 would be sufficient -->
     <xsl:if test="$numbering-depth">
-      <xsl:value-of select="concat('\setcounter{secnumdepth}{',
-                                   $secnumdepth,
-                                   '}&#xa;')"/>
+      <xsl:value-of select="concat('\setcounter{secnumdepth}{', $secnumdepth, '}&#xa;')"/>
     </xsl:if>
+  </xsl:variable>
+  
+  <preamble>%
+    <xsl:message select="'&#xa;&#xa;Layout: ', $layout, '&#xa;Publikationstyp: ', $pubtype, '&#xa;Format: ', $format, '&#xa;Notentyp: ', $notes-type, '&#xa;Kapitelweise Endnoten: ', 
+                          $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
+    <xsl:sequence select="$preamble"/>
   </preamble>
   
   <!--  *
