@@ -1,0 +1,511 @@
+%%
+%% This is file `coco-headings.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `headings')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-headings.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\fileversion{0.2.1}%
+\def\filedate{2021-08-20}%
+%%
+%% module for CoCoTeX that extends heading objects.
+%%
+%% Maintainer: p.schulz@le-tex.de
+%%
+%% lualatex  -  texlive >= 2019
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-headings}
+    [\filedate \fileversion CoCoTeX headings module]
+\RequirePackage{coco-meta}
+\RequirePackage{bookmark}
+\hypersetup{bookmarksdepth=-999}
+\tpDeclareContainer{tpHeading}{%
+  \tpInherit {Components,Properties} from Meta;
+  \tpDeclareType{Components}{%
+    \tp@heading@authors%
+    \tp@provide@hd@macros{Title}%
+    \tp@provide@hd@macros{Subtitle}%
+    \tp@provide@hd@macros{Number}%
+    \tpIfProp{extended}{%
+      \tp@extended@ht@macros
+    }{}%
+    \tpDeclareComp{Quote}{}{}%
+    \tpDeclareComp{QuoteSource}{}{}%
+  }%
+  \tpDeclareType{Properties}{\tp@heading@default}%
+  \tpDeclareEnv{\@heading}{\end@heading}%
+}
+\long\def\tpDeclareHeading{\tp@opt@empty\@tpDeclareHeading}
+\long\def\@tpDeclareHeading[#1]#2#3#4{%
+  \tpDeclareContainer{#3}{%
+    \edef\@argi{#1}%
+    \tpDeclareType{Parent}{\tp@heading@create@parent{#1}{#3}}
+    \ifx\@argi\@empty
+      \tpInherit {Components,Properties} from tpHeading;
+    \else
+      \tpInherit {Components,Properties,Parent} from #1;
+    \fi
+    \tpDeclareType{Properties}{%
+      #4%
+    }%
+    \tpDeclareType{Init}{%
+      \tp@init@hooks{#3}%
+      \tp@init@l@{toc}{#2}{#3}%
+      \tp@init@cnt{#3}%
+      \tp@restore@init{heading}{number-#2-maxwd}%
+    }%
+    \tp@declare@heading{#2}{#3}%
+  }%
+}
+\def\tp@heading@create@parent#1#2{%
+  \def\tp@heading@name{#2}%
+  \if!#1!\else
+    \tpCheckParent{#1}{#2}%
+  \fi%
+}
+\def\tp@declare@heading#1#2{%
+  \tpEvalType{Parent}%
+  \tpEvalType{Init}%
+  \csgdef{tpUseHeading#2}{%
+    \tpNamespace{heading}%
+    \@setpar{\@@par}%
+    \tpEvalType[#2]{Properties}%
+    \csname tp@heading@#2@properties\endcsname
+    \tp@meta@role@eval{Author}%
+    \tpComposeCollection{tpAuthor}{author-contact-block-format}{AuthorContactBlock}%
+    \tpComposeCollection{tpAffil}{affil-block-format}{AffilBlock}%
+    \def\Hy@toclevel{#1}%
+    \tp@auto@number{#1}{#2}%
+    \tpUseProperty{heading-par}%
+    \expandafter\ifx\csname tp@parent@#2\endcsname\relax\else
+      \edef\@@parent{before-hook-\csname\tp@parent@#2\endcsname}%
+      \expandafter\tpUseHook\expandafter{\@@parent}%
+    \fi
+    \tpUseHook{before-hook-\tp@heading@name}%
+    \tpUseProperty{before-heading}%
+    \tp@do@before@skip
+    \tp@format@number{}{}{#2}%
+    \tpIfProp{after-skip}{\expandafter\global\expandafter\@tempskipa\expandafter=\tpUseProperty{after-skip}\relax}{\global\@tempskipa=1sp\relax}%
+      \tp@heading@create@labels{#2}% label facility
+    \def\@svsec{%
+      \tpUseProperty{before-heading-block}%
+      \leftskip\tpUseProperty{margin-left}%
+      \rightskip\tpUseProperty{margin-right}%
+      \bgroup
+        \tpUseProperty{heading-block}%
+        \tpIfProp{extended}{\tpUseProperty{extended-heading}}{}%
+      \egroup%
+      \tpIfPropVal{no-toc}{true}{}{\tp@make@toc}% ToC entries
+      \tpIfPropVal{no-BM}{true}{}{\tp@make@bookmarks}% Bookmarks
+      \tp@make@run% Running headers
+      \tpUseProperty{after-heading-block}%
+    }%
+    \ifdim\@tempskipa <\z@\relax
+      \tp@inline@heading
+    \else
+      \tp@block@heading
+    \fi
+    \aftergroup\next%
+  }%
+}
+\def\tp@do@before@skip{%
+  \setlength\@tempskipa{\tpUseProperty{before-skip}}%
+  \ifdim\@tempskipa<\z@\relax
+    \def\do@skip{\minusvspace{-\@tempskipa}}%
+  \else
+    \def\do@skip{\addvspace{\@tempskipa}}%
+  \fi%
+  \if@nobreak
+    \everypar{}%
+    \do@skip
+  \else
+    \addpenalty\@secpenalty
+    \do@skip
+  \fi}
+\def\tp@init@hooks#1{%
+  \tpDeclareHook{toc-before-hook-#1}%
+  \tpDeclareHook{toc-after-hook-#1}%
+  \tpDeclareHook{before-hook-#1}%
+}
+\def\tp@init@cnt#1{\@definecounter{#1}}
+\tp@restore@init{heading}{toc-number-maxwd}
+\tp@restore@init{heading}{number-maxwd}
+\def\tp@auto@number#1#2{%
+  \tpIfPropVal{numbering}{auto}
+    {\expandafter\ifx\csname c@#2\endcsname\relax\tp@init@cnt{#2}\fi
+     \expandafter\ifx\csname tp@heading@attr@nonumber\endcsname\@empty
+     \else
+       \tpIfComp{Number}
+         {}
+         {\ifnum #1>\c@secnumdepth\relax\else
+            \stepcounter{#2}%
+            \edef\@tempa{\csname the#2\endcsname}%
+            \expandafter\tpNumber\expandafter{\@tempa}%
+          \fi}%
+     \fi}{}%
+}
+\def\tp@heading@create@labels#1{%
+  \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
+    \Hy@MakeCurrentHrefAuto{tp.#1}%
+    \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+  \fi
+  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
+    \tpIfComp{Number}
+      {\edef\@tempa{\expandonce{\tp@heading@Number}}%
+       \let\@currentlabel\@tempa\relax
+       \let\@currentlabelname\tp@heading@Title}
+      {\phantomsection}
+    \expandafter\tpltx@label\expandafter{\tp@heading@attr@label}%
+  \fi
+  \global\let\label\tpltx@label}
+\def\tp@make@toc{%
+  \tp@check@empty{heading}{Title}{Toc}%
+  \tp@check@empty{heading}{Number}{Toc}%
+  \tp@check@empty{heading}{Subtitle}{Toc}%
+  \tp@check@author{Toc}%
+  \expandafter\ifx\csname tp@heading@attr@notoc\endcsname\@empty\else
+    \protected@edef\tp@heading@toc@entry{%
+      \tpIfComp{TocTitle}{\string\tpTocTitle{\string\ignorespaces\space\expandonce{\tp@heading@TocTitle}}}{}%
+      \tpIfComp{TocNumber}{\string\tpTocNumber{\string\ignorespaces\space\expandonce{\tp@heading@TocNumber}}}{}%
+      \tpIfComp{TocAuthorNameList}{\string\tpTocAuthorNameList{\string\ignorespaces\space\expandonce{\tp@heading@TocAuthorNameList}}}{}%
+      \tpIfComp{TocSubtitle}{\string\tpTocSubtitle{\string\ignorespaces\space\expandonce{\tp@heading@TocSubtitle}}}{}%
+    }%
+    \tpIfProp{toc-level}{\edef\tp@heading@name{\tpUseProperty{toc-level}}}{}%
+    \protected@write\@auxout
+      {\tpGobble}%
+      {\string\@writefile{toc}{\protect\tpContentsline{\tp@heading@name}{\tp@heading@toc@entry}{\thepage}{\@currentHref}\protected@file@percent}}\relax
+  \fi
+}
+\def\tp@check@author#1{%
+  \tpIfComp{#1AuthorNameList}{}{%
+    \tpIfComp{AuthorNameList}{%
+      \expandafter\csname tp#1AuthorNameList\expandafter\endcsname\expandafter{\tp@heading@AuthorNameList}%
+    }{\tpCompDef\tp@tempa{tpAuthor}{author-list-format}%
+      \ifx\tp@tempa\relax
+      \else
+        \expandafter\csname tp#1AuthorNameList\expandafter\endcsname\expandafter{\tp@tempa}%
+      \fi
+    }%
+  }%
+}%
+\long\def\tpContentsline#1#2#3#4{\bgroup\csletcs{l@#1}{tp@l@#1}\contentsline{#1}{#2}{#3}{#4}\egroup}
+\def\tp@toc@extract@data#1#2#3#4{%
+  \tpNamespace{heading}%
+  \tpCascadeProps{#2}{heading}%
+  \tpDeclareComp{TocPage}{}{}%
+  \tpTocPage{\tpUseProperty{toc-page-face}#4}%
+  \tpDeclareComp{TocTitle}{}{}%
+  \tpDeclareComp{TocSubtitle}{}{}%
+  \tpDeclareComp{TocNumber}{}{}%
+  \tpDeclareComp{TocAuthorNameList}{}{}%
+  \tp@expand@l@contents{#3}{heading}{Toc}{Title}%%
+  \tp@format@number{toc-}{Toc}{#1}%
+}
+\def\tp@toc@print@entry#1{%
+  \bgroup
+    \tpUseHook{toc-before-hook-#1}%
+    \tpUseProperty{toc-before-entry}%
+    \tpUseProperty{toc-heading}%
+    \tpUseHook{toc-after-hook-#1}%
+    \tpUseProperty{toc-after-entry}%
+  \egroup}
+\def\tp@make@run{%
+  \tp@check@empty{heading}{Title}{Run}%
+  \tp@check@empty{heading}{Number}{Run}%
+  \tp@check@author{Run}%
+  \tp@check@empty{heading}{Subtitle}{Run}%
+  \tpUseProperty{running-extra}%
+  \tpIfProp{running-level}
+    {\expandafter\let\expandafter\tp@mark@name\csname\tpUseProperty{running-level}mark\endcsname}
+    {\expandafter\let\expandafter\tp@mark@name\csname\tp@heading@name mark\endcsname}%
+    \ifx\tp@mark@name\relax\ifx\tp@heading@parent\@undefined\else
+      \letcs\tp@mark@name{\tp@heading@parent mark}%
+    \fi\fi
+  \ifx\tp@mark@name\relax\else
+    \begingroup
+      \tpGobble
+      \protected@edef\@tempa{\csname tp@heading@running-heading\endcsname}%
+      \expandafter\tp@mark@name\expandafter{\@tempa}%
+    \endgroup
+  \fi
+}
+\def\tp@make@bookmarks{%
+  \tp@check@empty[Toc]{heading}{Title}{BM}%
+  \tp@check@empty[Toc]{heading}{Number}{BM}%
+  \tp@check@empty[Toc]{heading}{AuthorNameList}{BM}%
+  \tp@check@empty[Toc]{heading}{Subtitle}{BM}%
+  \expandafter\ifx\csname tp@heading@attr@noBM\endcsname\@empty\else
+    \tpIfProp{bookmark-level}{\edef\Hy@toclevel{\tpUseProperty{bookmark-level}}}{}%
+    \begingroup
+      \tpGobble
+      \protected@edef\@tempa{\csname tp@heading@bookmark\endcsname}%
+      \bookmark[level=\Hy@toclevel,dest=\@currentHref]{\expandonce{\@tempa}}%
+    \endgroup
+  \fi
+}
+\newbox\tp@inlinesecbox
+\def\tp@inline@heading{%
+  \tpIfProp{after-indent}{\global\@afterindenttrue}{\global\@afterindentfalse}%
+  \tpIfProp{interline-para}
+    {\global\setbox\tp@inlinesecbox\hbox{\ifvoid\tp@inlinesecbox\else\unhbox\tp@inlinesecbox\tpUseProperty{interline-para-sep}\fi\@svsec}}%
+    {\global\setbox\tp@inlinesecbox\hbox{\@svsec}}
+  \@nobreakfalse
+  \global\@noskipsectrue
+  \gdef\next{%
+    \global\everypar{%
+      \if@noskipsec
+        \global\@noskipsecfalse
+        {\setbox\z@\lastbox}%
+        \clubpenalty\@M
+        \begingroup \unhbox\tp@inlinesecbox \endgroup
+        \unskip
+        \hskip -\@tempskipa
+      \else
+        \clubpenalty \@clubpenalty
+        \global\setbox\tp@inlinesecbox\box\voidb@x
+        \everypar{}%
+      \fi}%
+    \ignorespaces}}
+\def\tp@block@heading{%
+  \@svsec
+  \tpUseProperty{after-heading-par}%
+  \tpIfProp{after-indent}{\global\@afterindenttrue}{\global\@afterindentfalse}%
+  \gdef\next{%
+    \vskip \@tempskipa
+    \@afterheading
+    \ignorespaces}}
+\def\@heading{\@ifnextchar [{\@@heading}{\@@heading[]}}%]
+\def\@@heading[#1]#2{%
+  \tp@heading@reserve
+  \tpParseAttributes{heading}{#1}%
+  \edef\tp@heading@name{#2}%
+  \tp@heading@load@props%
+  \tpEvalType[#2]{Components}%
+}
+\def\end@heading{%
+  \expandafter\ifx\csname tpUseHeading\tp@heading@name\endcsname\relax
+    \PackageError{coco-headings.sty}{Heading level \tp@heading@name\space unknown!}{A Heading with level \tp@heading@name\space is unknown. Use the \string\tpDeclareHeading\space macro to declare heading levels.}%
+  \else
+    \csname tpUseHeading\tp@heading@name\endcsname%
+  \fi
+  \tp@heading@reset
+}
+\let\heading\tpHeading
+\let\endheading\endtpHeading
+\def\tp@heading@reserve{%
+  \tpNamespace{heading}%
+  \let\tpltx@dbl@backslash\\
+  \let\\\tpBreak
+  \let\tpltx@label\label
+  \let\tp@heading@label\relax
+  \def\tpAuthorCnt{\z@}%
+  \def\tpAffilCnt{\z@}%
+  \tp@reset@components{\tp@cur@cont}%
+  }
+\def\tp@heading@reset{%
+  \let\tp@cur@cont\relax
+  \let\\\tpltx@dbl@backslash
+  \let\label\tpltx@label
+  \let\tp@heading@name\relax
+  \let\tp@heading@label\relax
+  }
+\def\tp@heading@load@props{\csname tp@heading@\tp@heading@name @properties\endcsname}
+\def\tp@extended@ht@macros{%
+  \tp@provide@ext@hd@macros{Abstract}%
+  \tp@provide@ext@hd@macros{Keywords}%
+  \tp@provide@ext@hd@macros{DOI}%
+}
+\def\tp@provide@ext@hd@macros#1{%
+  \tpDeclareComp{#1}{}{}%
+  \tpDeclareComp{#1Title}{}{}%
+}
+\def\tp@heading@authors{%
+  \tpAddToRole{Author}{%
+    \tpDeclareCountedComp{AuthorContact}%
+  }%
+  \tpDeclareRoleBlock{Author}{ContactBlock}{author-contact-block-format}%
+  \tpGroupHandler{tpAuthor}{%
+    \tpIfComp{AuthorContact}{}{\csname tpAuthorContact\endcsname{\tpUseProperty{author-contact-format}}}{}%
+  }%
+  \tp@provide@hd@overrides{AuthorNameList}%
+  \tp@heading@affils
+}
+\def\tp@heading@affils{%
+  \tpDeclareComp{AffilBlock}{\expandafter\global}{}%
+  \tpDeclareComponentGroup{tpAffil}{%
+    \tpDeclareCountedComp{Affiliation}%
+    \tpDeclareCountedComp{Address}%
+    \tpDeclareCountedComp{Institute}%
+    \tpDeclareCountedComp{Country}%
+    \tpDeclareCountedComp{Department}%
+    \tpDeclareCountedComp{AffilID}%
+  }%
+  \tpGroupHandler{tpAffil}{%
+    \tpIfComp{AffilID}{}{\expandafter\tpAffilID\expandafter{\tpAffilCnt}}%
+    \tpIfComp{Affiliation}{}{\tpAffiliation{\tpUseProperty{affiliation-format}}}%
+  }%
+}
+\def\tp@provide@hd@macros#1{%
+  \tpDeclareComp{#1}{}{}%
+  \tp@provide@hd@overrides{#1}%
+}
+\def\tp@provide@hd@overrides#1{%
+  \tpDeclareComp{Toc#1}{}{}% toc overrides
+  \tpDeclareComp{Run#1}{}{}% running overrides
+  \tpDeclareComp{BM#1}{}{}% bookmark overrides
+}
+\tpAddToDefault{heading}{%
+  \tpSetProperty{interline-para}{}%
+  \tpSetProperty{interline-para-sep}{\space}
+  \tpSetProperty{heading-par}{%
+    \tpIfProp{interline-para}{\if@noskipsec \leavevmode \fi}{}%
+    \par
+    \global\@afterindenttrue
+  }%
+  \tpSetProperty{after-heading-par}{\par \nobreak}% par commands at the end of non-inline headings
+  \tpSetProperty{before-heading}{}%
+  \tpSetProperty{title-face}{\bfseries}%
+  \tpSetProperty{subtitle-face}{\normalfont}%
+  \tpSetProperty{author-face}{\normalfont}%
+  \tpSetProperty{quote-face}{\raggedleft}%
+  \tpSetProperty{quote-source-face}{}%
+  \tpSetProperty{heading-block}
+    {\tpUseProperty{title-face}%
+     \tpIfComp{Number}
+       {\tpUseProperty{hang-number}}
+       {\leftskip0pt}%
+     \tpUseComp{Title}\par%
+     \tpIfComp{Subtitle}{{\tpUseProperty{subtitle-face}\tpUseComp{Subtitle}}\par}{}%
+     \tpIfComp{AuthorNameList}{{\tpUseProperty{author-face}\tpUseComp{AuthorNameList}}\par}{}%
+     \tpIfComp{Quote}{%
+       \bgroup
+         \tpUseProperty{quote-face}%
+         \tpUseComp{Quote}\par
+         \tpIfComp{QuoteSource}{{\tpUseProperty{quote-source-face}--\space\tpUseComp{Quote}}\par}{}%
+       \egroup}{}%
+     \tpIfComp{AffilBlock}{{\tpUseProperty{affil-block-face}\tpUseComp{AffilBlock}}\par}{}%
+    }%
+  \tpSetProperty{extended-heading}{%
+    \tpIfComp{Abstract}
+      {\par\vskip\baselineskip
+       {\bfseries\tpIfComp{AbstractTitle}{\tpUseComp{AbstractTitle}}{Abstract}}\par
+       {\itshape\small\tpUseComp{Abstract}}\par}
+      {}%
+    \tpIfComp{Keywords}
+      {\par\vskip\baselineskip
+       {\bfseries\tpIfComp{KeywordsTtitle}{\tpUseComp{KeywordsTitle}}{Keywords}}\par
+       {\itshape\small\tpUseComp{Keywords}\par}}
+     {}%
+   }%
+  \tpSetProperty{before-skip}{\z@skip}% TODOC: values < 0pt use \minusvspace, else \addvspace. LaTeX's default behaviour of @afterindent is relocated to the after-indent property.
+  \tpSetProperty{after-heading-block}{}%
+  \tpSetProperty{before-heading-block}{\parindent\z@ \parskip\z@}%
+  \tpSetProperty{after-indent}{}%
+  \tpSetProperty{margin-left}{\z@}%
+  \tpSetProperty{margin-right}{\@flushglue}%
+  \tpSetProperty{after-skip}{1sp}%
+  \tpSetProperty{indent}{auto}%
+  \tpSetProperty{number-width}{}%
+  \tpSetProperty{number-sep}{\space}%
+  \tpSetProperty{number-align}{left}%
+  \tpSetProperty{numbering}{auto}%
+  %% running header
+  \tpSetProperty{running-level}{}% override level for running title, name
+  \tpSetProperty{running-heading}{%
+    \tpIfComp{RunAuthorNameList}{\tpUseComp{RunAuthorNameList}:\space}{}%
+    \tpUseComp{RunTitle}%
+  }%
+  %% ToC
+  \tpSetProperty{no-toc}{false}% toc entries are generally disabled iff true
+  \tpSetProperty{no-BM}{false}% bookmark entries are generally disabled, iff true
+  \tpSetProperty{toc-page-sep}{\dotfill}% between toc-title and page
+  \tpSetProperty{toc-page-face}{}%
+  \tpSetProperty{toc-number-width}{}% current width of number
+  \tpSetProperty{toc-number-align}{left}% alignment of number within hbox when hanging
+  \tpSetProperty{toc-title-face}{}% face of title
+  \tpPropertyLet{toc-number-face}{toc-title-face}% format of number
+  \tpSetProperty{toc-number-sep}{\enskip}% thing between numebr and toc-title
+  \tpSetProperty{toc-margin-top}{\z@}% left indent of the whole entry
+  \tpSetProperty{toc-margin-bottom}{\z@}% right margin of the whole entry
+  \tpSetProperty{toc-margin-left}{auto}% left indent of the whole entry
+  \tpSetProperty{toc-margin-right}{\@pnumwidth}% right margin of the whole entry
+  \tpSetProperty{toc-link}{none}% should toc entries be linked? values: none,title,page,all
+  \tpSetProperty{toc-level}{}% override heading level for ToC, name!
+  \tpSetProperty{toc-indent}{auto}% offset of the first line of the entry. auto: hang indent by max-number-width for the level
+  \tpSetProperty{toc-before-entry}{% stuff before anything is output; used to setup margins, alignment, line-breaking rules, etc.
+    \addvspace{\tpUseProperty{toc-margin-top}}%
+    \parindent \z@
+    \let\\\@centercr
+    \hyphenpenalty=\@M
+    \rightskip \tpUseProperty{toc-margin-right} \@plus 1fil\relax
+    \parfillskip -\rightskip
+    \leftskip\tpUseProperty{toc-margin-left}%
+  }%
+  \tpSetProperty{toc-after-entry}{\par\addvspace{\tpUseProperty{toc-margin-bottom}}}% Thing at the end of the entry, after the page number
+  \tpSetProperty{toc-heading}{% Order and formatting of the entry itself
+    \tpUseProperty{toc-title-face}%
+    \tpIfComp{TocNumber}
+      {\tpUseProperty{toc-hang-number}}
+      {\leftskip0pt\leavevmode}%
+    \tpIfComp{TocAuthorNameList}{\tpUseComp{TocAuthorNameList}:\space}{}%
+    \tpUseComp{TocTitle}%
+    \tpUseProperty{toc-page-sep}\tpUseComp{TocPage}%
+  }%
+  %% PDF-Bookmarks
+  \tpSetProperty{bookmark-level}{}% override heading level for PDF bookmarks, numeric!
+  \tpSetProperty{bookmark}{%
+    \tpIfComp{BMNumber}{\tpUseComp{BMNumber}\space}{}%
+    \tpUseComp{BMTitle}%
+  }%
+  \tpSetProperty{orcid-link}{% how the ORC-ID is rendered
+    \tpIfComp{ORCID}{\tpCompLink{ORCID}{\includegraphics[height=1em]{logos/ORCID.pdf}}}{}%
+  }%
+  %% a single Author's contact infomration block
+  \tpSetProperty{author-contact-format}{%Format of a single author's contact information
+    \tpUseComp{FullName}\tpIfComp{Affil}{\textsuperscript{\tpUseComp{Affil}}}{}%
+    \tpUseProperty{orcid-link}%
+    %
+  }%
+  \tpSetProperty{author-list-format}{% Format of the whole contact information block
+    \tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi
+  }%
+  \tpSetProperty{author-contact-block-format}{% Format of the whole contact information block
+    \tpUseComp{AuthorContact}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi
+  }%
+  \tpSetProperty{affiliation-format}{% Format of the  affiliation block
+    \tpIfComp{Institute}{\tpUseComp{Institute}}{}%
+    \tpIfComp{Department}{, \tpUseComp{Department}}{}%
+    \tpIfComp{Address}{, \tpUseComp{Address}}{}%
+    \tpUseProperty{affil-sep}%
+  }%
+  \tpSetProperty{affil-sep}{\par}
+  \tpSetProperty{affil-block-format}{\textsuperscript{\tpUseComp{AffilID}}\tpUseComp{Affiliation}}
+  \tpSetProperty{affil-block-face}{\small\normalfont}
+}
+\newdimen\tpnewparskip \AtBeginDocument{\ifdim\tpnewparskip=\z@\relax \tpnewparskip=1\baselineskip\relax\fi}
+\def\tpNewPar{\@ifnextchar[{\@tpnewpar}{\@tpnewpar[\the\tpnewparskip]}}%]
+\def\@tpnewpar[#1]{%
+  \ifhmode\par\fi
+  \vskip#1\relax
+  \@afterheading
+}
+\let\TitleBreak\tpBreak
+\endinput
+%%
+%% End of file `coco-headings.sty'.

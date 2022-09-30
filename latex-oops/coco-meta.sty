@@ -1,0 +1,105 @@
+%%
+%% This is file `coco-meta.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `meta')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-meta.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\fileversion{0.2.1}%
+\def\filedate{2021-08-20}%
+%%
+%% module for CoCoTeX that provides handling of a document's meta data.
+%%
+%% Maintainer: p.schulz@le-tex.de
+%%
+%% lualatex  -  texlive > 2019
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-meta}
+    [\filedate \fileversion CoCoTeX meta module]
+\RequirePackage{coco-common}
+\tpDeclareContainer{Meta}{%
+  \tpDeclareType{Components}{%
+    \tpDeclareRole[author]{Author}%
+    \tp@declare@meta@comp
+  }%
+  \tpDeclareType{Properties}{%
+    \tp@Meta@default
+  }%
+}
+\def\tp@meta@generic@comp{%
+  \tpDeclareComp{GenericMetaBlock}{\expandafter\global}{}%
+  \tpDeclareComponentGroup{tpGenericMeta}{%
+    \tpDeclareCountedComp{Heading}%
+    \tpDeclareCountedComp{Content}%
+  }}
+\def\tp@meta@generic@eval{{%
+  \def\tp@cur@cont{titlepage}%
+  \tpComposeCollection{tpGenericMeta}{generic-meta-format}{GenericMetaBlock}
+}}
+\def\tpDeclareRole{\tp@opt@second\tp@declare@role}%
+\def\tp@declare@role[#1]#2{%
+  \tpDeclareComponentGroup{tp#2}{%
+    \tpDeclareCountedComp{FullName}%
+    \tpDeclareCountedComp{LastName}%
+    \tpDeclareCountedComp{FirstName}%
+    \tpDeclareCountedComp{MidName}%
+    \tpDeclareCountedComp{PersonPrefix}%
+    \tpDeclareCountedComp{ORCID}%
+    \tpDeclareCountedComp{Affil}%
+    \tpDeclareCountedComp{Email}%
+  }%
+  \tpGroupHandler{tp#2}{%
+    \tpIfComp{FullName}{}{\tpFullName{\tpUseProperty{name-format}}}%
+  }%
+  \tpDeclareRoleBlock{#2}{NameList}{#1-list-format}%
+}
+\def\tpAddToRole#1#2{\csgappto{tp#1}{#2}}
+\def\tpDeclareRoleBlock#1#2#3{%
+  \tpDeclareComp{#1#2}{\expandafter\global}{}%
+  \csgdef{tp@meta@role@#1@#2}{#3}}
+\def\tp@meta@role@eval#1{{%
+  \tpIfComp{#1NameList}{}{%
+    \ifcsdef{tp#1Cnt}
+      {\expandafter\ifnum\csname tp#1Cnt\endcsname>\z@
+          \tp@eval@role@attrs{#1}%
+          \tpApplyCollection{tp#1}{\csname tp@meta@role@#1@NameList\endcsname}{#1NameList}%
+        \fi
+      }{}}}}%
+\def\tp@eval@role@attrs#1{%
+    \tp@iterate{\@tempcnta}{\@ne}{\csname tp#1Cnt\endcsname}{%
+      \ifcsdef{tp@meta@#1-\the\@tempcnta @attrs\endcsname}{%
+        \tpParseAttributes{#1-\the\@tempcnta }{\csname tp@meta@#1-\the\@tempcnta @attrs\endcsname}%
+      }{}}}
+\def\tp@declare@meta@comp{%
+    \tpDeclareComp{Copyright}{\expandafter\global}{}% Copyright text
+    \tpDeclareComp{DOI}{\expandafter\global}{}%         DOI
+}%
+\tpAddToDefault{Meta}{%
+  \tpSetProperty{name-format}{\tpUseComp{FirstName}\space\tpUseComp{LastName}}%
+  \tpSetProperty{name-list-format}{\tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}%
+  \tpSetProperty{counted-name-sep}{,\space}%
+  \tpPropertyLet{author-format}{name-format}% Override for single author names
+  \tpSetProperty{name-and}{\space and\space}%
+  \tpSetProperty{name-etal}{\space et~al.}%
+  \tpSetProperty{name-sep}{,\space}%
+  \tpSetProperty{corresp-mark}{*}%
+}
+\endinput
+%%
+%% End of file `coco-meta.sty'.

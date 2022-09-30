@@ -1,0 +1,373 @@
+%%
+%% This is file `coco-kernel.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `kernel')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-kernel.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\fileversion{0.2.1}%
+\def\filedate{2021-08-20}%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-kernel}
+    [\filedate \fileversion cocotex kernel]
+\newif\if@tp@debug \@tp@debugfalse
+\DeclareOption{debug}{\global\@tp@debugtrue}%
+\ProcessOptions
+\RequirePackage{etoolbox}
+\def\tpKernelDebugMsg#1{\if@tp@debug\message{[tp Kernel Debug]\space\space#1^^J}\fi}
+\def\tpPackageError#1#2#3#4{%
+   \GenericError{%
+      (#1)\@spaces\@spaces\@spaces\@spaces
+   }{%
+      [tp #1 #2 Error] #3%
+   }{}{#4}%
+}
+\def\tpPackageWarning#1#2#3{%
+   \GenericWarning{%
+      (#1)\@spaces\@spaces\@spaces\@spaces
+   }{%
+      [tp #1 #2 Warning] #3%
+   }%
+}
+\long\def\tpDeclareContainer#1#2{%
+  \@namedef{tp@container@#1}{}%
+  \@namedef{tp@cur@cont}{#1}%
+  \begingroup
+    \def\tpInherit ##1 from ##2;{\@tp@inherit{##1}{##2}{#1}}%
+    \long\def\tpDeclareType##1##2{\csgappto{tp@type@##1@#1}{##2}}%
+    \def\tpDeclareEnv{\@ifnextchar [{\tp@declare@env}{\tp@declare@env[#1]}}%]
+    \def\tp@declare@env[##1]##2##3{\csgdef{##1}{\global\let\reserved@cont\tp@cur@cont\def\tp@cur@cont{#1}##2}\csgdef{end##1}{##3}\global\let\tp@cur@cont\reserved@cont}%
+    \def\x{%
+      #2%
+    }%
+  \expandafter\x\endgroup
+}
+\@onlypreamble\tpDeclareContainer
+\def\tpAddToType#1#2#3{\csgappto{tp@type@#1@#2}{#3}}
+\def\tpEvalType{\tp@opt@curcont\tp@eval@type}
+\def\tp@eval@type[#1]#2{%
+  \expandafter\ifx\csname tp@type@#2@#1\endcsname\relax
+    \tpPackageError{Kernel}{Class}
+    {Data Type #2 in Container #1 undefined!}
+    {You try to evaluate a data type `#2' from container `#1', but that data type has not been declared.}%
+  \else
+    \tpKernelDebugMsg{Evaluating tp@type@#2@#1:^^J \csmeaning{tp@type@#2@#1}}%
+    \csname tp@type@#2@#1\endcsname
+  \fi
+}
+\def\tpCheckParent#1#2{%
+  \expandafter\ifx\csname tp@container@#1\endcsname\relax
+    \tpPackageError{Kernel}{Class}
+    {Parent Container `#1' undeclared}
+    {You tried to make a Container named `#2' inherit from a Container named `#1', but a Container with that name does not exist.\MessageBreak
+     Please make sure that parent Containers are declared before their descendents.}%
+  \else
+    \@namedef{tp@parent@#2}{#1}%
+  \fi
+}
+\def\@tp@inherit#1#2#3{\@tp@parse@inherit #1,,\@nil #2,,\@nil #3\@@nil}
+\def\@tp@parse@inherit #1,#2,\@nil #3,#4,\@nil #5\@@nil{%
+  \let\next\relax
+  \if!#1!\else
+    \if!#3!\else
+      \tp@do@inherit{#1}{#3}{#5}%
+      \def\@argii{#2}\def\@argiv{#4}%
+      \ifx\@argii\@empty
+        \ifx\@argiv\@empty\else
+          \def\next{\@tp@parse@inherit #1,,\@nil #4,\@nil #5\@@nil}%
+        \fi
+      \else
+        \ifx\@argiv\@empty
+          \def\next{\@tp@parse@inherit #2,\@nil #3,,\@nil #5\@@nil}%
+        \else
+          \def\next{%
+            \@tp@parse@inherit #1,,\@nil #4,\@nil #5\@@nil
+            \@tp@parse@inherit #2,\@nil #3,#4,\@nil #5\@@nil
+          }%
+        \fi\fi\fi\fi
+  \next}
+\def\tp@do@inherit#1#2#3{%
+  \tpKernelDebugMsg{#3 inherits #1 from #2.}%
+  \tpCheckParent{#2}{#3}%
+  \expandafter\ifx\csname tp@type@#1@#2\endcsname\relax
+    \tpPackageError{Kernel}{Type}{Type `#1' was not declared}{Type `#1' was not declared for Container `#2'.}%
+  \else
+    \edef\x{\noexpand\csgappto{tp@type@#1@#3}}%
+    \expandafter\expandafter\expandafter\x\expandafter\expandafter\expandafter{\csname tp@type@#1@#2\endcsname}%
+    \tpKernelDebugMsg{value tp@type@#1@#3:^^J \expandafter\meaning\csname tp@type@#1@#3\endcsname}%
+  \fi
+}
+\def\tpDeclareComp{\@dblarg\@tpDeclareComp}
+\def\@tpDeclareComp[#1]#2#3#4{%
+  \ltx@LocalExpandAfter\global\expandafter\let\csname tp@\tp@cur@cont @#1\endcsname\relax
+  \expandafter\long\expandafter\def\csname tp#2\endcsname##1{%
+    #3\expandafter\long\expandafter\def\csname tp@\tp@cur@cont @#1\endcsname{##1}\ignorespaces#4}%
+}
+\long\protected\def\tpComp#1#2{%
+  \ifx\tp@is@counted\relax
+    \ifcsdef{tp@\tp@cur@cont @#1}{}
+      {\tp@def@counted@comp{\tp@cnt@grp-#1-\csname \tp@cnt@grp Cnt\endcsname}{#1}{}{}}%
+    \csgdef{tp@\tp@cur@cont @\tp@cnt@grp-#1-\csname \tp@cnt@grp Cnt\endcsname}{#2}%
+  \else
+    \ifcsdef{tp@\tp@cur@cont @#1}{}{\tpDeclareComp{#1}{}{}}%
+    \csname tp#1\endcsname{#2}%
+  \fi
+}
+\let\tpSetComp\tpComp
+\def\tpUseComp#1{\csname tp@\tp@cur@cont @#1\endcsname}
+\def\tpUseGComp#1#2{\csname tp@#1@#2\endcsname}
+\def\tpGetComp#1{\tpIfComp{#1}{\tpUseComp{#1}\par}{}}
+\long\def\tpIfComp#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else#2\fi}
+\long\def\tpIfGComp#1#2#3#4{\expandafter\ifx\csname tp@#1@#2\endcsname\relax#4\else#3\fi}
+\long\def\long@empty{}
+\long\def\tpIfCompEmpty#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\long@empty#2\else#3\fi}
+\long\def\tpIfGCompEmpty#1#2#3#4{\expandafter\ifx\csname tp@#1@#2\endcsname\long@empty#3\else#4\fi}
+\def\tp@check@empty{\tp@opt@empty\@tp@check@empty}%]
+\def\@tp@check@empty[#1]#2#3#4{%
+   \tpIfComp{#4#3}
+     {\tpIfCompEmpty{#4#3}
+       {\expandafter\global\expandafter\let\csname tp@#2@#4#3\endcsname\relax}
+       {}}
+     {\tpIfComp{#1#3}
+       {\expandafter\expandafter\expandafter\let\expandafter\csname tp@#2@#4#3\expandafter\endcsname\csname tp@#2@#1#3\endcsname}
+       {}}}
+\def\tpDeclareComponentGroup#1#2{%
+  \csnumgdef{#1Cnt}{\z@}%
+  \csdef{#1}{\expandafter\tp@opt@empty\csname @#1\endcsname}%
+  \csdef{@#1}[##1]{%
+    \def\tp@cnt@grp{#1}%
+    \csxdef{#1Cnt}{\expandafter\the\expandafter\numexpr\csname #1Cnt\endcsname+\@ne\relax}%
+    \if!##1!\else
+      \csgdef{tp@\tp@cur@cont @#1-\csname #1Cnt\endcsname @attrs}{##1}\fi
+    #2%
+  }%
+  \csdef{end#1}{{\tpToggleCountedCond\csname tp@compose@group@#1\endcsname}}%
+}
+\def\tpGroupHandler#1#2{%
+  \ifcsdef{@#1}
+    {\ifcsdef{tp@compose@group@#1}
+      {\csgappto{tp@compose@group@#1}{#2}}
+      {\csgdef{tp@compose@group@#1}{#2}}}
+    {\tpPackageError{Kernel}{Type}{Component Group `#1' unknown!}{You tried to declare a Group Handler for a Component Group that has not been declared, yet!}}%
+}
+\let\tp@cnt@grp\@empty
+\def\tpUseGroupComp#1#2{{\def\tp@cnt@grp{#1}\csname\tp@cnt@grp-#2-\csname \tp@cnt@grp Cnt\endcsname}}
+\def\tpUseGroupProp#1#2#3{%
+  \begingroup
+    \@tempcnta\numexpr#2\relax
+    \letcs\tpTotalCount{#1Cnt}%
+    \def\tp@cnt@grp{#1}%
+    \tpToggleCountedCond
+    \csnumdef{#1Cnt}{\the\@tempcnta}%
+    \tpCurCount=\the\@tempcnta\relax%
+    \csname tp@\tp@cur@cont @#3\endcsname%
+  \endgroup}
+\newcount\tpCurCount
+\def\tpComposeCollection#1#2#3{%
+  \tpIfComp{#3}{}{%
+    \ifcsdef{#1Cnt}{%
+      \expandafter\ifnum\csname #1Cnt\endcsname > \z@\relax
+        \edef\tp@iterate@res{%
+          \noexpand\bgroup
+            \noexpand\def\noexpand\tpTotalCount{\csname #1Cnt\endcsname}%
+            \noexpand\tpToggleCountedCond
+            \noexpand\def\noexpand\tp@cnt@grp{#1}}%
+          \expandafter\@tempcntb=\csname #1Cnt\endcsname\relax
+          \tp@iterate{\@tempcnta}{\@ne}{\@tempcntb}{%
+            \edef\@tempb{%
+              %% top-level counter for user interaction
+              \noexpand\tpCurCount=\the\@tempcnta
+              %% internal counter for macro grabbing
+              \noexpand\csnumdef{#1Cnt}{\tpCurCount}%
+              \noexpand\tpUseProperty{#2}}%
+            \expandafter\expandafter\expandafter\def
+            \expandafter\expandafter\expandafter\tp@iterate@res
+            \expandafter\expandafter\expandafter{\expandafter\tp@iterate@res\@tempb}%
+          }%
+          \expandafter\def\expandafter\tp@iterate@res\expandafter{\tp@iterate@res\egroup}%
+        \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+      \fi
+    }{}}%
+}
+\def\tpApplyCollection#1#2#3{%
+  \tpIfComp{#3}{}
+    {\tp@apply@collection{#1}{#2}%
+     \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+   }%
+}
+\def\tp@apply@collection#1#2{%
+  \begingroup
+    \global\let\tp@iterate@res\relax
+    \letcs\tpTotalCount{#1Cnt}%
+    \tp@iterate{\@tempcnta}{\@ne}{\tpTotalCount}{%
+      \bgroup
+        \tpToggleCountedCond
+        \def\tp@cnt@grp{#1}%
+        \csnumdef{#1Cnt}{\the\@tempcnta}%
+        \tpCurCount=\the\@tempcnta
+        \protected@xdef\@tempb{\csname tp@\tp@cur@cont @#2\endcsname}%
+        \@temptokena \expandafter{\@tempb}%
+        \def\@tempc{\csgappto{tp@iterate@res}}%
+        \expandafter\@tempc\expandafter{\@tempb}%
+      \egroup
+    }%
+  \endgroup
+  \message{^^J==> applied #1 with #2: \meaning\tp@iterate@res}%\STOPP
+}
+\def\tp@comp@def[#1]#2#3#4{%
+  \tp@apply@collection{#3}{#4}%
+  \ifx\tp@iterate@res\relax
+    #1\let#2\relax%
+  \else
+    \def\@tempa{#1\def#2}%
+    \expandafter\@tempa\expandafter{\tp@iterate@res}%
+  \fi
+}
+\def\tpCompDef{\tp@comp@def[]}
+\def\tpCompGDef{\tp@comp@def[\global]}
+\def\tpDeclareCountedComp#1{%
+  \tp@def@counted@comp
+    {\tp@cnt@grp-#1-\csname \tp@cnt@grp Cnt\endcsname}
+    {#1}
+    {}
+    {\expandafter\global}%
+}
+\def\tp@def@counted@comp#1#2#3#4{%
+  \tpDeclareComp[#1]{#2}
+    {\bgroup#3\expandafter\global}
+    {\def\@tempa{{@tp@reset@components@\tp@cur@cont}}%
+     \edef\@tempb{\noexpand\csgundef{tp@\noexpand\tp@cur@cont @#1}}%
+     \expandafter\expandafter\expandafter\csgappto\expandafter\@tempa\expandafter{\@tempb}%
+     \egroup}%
+  #4\expandafter\long\expandafter\def\csname tp@\tp@cur@cont @#2\endcsname{\csname tp@\tp@cur@cont @#1\endcsname}%
+  %%\csgappto{@tp@reset@components@\tp@cur@cont}{\csname tp@\tp@cur@cont @#2\endcsname{}}%
+}
+\def\tp@reset@components#1{%
+  \csname @tp@reset@components@#1\endcsname
+  \global\cslet{@tp@reset@components@#1}\relax%
+}
+\long\def\tpToggleCountedCond{%
+  \let\tp@is@counted\relax
+  \long\def\tpIfComp##1##2##3{%
+    \expandafter\let\expandafter\@tempa\csname tp@\tp@cur@cont @##1\endcsname\relax
+    \expandafter\expandafter\expandafter\ifx\@tempa\relax##3\else##2\fi%
+  }%
+  \long\protected\def\tpIfCompEmpty##1##2##3{%
+    \expandafter\expandafter\expandafter\ifx\csname tp@\tp@cur@cont @##1\endcsname\long@empty ##2\else ##3\fi}}
+\def\tpDeclareHook{\tp@opt@curcont\tp@declare@hook}
+\def\tp@declare@hook[#1]#2{\expandafter\global\expandafter\let\csname tp@hook@#1@#2\endcsname\@empty}
+\def\tpAddToHook{\tp@opt@curcont\tp@add@to@hook}
+\def\tp@add@to@hook[#1]#2#3{%
+  \expandafter\ifx\csname tp@hook@#1@#2\endcsname\relax
+    \tpDeclareHook[#1]{#2}%
+  \fi
+  \csgappto{tp@hook@#1@#2}{#3}%
+}
+\def\tpUseHook{\tp@opt@curcont\tp@use@hook}
+\def\tp@use@hook[#1]#2{\csuse{tp@hook@#1@#2}}
+\long\def\tpSetProperty#1#2{\long\csdef{tp@\tp@cur@cont @#1}{#2}}
+\long\def\tpPropertyLet#1#2{\long\csdef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
+\long\def\tpSetValProp#1#2{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
+\long\def\tpSetPropertyX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{#2}}
+\long\def\tpAddToDefault#1#2{\csgappto{tp@#1@default}{#2}}
+\def\tpUseProperty#1{\csuse{tp@\tp@cur@cont @#1}}
+\def\tpUsePropEnv#1{\cslet{tp@#1@active}{\relax}\csuse{tp@\tp@cur@cont @#1}\csundef{tp@#1@active}}
+\DeclareRobustCommand\tpPI[2]{\ifcsdef{tp@#1@active}{#2}{}}
+\def\tpCascadeProps#1#2{%
+  \csname tp@#2@default\endcsname
+  \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
+    \expandafter\tp@inherit@props\expandafter{\csname tp@#2@#1@parent\endcsname}{#2}%
+  \fi
+  \csname tp@#2@#1@properties\endcsname
+}
+\def\tp@inherit@props#1#2{%
+  \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
+    \edef\@tempa{\csname tp@#2@#1@parent\endcsname}%
+    \expandafter\tp@inherit@props\expandafter{\@tempa}{#2}%
+  \fi
+  \csname tp@#2@#1@properties\endcsname
+}
+\long\def\tpIfProp#1#2#3{\long\def\@tempa{}%
+    \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa #3\else#2\fi
+\ignorespaces}
+\long\def\tpIfPropVal#1#2#3#4{\long\def\@tempa{#2}%
+  \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa\relax#3\else#4\fi\ignorespaces}
+\def\tp@opt@curcont#1{\@ifnextchar[{#1}{#1[\tp@cur@cont]}}%]
+\def\tp@opt@empty#1{\@ifnextchar[{#1}{#1[]}}%]
+\def\tp@opt@second#1{\def\@tempa[##1]##2{#1[##1\if!##1!##2\fi]{##2}}%
+  \@ifnextchar[{\@tempa}{\@tempa[]}}%
+\long\def\tp@iterate{\@ifnextchar[{\@tp@iterate}{\@tp@iterate[\@ne]}}%]
+\long\def\@tp@iterate[#1]#2#3#4#5{%
+  \advance#2 by #1\relax
+  #2=#3\relax%
+  \expandafter\ifnum#2>#4\relax%
+  \else
+    #5%
+    \tp@iterate[#1]{#2}{\the#2}{#4}{#5}%
+  \fi}%
+\def\csmean#1{\expandafter\meaning\csname#1\endcsname}%
+\begingroup
+\catcode`"=12
+\gdef\tpParseAttributes#1#2{%
+  \if!#1!\else
+    \if!#2!\else
+      \def\tp@cur@node{#1}%
+      \@tp@parse@attributes #2,,\@nil
+    \fi\fi}
+\gdef\@tp@parse@attributes #1,#2,\@nil{%
+  \if!#1!\else
+    \tp@parse@kv#1==\@nil
+    \if!#2!\else
+      \@tp@parse@attributes#2,\@nil
+    \fi\fi}
+\endgroup
+\gdef\tp@parse@kv#1=#2=#3\@nil{%
+  \edef\@argii{#2}%
+  \ifx\@argii\@empty
+    \expandafter\let\csname tp@\tp@cur@node @attr@#1\endcsname\@empty%
+  \else
+    \ifx #2 =\else
+      \expandafter\def\csname tp@\tp@cur@node @attr@#1\endcsname{#2}%
+    \fi
+  \fi}
+\long\def\tpDeclareClass{\@ifnextchar [{\@tp@set@class}{\@tp@set@class[default]}}%]
+\long\def\@tp@set@class[#1]#2{\tp@opt@empty{\tp@set@class[#1]{#2}}}%
+\long\gdef\tp@default@class@default{}
+\long\def\tp@set@class[#1]#2[#3]#4{%
+  \def\@argii{#2}\ifx\@argii\@empty\let\@argii\tp@str@default\fi%
+  \if!#3!\else
+    \expandafter\long\expandafter\def\csname tp@#1@class@\@argii @parent\endcsname{#3}%
+  \fi
+  \expandafter\long\expandafter\def\csname tp@#1@class@\@argii\endcsname{#4}%
+}
+\def\tpUseClass#1#2{%
+  \expandafter\ifx\csname tp@#2@class@#1\endcsname\relax
+    \expandafter\ifx\csname tp@default@class@#1\endcsname\relax
+      \PackageError{cocotex.cls}{Class `#1' with scope `#2' not defined!}{Please declare the class `#1'!}%
+    \fi
+  \fi
+  \csname tp@default@class@#1\endcsname%
+  \expandafter\ifx\csname tp@#2@class@#1@parent\endcsname\relax\else
+    \expandafter\tpUseClass\expandafter{\csname tp@#2@class@#1@parent\endcsname}{#2}%
+  \fi
+  \csname tp@#2@class@#1\endcsname}
+\def\CoCoTeX{{\ttfamily CoCo\TeX}}
+ \def\tpNamespace#1{\def\tp@cur@cont{#1}}
+\endinput
+%%
+%% End of file `coco-kernel.sty'.

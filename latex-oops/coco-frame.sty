@@ -1,0 +1,212 @@
+%%
+%% This is file `coco-frame.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `frame')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-frame.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\fileversion{0.2.1}%
+\def\filedate{2021-08-20}%
+%%
+%% module for CoCoTeX for crop marks and print area frames.
+%%
+%% Maintainer: p.schulz@le-tex.de
+%%
+%% lualatex  -  texlive > 2019
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-frame}
+    [2020/27/08 coco-frame]\relax
+\let\tp@frame n
+\define@choicekey{coco-frame.sty}{frame}[\tp@frame\nr]{none,crop,frame}{%
+  \ifcase\nr\relax% none
+    \let\tp@frame n
+  \or% crop
+    \let\tp@frame p
+  \else% frame
+    \let\tp@frame w
+  \fi
+}%
+\ProcessOptionsX\relax
+\ifx\tp@frame p\relax
+  \newdimen\bleed \bleed4mm\relax
+  \newdimen\tp@frame@offset \tp@frame@offset4em\relax%
+  \voffset\dimexpr\tp@frame@offset-1in\relax
+  \hoffset\dimexpr\tp@frame@offset-1in\relax
+  \edef\l@offset{\strip@pt\dimexpr\tp@frame@offset*7200/7227\relax}
+  \edef\r@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperwidth)*7200/7227\relax}
+  \edef\u@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset-\paperheight)*7200/7227\relax}
+  \edef\o@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset)*7200/7227\relax}
+  \edef\b@l@offset{\strip@pt\dimexpr(\tp@frame@offset-\bleed)*7200/7227\relax}
+  \edef\b@r@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperwidth+\bleed)*7200/7227\relax}
+  \edef\b@u@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset-\paperheight-\bleed)*7200/7227\relax}
+  \edef\b@o@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset+\bleed)*7200/7227\relax}
+  \edef\@tempa{%
+    /TrimBox [\l@offset\space\u@offset\space\r@offset\space\o@offset]
+    /BleedBox[\b@l@offset\space\b@u@offset\space\b@r@offset\space\b@o@offset]
+    %/CropBox[\b@l@offset\space\b@u@offset\space\b@r@offset\space\b@o@offset]
+    %/MediaBox[\b@l@offset\space\b@u@offset\space\b@r@offset\space\b@o@offset]
+  }
+  \expandafter\pdfpageattr\expandafter{\@tempa}
+\fi
+\ifx\tp@frame n\relax
+  \RequirePackage{luatex85}
+  \pdfpagewidth\paperwidth
+  \pdfpageheight\paperheight
+\else
+  \ifx\tp@frame p\relax
+    \edef\stockwidth{\the\dimexpr\paperwidth+\tp@frame@offset+\tp@frame@offset\relax}
+    \edef\stockheight{\the\dimexpr\paperheight+\tp@frame@offset+\tp@frame@offset\relax}
+  \fi
+  \RequirePackage{crop}
+  \renewcommand*\CROP@marks{%
+    \CROP@setmarkcolor
+    \CROP@user@b
+    \vskip1in\hskip1in\relax
+    \CROP@ulc\null\hfill\CROP@@@info\CROP@upedge\hfill\null\CROP@urc\hskip-1in\null
+    \vfill
+    \CROP@ledge\hfill\CROP@redge
+    \vfill
+    \hskip1in\relax
+    \CROP@llc\null\hfill\CROP@loedge\hfill\null\CROP@lrc\hskip-1in\null
+    \vskip-1in}%
+  \ifx\tp@frame p\relax
+    \def\camcross{%
+      \smash{\rlap{%
+          \kern-0.15\p@
+          \vrule\@width0.3\p@\@height1.7mm\@depth1.7mm\relax
+          \kern-0.15\p@
+          \kern-1.7mm\relax
+          \vrule\@width0.3\p@\@height1.7mm\@depth1.7mm\relax
+          \kern-0.3\p@
+          \raise1.7mm\rlap{\vrule\@width3.4mm\@height\z@\@depth0.3\p@}%
+          \lower1.7mm\rlap{\vrule\@width3.4mm\@height0.3\p@\@depth\z@}%
+          \hbox{\vrule\@width3.4mm\@height0.15\p@\@depth0.15\p@}%
+          \kern-0.3\p@
+          \vrule\@width0.3\p@\@height1.7mm\@depth1.7mm\relax}}}
+    \def\cammcrossleft{%
+      \llap{\camcross\vrule\@width6mm\@height0.15\p@\@depth0.15\p@\kern4mm}}
+    \def\cammcrossright{%
+      \rlap{\kern4mm\vrule\@width6mm\@height0.15\p@\@depth0.15\p@\camcross}}
+    \def\cammcrossup{%
+      \rlap{\smash{\raise10mm\hbox{\camcross}%
+          \kern-0.15\p@\vrule\@width0.3\p@\@height10mm\@depth-4mm}}}%
+    \def\cammcrossdown{%
+      \rlap{\smash{\lower10mm\hbox{\camcross}%
+          \kern-0.15\p@\vrule\@width0.3\p@\@height-4mm\@depth10mm}}}%
+    \def\CROP@@ulc{\cammcrossup\cammcrossleft}
+    \def\CROP@@urc{\cammcrossup\cammcrossright}
+    \def\CROP@@llc{\cammcrossdown\cammcrossleft}
+    \def\CROP@@lrc{\cammcrossdown\cammcrossright}
+    \renewcommand*\CROP@@info{{%
+        \global\advance\CROP@index\@ne
+        \def\x{\discretionary{}{}{\hbox{\kern.5em---\kern.5em}}}%
+        \ifx\CROP@pagecolor\@empty
+        \else
+          \advance\dimen@\CROP@overlap
+        \fi
+        \hb@xt@\z@{%
+          \hss
+          \lower1em\vbox to\z@{\vss
+            \centering
+            \hsize\dimexpr\paperwidth-20\p@\relax
+            \normalfont
+            \large
+            \vskip5mm\relax
+            \addvspace{\bleed}}%
+          \hss}}%
+    }%
+    \crop[cam]
+  \else% w
+    \@tempdima\dimexpr\textheight\relax
+    \divide\@tempdima by\baselineskip
+    \multiply\@tempdima by65536\relax
+    \edef\cnt@baselines{\strip@pt\@tempdima}%
+    \def\tp@frame@lines{%
+      \@tempcnta\z@
+      \loop\advance\@tempcnta\@ne
+        \hsize1em\relax
+        \ifodd\count\z@
+          \vrule\@width1em\@height0.2\p@\@depth0.02\p@
+          \llap{\smash{\the\@tempcnta\,}}%
+        \fi%
+        \rlap{%
+          \ifodd\count\z@\else\fi
+          \vrule\@width\columnwidth\@height0.00005\p@\@depth0\p@
+          \if@twocolumn
+            \kern\columnsep\vrule\@width\columnwidth\@height0.00005\p@\@depth0\p@
+          \fi
+          \ifodd\count\z@\else
+            \vrule\@width1em\@height0.00005\p@\@depth0\p@%
+            \llap{\smash{\the\@tempcnta\,}}%
+          \fi
+        }%
+        \break
+      \ifnum\@tempcnta<\cnt@baselines
+      \repeat}
+    \def\tp@margin@frame{%
+      \vrule height\textheight%
+      \hskip-\marginparwidth\relax
+      \vbox to\textheight{\hsize\marginparwidth\relax
+        \rlap{\vbox to\z@{\hrule width\marginparwidth}}%
+        \null\vss
+        \rlap{\vbox to\z@{\hrule width\marginparwidth}}%
+      }%
+      \vrule height\textheight%
+    }
+    \renewcommand*\CROP@@frame{%
+      \vskip0in%
+      \color[cmyk]{0.4,0,0,0}%
+      \ifodd\count\z@\let\@themargin\oddsidemargin\else\let\@themargin\evensidemargin\fi
+      \advance\@themargin1in
+      \moveright\@themargin
+      \vbox to\z@{\baselineskip\z@skip\lineskip\z@skip\lineskiplimit\z@
+        \vskip\topmargin\vbox to\z@{\vss\hrule width\textwidth}%
+        \vskip\headheight\vbox to\z@{\vss\hrule width\textwidth}%
+        \vskip\headsep\vbox to\z@{\vss\hrule width\textwidth}%
+        \hbox to\textwidth{%
+          \ifodd\count\z@
+            \rlap{\hskip\dimexpr\textwidth+\marginparsep+\marginparwidth\relax\tp@margin@frame}%
+          \else
+            \rlap{\hskip-\marginparsep\relax\tp@margin@frame}%
+          \fi
+          \llap{\vbox to\textheight{\tiny\let\@tempa\f@size\normalsize\let\f@size\@tempa\selectfont
+              \vskip\topskip\tp@frame@lines\null\vss}}%
+          \llap{\vrule height\textheight}%
+          \if@twocolumn
+            \hskip\columnwidth\rlap{\vrule height\textheight}%
+            \hskip\columnsep\rlap{\vrule height\textheight}%
+          \fi
+          \hfil\vrule height\textheight
+        }%
+        \vbox to\z@{\vss\hrule width\textwidth}%
+        \vskip\footskip\vbox to\z@{\vss\hrule width\textwidth}%
+        \vss}%
+      \vbox to\z@{\baselineskip\z@skip\lineskip\z@skip\lineskiplimit\z@%
+        \vskip-0in\rlap{\hskip1in%
+          \vbox to\z@{\vbox to\z@{\vss\hrule width\paperwidth}%
+            \hbox to \paperwidth{\llap{\vrule height\paperheight}\hfil%
+              \vrule height\paperheight}%
+            \vbox to\z@{\vss\hrule width\paperwidth}%
+            \vss}}\vss}}
+    \crop[frame,noinfo]%
+  \fi
+\fi
+\endinput
+%%
+%% End of file `coco-frame.sty'.
