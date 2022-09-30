@@ -223,6 +223,7 @@
   \edef\tp@heading@name{#2}%
   \tp@heading@load@props%
   \tp@provide@hd@macros{Author}%
+  \tp@provide@hd@alias{AuthorNameList}{Author}%
   \tp@provide@hd@macros{Title}%
   \tp@provide@hd@macros{Subtitle}%
   \tp@provide@hd@macros{Number}%
@@ -246,6 +247,12 @@
   \tpProvideComp{tpToc#1}{}{}{Toc#1}% toc overrides
   \tpProvideComp{tpRun#1}{}{}{Run#1}% running overrides
   \tpProvideComp{tpBM#1}{}{}{BM#1}% bookmark overrides
+}
+\def\tp@provide@hd@alias#1#2{%
+  \csletcs{tp#1}{tp#2}%
+  \csletcs{tpToc#1}{tpToc#2}%
+  \csletcs{tpRun#1}{tpRun#2}%
+  \csletcs{tpBM#1}{tpBM#2}%
 }
 \def\endheading{%
   \expandafter\ifx\csname tpUseHeading\tp@heading@name\endcsname\relax
