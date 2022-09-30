@@ -418,7 +418,7 @@
   <preamble>%
     <xsl:message select="'&#xa;&#xa;Layout: ', $layout, '&#xa;Publikationstyp: ', $pubtype, '&#xa;Format: ', $format, '&#xa;Notentyp: ', $notes-type, '&#xa;Kapitelweise Endnoten: ', 
                           $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
-    <xsl:sequence select="$preamble"/>
+    <xsl:sequence select="string-join($preamble, '')"/>
   </preamble>
   
   <!--  *
@@ -463,7 +463,7 @@
     <xsl:param name="notes-type" as="xs:string?"/>
     <xsl:param name="notes-per-chapter" as="xs:string?"/>
     <xsl:param name="endnotes-with-chapter" as="xs:string?"/>
-    <!-- overwrite this for yout project's needs. those are valid for Campus -->
+    <!-- overwrite this for your project's needs. those are valid for Campus -->
     <!-- standard: coll: resetnotesperchapter mono ohne -->
     <xsl:variable name="fn-reset" as="xs:string?">
       <xsl:sequence select="if ($notes-per-chapter = 'no') 
