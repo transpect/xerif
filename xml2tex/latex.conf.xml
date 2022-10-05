@@ -2297,10 +2297,10 @@
                           select="$footnote-anchor/ancestor::dbk:chapter//dbk:anchor[@role eq 'start' or not(@role)]
                                                                                     [@xml:id = $link-refs]
                                                                                     [following-sibling::*[1][self::dbk:footnote]]/@xml:id"/>            
-            <xsl:value-of select="concat('{\hyperlink[', $ref, ']{', index-of($anchor-ids-in-chapter, $linkend),  '}}')"/>
+            <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', index-of($anchor-ids-in-chapter, $linkend),  '}}')"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat('{\hyperlink[', $ref, ']{', string-join(.//text(), ' '), '}}')"/>
+            <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', string-join(.//text(), ' '), '}}')"/>
           </xsl:otherwise>
         </xsl:choose>  
       </xsl:when>
