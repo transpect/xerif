@@ -819,9 +819,16 @@
 
       <rule name="heading" type="env" break-after="2" break-before="2">
         <xsl:if test="   .//dbk:anchor[@role eq 'start' or not(@role)][@xml:id = $link-refs]">
-          <option select="descendant::dbk:anchor[@role eq 'start' or not(@role)][@xml:id = $link-refs]">
-            <with-param name="as-title-param" select="true()" as="xs:boolean" tunnel="yes"/>
-          </option>
+          <xsl:text>[</xsl:text>
+          <xsl:for-each select="descendant::dbk:anchor[@role eq 'start' or not(@role)][@xml:id = $link-refs]">
+            <xsl:apply-templates select="." mode="#current">
+              <xsl:with-param name="as-title-param" select="true()" as="xs:boolean" tunnel="yes"/>
+            </xsl:apply-templates>
+            <xsl:if test="position() ne last()">
+              <xsl:text>,</xsl:text>
+            </xsl:if>
+          </xsl:for-each>
+          <xsl:text>]</xsl:text>
         </xsl:if>
         <xsl:if test="matches(parent::*/@renderas, 'hub:(no-toc|no-pdf-bookmarks)')">
           <option select="replace(string-join(tokenize(parent::*/@renderas, '((hub:|sect\d)\s?)+' ), ''), '-', '')"/>
