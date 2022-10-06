@@ -1211,7 +1211,7 @@
     </rule>
   </template>
 
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/*[self::dbk:givenname|self::dbk:firstname]]">
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/*[self::dbk:givenname|self::dbk:firstname]">
     <rule name="tpFirstName" type="cmd" break-before="1">
       <param/>
     </rule>
