@@ -32,6 +32,8 @@
   <xsl:param name="running-header" as="xs:string"/>
   
   <xsl:param name="run-local" as="xs:string"/>
+  <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
+  
   <xsl:variable name="image-dir" as="xs:string?" 
                 select="if($run-local eq 'yes') then () else '../../images/'"/>
   <xsl:variable name="clientname" as="xs:string*"/>
@@ -187,7 +189,9 @@
                                  xml2tex:foreign-scripts(root()),
                                  ',autonumbering'[$numbering-depth ne '0'],
                                  ',withcoltitles'[$running-header eq 'yes'],
-                                 ']{transpect}&#xa;')"/>
+                                 ']{', 
+                                 if ($cocotex) then 'cocotex' else 'transpect',
+                                 '}&#xa;')"/>
     <xsl:text>\usepackage{htmltabs}&#xa;</xsl:text>
     <!--  <xsl:value-of select="concat('\usepackage[main=', xml2tex:lang-to-babel-lang($main-lang), ',bidi=basic,silent]{babel}&#xa;')"/>-->
     <!--<xsl:for-each select="$babel-langs[. ne xml2tex:lang-to-babel-lang($main-lang)]"><xsl:value-of select="concat('\babelprovide[import]{', ., '}&#xa;')"/></xsl:for-each>-->
@@ -1178,9 +1182,68 @@
         * chapter and section authors
         * -->
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/dbk:author">
-    <rule name="tpAuthor" type="cmd" break-before="1">
-      <param select="for $a in dbk:personname/dbk:othername return normalize-space($a)"/>
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]">
+    <xsl:choose>
+      <xsl:when test="$cocotex and (dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname] or exists(*[not(self::dbk:personname)]))">
+        <!-- if author contains only name → tpAuthorNamelist. If name is structured though or if other metadata is present generate environment -->
+        <rule name="tpAuthor" type="env" break-before="1">
+          <param/>
+        </rule>
+      </xsl:when>
+      <xsl:otherwise>
+        <rule name="tpAuthorNameList" type="cmd" break-before="1">
+          <param select="for $a in dbk:personname/dbk:othername return normalize-space($a)"/>
+        </rule>
+      </xsl:otherwise>
+    </xsl:choose>
+  </template>
+  
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:surname">
+    <rule name="tpSurName" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/*[self::dbk:givenname|self::dbk:firstname]]">
+    <rule name="tpFirstName" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:lineage">
+    <rule name="tpPersonSuffix" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+
+
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:honorific">
+    <rule name="tpPersonPrefix" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+  
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:email">
+    <rule name="tpMail" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+  
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:affiliation">
+    <rule name="tpAffilID" type="cmd" break-before="1">
+      <!-- To Do: generate index from Affiliation list -->
+    </rule>
+  </template>
+  
+  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personblurb">
+    <rule name="tpBio" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+  
+   <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:uri">
+    <rule name="tpPersonID" type="cmd" break-before="1">
+      <param/>
     </rule>
   </template>
   
