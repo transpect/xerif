@@ -74,7 +74,7 @@
   </hub2tei:hub2tei>
   
   <tr:store-debug name="store-tei" pipeline-step="difftest/out-tei">
-    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
   </tr:store-debug>
@@ -96,7 +96,7 @@
   </jats:hub2bits>
   
   <tr:store-debug name="store-bits" pipeline-step="difftest/out-bits">
-    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
   </tr:store-debug>
@@ -184,7 +184,7 @@
     <p:input port="source">
       <p:pipe step="create-epub" port="html"/>
     </p:input>
-    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
   </tr:store-debug>
    

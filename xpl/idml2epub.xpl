@@ -267,7 +267,7 @@
     <p:input port="source">
       <p:pipe port="result" step="hub2tei"/>
     </p:input>
-    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
   </tr:store-debug>
@@ -276,7 +276,7 @@
     <p:input port="source">
       <p:pipe step="tei2epub" port="html"/>
     </p:input>
-    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
   </tr:store-debug>
 
