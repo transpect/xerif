@@ -906,7 +906,7 @@
     <!-- optional: include running title authors  -->
    <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
      <xsl:if test="dbk:author">
-      <rule name="tpRunAuthor" type="cmd" break-before="1">
+      <rule name="tpRunAuthorNameList" type="cmd" break-before="1">
          <param select="dbk:author/dbk:personname/dbk:othername">
           <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
