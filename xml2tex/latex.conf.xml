@@ -751,7 +751,7 @@
                                                          |self::dbk:br
                                                          |self::dbk:tab
                                                          |self::dbk:anchor)]]">
-      <rule name="tpBMAuthor" type="cmd" break-before="1">
+      <rule name="tpBMAuthorNameList" type="cmd" break-before="1">
           <xsl:variable name="content">
             <xsl:apply-templates select="../*[self::dbk:author]/dbk:personname/dbk:othername" mode="bookmark-contents"/>
           </xsl:variable>
@@ -939,9 +939,9 @@
   <xsl:variable name="create-customer-toctitles" select="true()" as="xs:boolean"><!-- if set template will be used --></xsl:variable>
   
   <template name="toc-titles">
-     <!-- here the content of the heading in the ToC is determined. If the 
-          heading contains footnotes or linebreaks: discard those for ToC. 
-          Otherwise do nothing.-->
+    <!-- here the content of the heading in the ToC is determined. If the 
+      heading contains footnotes or linebreaks: discard those for ToC. 
+      Otherwise do nothing.-->
     <xsl:choose>
       <xsl:when test="$create-customer-toctitles">
         <xsl:call-template name="customer-toctitles"/>
@@ -952,6 +952,7 @@
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
           </param>
         </rule>
         <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
@@ -960,6 +961,7 @@
               <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
               <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
               <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+              <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
             </param>
           </rule>
         </xsl:if>
@@ -973,6 +975,7 @@
         <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
         <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
         <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+        <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
       </param>
     </rule>
     <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
@@ -981,6 +984,7 @@
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -990,15 +994,17 @@
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
     <xsl:if test="dbk:author">
-      <rule name="tpTocAuthor" type="cmd" break-after="0" break-before="1">
+      <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
         <param select="dbk:author/dbk:personname/dbk:othername">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1249,7 +1255,7 @@
   </template>
   
    <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:uri">
-    <rule name="tpPersonID" type="cmd" break-before="1">
+    <rule name="tpORCID" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
