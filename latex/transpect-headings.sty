@@ -107,7 +107,18 @@
           \fi}%
      \fi}{}%
 }
+\def\@tp@hdg@parse@label#1,#2,\@nil#3\@nil{%
+  \@tp@hdg@create@labels{#3}{#1}%
+  \if!#2!\else
+    \@tp@hdg@parse@label#2,\@nil#3\@nil
+  \fi
+}
 \def\tp@hdg@create@labels#1{%
+  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
+    \expandafter\@tp@hdg@parse@label\tp@heading@attr@label,,\@nil#1\@nil
+  \fi
+}
+\def\@tp@hdg@create@labels#1#2{%
   \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
     \Hy@MakeCurrentHrefAuto{tp.#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
@@ -118,7 +129,8 @@
        \let\@currentlabel\@tempa\relax
        \let\@currentlabelname\tp@heading@Title}
       {\phantomsection}%
-    \expandafter\tpltx@label\expandafter{\tp@heading@attr@label}%
+    \expandafter\hypertarget\expandafter{#2}{}%
+    \expandafter\tpltx@label\expandafter{#2}%
   \fi
   \global\let\label\tpltx@label}
 \def\tp@make@toc{%
