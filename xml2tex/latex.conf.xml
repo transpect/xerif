@@ -173,6 +173,7 @@
   <!-- pub type metadata -->
   <xsl:variable name="is-collection" as="xs:boolean" 
                 select="exists(//dbk:chapter/dbk:info/dbk:author)"/>
+  <xsl:variable name="is-journal" as="xs:boolean"  select="false()"><!-- set to yes in your a9s if needed--></xsl:variable>
   <xsl:variable name="layout-value" as="xs:string"  select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
   <xsl:variable name="pubtype-value" as="xs:string?" select="if ($pubtype = ('article','collection', 'mono')) then concat(',pubtype=', $pubtype) else ()"/>
   <xsl:variable name="format-value" as="xs:string?"  select="if ($format) then concat('format=', $format)  else ()"/>
@@ -214,9 +215,9 @@
       <xsl:text>&#xa;\begin{tpAuthor}</xsl:text>
       <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
       <xsl:if test="$author-info">
-        <xsl:value-of select="concat('&#xa;\tpBio{', normalize-space($author-info), '}&#xa;')"/>
+        <xsl:value-of select="concat('&#xa;\tpBio{', normalize-space($author-info), '}')"/>
       </xsl:if>
-      <xsl:text>\end{tpAuthor}&#xa;</xsl:text>
+      <xsl:text>&#xa;\end{tpAuthor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:for-each select="$editors">
       <xsl:text>&#xa;\begin{tpEditor}</xsl:text>
@@ -746,14 +747,14 @@
                                )"/>
       </rule>
     </xsl:if>
-    <xsl:if test="../*[self::dbk:author]
-                      [dbk:personname/dbk:othername/*[not(self::dbk:footnote
+    <xsl:if test="../*[self::dbk:author|self::dbk:authorgroup[dbk:author]]
+                      [descendant::dbk:personname/dbk:othername/*[not(self::dbk:footnote
                                                          |self::dbk:br
                                                          |self::dbk:tab
                                                          |self::dbk:anchor)]]">
       <rule name="tpBMAuthorNameList" type="cmd" break-before="1">
           <xsl:variable name="content">
-            <xsl:apply-templates select="../*[self::dbk:author]/dbk:personname/dbk:othername" mode="bookmark-contents"/>
+            <xsl:apply-templates select="../(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername" mode="bookmark-contents"/>
           </xsl:variable>
           <param select="replace(string-join($content, ''), '\s+$', '')"/>
         </rule>
@@ -834,7 +835,7 @@
           <option select="replace(string-join(tokenize(parent::*/@renderas, '((hub:|sect\d)\s?)+' ), ''), '-', '')"/>
         </xsl:if>
         <param select="tr:heading-level(parent::*)"/>
-        <xsl:apply-templates select="dbk:author, dbk:title" mode="#current"/>
+        <xsl:apply-templates select="(dbk:authorgroup | dbk:author), dbk:title" mode="#current"/>
         <xsl:call-template name="toc-titles" />
         <xsl:call-template name="col-titles" /> 
         <xsl:apply-templates select="dbk:subtitle,
@@ -842,8 +843,14 @@
                                      dbk:abstract,
                                      dbk:keywordset,
                                      dbk:biblioset" mode="#current"/>
+        <xsl:if test="(dbk:authorgroup | dbk:author)//dbk:affiliation">
+          <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
+          <xsl:apply-templates select="(dbk:authorgroup | dbk:author)//dbk:affiliation" mode="#current"/>
+          <xsl:text>&#xa;\end{tpAffil}</xsl:text>
+        </xsl:if>
       </rule>
       <xsl:apply-templates select="* except (dbk:author,
+                                             dbk:authorgroup, 
                                              dbk:title,
                                              dbk:titleabbrev,
                                              dbk:subtitle,
@@ -907,7 +914,7 @@
    <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
      <xsl:if test="dbk:author">
       <rule name="tpRunAuthorNameList" type="cmd" break-before="1">
-         <param select="dbk:author/dbk:personname/dbk:othername">
+         <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -935,13 +942,13 @@
     </xsl:if>
    </xsl:if>
   </template>
-  
+
   <xsl:variable name="create-customer-toctitles" select="true()" as="xs:boolean"><!-- if set template will be used --></xsl:variable>
   
   <template name="toc-titles">
-    <!-- here the content of the heading in the ToC is determined. If the 
-      heading contains footnotes or linebreaks: discard those for ToC. 
-      Otherwise do nothing.-->
+     <!-- here the content of the heading in the ToC is determined. If the 
+          heading contains footnotes or linebreaks: discard those for ToC. 
+          Otherwise do nothing.-->
     <xsl:choose>
       <xsl:when test="$create-customer-toctitles">
         <xsl:call-template name="customer-toctitles"/>
@@ -998,9 +1005,9 @@
         </param>
       </rule>
     </xsl:if>
-    <xsl:if test="dbk:author">
+    <xsl:if test="dbk:author or dbk:authorgroup/dbk:author)">
       <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
-        <param select="dbk:author/dbk:personname/dbk:othername">
+        <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -1021,7 +1028,7 @@
                              then 'true'
                              else 'false')"/>
       <param select="tr:heading-level(parent::*)"/>
-      <xsl:apply-templates select="dbk:author, 
+      <xsl:apply-templates select="(dbk:author|dbk:authorgroup/dbk:author), 
                                    dbk:title/dbk:phrase[@role eq 'hub:identifier'],
                                    dbk:title" mode="#current"/>
       <xsl:call-template name="toc-titles" /> 
@@ -1069,7 +1076,9 @@
              level is called contribution and allows integration of abstracts and keywords -->
         <xsl:sequence select="if ($pubtype = ('collection', 'anth', '') 
                                   or contains($basename, '_anth_')
-                                  or $heading[dbk:info[dbk:abstract | dbk:keywordset]]) 
+                                  or $heading[dbk:info[dbk:abstract | dbk:keywordset | (dbk:author|dbk:authorgroup/dbk:author)[dbk:email]]]
+                                  or $is-collection
+                                  or $is-journal) 
                               then 'contribution' 
                               else 'chapter'"/>
       </xsl:when>
@@ -1195,12 +1204,16 @@
         * chapter and section authors
         * -->
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]">
     <xsl:choose>
-      <xsl:when test="$cocotex and (dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname] or exists(*[not(self::dbk:personname)]))">
+      <xsl:when test="$cocotex 
+                      and 
+                      ((dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]) or exists(*[not(self::dbk:personname)]))">
         <!-- if author contains only name → tpAuthorNamelist. If name is structured though or if other metadata is present generate environment -->
-        <rule name="tpAuthor" type="env" break-before="1">
-          <param/>
+        <rule name="tpAuthor" type="env" break-after="1" break-before="2">
+          <param select="node()">
+            <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
+          </param>
         </rule>
       </xsl:when>
       <xsl:otherwise>
@@ -1211,52 +1224,80 @@
     </xsl:choose>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:surname">
+  <template context="dbk:authorgroup">
+  <!-- overwrite docx2tex handling -->
+    <xsl:apply-templates select="node()" mode="xml2tex"/>
+  </template>
+
+  <template context="*[not(self::*:hub)]/*:info//*[self::*:author|self::*:editor]/*:personname/*:othername">
+    <rule name="tpFullName" type="cmd" break-before="1">
+      <param/>
+    </rule>
+  </template>
+
+
+  <xsl:template match="*[not(self::*:hub)]/*:info//*[self::*:author|self::*:editor]/*:personname" priority="600" mode="xml2tex">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:surname">
     <rule name="tpSurName" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
 
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/*[self::dbk:givenname|self::dbk:firstname]">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/*[self::dbk:givenname|self::dbk:firstname]">
     <rule name="tpFirstName" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
 
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:lineage">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:lineage">
     <rule name="tpPersonSuffix" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
 
 
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:honorific">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:honorific">
     <rule name="tpPersonPrefix" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:email">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:email">
     <rule name="tpMail" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:affiliation">
-    <rule name="tpAffilID" type="cmd" break-before="1">
-      <!-- To Do: generate index from Affiliation list -->
-    </rule>
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:affiliation">
+    <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/> 
+    <xsl:choose>
+      <xsl:when test="$in-author">
+        <rule name="tpAffilID" type="cmd" break-before="1">
+          <!-- To Do: generate index from Affiliation list -->
+          <param select="index-of(ancestor::dbk:info[1]//dbk:orgname, .)"/>
+        </rule>
+      </xsl:when>
+      <xsl:otherwise>
+        <rule name="tpAffiliation" type="cmd" break-before="1">
+          <!-- To Do: generate index from Affiliation list -->
+          <param select="node()"/>
+        </rule>
+      </xsl:otherwise>
+    </xsl:choose>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:personblurb">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personblurb">
     <rule name="tpBio" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
   
-   <template context="*[not(self::dbk:hub)]/dbk:info/*[self::dbk:author|self::dbk:editor]/dbk:uri">
+   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:uri">
     <rule name="tpORCID" type="cmd" break-before="1">
-      <param/>
+      <param select="if (dbk:link) then dbk:link/node() else node()"/>
     </rule>
   </template>
   
@@ -1307,12 +1348,20 @@
         * artice/chapter meta
         * -->
 
-  <template context="dbk:info/dbk:biblioset">
+  <xsl:template match="dbk:info/dbk:biblioset" mode="xml2tex">
     <!--<xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="#current"/>-->
-    <rule>
-      <text select="dbk:biblioid[@role = 'tsmetachunkdoi']"/>
-    </rule>
-  </template>
+        <xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="xml2tex"/>
+    <xsl:if test="dbk:legalnotice[normalize-space()]">
+      <!-- several paa have to be merged to one makro -->
+      <xsl:text>&#xa;\tpCopyright{</xsl:text>
+      <xsl:for-each select="dbk:legalnotice[normalize-space()]">
+        <xsl:apply-templates select="node()" mode="#current"/>
+        <xsl:if test="not(. is ../dbk:legalnotice[last()])"><xsl:text>\tpBreak </xsl:text></xsl:if>
+      </xsl:for-each>
+      <xsl:text>}&#xa;</xsl:text>
+    </xsl:if>
+
+  </xsl:template>
 
   <template context="dbk:info/dbk:biblioset/dbk:biblioid[@role = 'tsmetachunkdoi']">
    <!-- tpDOITitle also available-->
@@ -1575,7 +1624,6 @@
        <xsl:apply-templates mode="#current"/>
      </xsl:if>
    </template>
-     
   
   <template context="dbk:figure/dbk:info/dbk:legalnotice/dbk:para[1] | dbk:figure/dbk:caption | *:table/dbk:caption | *:table/dbk:info/dbk:legalnotice/dbk:para[1]">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
