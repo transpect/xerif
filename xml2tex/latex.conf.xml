@@ -1290,12 +1290,16 @@
     <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/> 
     <xsl:choose>
       <xsl:when test="$in-author">
-        <rule name="tpAffilID" type="cmd" break-before="1">
+        <rule name="tpAffil" type="cmd" break-before="1">
           <!-- To Do: generate index from Affiliation list -->
           <param select="index-of(ancestor::dbk:info[1]//dbk:orgname, .)"/>
         </rule>
       </xsl:when>
       <xsl:otherwise>
+         <rule name="tpAffilID" type="cmd" break-before="1">
+          <!-- To Do: generate index from Affiliation list -->
+           <param select="index-of(ancestor::dbk:info[1]//dbk:orgname, .)"/>
+        </rule>
         <rule name="tpAffiliation" type="cmd" break-before="1">
           <!-- To Do: generate index from Affiliation list -->
           <param select="node()"/>
