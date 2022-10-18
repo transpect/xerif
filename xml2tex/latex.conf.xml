@@ -1281,7 +1281,7 @@
   </template>
   
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:email">
-    <rule name="tpMail" type="cmd" break-before="1">
+    <rule name="tpEmail" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
