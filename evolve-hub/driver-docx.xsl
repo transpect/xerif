@@ -180,7 +180,7 @@
                            [every $i in *[not(self::tab|self::footnote|self::anchor)]
                             satisfies $i[@xml:lang eq $doc-lang or (@xml:lang ne ../@xml:lang)]]
                            [  string-length(normalize-space(string-join(for $n in node()[not(self::tab|self::footnote|self::anchor)] return $n))) 
-                            = string-length(normalize-space(string-join(*[@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" 
+                            = string-length(normalize-space(string-join(*[not(self::tab|self::footnote|self::anchor)][@xml:lang eq $doc-lang or @xml:lang ne ../@xml:lang])))]" 
                 mode="hub:preprocess-hierarchy" priority="3">
     <xsl:copy>
       <!-- discard lang on para if every child has another lang. -->
@@ -190,7 +190,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="phrase[@xml:lang eq $doc-lang]" mode="hub:preprocess-hierarchy">
+  <xsl:template match="*[self::phrase|self::footnote][@xml:lang eq $doc-lang]" mode="hub:preprocess-hierarchy" priority="3">
     <xsl:param name="remove-lang" as="xs:boolean?" tunnel="yes"/>
     <xsl:copy>
       <xsl:apply-templates select="@* except @xml:lang,
@@ -1468,19 +1468,18 @@
     </section>
   </xsl:template>
 
-  <xsl:template match="*[para[matches(@role, '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)')]
+  <xsl:template match="*[para[matches(@role, '^[a-z]{1,3}(meta(chunk)?)?(abstracts?|keywords?|alternativeheadline)')]
                              [not(parent::abstract)]]" mode="hub:repair-hierarchy" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="exists(.[self::para][@role[matches(., '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)(heading)?')]])">
+      <xsl:for-each-group select="*" group-adjacent="exists(.[self::para][@role[matches(., '^[a-z]{1,3}(meta(chunk)?)?(abstracts?|keywords?|alternativeheadline)(heading)?')]])">
         <xsl:variable name="all-abstract-and-keyword-para" as="element(*)*" select="current-group()"/>
-        <xsl:for-each-group select="current-group()" group-starting-with="(para[@role[matches(., '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)heading')] 
+        <xsl:for-each-group select="current-group()" group-starting-with="(para[@role[matches(., '^[a-z]{1,3}(meta(chunk)?)?(abstracts?|keywords?|alternativeheadline)heading')] 
                                                                             or 
-                                                                            (@role[matches(., '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)($|_-_)')] 
+                                                                            (@role[matches(., '^[a-z]{1,3}(meta(chunk)?)?(abstracts?|keywords?|alternativeheadline)($|_-_)')] 
                                                                               and (. is $all-abstract-and-keyword-para[@role = current()/@role][1])
                                                                                 (:and empty($all-abstract-and-keyword-para[@role[matches(., '[a-z]{1,3}(abstracts?|meta(chunk)?keywords?|alternativeheadline)heading')]]):)
-                                                                             and empty($all-abstract-and-keyword-para[@role[matches(., '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)heading')]]
-                                                                                                                      [contains(@role, substring(current()/@role, 1, 7))]) 
+                                                                             and empty($all-abstract-and-keyword-para[@role = concat(current()/@role, 'heading')]) 
                                                                             )]|*[not(self::para)])">
           <xsl:choose>
             <xsl:when test="current-group()[self::para[@role[matches(., '[a-z]{1,3}meta(chunk)?keywords?')]]]">
@@ -1493,7 +1492,7 @@
                 <xsl:apply-templates select="current-group()" mode="#current"/>
               </section>
             </xsl:when>
-            <xsl:when test="current-group()[self::para[@role[matches(., '[a-z]{1,3}metaalternativeheadline$')]]]">
+            <xsl:when test="current-group()[self::para[@role[matches(., '[a-z]{1,3}metaalternativeheadline')]]]">
               <section role="alternative-title">
                 <xsl:apply-templates select="current-group()" mode="#current"/>
               </section>
@@ -1507,7 +1506,7 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="para[matches(@role, '^[a-z]{1,3}((meta(chunk))?(abstracts?|keywords?)|alternativeheadline)heading')]" mode="hub:repair-hierarchy" priority="2">
+  <xsl:template match="para[matches(@role, '^[a-z]{1,3}(meta(chunk)?)?(abstracts?|keywords?|alternativeheadline)heading')]" mode="hub:repair-hierarchy" priority="2">
     <title>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </title>
@@ -1516,7 +1515,7 @@
   <xsl:template match="/hub/info" mode="custom-2" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-      <xsl:for-each select="/hub/descendant::biblioset[1]/(issuenum | volumenum | biblioid[@role = '[a-z]{2,3}metadoi'] | productname | pubdate)">
+      <xsl:for-each select="/hub/descendant::biblioset[1]/(issuenum | volumenum | biblioid[matches(@role, '[a-z]{1,3}metadoi$')] | productname | pubdate)">
         <xsl:copy copy-namespaces="no">
           <xsl:apply-templates select="current()/@* except @srcpath" mode="#current"/>
           <xsl:value-of select="normalize-space(current())"/>
