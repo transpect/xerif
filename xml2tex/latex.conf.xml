@@ -1223,7 +1223,9 @@
       </xsl:when>
       <xsl:otherwise>
         <rule name="tpAuthorNameList" type="cmd" break-before="1">
-          <param select="for $a in dbk:personname/dbk:othername return normalize-space($a)"/>
+          <param select="for $a in dbk:personname/dbk:othername return $a">
+            <with-param name="no-nesting" select="true()" as="xs:boolean" tunnel="yes"/>
+          </param>
         </rule>
       </xsl:otherwise>
     </xsl:choose>
@@ -1235,9 +1237,17 @@
   </template>
 
   <template context="*[not(self::*:hub)]/*:info//*[self::*:author|self::*:editor]/*:personname/*:othername">
-    <rule name="tpFullName" type="cmd" break-before="1">
-      <param/>
-    </rule>
+    <xsl:param name="no-nesting" as="xs:boolean?" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="not($no-nesting)">
+        <rule name="tpFullName" type="cmd" break-before="1">
+          <param/>
+        </rule>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:next-match/>
+      </xsl:otherwise>
+    </xsl:choose>
   </template>
 
 
