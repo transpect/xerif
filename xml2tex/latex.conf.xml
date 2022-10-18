@@ -2554,6 +2554,17 @@
     <char character="&#x201a;" string=","/>
     <!-- FULLWIDTH COMMA -->
     <char character="&#xff0c;" string=","/>
+    <!-- *
+         * remove bidirectional Unicode characters, Babel handles text direction
+         * -->
+    <char character="&#x202a;" string=""/>
+    <char character="&#x202b;" string=""/>
+    <char character="&#x202c;" string=""/>
+    <char character="&#x202d;" string=""/>
+    <char character="&#x202e;" string=""/>
+    <char character="&#x202f;" string=""/>
+    <!-- FULLWIDTH COMMA -->
+    <char character="&#xff0c;" string=","/>
     <!-- * 
          * special processing instructions for common 
          * -->
