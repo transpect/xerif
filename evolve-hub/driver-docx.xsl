@@ -1577,9 +1577,7 @@
       <xsl:otherwise>
         <!-- no author specific metadata-->
         <xsl:copy>
-          <xsl:apply-templates select="@*" mode="#current"/>
-          <xsl:attribute name="role" select="'override'"/>
-          <xsl:apply-templates select="node()" mode="#current"/>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
           <xsl:if test="parent::info/biblioset/orgname">
             <affiliation>
               <xsl:copy-of select="parent::info/biblioset/orgname"/>
