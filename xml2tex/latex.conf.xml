@@ -843,6 +843,11 @@
                                      dbk:abstract,
                                      dbk:keywordset,
                                      dbk:biblioset" mode="#current"/>
+        <xsl:if test="../dbk:section[@role = 'alternative-title'][dbk:para[normalize-space()]]">
+          <xsl:text>&#xa;\tpTitleEn{</xsl:text>
+          <xsl:apply-templates select="../dbk:section[@role = 'alternative-title']/dbk:para[normalize-space()]" mode="#current"/>
+          <xsl:text>}</xsl:text>
+        </xsl:if>
         <xsl:if test="(dbk:authorgroup | dbk:author)//dbk:affiliation">
           <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
           <xsl:apply-templates select="(dbk:authorgroup | dbk:author)//dbk:affiliation" mode="#current"/>
@@ -1331,7 +1336,7 @@
     </rule>
   </template>
   
-  <template context="dbk:section[@role = 'keywords']"/>
+  <template context="dbk:section[@role = 'keywords'] | dbk:section[@role = 'alternative-title']"/>
 
   <template context="dbk:info/dbk:keywordset">
     <xsl:if test="@role">
