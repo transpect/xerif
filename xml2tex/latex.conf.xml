@@ -1215,7 +1215,7 @@
                       and 
                       ((dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]) or exists(*[not(self::dbk:personname)]))">
         <!-- if author contains only name → tpAuthorNamelist. If name is structured though or if other metadata is present generate environment -->
-        <rule name="tpAuthor" type="env" break-after="1" break-before="2">
+        <rule name="tpAuthor" type="env" break-after="0" break-before="1">
           <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
           </text>
@@ -1367,13 +1367,13 @@
     <!--<xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="#current"/>-->
         <xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="xml2tex"/>
     <xsl:if test="dbk:legalnotice[normalize-space()]">
-      <!-- several paa have to be merged to one makro -->
+      <!-- several paras have to be merged to one makro -->
       <xsl:text>&#xa;\tpCopyright{</xsl:text>
       <xsl:for-each select="dbk:legalnotice[normalize-space()]">
         <xsl:apply-templates select="node()" mode="#current"/>
         <xsl:if test="not(. is ../dbk:legalnotice[last()])"><xsl:text>\tpBreak </xsl:text></xsl:if>
       </xsl:for-each>
-      <xsl:text>}&#xa;</xsl:text>
+      <xsl:text>}</xsl:text>
     </xsl:if>
 
   </xsl:template>
