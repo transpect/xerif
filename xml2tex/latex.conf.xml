@@ -1218,7 +1218,7 @@
       </xsl:when>
       <xsl:otherwise>
         <rule name="tpAuthorNameList" type="cmd" break-before="1">
-          <param select="for $a in dbk:personname/dbk:othername return $a"/>
+          <param select="for $a in dbk:personname/dbk:othername return normalize-space($a)"/>
         </rule>
       </xsl:otherwise>
     </xsl:choose>
