@@ -1005,7 +1005,7 @@
         </param>
       </rule>
     </xsl:if>
-    <xsl:if test="dbk:author or dbk:authorgroup/dbk:author)">
+    <xsl:if test="dbk:author or dbk:authorgroup/dbk:author">
       <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
         <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
@@ -1218,7 +1218,7 @@
       </xsl:when>
       <xsl:otherwise>
         <rule name="tpAuthorNameList" type="cmd" break-before="1">
-          <param select="for $a in dbk:personname/dbk:othername return normalize-space($a)"/>
+          <param select="for $a in dbk:personname/dbk:othername return $a"/>
         </rule>
       </xsl:otherwise>
     </xsl:choose>
