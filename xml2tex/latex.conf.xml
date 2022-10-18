@@ -1211,9 +1211,9 @@
                       ((dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]) or exists(*[not(self::dbk:personname)]))">
         <!-- if author contains only name → tpAuthorNamelist. If name is structured though or if other metadata is present generate environment -->
         <rule name="tpAuthor" type="env" break-after="1" break-before="2">
-          <param select="node()">
+          <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
-          </param>
+          </text>
         </rule>
       </xsl:when>
       <xsl:otherwise>
@@ -2066,8 +2066,10 @@
                     |dbk:bibliography[not(@role = ('Citavi', 'CSL', 'CSL-formatted'))]/dbk:biblioentry">
     <rule break-after="2" type="cmd" name="bibitem">
       <option select="concat('a(', position(), ')')"/>
-      <param select="(@xreflabel, concat('bib-', index-of($bibitem-ids, generate-id())))[1]"/>  
-      <text/>
+      <param select="(@xreflabel, concat('bib-', index-of($bibitem-ids, generate-id())))[1]"/>
+      <xsl:if test="@xml:lang"><xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{')"/></xsl:if>
+      <text select="node()"/>
+      <xsl:if test="@xml:lang"><xsl:value-of select="'}'"/></xsl:if>  
     </rule>
   </template>
   
