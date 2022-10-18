@@ -208,7 +208,7 @@
         <xsl:apply-templates select="@xml:lang" mode="#current"/>
       </xsl:if>
       <xsl:attribute name="corresp" select="concat('#', ancestor::*[self::dbk:chapter| self::dbk:toc | self::dbk:part][1]/@xml:id)"/>
-      <xsl:for-each select="*, ../(dbk:author|dbk:authorgroup/dbk:author)/(dbk:personname[not(../@role = 'override')], dbk:affiliation/dbk:orgname, dbk:email, dbk:uri)">
+      <xsl:for-each select="*, ../(dbk:author|dbk:authorgroup/dbk:author)/(dbk:personname/othername[@role = 'tsmetacontributionauthorname'], dbk:affiliation/dbk:orgname, dbk:email, dbk:uri)">
         <term>
           <xsl:if test="@role">
             <xsl:message select="translate(key('natives', @role)/@native-name, '_', '-')"></xsl:message>
