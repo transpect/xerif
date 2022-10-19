@@ -160,31 +160,29 @@
           \fi}%
      \fi}{}%
 }
-\def\@tp@heading@parse@label#1,#2,\@nil#3\@nil{%
-  \@tp@heading@create@labels{#3}{#1}%
+\def\@tp@heading@parse@label#1,#2,\@nil{%
+  \@tp@heading@create@labels{#1}%
   \if!#2!\else
-    \@tp@heading@parse@label#2,\@nil#3\@nil
+    \@tp@heading@parse@label#2,\@nil
   \fi}
 \def\tp@heading@create@labels#1{%
-  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax
-    \@tp@heading@create@labels{#1}{}%
-  \else
-    \expandafter\@tp@heading@parse@label\tp@heading@attr@label,,\@nil#1\@nil
-  \fi
-}
-\def\@tp@heading@create@labels#1#2{%
   \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
     \Hy@MakeCurrentHrefAuto{tp.#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
-  \if!#2!\else
+  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax
+    \expandafter\@tp@heading@parse@label\tp@heading@attr@label,,\@nil
+  \fi
+}
+\def\@tp@heading@create@labels#1{%
+  \if!#1!\else
     \tpIfComp{Number}
       {\edef\@tempa{\expandonce{\tp@heading@Number}}%
        \let\@currentlabel\@tempa\relax
        \let\@currentlabelname\tp@heading@Title}
       {\phantomsection}%
-    \expandafter\hypertarget\expandafter{#2}{}%
-    \expandafter\tpltx@label\expandafter{#2}%
+    \expandafter\hypertarget\expandafter{#1}{}%
+    \expandafter\tpltx@label\expandafter{#1}%
   \fi
   \global\let\label\tpltx@label}
 \def\tp@make@toc{%
