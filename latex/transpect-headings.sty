@@ -114,15 +114,16 @@
   \fi
 }
 \def\tp@hdg@create@labels#1{%
-  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
-    \expandafter\@tp@hdg@parse@label\tp@heading@attr@label,,\@nil#1\@nil
-  \fi
-}
-\def\@tp@hdg@create@labels#1#2{%
   \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
     \Hy@MakeCurrentHrefAuto{tp.#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
+  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax
+  \else
+    \expandafter\@tp@hdg@parse@label\tp@heading@attr@label,,\@nil#1\@nil
+  \fi
+}
+\def\@tp@hdg@create@labels#1#2{%
   \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
     \tpIfComp{Number}
       {\edef\@tempa{\expandonce{\tp@heading@Number}}%
