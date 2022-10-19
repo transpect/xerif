@@ -170,7 +170,7 @@
     \Hy@MakeCurrentHrefAuto{tp.#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
-  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax
+  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
     \expandafter\@tp@heading@parse@label\tp@heading@attr@label,,\@nil
   \fi
 }
