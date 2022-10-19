@@ -107,10 +107,10 @@
           \fi}%
      \fi}{}%
 }
-\def\@tp@hdg@parse@label#1,#2,\@nil#3\@nil{%
-  \@tp@hdg@create@labels{#3}{#1}%
+\def\@tp@hdg@parse@label#1,#2,\@nil{%
+  \@tp@hdg@create@labels{#1}%
   \if!#2!\else
-    \@tp@hdg@parse@label#2,\@nil#3\@nil
+    \@tp@hdg@parse@label#2,\@nil
   \fi
 }
 \def\tp@hdg@create@labels#1{%
@@ -120,18 +120,18 @@
   \fi
   \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax
   \else
-    \expandafter\@tp@hdg@parse@label\tp@heading@attr@label,,\@nil#1\@nil
+    \expandafter\@tp@hdg@parse@label\tp@heading@attr@label,,\@nil
   \fi
 }
-\def\@tp@hdg@create@labels#1#2{%
+\def\@tp@hdg@create@labels#1{%
   \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
     \tpIfComp{Number}
       {\edef\@tempa{\expandonce{\tp@heading@Number}}%
        \let\@currentlabel\@tempa\relax
        \let\@currentlabelname\tp@heading@Title}
       {\phantomsection}%
-    \expandafter\hypertarget\expandafter{#2}{}%
-    \expandafter\tpltx@label\expandafter{#2}%
+    \expandafter\hypertarget\expandafter{#1}{}%
+    \expandafter\tpltx@label\expandafter{#1}%
   \fi
   \global\let\label\tpltx@label}
 \def\tp@make@toc{%
