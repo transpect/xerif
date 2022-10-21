@@ -820,7 +820,7 @@
 
       <rule name="heading" type="env" break-after="2" break-before="2">
         <xsl:if test="   .//dbk:anchor[@role eq 'start' or not(@role)][@xml:id = $link-refs]">
-          <xsl:text>[label=</xsl:text>
+          <xsl:text>[label={</xsl:text>
           <xsl:for-each select="descendant::dbk:anchor[@role eq 'start' or not(@role)][@xml:id = $link-refs]">
             <xsl:apply-templates select="." mode="#current">
               <xsl:with-param name="as-title-param" select="true()" as="xs:boolean" tunnel="yes"/>
@@ -829,7 +829,7 @@
               <xsl:text>,</xsl:text>
             </xsl:if>
           </xsl:for-each>
-          <xsl:text>]</xsl:text>
+          <xsl:text>}]</xsl:text>
         </xsl:if>
         <xsl:if test="matches(parent::*/@renderas, 'hub:(no-toc|no-pdf-bookmarks)')">
           <option select="replace(string-join(tokenize(parent::*/@renderas, '((hub:|sect\d)\s?)+' ), ''), '-', '')"/>
