@@ -496,7 +496,10 @@
        \tpUseProperty{counted-meta-sep}}{}%
   }
   \tpSetProperty{name-format}{%
-    \tpIfComp{FullName}{}{\tpSetComp{FullName}{\tpUseComp{FirstName}\space\tpUseComp{SurName}}}%
+    % tpIfComp{FullName} does not work here, as the counted components have been reserved beforehand and are not empty.
+    \if\tpUseComp{FullName}\relax
+      \tpSetComp{FullName}{\tpUseComp{FirstName}\space\tpUseComp{SurName}}%
+    \fi
     \tpUseComp{FullName}%
     \tpUseProperty{counted-name-sep}%
   }
