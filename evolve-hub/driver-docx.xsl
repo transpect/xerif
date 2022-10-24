@@ -436,7 +436,7 @@
                 <xsl:attribute name="css:display" select="'grid'"/>
                 <xsl:attribute name="css:grid-template-columns" 
                                select="concat('repeat(',
-                                              count(current-group()/dbk:mediaobject),
+                                              count(current-group()/mediaobject),
                                               ',1fr)')"/>
               </xsl:if>
               <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')]/@role" mode="figure-role-type"/>
@@ -554,7 +554,7 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:variable name="refs" select="tokenize(//dbk:link/(@linkend, @linkends), '\s')" as="xs:string*"/>
+  <xsl:variable name="refs" select="tokenize(//link/(@linkend, @linkends), '\s')" as="xs:string*"/>
   
   <xsl:template match="anchor[@role = ('start', 'end')][not(@xml:id = $refs)]" mode="hub:split-at-tab"/>
   
@@ -971,7 +971,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="dbk:variablelist[matches(@role, $variable-list-role-regex)]" mode="hub:postprocess-lists">
+  <xsl:template match="variablelist[matches(@role, $variable-list-role-regex)]" mode="hub:postprocess-lists">
     <xsl:copy>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
@@ -1249,7 +1249,7 @@
     </index>
   </xsl:template>
   
-  <xsl:template match="para[not(parent::dbk:div[@role eq 'hub:index'])][matches(@role, $index-heading-regex, 'i')]" mode="custom-2"/>
+  <xsl:template match="para[not(parent::div[@role eq 'hub:index'])][matches(@role, $index-heading-regex, 'i')]" mode="custom-2"/>
   
   <xsl:template match="indexentry//@xml:lang
                       |indexterm//@xml:lang" mode="custom-2"/>
@@ -1706,7 +1706,7 @@
     <xsl:value-of select="hub:gentle-normalize(.)"/>
   </xsl:template>
   
-  <xsl:template match="dbk:phrase[matches(@role, '^[a-z]{1,3}pi$')]" mode="custom-2">
+  <xsl:template match="phrase[matches(@role, '^[a-z]{1,3}pi$')]" mode="custom-2">
     <xsl:copy>
       <xsl:apply-templates select="@role, node()" mode="#current"/>
     </xsl:copy>
