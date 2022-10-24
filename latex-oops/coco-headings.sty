@@ -94,7 +94,7 @@
     \tp@auto@number{#1}{#2}%
     \tpUseProperty{heading-par}%
     \expandafter\ifx\csname tp@parent@#2\endcsname\relax\else
-      \edef\@@parent{before-hook-\csname\tp@parent@#2\endcsname}%
+      \edef\@@parent{before-hook-\csname tp@parent@#2\endcsname}%
       \expandafter\tpUseHook\expandafter{\@@parent}%
     \fi
     \tpUseHook{before-hook-\tp@heading@name}%
@@ -243,12 +243,15 @@
   \tp@check@empty{heading}{Subtitle}{Run}%
   \tpUseProperty{running-extra}%
   \tpIfProp{running-level}
-    {\expandafter\let\expandafter\tp@mark@name\csname\tpUseProperty{running-level}mark\endcsname}
-    {\expandafter\let\expandafter\tp@mark@name\csname\tp@heading@name mark\endcsname}%
-    \ifx\tp@mark@name\relax\ifx\tp@heading@parent\@undefined\else
-      \letcs\tp@mark@name{\tp@heading@parent mark}%
-    \fi\fi
-  \ifx\tp@mark@name\relax\else
+    {\letcs\tp@mark@name{\tpUseProperty{running-level}mark}}
+    {\letcs\tp@mark@name{\tp@heading@name mark}}%
+    \letcs\tp@heading@parent{tp@parent@\tp@heading@name}%
+    \ifx\tp@mark@name\@undefined
+      \ifx\tp@heading@parent\relax\else
+        \letcs\tp@mark@name{\tp@heading@parent mark}%
+      \fi
+    \fi
+  \ifx\tp@mark@name\@undefined\else
     \begingroup
       \tpGobble
       \protected@edef\@tempa{\csname tp@heading@running-heading\endcsname}%

@@ -77,7 +77,7 @@
     {You tried to make a Container named `#2' inherit from a Container named `#1', but a Container with that name does not exist.\MessageBreak
      Please make sure that parent Containers are declared before their descendents.}%
   \else
-    \@namedef{tp@parent@#2}{#1}%
+    \csgdef{tp@parent@#2}{#1}%
   \fi
 }
 \def\@tp@inherit#1#2#3{\@tp@parse@inherit #1,,\@nil #2,,\@nil #3\@@nil}
