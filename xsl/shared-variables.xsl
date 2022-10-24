@@ -79,7 +79,10 @@
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
   
   <xsl:variable name="figure-image-role-regex" as="xs:string"
-                select="'^[a-z]{1,3}figure([A-Z]\d)?$'" />
+                select="'^[a-z]{1,3}figure([a-z]\d?)?$'" />
+  
+  <xsl:variable name="figure-role-suffix-regex" as="xs:string"
+                select="'^.+?([a-z])?(\d+)?$'" />
   
   <xsl:variable name="fig-legend-para-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}figurelegend$'"/>

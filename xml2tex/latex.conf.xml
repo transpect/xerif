@@ -1537,7 +1537,7 @@
     <xsl:sequence select="xml2tex:generate-clear-after-p(.)"/>
   </template>
   
-  <template context="dbk:informalfigure/dbk:figure">
+  <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
     <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
       <text select="dbk:title,
                     dbk:caption,
@@ -1676,8 +1676,7 @@
     </rule>
   </template>
   
-  <template context="dbk:figure[count(dbk:mediaobject) gt 1
-                                and not(parent::dbk:informalfigure)]/dbk:mediaobject">
+  <template context="dbk:figure[@css:display eq 'grid']/dbk:mediaobject">
     <rule name="tpSubFloat" type="env" break-before="0" break-after="0">
       <xsl:next-match/>
     </rule>
