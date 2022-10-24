@@ -158,6 +158,7 @@
   \tpProvideComp{tpTocSubtitle}{}{}{TocSubtitle}%
   \tpProvideComp{tpTocNumber}{}{}{TocNumber}%
   \tpProvideComp{tpTocAuthor}{}{}{TocAuthor}%
+  \tp@def@alias{TocAuthorNameList}{TocAuthor}%
   \tp@expand@l@contents{#3}{heading}{Toc}{Title}%%
   \tp@format@number{toc-}{Toc}{#1}%
 }
@@ -189,6 +190,7 @@
   \tp@check@empty[Toc]{heading}{Title}{BM}%
   \tp@check@empty[Toc]{heading}{Number}{BM}%
   \tp@check@empty[Toc]{heading}{Author}{BM}%
+  \tp@check@empty[Toc]{heading}{AuthorNameList}{BM}%
   \tp@check@empty[Toc]{heading}{Subtitle}{BM}%
   \expandafter\ifx\csname tp@heading@attr@noBM\endcsname\@empty\else
     \tpIfProp{bookmark-level}{\edef\Hy@toclevel{\tpUseProperty{bookmark-level}}}{}%
@@ -262,10 +264,14 @@
   \tpProvideComp{tpBM#1}{}{}{BM#1}% bookmark overrides
 }
 \def\tp@provide@hd@alias#1#2{%
-  \csletcs{tp#1}{tp#2}%
-  \csletcs{tpToc#1}{tpToc#2}%
-  \csletcs{tpRun#1}{tpRun#2}%
-  \csletcs{tpBM#1}{tpBM#2}%
+  \tp@def@alias{#1}{#2}%
+  \tp@def@alias{Toc#1}{Toc#2}%
+  \tp@def@alias{Run#1}{Run#2}%
+  \tp@def@alias{BM#1}{BM#2}%
+}
+\def\tp@def@alias#1#2{%
+  \csdef{tp#1}##1{\csname tp#2\endcsname{##1}}%
+  \csdef{tp@\tp@namespace @#1}{\csname tp@\tp@namespace @#2\endcsname}%
 }
 \def\endheading{%
   \expandafter\ifx\csname tpUseHeading\tp@heading@name\endcsname\relax
