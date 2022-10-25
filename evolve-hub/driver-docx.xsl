@@ -278,16 +278,32 @@
     </bridgehead>
   </xsl:template>
   
+  <!-- separate blockquotes by role after evolve-hub merged them
+       https://redmine.le-tex.de/issues/13193 -->
+  
+  <xsl:template match="blockquote[not(   para[matches(@role, $info-blockquote-roles)]
+                                      or para[matches(@role, $info-blockquote-source-roles)])]" mode="hub:clean-hub">
+    <xsl:for-each-group select="*" group-adjacent="@role">
+      <blockquote>
+        <xsl:apply-templates select="current-group()[1]/@role, 
+                                     current-group()" mode="#current"/>
+      </blockquote>
+    </xsl:for-each-group>
+  </xsl:template>
+  
   <xsl:template match="blockquote[para[matches(@role, $info-blockquote-roles)]]" mode="hub:clean-hub">
     <epigraph role="motto">
       <xsl:apply-templates select="node()"/>
       <xsl:copy-of select="following-sibling::*[1][self::para[matches(@role, $info-blockquote-source-roles)]]"/>
     </epigraph>
   </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $info-blockquote-source-roles)] | 
-                       *[self::bibliomixed | self::para]/node()[1][self::br] | 
-                       *[self::bibliomixed | self::para]/br[every $p in preceding-sibling::node() satisfies $p[not(matches(., '\P{Zs}')) or empty(.)]]" mode="hub:clean-hub"/>
+    
+  <xsl:template match="para[matches(@role, $info-blockquote-source-roles)]
+                      |*[self::bibliomixed|self::para]/node()[1][self::br]
+                      |*[self::bibliomixed|self::para]/br[every $p in preceding-sibling::node() 
+                                                          satisfies $p[   not(matches(., '\P{Zs}')) 
+                                                                       or empty(.)]]" 
+                mode="hub:clean-hub"/>
 
   <xsl:template match="*[part]" mode="hub:clean-hub">
     <xsl:copy>
@@ -1711,7 +1727,7 @@
       <xsl:apply-templates select="@role, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
-
+  
   <xsl:function name="hub:gentle-normalize" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
     <xsl:sequence select="replace($text, '(\s)(\s)+', '$1')"/>
