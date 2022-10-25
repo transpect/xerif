@@ -444,7 +444,8 @@
                          select="not(   count(current-group()[matches(@role, $figure-caption-role-regex, 'i')]) gt 1
                                      or count(current-group()[matches(@role, $figure-source-role-regex, 'i')])  gt 1)"/>
             <xsl:variable name="is-grid-group" as="xs:boolean"
-                          select="exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])" />
+                          select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])
+                                  and count(current-group()//dbk:mediaobject) gt 1"/>
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
