@@ -78,11 +78,10 @@
   <xsl:variable name="poem-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
   
+  <!-- role for para that contains image or file reference, first 
+       regex group identifies class, second group represents position -->
   <xsl:variable name="figure-image-role-regex" as="xs:string"
-                select="'^[a-z]{1,3}figure([a-z]\d?)?$'" />
-  
-  <xsl:variable name="figure-role-suffix-regex" as="xs:string"
-                select="'^.+?([a-z])?(\d+)?$'" />
+                select="'^[a-z]{1,3}figure([a-z])?(\d+)?$'" />
   
   <xsl:variable name="fig-legend-para-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}figurelegend$'"/>
