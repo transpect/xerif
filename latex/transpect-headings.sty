@@ -138,12 +138,12 @@
   \tp@check@empty{heading}{Title}{Toc}%
   \tp@check@empty{heading}{Number}{Toc}%
   \tp@check@empty{heading}{Subtitle}{Toc}%
-  \tp@check@empty{heading}{Author}{Toc}%
+  \tp@check@empty{heading}{AuthorNameList}{Toc}%
   \expandafter\ifx\csname tp@heading@attr@notoc\endcsname\@empty\else
     \edef\tp@heading@toc@entry{%
       \tpIfComp{TocTitle}{\string\tpTocTitle{\string\ignorespaces\space\expandonce{\tp@heading@TocTitle}}}{}%
       \tpIfComp{TocNumber}{\string\tpTocNumber{\string\ignorespaces\space\expandonce{\tp@heading@TocNumber}}}{}%
-      \tpIfComp{TocAuthor}{\string\tpTocAuthor{\string\ignorespaces\space\expandonce{\tp@heading@TocAuthor}}}{}%
+      \tpIfComp{TocAuthorNameList}{\string\tpTocAuthorNameList{\string\ignorespaces\space\expandonce{\tp@heading@TocAuthorNameList}}}{}%
       \tpIfComp{TocSubtitle}{\string\tpTocSubtitle{\string\ignorespaces\space\expandonce{\tp@heading@TocSubtitle}}}{}%
     }%
     \tpIfProp{toc-level}{\edef\tp@heading@name{\tpUseProperty{toc-level}}}{}%
@@ -157,8 +157,8 @@
   \tpProvideComp{tpTocTitle}{}{}{TocTitle}%
   \tpProvideComp{tpTocSubtitle}{}{}{TocSubtitle}%
   \tpProvideComp{tpTocNumber}{}{}{TocNumber}%
-  \tpProvideComp{tpTocAuthor}{}{}{TocAuthor}%
-  \tp@def@alias{TocAuthorNameList}{TocAuthor}%
+  \tpProvideComp{tpTocAuthorNameList}{}{}{TocAuthorNameList}%
+  \tp@def@alias{TocAuthor}{TocAuthorNameList}%
   \tp@expand@l@contents{#3}{heading}{Toc}{Title}%%
   \tp@format@number{toc-}{Toc}{#1}%
 }
@@ -173,7 +173,7 @@
 \def\tp@make@run{%
   \tp@check@empty{heading}{Title}{Run}%
   \tp@check@empty{heading}{Number}{Run}%
-  \tp@check@empty{heading}{Author}{Run}%
+  \tp@check@empty{heading}{AuthorNameList}{Run}%
   \tp@check@empty{heading}{Subtitle}{Run}%
   \tpUseProperty{running-extra}%
   \tpIfProp{running-level}
@@ -189,7 +189,6 @@
 \def\tp@make@bookmarks{%
   \tp@check@empty[Toc]{heading}{Title}{BM}%
   \tp@check@empty[Toc]{heading}{Number}{BM}%
-  \tp@check@empty[Toc]{heading}{Author}{BM}%
   \tp@check@empty[Toc]{heading}{AuthorNameList}{BM}%
   \tp@check@empty[Toc]{heading}{Subtitle}{BM}%
   \expandafter\ifx\csname tp@heading@attr@noBM\endcsname\@empty\else
@@ -237,8 +236,8 @@
   \tpParseAttributes{heading}{#1}%
   \edef\tp@heading@name{#2}%
   \tp@heading@load@props%
-  \tp@provide@hd@macros{Author}%
-  \tp@provide@hd@alias{AuthorNameList}{Author}%
+  \tp@provide@hd@macros{AuthorNameList}%
+  \tp@provide@hd@alias{Author}{AuthorNameList}%
   \tp@provide@hd@macros{Title}%
   \tp@provide@hd@macros{Subtitle}%
   \tp@provide@hd@macros{Number}%
@@ -270,7 +269,7 @@
   \tp@def@alias{BM#1}{BM#2}%
 }
 \def\tp@def@alias#1#2{%
-  \csdef{tp#1}##1{\csname tp#2\endcsname{##1}}%
+  \csdef{tp#1}##1{\csdef{tp@\tp@namespace @#2}{##1}}%
   \csdef{tp@\tp@namespace @#1}{\csname tp@\tp@namespace @#2\endcsname}%
 }
 \def\endheading{%
@@ -316,7 +315,7 @@
        {\leftskip0pt}%
      {\tpUseComp{Title}}\par%
      \tpIfComp{Subtitle}{{\tpUseProperty{subtitle-format}\tpUseComp{Subtitle}}\par}{}%
-     \tpIfComp{Author}{{\tpUseProperty{author-format}\tpUseComp{Author}}\par}{}%
+     \tpIfComp{AuthorNameList}{{\tpUseProperty{author-format}\tpUseComp{AuthorNameList}}\par}{}%
      \tpIfComp{Quote}{%
        \bgroup
          \tpUseProperty{quote-format}%
@@ -350,7 +349,7 @@
   %% running header
   \tpSetProperty{running-level}{}% override level for running title, name
   \tpSetProperty{running-heading}{%
-    \tpIfComp{RunAuthor}{\tpUseComp{RunAuthor}:\space}{}%
+    \tpIfComp{RunAuthorNameList}{\tpUseComp{RunAuthorNameList}:\space}{}%
     \tpUseComp{RunTitle}%
   }%
   %% ToC
@@ -385,7 +384,7 @@
     \tpIfComp{TocNumber}
       {\tpUseProperty{toc-hang-number}}
       {\leftskip0pt\leavevmode}%
-    \tpIfComp{TocAuthor}{\tpUseComp{TocAuthor}:\space}{}%
+    \tpIfComp{TocAuthorNameList}{\tpUseComp{TocAuthorNameList}:\space}{}%
     \tpUseComp{TocTitle}%
     \tpUseProperty{toc-page-sep}\tpUseComp{TocPage}%
   }%
