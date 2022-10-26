@@ -543,8 +543,6 @@
     <xsl:param name="is-grid-group" select="false()" as="xs:boolean"/>
     <xsl:variable name="figure-type" as="xs:string" 
                   select="replace(., $figure-image-role-regex, '$1', 'i')"/>
-    <xsl:message select="'####', xs:string(.), $figure-image-role-regex"></xsl:message>
-    <xsl:message select="'----', $figure-type"></xsl:message>
     <xsl:choose>
       <xsl:when test="string-length($figure-type) gt 0">
         <xsl:attribute name="role" select="concat('figure-', lower-case($figure-type))"/>
