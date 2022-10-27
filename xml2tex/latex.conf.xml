@@ -1689,11 +1689,11 @@
   </template>
   
   <xsl:function name="xml2tex:get-image-url" as="xs:string">
-    <xsl:param name="imageobject" as="element(dbk:imageobject)"/>
+    <xsl:param name="imagedata" as="element(dbk:imagedata)"/>
     <xsl:param name="image-dir" as="xs:string"/>
     <xsl:sequence select="string-join(($image-dir,
-                                       'repo'[$imageobject/@role eq 'archive'],
-                                       $imageobject/@fileref, '^.+/(.+?)$', '$1'), 
+                                       'repo'[$imagedata/@role eq 'archive'],
+                                       $imagedata/@fileref, '^.+/(.+?)$', '$1'), 
                                       '/')"/>
   </xsl:function>
 
