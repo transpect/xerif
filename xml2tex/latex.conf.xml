@@ -1693,8 +1693,8 @@
     <xsl:param name="image-dir" as="xs:string"/>
     <xsl:sequence select="string-join(($image-dir,
                                        'repo'[$imageobject/@role eq 'archive'],
-                                       $imageobject/@fileref, '^.+/(.+?)$', '$1')), 
-                                     '/')"/>
+                                       $imageobject/@fileref, '^.+/(.+?)$', '$1'), 
+                                      '/')"/>
   </xsl:function>
 
   <template context="dbk:mediaobject[not(..[self::dbk:figure])]
