@@ -508,7 +508,7 @@
                            [not(.//mediaobject)]" mode="figures">
     <mediaobject>
       <imageobject>
-        <imagedata fileref="{normalize-space(.)}"/>
+        <imagedata role="archive" fileref="{normalize-space(.)}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>

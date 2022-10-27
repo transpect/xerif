@@ -35,7 +35,7 @@
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
   
   <xsl:variable name="image-dir" as="xs:string?" 
-                select="if($run-local eq 'yes') then () else '../../images/'"/>
+                select="if($run-local eq 'yes') then () else '../../images'"/>
   <xsl:variable name="clientname" as="xs:string*"/>
   <xsl:variable name="client-options" as="xs:string*"/>
   <xsl:variable name="secnumdepth" as="xs:string" 
@@ -1672,7 +1672,7 @@
      <!-- Bilder in Tabellen -->
     <rule name="includegraphics" type="cmd" break-before="1">
       <option/>
-      <param select="replace(@fileref, '^.+/(.+?)$', concat($image-dir, '$1'))"/>
+      <param select="xml2tex:get-image-url(., $image-dir)"/>
     </rule>
   </template>
   
@@ -1684,10 +1684,18 @@
   
   <template context="dbk:imagedata[@fileref]">
     <rule name="includegraphics" type="cmd">
-     <!--<option select="'width=\hsize'"/> https://mattermost.le-tex.de/letexml/pl/xtzwz7qu4bbjix89jhg3m185je -->
-      <param select="replace(@fileref, '^.+/(.+?)$', concat($image-dir, '$1'))"/>
+      <param select="xml2tex:get-image-url(., $image-dir)"/>
     </rule>
   </template>
+  
+  <xsl:function name="xml2tex:get-image-url" as="xs:string">
+    <xsl:param name="imageobject" as="element(dbk:imageobject)"/>
+    <xsl:param name="image-dir" as="xs:string"/>
+    <xsl:sequence select="string-join(($image-dir,
+                                       'repo'[$imageobject/@role eq 'archive'],
+                                       $imageobject/@fileref, '^.+/(.+?)$', '$1')), 
+                                     '/')"/>
+  </xsl:function>
 
   <template context="dbk:mediaobject[not(..[self::dbk:figure])]
                                     [not(ancestor::*[self::*:td | *:th | *:entry])]
