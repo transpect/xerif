@@ -35,7 +35,7 @@
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
   
   <xsl:variable name="image-dir" as="xs:string?" 
-                select="if($run-local eq 'yes') then () else '../../images'"/>
+                select="if($run-local eq 'yes') then () else '../../images/'"/>
   <xsl:variable name="clientname" as="xs:string*"/>
   <xsl:variable name="client-options" as="xs:string*"/>
   <xsl:variable name="secnumdepth" as="xs:string" 
