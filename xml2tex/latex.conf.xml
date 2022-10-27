@@ -1691,10 +1691,12 @@
   <xsl:function name="xml2tex:get-image-url" as="xs:string">
     <xsl:param name="imagedata" as="element(dbk:imagedata)"/>
     <xsl:param name="image-dir" as="xs:string"/>
-    <xsl:sequence select="string-join(($image-dir,
-                                       'print'[$imagedata/@role eq 'archive'],
-                                       replace($imagedata/@fileref, '^.+/(.+?)$', '$1')), 
-                                      '/')"/>
+    <xsl:sequence select="replace(
+                                  string-join(($image-dir,
+                                               'print'[$imagedata/@role eq 'archive'],
+                                               replace($imagedata/@fileref, '^.+/(.+?)$', '$1')), 
+                                               '/'),
+                                  '(^(file|https?)://)?((.+/)/)+', '$1$4')"/>
   </xsl:function>
 
   <template context="dbk:mediaobject[not(..[self::dbk:figure])]
