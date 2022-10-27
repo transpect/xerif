@@ -1692,7 +1692,7 @@
     <xsl:param name="imagedata" as="element(dbk:imagedata)"/>
     <xsl:param name="image-dir" as="xs:string"/>
     <xsl:sequence select="string-join(($image-dir,
-                                       'repo'[$imagedata/@role eq 'archive'],
+                                       'print'[$imagedata/@role eq 'archive'],
                                        replace($imagedata/@fileref, '^.+/(.+?)$', '$1')), 
                                       '/')"/>
   </xsl:function>
