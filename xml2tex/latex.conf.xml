@@ -1693,7 +1693,7 @@
     <xsl:param name="image-dir" as="xs:string"/>
     <xsl:sequence select="string-join(($image-dir,
                                        'repo'[$imagedata/@role eq 'archive'],
-                                       $imagedata/@fileref, '^.+/(.+?)$', '$1'), 
+                                       replace($imagedata/@fileref, '^.+/(.+?)$', '$1')), 
                                       '/')"/>
   </xsl:function>
 
