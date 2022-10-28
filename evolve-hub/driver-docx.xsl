@@ -431,7 +431,7 @@
                                ')')" />
   
   <xsl:template match="*[   para[.//mediaobject]
-                         or para[matches(@role, $figure-image-role-regex, 'i')]]" mode="hub:split-at-tab">
+                         or para[matches(@role, $figure-image-role-regex, 'i')]][normalize-space()]" mode="hub:split-at-tab">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
@@ -448,9 +448,9 @@
                           select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])
                                   and (   count(current-group()//dbk:mediaobject) gt 1
                                        or count(current-group()[matches(@role, $figure-image-role-regex)]) gt 1)"/>
-            <xsl:variable name="image-object-or-file-reference" as="element()+" 
+            <xsl:variable name="image-object-or-file-reference" as="element()*" 
                           select="if(not(current-group()//mediaobject))
-                                  then current-group()[matches(@role, $figure-image-role-regex, 'i')]
+                                  then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                                   else current-group()//mediaobject"/>
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
@@ -504,7 +504,7 @@
   
   <!-- create mediaobject from file reference text -->
   
-  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')]
+  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                            [not(.//mediaobject)]" mode="figures">
     <mediaobject>
       <imageobject>
