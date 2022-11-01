@@ -1530,11 +1530,47 @@
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
                     dbk:note,
-                    dbk:para[matches(@role, $fig-legend-para-style-regex)],
-                    dbk:mediaobject,
-                    dbk:figure"/>
+                    dbk:para[matches(@role, $fig-legend-para-style-regex)]"/>
+      <xsl:call-template name="handle-mediaobjects"/>
+      <text select="dbk:figure"/>
+      
     </rule>
     <xsl:sequence select="xml2tex:generate-clear-after-p(.)"/>
+  </template>
+  
+  <xsl:template name="handle-mediaobjects">
+    <xsl:choose>
+      <xsl:when test="@css:display eq 'grid'">
+        <xsl:for-each select="dbk:mediaobject">
+          <xsl:text>&#xa;\begin{tpSubFloat}</xsl:text>
+            <xsl:apply-templates select="." mode="xml2tex"/>
+          <xsl:text>&#xa;\end{tpSubFloat}</xsl:text>
+        </xsl:for-each>
+      </xsl:when>
+      <xsl:when test="exists(dbk:mediaobject)">
+        <!-- several images in one figure without subfloats must be handled as several \includegraphics-->
+         <xsl:text>&#xa;\tpFig{</xsl:text>
+         <xsl:apply-templates select="dbk:mediaobject" mode="xml2tex">
+           <xsl:with-param name="not-create-tpFig" select="true()" as="xs:boolean" tunnel="yes"/>
+         </xsl:apply-templates>
+        <xsl:text>}</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  
+  <template context="dbk:mediaobject">
+    <xsl:param name="not-create-tpFig" as="xs:boolean?" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="$not-create-tpFig">
+        <!-- (several) images in one \tpFig without floats -->
+        <xsl:apply-templates select="node()" mode="xml2tex"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <rule name="tpFig" type="cmd" break-before="1" break-after="0">
+          <param select="node()"/>
+        </rule>
+      </xsl:otherwise>
+    </xsl:choose>
   </template>
   
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
@@ -1628,7 +1664,7 @@
                      *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][1] (:htmltable:)">
     <rule name="tpLegend" break-before="1" break-after="0" type="cmd" >
       <param select="if (self::dbk:para) then (node(), following-sibling::dbk:para[@role[matches(., $tab-legend-para-style-regex)]]) else dbk:para">
-        <with-param name="already-merged" as="xs:boolean" select="true()" tunnel="yes"></with-param>
+        <with-param name="already-merged" as="xs:boolean" select="true()" tunnel="yes"/>
       </param>
     </rule>
   </template>
@@ -1657,11 +1693,11 @@
     </rule>
   </template>-->
 
-  <template context="dbk:mediaobject/dbk:imageobject[dbk:imagedata[@fileref]]">
+<!--  <template context="dbk:mediaobject/dbk:imageobject[dbk:imagedata[@fileref]]">
     <rule name="tpFig" type="cmd" break-before="1" break-after="0">
       <param select="dbk:imagedata"/>
     </rule>
-  </template>
+  </template>-->
   
   <template context="*[self::*:td | *:th | *:entry]//dbk:mediaobject/dbk:imageobject[dbk:imagedata[@fileref]]" priority="500">
     <!-- Bilder in Tabellen -->
@@ -1676,16 +1712,24 @@
     </rule>
   </template>
   
-  <template context="dbk:figure[@css:display eq 'grid']/dbk:mediaobject">
+<!--  <template context="dbk:figure[@css:display eq 'grid']/dbk:mediaobject">
     <rule name="tpSubFloat" type="env" break-before="0" break-after="0">
       <xsl:next-match/>
     </rule>
-  </template>
+  </template>-->
   
   <template context="dbk:imagedata[@fileref]">
     <rule name="includegraphics" type="cmd">
+      <xsl:if test="xml2tex:image-option(.)[normalize-space()]">
+        <option select="xml2tex:image-option(.)"/>
+      </xsl:if>
       <param select="xml2tex:get-image-url(., $image-dir)"/>
     </rule>
+    <xsl:if test="../..[self::dbk:mediaobject]
+                       [following-sibling::dbk:mediaobject]
+                       [..[not(@css:display eq 'grid')]]">
+      <xsl:text>&#xa;</xsl:text>
+    </xsl:if>
   </template>
   
   <xsl:function name="xml2tex:get-image-url" as="xs:string">
@@ -1699,6 +1743,12 @@
                                   '(^(file|https?)://)?((.+/)/)+', '$1$4')"/>
   </xsl:function>
 
+  <xsl:function name="xml2tex:image-option" as="xs:string?">
+    <xsl:param name="image" as="element(dbk:imagedata)"/>
+    <xsl:sequence select="()"/>
+    <!-- overwrite this in your customer specific styles. E.g. for adjusting the width.-->
+  </xsl:function>
+  
   <template context="dbk:mediaobject[not(..[self::dbk:figure])]
                                     [not(ancestor::*[self::*:td | *:th | *:entry])]
                                     [dbk:imageobject/dbk:imagedata[@fileref]]">
