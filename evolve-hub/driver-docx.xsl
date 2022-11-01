@@ -1603,18 +1603,18 @@
   <xsl:template match="info[not(author) and biblioset[person]]/node()[1]" mode="custom-2" priority="15">
     <!-- only author metadata in biblioset will not be overridden -->
     <xsl:choose>
-      <xsl:when test="count(biblioset/person) gt 1">
+      <xsl:when test="count(../biblioset/person) gt 1">
         <xsl:element name="authorgroup" exclude-result-prefixes="#all">
-          <xsl:for-each select="biblioset/person">
+          <xsl:for-each select="../biblioset/person">
             <xsl:element name="author" exclude-result-prefixes="#all">
-              <xsl:copy-of select="biblioset/person/node()"/>
+              <xsl:copy-of select="node()" copy-namespaces="no"/>
             </xsl:element>
           </xsl:for-each>
         </xsl:element>
       </xsl:when>
       <xsl:otherwise>
         <xsl:element name="author" exclude-result-prefixes="#all">
-          <xsl:copy-of select="biblioset/person/node()"/>
+          <xsl:copy-of select="../biblioset/person/node()" copy-namespaces="no"/>
         </xsl:element>
       </xsl:otherwise>
     </xsl:choose>
