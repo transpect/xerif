@@ -452,10 +452,16 @@
                           select="if(not(current-group()//mediaobject))
                                   then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                                   else current-group()//mediaobject"/>
+            <xsl:message select="'----------------------------&#xa;',
+              'is-grid:', $is-grid-group, '&#xa;',
+              'count:', count(current-group()[matches(@role, $figure-caption-role-regex, 'i')]), '&#xa;',
+              'one-caption-for-multiple-images:', $one-caption-for-multiple-images, '&#xa;',
+              current-group()/@role"></xsl:message>
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
               <xsl:if test="$is-grid-group">
+                <xsl:message select="'##################'"></xsl:message>
                 <xsl:attribute name="css:display" select="'grid'"/>
                 <xsl:attribute name="css:grid-template-columns" 
                                select="concat('repeat(',
@@ -467,12 +473,10 @@
                             satisfies $p[node()[1][descendant-or-self::tab]]">
                 <xsl:attribute name="remap" select="'list'"/>
               </xsl:if>
-              <xsl:if test="$one-caption-for-multiple-images">
-                <xsl:apply-templates select="current-group()[matches(@role, $figure-caption-role-regex, 'i')]" mode="figures"/>
-              </xsl:if>
               <xsl:choose>
                 <xsl:when test="$one-caption-for-multiple-images">
-                  <xsl:apply-templates select="$image-object-or-file-reference" mode="figures">
+                  <xsl:apply-templates select="current-group()[matches(@role, $figure-caption-role-regex, 'i')],
+                                               $image-object-or-file-reference" mode="figures">
                     <xsl:with-param name="one-caption-for-multiple-images" as="xs:boolean" select="$one-caption-for-multiple-images"/>
                   </xsl:apply-templates>
                 </xsl:when>
@@ -483,8 +487,9 @@
                         <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')][1]/@role" mode="figure-role-type">
                           <xsl:with-param name="is-grid-group" select="$is-grid-group" as="xs:boolean"/>
                         </xsl:apply-templates>
-                        <xsl:apply-templates select="$image-object-or-file-reference" mode="figures">
-                        </xsl:apply-templates>
+                        <xsl:apply-templates select="(current-group()[matches(@role, $figure-caption-role-regex, 'i')],
+                                                      current-group()[matches(@role, $figure-image-role-regex, 'i')],
+                                                      current-group()[matches(@role, $figure-source-role-regex, 'i')])" mode="figures"/>
                       </figure>
                     </xsl:for-each-group>
                 </xsl:otherwise>
@@ -511,6 +516,10 @@
         <imagedata role="archive" fileref="{normalize-space(.)}"/>
       </imageobject>
     </mediaobject>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')][.//mediaobject]" mode="figures">
+    <xsl:apply-templates select=".//mediaobject" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $figure-caption-role-regex, 'i')]" mode="figures">
