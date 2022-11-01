@@ -1753,7 +1753,7 @@
                                     [not(ancestor::*[self::*:td | *:th | *:entry])]
                                     [dbk:imageobject/dbk:imagedata[@fileref]]">
     <rule name="tpFigure" type="env" break-after="1" break-before="1">
-      <xsl:apply-templates mode="#current"/>
+      <xsl:next-match/>
       <!-- doesn't -->
     </rule>
   </template>
