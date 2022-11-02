@@ -444,8 +444,11 @@
         <xsl:text>\setcounter{page}{5}&#xa;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-     <xsl:apply-templates select="/dbk:*/dbk:colophon[@role = 'dedication']
-                                 |/dbk:*/dbk:dedication" mode="#current">
+    <xsl:if test="matches(/dbk:*/dbk:preface/dbk:info/dbk:title/@role, $frontmatter-heading-role-regex)">
+      <xsl:text>\frontmatter&#xa;</xsl:text>
+    </xsl:if>
+    <xsl:apply-templates select="/dbk:*/dbk:colophon[@role = 'dedication']
+                                |/dbk:*/dbk:dedication" mode="#current">
       <xsl:with-param name="keep" select="true()" tunnel="yes"/>
     </xsl:apply-templates>
     <xsl:text>\tableofcontents&#xa;</xsl:text>
@@ -610,9 +613,9 @@
   
   <xsl:variable name="new-common" as="xs:boolean" select="true()">
   <!-- overriden by transcript to allow other behaviour and not inherit some templates via next-match  -->
-  </xsl:variable>  
+  </xsl:variable>
 
-  <template context="/dbk:hub/*[self::dbk:part | self::dbk:chapter | self::dbk:section][1]">
+  <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][1]">
     <xsl:if test="$new-common"><xsl:text>&#xa;\mainmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
@@ -631,7 +634,7 @@
 
   <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
                                |self::dbk:appendix
-                               |dbk:preface]
+                               |self::dbk:preface]
                     |/dbk:hub/*[self::dbk:part
                                |self::dbk:chapter[@renderas='subhead']]/*[self::dbk:chapter
                                                                          |self::dbk:appendix
@@ -642,6 +645,7 @@
       <xsl:with-param name="context" as="element(*)" select="."/>
     </xsl:call-template>
   </template>
+  
   <!--  *
         * this stuff comes before \end{document}
         * -->
@@ -810,6 +814,7 @@
   -->  
   
   <template context="dbk:part/dbk:info
+                    |dbk:preface/dbk:info
                     |dbk:chapter/dbk:info 
                     |dbk:section/dbk:info
                     |dbk:bibliography/dbk:info
@@ -1066,7 +1071,7 @@
                       ($heading/local-name() = 'bibliography' and $heading/parent::dbk:*[local-name() = ('hub', 'book')][dbk:part])">
         <xsl:sequence select="'part'"/>
       </xsl:when>
-      <xsl:when test="$heading/local-name() = ('chapter', 'index') 
+      <xsl:when test="$heading/local-name() = ('chapter', 'index', 'preface', 'appendix') 
                       or 
                       ($heading/local-name() = 'section' and $heading[@renderas = 'chapter'])
                       or

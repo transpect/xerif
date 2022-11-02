@@ -109,7 +109,10 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="chapter | part" mode="custom-1">
+  <xsl:template match="chapter
+                      |part
+                      |preface
+                      |appendix" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
     <xsl:variable name="chapter-info" as="element()*" 
                   select="((author, 
@@ -1674,6 +1677,22 @@
     <toc xml:id="toc">
       <xsl:apply-templates select="@*, title, sidebar[@role = 'chunk-metadata']" mode="#current"/>
     </toc>
+  </xsl:template>
+  
+  <!-- special sections to wrap frontmatter and backmatter sections -->
+
+  <xsl:template match="hub/*[matches(@role, $frontmatter-heading-role-regex)]"
+                mode="hub:postprocess-hierarchy">
+    <preface role="frontmatter">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </preface>
+  </xsl:template>
+  
+  <xsl:template match="hub/*[matches(@role, $backmatter-heading-role-regex)]" 
+                mode="hub:postprocess-hierarchy">
+    <appendix role="backmatter">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </appendix>
   </xsl:template>
 
   <!-- optional mode preprocesses whitespaces. based on mode docx2tex-preprocess in docx2tex/xsl/docx2tex-preprocess.xsl -->
