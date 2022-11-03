@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.1}%
-\def\filedate{2021-08-20}%
+\def\fileversion{0.2.2}%
+\def\filedate{2021-11-03}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-kernel}
     [\filedate \fileversion cocotex kernel]
@@ -227,7 +227,6 @@
       \egroup
     }%
   \endgroup
-  \message{^^J==> applied #1 with #2: \meaning\tp@iterate@res}%\STOPP
 }
 \def\tp@comp@def[#1]#2#3#4{%
   \tp@apply@collection{#3}{#4}%
