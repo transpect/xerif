@@ -884,7 +884,10 @@
   
   <template context="dbk:indexterm" priority="500">
     <xsl:param name="remove-indexterm" as="xs:boolean?" tunnel="yes"/>
-    <xsl:if test="not($remove-indexterm)">
+    <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="not($remove-indexterm) and not($toc-override) and not($bm-override) and not($run-override)">
       <xsl:next-match/>
     </xsl:if>
   </template>
@@ -989,39 +992,31 @@
   <template name="customer-toctitles">
     <rule name="tpTocTitle" type="cmd" break-after="0" break-before="1">
       <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
-        <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
         <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+        <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
       </param>
     </rule>
     <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
       <rule name="tpTocNumber" type="cmd" break-after="0" break-before="1">
         <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/text()">
-          <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
     <xsl:if test="dbk:subtitle">
       <rule name="tpTocSubtitle" type="cmd" break-after="0" break-before="1">
         <param select="dbk:subtitle/node()">
-          <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
     <xsl:if test="dbk:author or dbk:authorgroup/dbk:author">
       <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
         <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
-          <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1120,8 +1115,11 @@
   
   <template context="dbk:br">
     <xsl:param name="remove-newline" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
-      <xsl:when test="$remove-newline eq true()">
+      <xsl:when test="$remove-newline eq true() or $toc-override eq true() or $bm-override eq true() or $run-override eq true()">
        <xsl:if test="preceding-sibling::node()[1][not(matches(., '\p{Zs}$'))]
                      and 
                      following-sibling::node()[1][not(matches(., '^\p{Zs}'))]">
@@ -1129,19 +1127,34 @@
        </xsl:if>
       </xsl:when>
        <xsl:when test="not($remove-newline eq true()) 
+                       and not($toc-override eq true())
+                       and not($bm-override eq true())
+                       and not($run-override eq true())
                        and (   ancestor::*[self::dbk:epigraph|self::dbk:blockquote][..[self::dbk:info]] 
                             or ancestor::*[self::dbk:colophon[@role = ('motto', 'dedication')]]
                             or ancestor::dbk:keyword)">
        <xsl:text>\\&#xa;</xsl:text>
        </xsl:when>
-       <xsl:when test="not($remove-newline eq true()) and ancestor::*[local-name() = ('info', 'title')]
+       <xsl:when test="not($remove-newline eq true()) 
+                       and not($toc-override eq true())
+                       and not($bm-override eq true())
+                       and not($run-override eq true()) 
+                       and ancestor::*[local-name() = ('info', 'title')]
                                                                      [parent::dbk:part | parent::dbk:chapter | parent::dbk:section]">
          <xsl:text>\tpBreak&#xa;</xsl:text>
        </xsl:when>
-      <xsl:when test="not($remove-newline eq true()) and ancestor::*[self::dbk:title][parent::dbk:figure]">
+      <xsl:when test="not($remove-newline eq true()) 
+                       and not($toc-override eq true())
+                       and not($bm-override eq true())
+                       and not($run-override eq true()) 
+                       and ancestor::*[self::dbk:title][parent::dbk:figure]">
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
-      <xsl:when test="not($remove-newline eq true()) and ancestor::*:tr">
+      <xsl:when test="not($remove-newline eq true()) 
+                          and not($toc-override eq true())
+                          and not($bm-override eq true())
+                          and not($run-override eq true())
+                          and ancestor::*:tr">
         <!-- in HTML tables-->
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
@@ -1162,7 +1175,10 @@
                     |dbk:subtitle//dbk:footnote
                     |dbk:author//dbk:footnote">
     <xsl:param name="remove-footnote" as="xs:boolean?" tunnel="yes"/>
-    <xsl:if test="not($remove-footnote)">
+    <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="not($remove-footnote) and not($toc-override) and not($bm-override) and not($run-override)">
       <rule name="protect\footnote" type="cmd">
         <param/>
       </rule>
@@ -1739,7 +1755,7 @@
   
   <xsl:function name="xml2tex:get-image-url" as="xs:string">
     <xsl:param name="imagedata" as="element(dbk:imagedata)"/>
-    <xsl:param name="image-dir" as="xs:string"/>
+    <xsl:param name="image-dir" as="xs:string?"/>
     <xsl:sequence select="replace(
                                   string-join(($image-dir,
                                                'print'[$imagedata/@role eq 'archive'],
@@ -2596,6 +2612,37 @@
     <rule name="tpBreak" type="cmd" break-after="1"/>
   </template>
   
+  <xsl:template match="dbk:title//text()[matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+')]" mode="xml2tex" priority="100000">
+    <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="$toc-override eq true() or $bm-override eq true() or $run-override eq true()">
+        <xsl:analyze-string select="." regex="([&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+)">
+          <xsl:matching-substring>
+            
+            <xsl:value-of select="replace(
+                                     replace(
+                                      translate(regex-group(2), '&#xa0;', '~'),
+                                      '\\(&amp;)',
+                                      '\\string$1'
+                                      ),
+                                      '\p{Zs}+',
+                                      '&#x20;'
+                                      )"/>
+          </xsl:matching-substring>
+          <xsl:non-matching-substring>
+            <xsl:value-of select="."/>
+          </xsl:non-matching-substring>
+        </xsl:analyze-string>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:next-match/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
+  </xsl:template>
+
   <charmap ignore-imported-charmaps="true">
     <!--SOFT HYPHEN -->
     <char character="&#xad;" string="\-"/>
