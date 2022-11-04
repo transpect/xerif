@@ -2611,7 +2611,7 @@
     <rule name="tpBreak" type="cmd" break-after="1"/>
   </template>
   
-  <xsl:template match="dbk:title//text()[matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+')]" mode="xml2tex" priority="100000">
+  <xsl:template match="*[self::dbk:title|self::dbk:subtitle]//text()[matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+')]" mode="xml2tex" priority="100000">
     <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
