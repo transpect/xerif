@@ -1119,7 +1119,7 @@
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
-      <xsl:when test="$remove-newline eq true() or $toc-override eq true() or $bm-override eq true() or $run-override eq true()">
+      <xsl:when test="$remove-newline eq true() or $bm-override eq true() or $run-override eq true()">
        <xsl:if test="preceding-sibling::node()[1][not(matches(., '\p{Zs}$'))]
                      and 
                      following-sibling::node()[1][not(matches(., '^\p{Zs}'))]">
@@ -2615,6 +2615,8 @@
     <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
+    <!-- in \tpTocTitle etc. some characters cannot be displayed properly and therefore have to be escaped. 
+          Example: A no-break Space has to be mapped to a tilde (https://redmine.le-tex.de/issues/13715) otherwise no space is displayed-->
     <xsl:choose>
       <xsl:when test="$toc-override eq true() or $bm-override eq true() or $run-override eq true()">
         <xsl:analyze-string select="." regex="([&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+)">
