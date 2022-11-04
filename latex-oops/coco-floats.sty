@@ -238,7 +238,7 @@
     \newenvironment{#2}[1][]{\tp@float[##1]{#3}{#4}{#2}}{\endtp@float}%
     \newenvironment{#2*}[1][]{\let\tp@do@dblfloat\relax\tp@float[##1]{#3}{#4}{#2}}{\let\tp@do@dblfloat\relax\endtp@float}%
   \else
-    \PackageWarning{coco-floats.sty}{#2 environment already exists. Re-Declaring.}%
+    \PackageInfo{coco-floats.sty}{#2 environment already exists. Re-Declaring.}%
     \renewenvironment{#2}[1][]{\tp@float[##1]{#3}{#4}{#2}}{\endtp@float}%
     \renewenvironment{#2*}[1][]{\let\tp@do@dblfloat\relax\tp@float[##1]{#3}{#4}{#2}}{\let\tp@do@dblfloat\relax\endtp@float}%
   \fi
