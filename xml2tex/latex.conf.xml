@@ -1136,7 +1136,6 @@
        <xsl:text>\\&#xa;</xsl:text>
        </xsl:when>
        <xsl:when test="not($remove-newline eq true()) 
-                       and not($toc-override eq true())
                        and not($bm-override eq true())
                        and not($run-override eq true()) 
                        and ancestor::*[local-name() = ('info', 'title')]
@@ -2623,7 +2622,7 @@
             
             <xsl:value-of select="replace(
                                      replace(
-                                      translate(regex-group(2), '&#xa0;', '~'),
+                                      translate(regex-group(1), '&#xa0;', '~'),
                                       '\\(&amp;)',
                                       '\\string$1'
                                       ),
