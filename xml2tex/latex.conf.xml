@@ -1276,7 +1276,7 @@
   </xsl:template>
 
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:surname">
-    <rule name="tpSurName" type="cmd" break-before="1">
+    <rule name="{if ($cocotex) then 'tpLastName' else 'tpSurName'}" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
