@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.2}%
-\def\filedate{2021-11-03}%
+\def\fileversion{0.2.3}%
+\def\filedate{2021-11-07}%
 %%
 %% module for CoCoTeX for maketitle.
 %%
@@ -103,6 +103,7 @@
     \tpGobble
     \renewcommand\foreignlanguage[2]{{##2}}%
     \ifnum\tpAuthorCnt>\z@
+      \@setpar{\@@par}%
       \tpCompGDef\tpRunBookName{tpAuthor}{author-list-format}%
     \else
       \ifnum\tpEditorCnt>\z@
@@ -167,7 +168,7 @@
   \tp@create@editor@string{#1}}
 \def\tp@create@editor@string#1{%
   \expandafter\ifx\csname tp@\tp@cur@cont @#1NameList\endcsname\relax\else
-    \csgappto{tp@\tp@cur@cont @#1NameList}{\tpUseProperty{editor-suffix}}%
+    \csgappto{tp@\tp@cur@cont @#1NameList}{{\letcs\tpTotalCount{tp#1Cnt}\tpUseProperty{editor-suffix}}}%
   \fi
 }%
 \def\tp@title@macro{\@ifnextchar[\@tp@title@macro{\@tp@title@macro[]}}%]

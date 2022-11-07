@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.2}%
-\def\filedate{2021-11-03}%
+\def\fileversion{0.2.3}%
+\def\filedate{2021-11-07}%
 %%
 %% module for CoCoTeX that extends heading objects.
 %%
@@ -42,8 +42,8 @@
     \tp@provide@hd@macros{Title}%
     \tp@provide@hd@macros{Subtitle}%
     \tp@provide@hd@macros{Number}%
-    \tp@provide@hd@macros{LicenceLogo}
-    \tp@provide@hd@macros{LicenceName}
+    \tp@provide@hd@macros{LicenceLogo}%
+    \tp@provide@hd@macros{LicenceName}%
     \tpIfProp{extended}{%
       \tp@extended@ht@macros
     }{}%
@@ -87,6 +87,7 @@
   \csgdef{tpUseHeading#2}{%
     \tpNamespace{heading}%
     \@setpar{\@@par}%
+    \def\tpHeadingLevel{#1}%
     \tpEvalType[#2]{Properties}%
     \tp@meta@role@eval{Author}%
     \tpComposeCollection{tpAuthor}{author-contact-block-format}{AuthorContactBlock}%

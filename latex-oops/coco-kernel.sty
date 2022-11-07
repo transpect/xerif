@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.2}%
-\def\filedate{2021-11-03}%
+\def\fileversion{0.2.3}%
+\def\filedate{2021-11-07}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-kernel}
     [\filedate \fileversion cocotex kernel]
@@ -288,7 +288,6 @@
 \def\tpUsePropEnv#1{\cslet{tp@#1@active}{\relax}\csuse{tp@\tp@cur@cont @#1}\csundef{tp@#1@active}}
 \DeclareRobustCommand\tpPI[2]{\ifcsdef{tp@#1@active}{#2}{}}
 \def\tpCascadeProps#1#2{%
-  \message{^^J=> Cascading tp@#2@#1@properties: \csmeaning{tp@#2@#1@properties}}%
   \csname tp@#2@default\endcsname
   \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
     \expandafter\tp@inherit@props\expandafter{\csname tp@#2@#1@parent\endcsname}{#2}%
@@ -296,12 +295,10 @@
   \csname tp@#2@#1@properties\endcsname
 }
 \def\tp@inherit@props#1#2{%
-  \message{^^J===> Loading tp@#2@#1@parent: \csmeaning{tp@#2@#1@parent}}%
   \expandafter\ifx\csname tp@#2@#1@parent\endcsname\relax\else
     \edef\@tempa{\csname tp@#2@#1@parent\endcsname}%
     \expandafter\tp@inherit@props\expandafter{\@tempa}{#2}%
   \fi
-  \message{^^J===> Loading tp@#2@#1@properties: \csmeaning{tp@#2@#1@properties}}%
   \csname tp@#2@#1@properties\endcsname
 }
 \long\def\tpIfProp#1#2#3{\long\def\@tempa{}%
