@@ -1905,13 +1905,14 @@
   <xsl:variable name="motto-linebreak-content" as="xs:string" select="'\tpBreak '"/>
   <xsl:variable name="mottosource-linebreak-content" as="xs:string" select="'\tpBreak '"/>
   
-  <template context="dbk:para[following-sibling::*[1][self::dbk:blockquote]]
+<!--  <template context="dbk:para[following-sibling::*[1][self::dbk:blockquote]]
                     |dbk:blockquote/dbk:para[last()]
                     |dbk:caption/dbk:para[last()]">
+    <!-\- this prevents processing on para’s attributes. testing results if commented out. -\->
     <rule break-after="0">
       <text/>
     </rule>
-  </template>
+  </template>-->
 
   <!--  *
         * verse
@@ -2593,7 +2594,11 @@
   </xsl:template>
   
 
-  <template context="dbk:para[preceding-sibling::node()[1][self::processing-instruction()[name() = $name-for-Tex-PI][contains(., 'newpage')]]]" priority="400">
+  <template context="dbk:para[preceding-sibling::node()[1]
+                                                       [self::processing-instruction()[name() = $name-for-Tex-PI]
+                                                                                      [contains(., 'newpage')]
+                                                       ]
+                              ]" priority="400">
     <xsl:text> </xsl:text>
     <xsl:next-match/>
   </template>
