@@ -444,7 +444,9 @@
         <xsl:text>\setcounter{page}{5}&#xa;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="matches(/dbk:*/dbk:preface/dbk:info/dbk:title/@role, $frontmatter-heading-role-regex)">
+    <xsl:if test="    exists(/dbk:*/dbk:preface)
+		  and (some $front in /dbk:*/dbk:preface
+		       satisfies matches($front/dbk:info/dbk:title/@role, $frontmatter-heading-role-regex))">
       <xsl:text>\frontmatter&#xa;</xsl:text>
     </xsl:if>
     <xsl:apply-templates select="/dbk:*/dbk:colophon[@role = 'dedication']
