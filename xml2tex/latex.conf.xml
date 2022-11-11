@@ -638,10 +638,11 @@
                                |self::dbk:appendix
                                |self::dbk:preface]
                     |/dbk:hub/*[self::dbk:part
-                               |self::dbk:chapter[@renderas='subhead']]/*[self::dbk:chapter
-                                                                         |self::dbk:appendix
-                                                                         |dbk:preface
-                                                                         |self::dbk:section]" priority="300">
+                               |self::dbk:chapter[@renderas='subhead']
+                               |self::dbk:appendix]/*[ self::dbk:chapter
+                                                      |self::dbk:appendix
+                                                      |dbk:preface
+                                                      |self::dbk:section]" priority="300">
     <xsl:next-match/>
     <xsl:call-template name="create-printnotes">
       <xsl:with-param name="context" as="element(*)" select="."/>
