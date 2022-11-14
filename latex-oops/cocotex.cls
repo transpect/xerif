@@ -56,7 +56,7 @@
   \or% journal
     \global\journaltrue
   \else% monograph
-    \global\monographytrue
+    \global\monographtrue
   \fi
 }
 \DeclareOptionX*{\PassOptionsToClass{\CurrentOption}{article}}
