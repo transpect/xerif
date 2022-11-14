@@ -183,7 +183,7 @@
   <xsl:variable name="preamble" as="xs:string*">
     <xsl:value-of select="concat('\documentclass[',
                                  string-join(($babel-langs[position() ne 1],
-                                 replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst')), (: 1st lang is main lang and comes last :)
+                                 replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst,es-noshorthands')), (: 1st lang is main lang and comes last :)
                                  ','),
                                  $pubtype-value, 
                                  xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
@@ -1279,7 +1279,7 @@
   </xsl:template>
 
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:surname">
-    <rule name="tpSurName" type="cmd" break-before="1">
+    <rule name="tpLastName" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
