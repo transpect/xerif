@@ -37,6 +37,8 @@
 \PassOptionsToPackage{cmyk}{xcolor}
 \RequirePackage{coco-common}
 \DeclareOptionX{main}{\PassOptionsToPackage{\CurrentOption}{babel}}
+\DeclareOption{es-noindentfirst}{\PassOptionsToPackage{es-noindentfirst}{babel}}
+\DeclareOption{es-noshorthands}{\PassOptionsToPackage{es-noshorthands}{babel}}
 \PassOptionsToPackage{shorthands=off}{babel}
 \DeclareOptionX{ennotoc}{\PassOptionsToPackage{\CurrentOption}{coco-notes}}
 \DeclareOptionX{endnotes}{\PassOptionsToPackage{\CurrentOption}{coco-notes}}
