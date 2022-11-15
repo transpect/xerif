@@ -232,7 +232,11 @@
     \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@cur@cont-#1\string\endcsname{#2}}
     \expandafter\xdef\csname tp-\tp@cur@cont-#1\endcsname{#2}%
   \else
-    \expandafter\ifdim\csname tp-\tp@cur@cont-#1\endcsname<#2\relax
+    \expandafter\ifdim\csname tp-\tp@cur@cont-#1\endcsname>#2\relax
+    \else
+      % Store the value in case of <= #2. In case of < instead of <=,
+      % used values might alternate between TeX runs due to not
+      % having been stored in the run before.
       \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@cur@cont-#1\string\endcsname{#2}}%
       \expandafter\xdef\csname tp-\tp@cur@cont-#1\endcsname{#2}%
     \fi
