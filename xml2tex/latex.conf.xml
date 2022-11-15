@@ -173,10 +173,10 @@
   <!-- pub type metadata -->
   <xsl:variable name="is-collection" as="xs:boolean" 
                 select="exists(//dbk:chapter/dbk:info/dbk:author)"/>
-  <xsl:variable name="is-journal" as="xs:boolean"  select="false()"><!-- set to yes in your a9s if needed--></xsl:variable>
-  <xsl:variable name="layout-value" as="xs:string"  select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
+  <xsl:variable name="is-journal"    as="xs:boolean" select="false()"/><!-- set to true() in your a9s if needed-->
+  <xsl:variable name="layout-value"  as="xs:string?" select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
   <xsl:variable name="pubtype-value" as="xs:string?" select="if ($pubtype = ('article','collection', 'mono')) then concat(',pubtype=', $pubtype) else ()"/>
-  <xsl:variable name="format-value" as="xs:string?"  select="if ($format) then concat('format=', $format)  else ()"/>  
+  <xsl:variable name="format-value"  as="xs:string?" select="if ($format) then concat('format=', $format)  else ()"/>  
   
   <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Dokumentaufbau-->
   
