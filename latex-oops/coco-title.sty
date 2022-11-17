@@ -94,8 +94,6 @@
   \let\tpBreak\space
   \expandafter\title\expandafter{\tpUseComp{Title}}%
   \tp@write@pdf@meta{pdftitle}{\tpUseComp{Title}}%
-  \edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
-  \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
 \def\tp@title@process@bka{%
   \@tempswatrue
@@ -123,6 +121,10 @@
 \def\tp@title@process@bkc{%
   \tp@write@pdf@meta{pdfcreator}{\tpIfComp{PDFCreator}{\tpUseComp{PDFCreator}}{\tpUseComp{Publisher}\tpIfComp{PubPlace}{, \tpUseComp{PubPlace}}{}}}%
   \tp@write@pdf@meta{pdfproducer}{\tpUseComp{PDFProducer}}%
+}
+\AtBeginDocument{%
+  \edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
+  \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
 \def\tp@maketitle{%
   %\csname tp@titlepage\endcsname
