@@ -70,14 +70,12 @@
   \edef\tpRunBookName{\tpUseProperty{run-book-name}}%
   \expandafter\author\expandafter{\tpRunBookName}%
   \tp@write@pdf@meta{pdfauthor}{\tpRunBookName}%
+  \protected@edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
+  \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
 \def\tp@title@process@bkc{%
   \tp@write@pdf@meta{pdfcreator}{\tpIfComp{PDFCreator}{\tpUseComp{PDFCreator}}{\tpUseComp{Publisher}\tpIfComp{PubPlace}{, \tpUseComp{PubPlace}}{}}}%
   \tp@write@pdf@meta{pdfproducer}{\tpUseComp{PDFProducer}}%
-}
-\AtBeginDocument{%
-  \edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
-  \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
 \def\tp@maketitle{%
   \csname tp@titlepage\endcsname
