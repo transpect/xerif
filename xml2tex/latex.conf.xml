@@ -617,11 +617,18 @@
   <!-- overriden by transcript to allow other behaviour and not inherit some templates via next-match  -->
   </xsl:variable>
 
+  <xsl:template match="/" priority="1000" mode="xml2tex">
+    <xsl:next-match>
+      <xsl:with-param name="remove-indexterm" select="if (exists(//dbk:index)) then false() else true()" as="xs:boolean" tunnel="yes"/>
+    </xsl:next-match>
+    <!-- delete index terms to avoid TeX errors if no index is created but indexterms are contained in document.-->
+  </xsl:template>
+
   <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][1]">
     <xsl:if test="$new-common"><xsl:text>&#xa;\mainmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
-  
+    
   <template context="*[not(self::dbk:book | self::dbk:hub | self::dbk:figure)][dbk:info][@xml:lang][@xml:lang ne /*/@xml:lang][not(../@xml:lang = current()/@xml:lang)]" priority="800">
     <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
     <xsl:next-match/>
