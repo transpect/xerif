@@ -2277,6 +2277,21 @@
     </rule>
   </regex>
   
+  <!-- medieval font (junicode) -->
+  
+  <regex regex="([&#x17f;-&#x233;&#x237;-&#x239;&#x248;&#x249;&#x250;-&#x2ad;&#x16a0;-&#x16f0;&#x1d00;-&#x1d6b;&#x1d79;&#x1e00;-&#x1eff;&#x20b0;&#x2108;&#x2114;&#x211e;&#x211f;&#x2123;&#x2125;&#x2132;&#x214e;&#x2c71;-&#x2c73;&#x2c75;&#x2c76;&#xa722;-&#xa729;&#xa730;-&#xa787;&#xa7fb;-&#xa7ff;&#xab57;&#x10190;-&#x1019a;&#xe000;-&#xf8ff;&#x10330;-&#x1034a;]+)">
+    <rule name="mdvfont" type="cmd">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <!-- medieval combining characters (junicode) -->
+  
+  <regex regex="(\p{L}[&#x2b0;-&#x2b8;&#x2c0;&#x2c1;&#x2e0;-&#x2ff;&#x318;-&#x325;&#x329;-&#x341;&#x1d9c;&#x1da0;&#x1dbb;&#x1dcd;-&#x1de6;&#x20dd;&#x2c7d;]+)">
+    <rule name="mdvfont" type="cmd">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
   <!-- unichar for font change in sans-serif non-latin text #7115 -->
  
   <xsl:variable name="non-latin-style" select="'^[a-z]{1,3}nonlatin$'" as="xs:string"/>
