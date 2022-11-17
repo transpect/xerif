@@ -57,6 +57,22 @@
     </chapter>
   </xsl:template>
   
+  <!-- special sections to wrap frontmatter and backmatter sections -->
+  
+  <xsl:template match="hub/*[matches(@role, $frontmatter-heading-role-regex)]"
+                mode="hub:postprocess-hierarchy" priority="5">
+    <preface role="frontmatter">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </preface>
+  </xsl:template>
+  
+  <xsl:template match="hub/*[matches(@role, $backmatter-heading-role-regex)]" 
+                mode="hub:postprocess-hierarchy" priority="5">
+    <appendix role="backmatter">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </appendix>
+  </xsl:template>
+  
   <xsl:template match="informaltable//chapter
                       |informaltable//section
                       |table//chapter
@@ -1677,22 +1693,6 @@
     <toc xml:id="toc">
       <xsl:apply-templates select="@*, title, sidebar[@role = 'chunk-metadata']" mode="#current"/>
     </toc>
-  </xsl:template>
-  
-  <!-- special sections to wrap frontmatter and backmatter sections -->
-
-  <xsl:template match="hub/*[matches(@role, $frontmatter-heading-role-regex)]"
-                mode="hub:postprocess-hierarchy">
-    <preface role="frontmatter">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </preface>
-  </xsl:template>
-  
-  <xsl:template match="hub/*[matches(@role, $backmatter-heading-role-regex)]" 
-                mode="hub:postprocess-hierarchy">
-    <appendix role="backmatter">
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </appendix>
   </xsl:template>
 
   <!-- optional mode preprocesses whitespaces. based on mode docx2tex-preprocess in docx2tex/xsl/docx2tex-preprocess.xsl -->
