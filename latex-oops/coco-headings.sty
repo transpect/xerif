@@ -104,9 +104,9 @@
     \tp@do@before@skip
     \tp@format@number{}{}{#1}%
     \tpIfProp{after-skip}{\expandafter\global\expandafter\@tempskipa\expandafter=\tpUseProperty{after-skip}\relax}{\global\@tempskipa=1sp\relax}%
-      \tp@heading@create@labels{#2}% label facility
     \def\@svsec{%
       \tpUseProperty{before-heading-block}%
+      \tp@heading@create@labels{#2}% label facility
       \leftskip\tpUseProperty{margin-left}%
       \rightskip\tpUseProperty{margin-right}%
       \bgroup
