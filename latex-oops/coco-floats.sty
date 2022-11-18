@@ -258,15 +258,16 @@
   \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
   \bgroup
     \def\tp@cur@cont{#2}%
-    \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
+    \tp@init@l@[Listof]{#4}{0}{#3}% Generate listof-Entries for first level floats
     \tp@restore@init{#4}{number-0-maxwd}%
-    \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub floats
+    \tp@init@l@[Listof]{#4}{1}{sub#3}% Generate listof-Entries for sub floats
     \tp@restore@init{#4}{number-1-maxwd}%
   \egroup
 }
 \def\tp@flt@generate@listof@handlers#1#2#3{%
   \expandafter\gdef\csname tp@#1@extract@data\endcsname##1##2##3##4{%
     \tpNamespace{#3}%
+    %\tpEvalType[#3]{Properties}%
     \tpCascadeProps{#3}{float}%
     \tpDeclareComp{ListofCaption}{}{}%
     \tpDeclareComp{ListofLegend}{}{}%
@@ -302,20 +303,25 @@
         \ifx\tp@is@subflt\relax
           \tp@savecontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
         \else
-          \addcontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
+          \tp@flt@addcontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
           \tp@@savecontentsline
         \fi
       \fi
     \fi
   }%
 }
-\def\tp@savecontentsline#1#2#3{\protected@xdef\tp@@savecontentsline{\expandonce{\tp@@savecontentsline}\noexpand\addcontentsline{#1}{#2}{#3}\relax}}
+\def\tp@savecontentsline#1#2#3{\protected@xdef\tp@@savecontentsline{\expandonce{\tp@@savecontentsline}\noexpand\tp@flt@addcontentsline{#1}{#2}{#3}\relax}}
+\def\tp@flt@addcontentsline#1#2#3{%
+  \protected@write\@auxout
+    {\tpGobble}%
+    {\string\@writefile{#1}{\protect\tpContentsline{#2}{#3}{\thepage}{\@currentHref}\protected@file@percent}}\relax
+}
 \def\tp@flt@check@empty#1#2{%
   \ifx\tp@is@subflt\relax\else\tpSubFloatCnt\z@\fi
   \tpIfComp{Listof#1}
     {}
     {\tpIfComp{#1}
-      {\expandafter\expandafter\expandafter\let\expandafter\csname tp@\tp@cur@cont @list-of-#2-\the\tpSubFloatCnt\expandafter\endcsname\csname tp@\tp@cur@cont @#2-\the\tpSubFloatCnt\endcsname}
+      {\csletcs{tp@\tp@cur@cont @Listof#1-\the\tpSubFloatCnt}{tp@\tp@cur@cont @#1-\the\tpSubFloatCnt}}
       {\csname Listof#1\endcsname{}}}}
 \def\tp@flt@create@counters{%
   \expandafter\ifx\csname tp@\tp@captype @attr@nonumber\endcsname\relax

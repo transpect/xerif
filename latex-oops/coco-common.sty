@@ -170,6 +170,7 @@
     \fi
     \ifLuaTeX\suppresslongerror=0\fi
   }}
+\long\def\tpContentsline#1#2#3#4{\bgroup\csletcs{l@#1}{tp@l@#1}\contentsline{#1}{#2}{#3}{#4}\egroup}
 \def\tp@extract@generic#1#2#3#4{}
 \def\tp@print@generic#1{}
 \def\tp@expand@l@contents#1#2#3#4{%
