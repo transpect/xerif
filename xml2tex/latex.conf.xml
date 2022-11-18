@@ -628,6 +628,11 @@
     <xsl:if test="$new-common"><xsl:text>&#xa;\mainmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
+  
+  <template context="/*/dbk:appendix[matches(@role, $backmatter-heading-role-regex)][1]">
+    <xsl:if test="$new-common"><xsl:text>&#xa;\backmatter&#xa;</xsl:text></xsl:if>
+    <xsl:next-match/>
+  </template>
     
   <template context="*[not(self::dbk:book | self::dbk:hub | self::dbk:figure)][dbk:info][@xml:lang][@xml:lang ne /*/@xml:lang][not(../@xml:lang = current()/@xml:lang)]" priority="800">
     <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
