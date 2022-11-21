@@ -629,7 +629,7 @@
     <xsl:next-match/>
   </template>
   
-  <template context="/*/dbk:appendix[matches(@role, $backmatter-heading-role-regex)][1]">
+  <template context="/*/dbk:appendix[matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]">
     <xsl:if test="$new-common"><xsl:text>&#xa;\backmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
