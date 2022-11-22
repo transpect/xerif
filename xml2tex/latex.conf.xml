@@ -629,7 +629,9 @@
     <xsl:next-match/>
   </template>
   
-  <template context="/*/dbk:appendix[matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]">
+  <template context="/*/*[self::dbk:appendix|self::dbk:index|self::dbk:bibliography]
+                         [matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]
+                         [not(//processing-instruction()[contains(., '\backmatter')])]">
     <xsl:if test="$new-common"><xsl:text>&#xa;\backmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
