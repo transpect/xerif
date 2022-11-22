@@ -843,7 +843,7 @@
   
   <!-- bib sections which contain only bib entries -->
   
-  <xsl:template match="*[local-name() = ('chapter', 'section')]
+  <xsl:template match="*[local-name() = ('chapter', 'section', 'appendix')]
                         [title]
                         [bibliomixed]
                         [every $i in *[not(self::title|self::bridgehead|self::abbrev)]
@@ -860,7 +860,9 @@
   
   <xsl:template match="*[not(self::bibliography 
                             |self::bibliodiv
-                            |self::bibliolist)]
+                            |self::bibliolist
+                            )
+                        ]
                         [not(title[matches(@role, $index-heading-regex)])]
                         [not(info/title[matches(@role, $index-heading-regex)])]
                         [bibliomixed]
