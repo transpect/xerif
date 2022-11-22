@@ -590,8 +590,11 @@
     <xsl:text>}</xsl:text>
   </xsl:template>
 
-  <xsl:template match="text()[ancestor::*[self::dbk:keyword[matches(., 'file:|http|www|(\.(png|PNG|jpe?g|pdf|JPE?G|PDF|eps|EPS)\p{Zs}*$)')] ]]" mode="escape-bad-chars" priority="300">
-    <!-- prevent filename replacement in keywords -->
+  <xsl:template match="text()[ancestor::*[self::dbk:keyword[matches(., 'file:|http|www|(\.(png|PNG|jpe?g|pdf|JPE?G|PDF|eps|EPS)\p{Zs}*$)')] | 
+                                          self::dbk:para[@role[matches(., '^[a-z]{1,3}pi$', 'i')]]
+                                         ]
+                             ]" mode="escape-bad-chars" priority="300">
+    <!-- prevent filename replacement in keywords an PIs -->
     <xsl:value-of select="."/>
   </xsl:template>
 
