@@ -2484,7 +2484,7 @@
                                       concat($tactical-break-character-for-urls, '\\$1')
                                       ), 
                               '\\?_', '\\_'),
-                            '\s+', '\\space ')
+                            '\s+', '{\\space}')
                           "/>
   </xsl:function>
   
