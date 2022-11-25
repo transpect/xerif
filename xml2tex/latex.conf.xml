@@ -2574,6 +2574,8 @@
                              or self::dbk:phrase[exists(for $i in ./@role 
                                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
                                                                                                      [@remap = 'superscript']
+                                                        )
+                                                ]
                             ) 
                           then '\textsuperscript{' 
                           else '\textsubscript{'"/>
