@@ -1958,7 +1958,7 @@
   <xsl:variable name="letter-para-style" as="xs:string" select="'ts_letter$'"/>
   <xsl:variable name="letter-spacing-para-style" as="xs:string" select="'ts_letter_spacing$'"/>
   
-  <template context="dbk:div[@role = 'letter'] | dbk:sidebar[@role = 'letter']">
+  <template context="dbk:div[@role = ('letter', 'poem')] | dbk:sidebar[@role = ('letter', 'poem')]">
     <rule name="letter" type="env" break-after="1"  break-before="1">
       <text/>
     </rule>
@@ -2567,8 +2567,19 @@
                     |dbk:phrase[not(dbk:footnote)][exists(for $i in ./@role 
                                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
                                                                                                      [@remap = ('superscript', 
-                                                                                                                'subscript')])]">
-    <xsl:value-of select="if(self::dbk:superscript) 
+                                                                                                                'subscript')
+                                                                                                      or 
+                                                                                                      @css:vertical-align = ('sub', 'super')]
+                                                          )
+                                                  ]">
+    <xsl:value-of select="if(   self::dbk:superscript 
+                             or self::dbk:phrase[exists(for $i in ./@role 
+                                                          return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
+                                                                                                     [@remap = 'superscript'
+                                                                                                      or 
+                                                                                                      @css:vertical-align = 'super'])
+                                                 ]
+                            ) 
                           then '\textsuperscript{' 
                           else '\textsubscript{'"/>
     <xsl:choose>
