@@ -509,8 +509,13 @@
   \tp@capt@top@offset
   \ifnum\tpSubFloatCnt=\z@
     \def\next{%
-      \hskip\tp@flt@marg@l
-      \vbox\bgroup\advance\hsize-\tp@flt@marg@l}%
+      \expandafter\ifx\csname tp@\tp@captype @attr@orientation\endcsname\tp@str@landscape\relax%
+        \vbox\bgroup\hsize\textheight%
+      \else%
+        \hskip\tp@flt@marg@l%
+        \vbox\bgroup\advance\hsize-\tp@flt@marg@l%
+      \fi%
+    }
   \else
     \expandafter\tp@tempskipa\csname tp@flt@capt@row@height@#1\endcsname\relax
     \expandafter\advance\expandafter\tp@tempskipa\dimexpr-\baselineskip+\topskip\relax
