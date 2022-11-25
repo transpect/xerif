@@ -2567,18 +2567,13 @@
                     |dbk:phrase[not(dbk:footnote)][exists(for $i in ./@role 
                                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
                                                                                                      [@remap = ('superscript', 
-                                                                                                                'subscript')
-                                                                                                      or 
-                                                                                                      @css:vertical-align = ('sub', 'super')]
+                                                                                                                'subscript')]
                                                           )
                                                   ]">
     <xsl:value-of select="if(   self::dbk:superscript 
                              or self::dbk:phrase[exists(for $i in ./@role 
                                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
-                                                                                                     [@remap = 'superscript'
-                                                                                                      or 
-                                                                                                      @css:vertical-align = 'super'])
-                                                 ]
+                                                                                                     [@remap = 'superscript']
                             ) 
                           then '\textsuperscript{' 
                           else '\textsubscript{'"/>
