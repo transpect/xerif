@@ -1679,7 +1679,7 @@
             </affiliation>
           </xsl:if>
           <xsl:copy-of select="parent::info/biblioset/email,
-            parent::info/biblioset/uri"/>
+                               parent::info/biblioset/uri"/>
         </xsl:copy>
       </xsl:otherwise>
     </xsl:choose>

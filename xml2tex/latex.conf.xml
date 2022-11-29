@@ -177,6 +177,7 @@
   <xsl:variable name="layout-value"  as="xs:string?" select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
   <xsl:variable name="pubtype-value" as="xs:string?" select="if ($pubtype = ('article','collection', 'mono')) then concat(',pubtype=', $pubtype) else ()"/>
   <xsl:variable name="format-value"  as="xs:string?" select="if ($format) then concat('format=', $format)  else ()"/>  
+  <xsl:variable name="customer-meta" as="xs:string*" select="()"/>
   
   <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Dokumentaufbau-->
   
@@ -401,6 +402,7 @@
       </xsl:for-each>
       <xsl:text>&#xa;\end{tpFunding}&#xa;</xsl:text>  
     </xsl:if>
+    <xsl:sequence select="$customer-meta"/>
     <xsl:text>&#xa;\end{tpMeta}&#xa;</xsl:text>
     <xsl:for-each select="//dbk:index">
       <xsl:variable name="index-index" as="attribute(remap)" select="@remap"/>
@@ -873,7 +875,7 @@
           <xsl:apply-templates select="../dbk:section[@role = 'alternative-title']/dbk:para[normalize-space()]" mode="#current"/>
           <xsl:text>}</xsl:text>
         </xsl:if>
-        <xsl:for-each select="(dbk:authorgroup | dbk:author)//dbk:affiliation">
+        <xsl:for-each select="(dbk:authorgroup)//dbk:affiliation">
           <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
           <xsl:apply-templates select="." mode="#current"/>
           <xsl:text>&#xa;\end{tpAffil}</xsl:text>
@@ -1276,7 +1278,8 @@
     <xsl:apply-templates select="node()" mode="xml2tex"/>
   </template>
 
-  <template context="*[not(self::*:hub)]/*:info//*[self::*:author|self::*:editor]/*:personname/*:othername">
+  <template context="*[not(self::*:hub)]/*:info//*[self::*:author
+                                                  |self::*:editor]/*:personname/*:othername">
     <xsl:param name="no-nesting" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
       <xsl:when test="not($no-nesting)">
@@ -1320,13 +1323,17 @@
     </rule>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:email">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
+                                                      |self::dbk:editor
+                                                      |self::dbk:othercredit]/dbk:email">
     <rule name="tpEmail" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:affiliation">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
+                                                      |self::dbk:editor
+                                                      |self::dbk:othercredit]/dbk:affiliation">
     <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/> 
     <xsl:choose>
       <xsl:when test="$in-author">
@@ -1348,13 +1355,18 @@
     </xsl:choose>
   </template>
   
-  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personblurb">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
+                                                      |self::dbk:editor
+                                                      |self::dbk:othercredit
+                                                      ]/dbk:personblurb">
     <rule name="tpBio" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
   
-   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:uri">
+   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
+                                                       |self::dbk:editor
+                                                       |self::dbk:othercredit]/dbk:uri">
     <rule name="tpORCID" type="cmd" break-before="1">
       <param select="if (dbk:link) then dbk:link/node() else node()"/>
     </rule>
