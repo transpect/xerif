@@ -881,7 +881,7 @@
           <xsl:apply-templates select="../dbk:section[@role = 'alternative-title']/dbk:para[normalize-space()]" mode="#current"/>
           <xsl:text>}</xsl:text>
         </xsl:if>
-        <xsl:for-each select="(dbk:authorgroup)//dbk:affiliation">
+        <xsl:for-each select=".//dbk:affiliation">
           <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
           <xsl:apply-templates select="." mode="#current"/>
           <xsl:text>&#xa;\end{tpAffil}</xsl:text>
