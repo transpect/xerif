@@ -163,7 +163,7 @@
     {\ifcsdef{tp@compose@group@#1}
       {\csgappto{tp@compose@group@#1}{#2}}
       {\csgdef{tp@compose@group@#1}{#2}}}
-    {\tpPackageError{Kernel}{Type}{Component Group `#1' unknown!}{You tried to declare a Group Handler for a Component Group that has not been declared, yet!}}%
+    {\tpPackageError{Kernel}{Type}{Component Group `#1' unknown!}{You tried to declare a Group Handler for a Component Group that has not been declared, yet! Use \string\tpDeclareComponentGroup{#1}{} to declare the Component Group first.}}%
 }
 \let\tp@cnt@grp\@empty
 \def\tpUseGroupComp#1#2{{\def\tp@cnt@grp{#1}\csname\tp@cnt@grp-#2-\csname \tp@cnt@grp Cnt\endcsname}}
