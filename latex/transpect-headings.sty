@@ -244,9 +244,10 @@
   \tpIfProp{extended}{%
     \tp@extended@ht@macros
   }{}%
-  \tpProvideComp{tpQuote}{}{}{Quote}%
+  \tpProvideComp{tpQuoteText}{}{}{Quote}%
   \tpProvideComp{tpQuoteSource}{}{}{QuoteSource}}
 \def\tp@heading@load@props{\csname tp@heading@\tp@heading@name @properties\endcsname}
+\newenvironment{tpQuote}{\endgroup}{\begingroup\def\@currenvir{tpQuote}}
 \def\tp@extended@ht@macros{%
   \tp@provide@ext@hd@macros{Abstract}%
   \tp@provide@ext@hd@macros{Keywords}%
