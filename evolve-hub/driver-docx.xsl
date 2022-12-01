@@ -156,7 +156,7 @@
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
           <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
-          <xsl:sequence select="hub:renderas-from-role-suffix(@renderas, title/@role)"/>
+          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title/@role))[1]"/>
           <xsl:if test="$chapter-info">
             <info>
               <xsl:apply-templates select="$chapter-info" mode="#current">
@@ -263,7 +263,7 @@
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
           <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
-          <xsl:sequence select="hub:renderas-from-role-suffix(@renderas, title/@role)"/>
+          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title/@role))[1]"/>
           <xsl:if test="$sec-info">
             <info>
               <xsl:apply-templates select="$sec-info" mode="#current">
@@ -976,7 +976,7 @@
   <!-- blind table for tab-like structures -->
   
   <xsl:template match="informaltable[matches(@role, '^[a-z]{1,3}tabulator$')]/tgroup" mode="custom-2">
-    <xsl:processing-instruction name="latex" 
+    <xsl:processing-instruction name="{$pi-xml-name}" 
                                 select="string-join(('&#xa;\begin{tabularx}{\textwidth}{', 
                                                      for $i in colspec return 'l', 
                                                      '}&#xa;'
@@ -985,16 +985,16 @@
       <xsl:for-each select="entry">
         <xsl:apply-templates select="*/node()" mode="#current"/>
         <xsl:if test="position() ne last()">
-          <xsl:processing-instruction name="latex" select="'&#x20;&amp;&#x20;'"/>
+          <xsl:processing-instruction name="{$pi-xml-name}" select="'&#x20;&amp;&#x20;'"/>
         </xsl:if>
       </xsl:for-each>
-      <xsl:processing-instruction name="latex" select="' \\&#xa;'"/>
+      <xsl:processing-instruction name="{$pi-xml-name}" select="' \\&#xa;'"/>
     </xsl:for-each>
-    <xsl:processing-instruction name="latex" select="'&#xa;\end{tabularx}&#xa;'"/>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'&#xa;\end{tabularx}&#xa;'"/>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, '^[a-z]{1,3}listofendnotes$')]" mode="hub:split-at-tab" priority="15">
-    <xsl:processing-instruction name="latex" select="'\printnotes'"/>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'\printnotes'"/>
   </xsl:template>
 
   <xsl:template match="phrase[@css:background-color eq '#FFFFFF']/@css:background-color" mode="custom-2"/>
@@ -1768,10 +1768,14 @@
     <xsl:value-of select="hub:gentle-normalize(.)"/>
   </xsl:template>
   
-  <xsl:template match="phrase[matches(@role, '^[a-z]{1,3}pi$')]" mode="custom-2">
-    <xsl:copy>
-      <xsl:apply-templates select="@role, node()" mode="#current"/>
-    </xsl:copy>
+  <xsl:template match="phrase[matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
+    <xsl:processing-instruction name="{$pi-xml-name}">
+      <xsl:apply-templates mode="#current"/>
+    </xsl:processing-instruction>
+  </xsl:template>
+  
+  <xsl:template match="phrase[matches(@role, $pi-style-regex, 'i')]/text()" mode="hub:split-at-tab">
+    <xsl:value-of select="replace(., $pi-tactical-mark, '\\')"/>
   </xsl:template>
   
   <xsl:function name="hub:gentle-normalize" as="xs:string">
@@ -1857,10 +1861,26 @@
       <xsl:if test="string-length($role-suffix) gt 0">
         <xsl:attribute name="renderas" 
                        select="string-join(($renderas,
-                                           'hub:no-toc'[matches($role-suffix, $no-toc-suffix)],
-                                           'hub:no-pdf-bm'[matches($role-suffix, $no-pdf-bookmarks-suffix)]
+                                           'hub:no-toc'[matches($role-suffix, $no-toc-suffix, 'i')],
+                                           'hub:no-pdf-bm'[matches($role-suffix, $no-pdf-bookmarks-suffix, 'i')]
                                            ), ' ')"/>
-      </xsl:if>  
+      </xsl:if>
+    </xsl:if>
+  </xsl:function>
+  
+  <!-- remove the pis that are already represented by the 
+       @renderas attribute which is generated below -->
+  <xsl:template match="dbk:title//processing-instruction()[name() eq $pi-xml-name][matches(., $suffixes-regex, 'i')]"/>
+  
+  <xsl:function name="hub:renderas-from-xml-pi" as="attribute(renderas)?">
+    <xsl:param name="renderas" as="xs:string?"/>
+    <xsl:param name="pis" as="processing-instruction()*"/>
+    <xsl:if test="matches(string-join($pis), $suffixes-regex, 'i')">
+      <xsl:attribute name="renderas" 
+                    select="string-join(($renderas,
+                                        'hub:no-toc'[$pis[matches(., $no-toc-suffix, 'i')]],
+                                        'hub:no-pdf-bm'[$pis[matches(., $no-pdf-bookmarks-suffix, 'i')]]
+        ), ' ')"/>
     </xsl:if>
   </xsl:function>
   

@@ -48,6 +48,15 @@
   <xsl:variable name="hub:caption-sep-regex" as="xs:string" 
                 select="'[&#x20;&#x2002;&#xa0;&#x202F; \p{Zs}]+'"/>
   
+  <xsl:variable name="pi-style-regex" as="xs:string" 
+                select="'^[a-z]{1,3}pi$'"/>
+  
+  <xsl:variable name="pi-tactical-mark" as="xs:string" 
+                select="'~'"/>
+  
+  <xsl:variable name="pi-xml-name" as="xs:string" 
+                select="'latex'"/>
+  
   <xsl:variable name="suffixes-regex" as="xs:string" 
                 select="concat($no-toc-suffix, '|', $no-pdf-bookmarks-suffix)"/>
   
