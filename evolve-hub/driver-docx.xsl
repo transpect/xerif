@@ -1870,7 +1870,7 @@
   
   <!-- remove the pis that are already represented by the 
        @renderas attribute which is generated below -->
-  <xsl:template match="dbk:title//processing-instruction()[name() eq $pi-xml-name][matches(., $suffixes-regex, 'i')]"/>
+  <xsl:template match="dbk:title//processing-instruction()[name() eq $pi-xml-name][matches(., $suffixes-regex, 'i')]" mode="custom-1"/>
   
   <xsl:function name="hub:renderas-from-xml-pi" as="attribute(renderas)?">
     <xsl:param name="renderas" as="xs:string?"/>
