@@ -1656,7 +1656,10 @@
                                     or dbk:caption 
                                     or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
                                     or ancestor::dbk:footnote]) 
-                           then 'float-pos=h!' 
+                           then ('float-pos=t'[$elt/@floatstyle eq 'top'],
+                                 'float-pos=b'[$elt/@floatstyle eq 'bottom'],
+                                 'float-pos=h!'[$elt/@floatstyle eq 'fixed'],
+                                 'float-pos=h!')[1]
                            else ()"/>
     <!-- other options are: 
      t = "oben",
