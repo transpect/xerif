@@ -471,16 +471,15 @@
                           select="if(not(current-group()//mediaobject))
                                   then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                                   else current-group()//mediaobject"/>
-            <xsl:message select="'----------------------------&#xa;',
-              'is-grid:', $is-grid-group, '&#xa;',
-              'count:', count(current-group()[matches(@role, $figure-caption-role-regex, 'i')]), '&#xa;',
-              'one-caption-for-multiple-images:', $one-caption-for-multiple-images, '&#xa;',
-              current-group()/@role"></xsl:message>
+            <xsl:variable name="float-pos" as="xs:string?" 
+                          select=".//phrase[matches(@role, $pi-style-regex, 'i')][matches(., concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
+              <xsl:if test="exists($float-pos)">
+                <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
+              </xsl:if>
               <xsl:if test="$is-grid-group">
-                <xsl:message select="'##################'"></xsl:message>
                 <xsl:attribute name="css:display" select="'grid'"/>
                 <xsl:attribute name="css:grid-template-columns" 
                                select="concat('repeat(',
@@ -1775,7 +1774,7 @@
   </xsl:template>
   
   <xsl:template match="phrase[matches(@role, $pi-style-regex, 'i')]/text()" mode="hub:split-at-tab">
-    <xsl:value-of select="replace(., $pi-tactical-mark, '\\')"/>
+    <xsl:value-of select="replace(., $pi-mark, '\\')"/>
   </xsl:template>
   
   <xsl:function name="hub:gentle-normalize" as="xs:string">

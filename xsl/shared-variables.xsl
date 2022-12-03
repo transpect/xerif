@@ -51,11 +51,14 @@
   <xsl:variable name="pi-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}pi$'"/>
   
-  <xsl:variable name="pi-tactical-mark" as="xs:string" 
+  <xsl:variable name="pi-mark" as="xs:string" 
                 select="'~'"/>
   
   <xsl:variable name="pi-xml-name" as="xs:string" 
                 select="'latex'"/>
+  
+  <xsl:variable name="float-options" as="xs:string+" 
+                select="'float', 'top', 'bottom', 'fixed'"/>
   
   <xsl:variable name="suffixes-regex" as="xs:string" 
                 select="concat($no-toc-suffix, '|', $no-pdf-bookmarks-suffix)"/>
