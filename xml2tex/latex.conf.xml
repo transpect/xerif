@@ -835,9 +835,16 @@
   \tpTocTitle{\textit{John Doe und Max Mustermann}\\Kap. 1: Einf?hrung -\- Unter?berschrift}% ?S in Inhaltsverzeichnis
   \tpRunTitle{Einf?hrung}% ?S im Kolumnentitel
   \tpSubtitle{Unter?berschrift}% Unter?berschrift
-  \tpQuote{Sein oder nicht sein, das ist hier die Frage\\
+  \tpQuoteText{Sein oder nicht sein, das ist hier die Frage\\
   \tpQuoteSource{William Shakespeare, Hamlet}}% Zitat/Motto
   \end{heading}
+  
+  several quotes in oop:
+  
+  \begin{tpQuote}
+   \tpQuoteText{}
+   \tpQuoteSource{}
+  \end{tpQuote}
   
   -->  
   
@@ -1903,18 +1910,20 @@
   
   <template context="dbk:info/dbk:epigraph">
     <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/%C3%9Cberschriften#%C3%9Cberschriften-im-transpect-tex-Common-Framework-transpect-headingsdtx-->
-    <!--   alle Zitat-Absätz in ein \quote-Makro, ggf. mit \tpBreak abgegrenzt, wenn mehrere Zitat-Absätze, analog Zitat-Quelle → \quotesource-->
+    <!--   alle Zitat-Absätze in ein \quote-Makro, ggf. mit \tpBreak abgegrenzt, wenn mehrere Zitat-Absätze, analog Zitat-Quelle → \quotesource-->
+
     <xsl:for-each-group select="node()" 
                         group-adjacent="boolean(.[self::dbk:para[matches(@role, concat($motto-style, 
                                                                                        '|', 
                                                                                        $motto-source-style))]])">
       <xsl:choose>
         <xsl:when test="current-grouping-key()">
+          <xsl:text>&#xa;\begin{tpQuote}</xsl:text>
           <xsl:for-each-group select="current-group()" group-starting-with=".[self::dbk:para[matches(@role, $motto-source-style)]]">
             <xsl:variable name="cg" select="current-group()"/>
             <xsl:choose>
               <xsl:when test="current-group()[1][self::dbk:para[matches(@role, $motto-style)]]">
-                <rule name="tpQuote" type="cmd" break-before="1">
+                <rule name="tpQuoteText" type="cmd" break-before="1">
                   <xsl:text>{</xsl:text>
                     <xsl:for-each select="current-group()">
                       <xsl:apply-templates select="./node()" mode="#current"/>
@@ -1935,6 +1944,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each-group>
+          <xsl:text>&#xa;\end{tpQuote}</xsl:text>
         </xsl:when>
         <xsl:otherwise>
           <xsl:apply-templates select="current-group()" mode="#current"/>
