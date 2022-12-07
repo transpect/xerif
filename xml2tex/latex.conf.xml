@@ -2691,6 +2691,13 @@
     <rule name="tpBreak" type="cmd" break-after="1"/>
   </template>
   
+  <!-- SPECIAL PAGE BREAK THAT FILLS THE LINE -->
+  <template context="processing-instruction()[name() eq $pi-xml-name][matches(., '&#x21a1;')]">
+    <rule name="vadjust" type="cmd" break-after="1">
+      <param select="'\newpage'"/>
+    </rule>
+  </template>
+  
   <xsl:template match="*[self::dbk:title|self::dbk:subtitle]//text()[matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+')]" mode="xml2tex" priority="100000">
     <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
@@ -2770,8 +2777,6 @@
     <!-- * 
          * special processing instructions for common 
          * -->
-    <!-- SPECIAL PAGE BREAK THAT FILLS THE LINE -->
-    <char character="&#x21a1;" string="\vadjust{\newpage}&#xa;" context="dbk:phrase[matches(@role, '^[a-z]{1,3}pi$')]"/>
   </charmap>
   
 </set>
