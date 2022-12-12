@@ -108,7 +108,6 @@
     \else
       \ifnum\tpEditorCnt>\z@
         \tpCompGDef\tpRunBookName{tpEditor}{editor-list-format}%
-        \csgappto{tpRunBookName}{\tpUseProperty{editor-suffix}}%
       \else
         \tpPackageWarning{transcript-title}{Meta Data}{No author or editor given!}%
         \@tempswafalse
