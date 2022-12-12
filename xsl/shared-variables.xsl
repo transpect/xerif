@@ -174,7 +174,7 @@
   
   <xsl:variable name="endnotes-heading-style" select="'^[a-z]{1,3}listofendnotes$'" as="xs:string"/>
 
-  <xsl:variable name="hub:article-keywords-role-regex" as="xs:string" select="'tsmeta(chunk)?keywords?'"/>
+  <xsl:variable name="hub:article-keywords-role-regex" as="xs:string" select="'tsmeta(chunk)?keywords'"/>
 
   <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
 
