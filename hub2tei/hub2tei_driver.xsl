@@ -252,4 +252,25 @@
 
   <xsl:template match="*:keywords[not(parent::*[self::*:textClass])]" mode="hub2tei:tidy"/>
 
+  <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
+    <xsl:choose>
+      <xsl:when test="parent::*[self::dbk:preface | self::dbk:info | self::dbk:abstract[parent::*[self::dbk:info]]] 
+                      or 
+                      (exists(preceding-sibling::*) and (every $pre in preceding-sibling::* satisfies $pre[self::dbk:title or self::dbk:info or self::dbk:epigraph]))">
+        <epigraph>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </epigraph>
+      </xsl:when>
+      <xsl:otherwise>
+        <floatingText type="motto">
+          <body>
+            <div1>
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </div1>
+          </body>
+        </floatingText>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
 </xsl:stylesheet>
