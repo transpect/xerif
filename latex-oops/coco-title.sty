@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.3}%
-\def\filedate{2021-11-07}%
+\def\fileversion{0.2.4}%
+\def\filedate{2022-12-15}%
 %%
 %% module for CoCoTeX for maketitle.
 %%
@@ -209,6 +209,7 @@
   \tp@title@macro{Editorial}% Editorial
   \tp@title@macro{Edition}%   Edition
   \tp@title@macro{Year}%       Publication Year
+  \tp@title@macro{ISBNPreText}% Text before ISBN block
   \tp@title@macro{ISBN}%       ISBN
   \tp@title@macro{ISSN}%       ISSN
   \tp@title@macro{EISSN}%      Ebook-ISSN
@@ -398,6 +399,7 @@
     \tpGetComp{DOI}%%
     \tpGetComp{Keywords}%%
     \tpUseProperty{imprint-sep}%
+    \tpGetComp{ISBNPreText}%
     \tpGetComp{ISBN}%
     \tpGetComp{EpubPreText}%
     \tpGetComp{EISBN}%
