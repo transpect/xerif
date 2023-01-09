@@ -2550,7 +2550,9 @@
     <xsl:choose>
       <xsl:when test="$as-title-param"><xsl:value-of select="$label"/></xsl:when>
       <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]"/>
-      <xsl:otherwise><xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/></xsl:otherwise>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/>
+      </xsl:otherwise>
     </xsl:choose>
   </template>
   
