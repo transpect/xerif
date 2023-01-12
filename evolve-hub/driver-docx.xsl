@@ -156,7 +156,7 @@
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
           <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
-          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title/@role))[1]"/>
+          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title[1]/@role))[1]"/>
           <xsl:if test="$chapter-info">
             <info>
               <xsl:apply-templates select="$chapter-info" mode="#current">
@@ -613,9 +613,9 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:variable name="refs" select="tokenize(//link/(@linkend, @linkends), '\s')" as="xs:string*"/>
+  <xsl:variable name="refs" select="for $ref in //link/(@linkend, @linkends) return tokenize($ref, '\s')" as="xs:string*"/>
   
-  <xsl:template match="anchor[@role = ('start', 'end')][not(@xml:id = $refs)]" mode="hub:split-at-tab"/>
+  <xsl:template match="anchor[@role = ('start', 'end')][not(@xml:id = $refs)]" mode="hub:dissolve-sidebars-without-purpose"/>
   
   <!-- move anchors inside of footnote -->
   
