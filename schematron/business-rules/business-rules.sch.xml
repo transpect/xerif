@@ -21,6 +21,9 @@
 
   <xsl:param name="customer-prefix" select="'ts'"/>  
 
+  <xsl:key name="tr:linking-item-by-id" match="*[@target]" use="@target" />
+  <xsl:key name="tr:linking-item-by-linkend" match="*[@*:id]" use="@*:id" />
+
   <pattern id="rule">
       
     <rule context="/tei:TEI">
@@ -73,10 +76,11 @@
       
     </rule>
 
-    
+    <xsl:variable name="ids" select="//xml:id" as="xs:string*"/>
+
     <rule context="tei:ref[@target]">
       <let name="srcpath" value="(@srcpath, ancestor::*[@srcpath][1]/@srcpath, .//@srcpath[1])[1]"/>
-      <assert test="tr:is-uri-valid(@target)" role="error" id="URL-invalide">
+      <assert test="tr:is-uri-valid(@target) or exists(key('tr:linking-item-by-linkend', replace(@target, '^#', '')))" role="error" id="URL-invalide">
         <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
         <span class="category">Satzkonventionen</span>
         Die URL "<value-of select="@target"/>" enthält nicht erlaubte Zeichen: 
