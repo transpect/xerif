@@ -181,16 +181,16 @@
 
   <xsl:template match="*[not(@xml:lang)]
                         [node()]/@srcpath" mode="hub:dissolve-sidebars-without-purpose" priority="10">
-    <xsl:variable name="first-child-lang" as="attribute(xml:lang)?" select="*[1]/@xml:lang"/>
+    <xsl:variable name="first-child-lang" as="attribute(xml:lang)?" select="../*[@xml:lang][1]/@xml:lang"/>
     <xsl:next-match/>
-    <!-- expand lang fro styles or pull up lang from children -->
+    <!-- expand lang from styles or pull up lang from children -->
     <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang, 
-                                  if (every $child in node() satisfies 
+                                  if (every $child in ../node()[not(self::anchor|self::indexterm|self::tab)] satisfies 
                                       $child[@xml:lang[. = $first-child-lang]
                                              or matches(.,'^[\p{Zs}\.,;!\?]+$')
                                             ]
                                       ) 
-                                  then ../*[1]/@xml:lang 
+                                  then ../*[@xml:lang][1]/@xml:lang 
                                   else ()" mode="#current"/>
   </xsl:template>
 
