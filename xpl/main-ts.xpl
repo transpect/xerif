@@ -315,7 +315,7 @@
     <p:input port="models">
       <p:inline>
         <c:models>
-          <c:model href="hhttp://www.le-tex.de/resource/schema/tei-cssa/tei_allPlus-cssa.rng"
+          <c:model href="http://www.le-tex.de/resource/schema/tei-cssa/tei_allPlus-cssa.rng"
             type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
         </c:models>
       </p:inline>
