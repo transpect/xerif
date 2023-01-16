@@ -27,7 +27,7 @@
   <p:output port="result" primary="true">
     <p:pipe port="result" step="remove-srcpaths"/>
   </p:output>
-  
+
   <p:output port="tex" primary="false">
     <p:pipe port="result" step="hub2tex"/>
   </p:output>
@@ -55,7 +55,7 @@
   <p:serialization port="tex" method="text" media-type="text/plain" encoding="utf8"/>
   <p:serialization port="hub-flat" indent="true"/>
   <p:serialization port="hub-rich" indent="true"/>
-  <p:serialization port="result" indent="true"/>
+  <p:serialization port="result" omit-xml-declaration="false"/>
   <p:serialization port="html" method="xhtml"/>
   <p:serialization port="htmlreport" method="xhtml"/>
   
@@ -147,6 +147,7 @@
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/check-styles.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/xml-model/xpl/prepend-xml-model.xpl"/>
   
   <p:import href="get-paths.xpl"/>
   <p:import href="copy-images.xpl"/>
@@ -310,6 +311,17 @@
     </p:otherwise>
   </p:choose>
   
+  <tr:prepend-xml-model name="prepend-model">
+    <p:input port="models">
+      <p:inline>
+        <c:models>
+          <c:model href="hhttp://www.le-tex.de/resource/schema/tei-cssa/tei_allPlus-cssa.rng"
+            type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
+        </c:models>
+      </p:inline>
+    </p:input>
+  </tr:prepend-xml-model>
+
   <p:delete match="@srcpath" name="remove-srcpaths"/>
   
   <p:sink/>
