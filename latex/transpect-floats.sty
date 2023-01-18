@@ -306,6 +306,13 @@
       \tpIfComp{ListofSource}{\csgappto{@tp@listof@entry}{\string\tpListofSource{\tpUseComp{ListofSource}}}}{}%
       \ifx\@tp@listof@entry\relax\else
         \protected@edef\tp@listof@entry{\@tp@listof@entry}%
+        \ifx\tp@captype\tp@str@figure
+          \tp@set@label{\the\c@figure}%
+          \global\advance\c@figure by \@ne%
+        \else
+          \tp@set@label{\the\c@table}%
+          \global\advance\c@table by \@ne%
+        \fi
         \ifx\tp@is@subflt\relax
           \tp@savecontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
         \else
