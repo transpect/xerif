@@ -110,6 +110,9 @@
   <xsl:variable name="figure-source-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figuresource$'"/>
   
+  <xsl:variable name="figure-link-role-regex" as="xs:string"
+                select="'^[a-z]{1,3}figurelink$'"/>
+  
   <xsl:variable name="table-caption-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}tablecaption$'" />
   

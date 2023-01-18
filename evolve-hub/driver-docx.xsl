@@ -444,7 +444,8 @@
                                string-join(
                                            ($figure-image-role-regex, 
                                             $figure-caption-role-regex, 
-                                            $figure-source-role-regex
+                                            $figure-source-role-regex,
+                                            $figure-link-role-regex
                                            ),
                                            ')|('),
                                ')')" />
@@ -487,6 +488,7 @@
                                               ',1fr)')"/>
               </xsl:if>
               <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')]/@role" mode="figure-role-type"/>
+              <xsl:apply-templates select="current-group()[matches(@role, $figure-link-role-regex, 'i')]" mode="figures"/>
               <xsl:if test="some $p in current-group()[matches(@role, concat($figure-image-role-regex, '|', $figure-source-role-regex), 'i')] 
                             satisfies $p[node()[1][descendant-or-self::tab]]">
                 <xsl:attribute name="remap" select="'list'"/>
@@ -505,7 +507,8 @@
                         <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')][1]/@role" mode="figure-role-type">
                           <xsl:with-param name="is-grid-group" select="$is-grid-group" as="xs:boolean"/>
                         </xsl:apply-templates>
-                        <xsl:apply-templates select="(current-group()[matches(@role, $figure-caption-role-regex, 'i')],
+                        <xsl:apply-templates select="(current-group()[matches(@role, $figure-link-role-regex, 'i')],
+                                                      current-group()[matches(@role, $figure-caption-role-regex, 'i')],
                                                       current-group()[matches(@role, $figure-image-role-regex, 'i')],
                                                       current-group()[matches(@role, $figure-source-role-regex, 'i')])" mode="figures"/>
                       </figure>
@@ -552,6 +555,10 @@
         <xsl:apply-templates select="@*, node()" mode="hub:split-at-tab"/>
       </xsl:copy>
     </caption>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $figure-link-role-regex, 'i')]" mode="figures">
+    <xsl:attribute name="xlink:href" select="."/>
   </xsl:template>
   
   <xsl:template match="mediaobject" mode="figures">
