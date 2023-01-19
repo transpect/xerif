@@ -157,7 +157,6 @@
   <p:import href="http://transpect.io/bits2hub/xpl/bits2hub.xpl"/>
   
   <p:import href="htmlreport.xpl"/>
-  <p:import href="tei2epub.xpl"/>
   <p:import href="xml2tex.xpl"/>
   <p:import href="validate.xpl"/>
   <p:import href="hub2idml.xpl"/>

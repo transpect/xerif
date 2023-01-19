@@ -57,77 +57,117 @@
     <p:documentation>preferred XML Output. possible values: "bits" or "tei"</p:documentation>
   </p:option>
   
+  <p:import href="http://transpect.io/hub2html/xpl/hub2html.xpl"/>
   <p:import href="http://transpect.io/hub2tei/xpl/hub2tei.xpl"/>
   <p:import href="http://transpect.io/tei2html/xpl/tei2html.xpl"/>
   <p:import href="http://transpect.io/hub2bits/xpl/hub2bits.xpl"/>
-   
-   <hub2tei:hub2tei name="hub2tei">
-    <p:input port="source">
-      <p:pipe port="source" step="hub2epub"/> 
-    </p:input>
-    <p:input port="paths">
-      <p:pipe port="params" step="hub2epub"/> 
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </hub2tei:hub2tei>
+  <p:import href="http://transpect.io/jats2html/xpl/jats2html.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/insert-srcpaths/xpl/insert-srcpaths.xpl"/>
   
-  <tr:store-debug name="store-tei" pipeline-step="difftest/out-tei">
-    <p:with-option name="active" select="'yes'"/>
-    <p:with-option name="base-uri" select="$debug-dir-uri"/>
-    <p:with-option name="indent" select="true()"/>
-  </tr:store-debug>
- 
-  <p:delete match="@srcpath" name="remove-srcpaths"/>
-  
-  <p:sink/>
-  
-   <jats:hub2bits name="hub2bits">
-    <p:input port="source">
-      <p:pipe port="source" step="hub2epub"/> 
-    </p:input>
-    <p:input port="paths">
-      <p:pipe port="params" step="hub2epub"/> 
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </jats:hub2bits>
-  
-  <tr:store-debug name="store-bits" pipeline-step="difftest/out-bits">
-    <p:with-option name="active" select="'yes'"/>
-    <p:with-option name="base-uri" select="$debug-dir-uri"/>
-    <p:with-option name="indent" select="true()"/>
-  </tr:store-debug>
-  
-  <p:sink/>
+  <p:import href="html2epub.xpl"/>
   
   <p:choose name="choose-output-xml">
-    <p:when test="$output-xml='tei'">
-      <p:output port="result"/>
-      <p:identity>
+    <p:when test="$output-xml eq 'tei'">
+      <p:output port="result" primary="true">
+        <p:pipe port="result" step="hub2tei"/>
+      </p:output>
+      <p:output port="html" primary="false">
+        <p:pipe port="result" step="tei2html"/>
+      </p:output>
+      
+      <hub2tei:hub2tei name="hub2tei">
         <p:input port="source">
-          <p:pipe port="result" step="hub2tei"/>
+          <p:pipe port="source" step="hub2epub"/> 
         </p:input>
-      </p:identity>
+        <p:input port="paths">
+          <p:pipe port="params" step="hub2epub"/> 
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </hub2tei:hub2tei>
+      
+      <tr:store-debug name="store-tei" pipeline-step="difftest/out-tei">
+        <p:with-option name="active" select="'yes'"/>
+        <p:with-option name="base-uri" select="$debug-dir-uri"/>
+        <p:with-option name="indent" select="true()"/>
+      </tr:store-debug>
+      
+      <tei2html:tei2html name="tei2html">
+        <p:input port="paths">
+          <p:pipe port="params" step="hub2epub"/>
+        </p:input>
+        <p:with-option name="srcpaths" select="'yes'"/>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </tei2html:tei2html>
+      
     </p:when>
-    <p:when test="$output-xml='bits'">
-      <p:output port="result"/>
-      <p:identity>
+    <p:when test="$output-xml eq 'bits'">
+      <p:output port="result" primary="true">
+        <p:pipe port="result" step="hub2bits"/>
+        <!--<p:pipe port="result" step="insert-srcpaths-into-bits"/>-->
+      </p:output>
+      <p:output port="html" primary="false">
+        <p:pipe port="result" step="jats2html"/>
+      </p:output>
+      
+      <jats:hub2bits name="hub2bits">
         <p:input port="source">
-          <p:pipe port="result" step="hub2bits"/>
+          <p:pipe port="source" step="hub2epub"/> 
         </p:input>
-      </p:identity>
-      <p:delete match="@css:* | *:custom-meta-group | @srcpath | @c:report"/>
+        <p:input port="paths">
+          <p:pipe port="params" step="hub2epub"/> 
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </jats:hub2bits>
+            
+      <tr:store-debug name="store-bits" pipeline-step="difftest/out-bits">
+        <p:with-option name="active" select="'yes'"/>
+        <p:with-option name="base-uri" select="$debug-dir-uri"/>
+        <p:with-option name="indent" select="true()"/>
+      </tr:store-debug>
+      
+      <jats:html name="jats2html">
+        <p:input port="paths">
+          <p:pipe port="params" step="hub2epub"/>
+        </p:input>
+        <p:with-option name="srcpaths" select="'yes'"/>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </jats:html>
+      
     </p:when>
     <p:otherwise>
-      <p:output port="result"/>
-      <p:identity>
+      <p:output port="result" primary="true">
+        <p:pipe port="result" step="identity-hub"/>
+      </p:output>
+      <p:output port="html" primary="false">
+        <p:pipe port="result" step="hub2html"/>
+      </p:output>
+      
+      <p:identity name="identity-hub">
         <p:input port="source">
-          <p:pipe port="result" step="hub2tei"/>
+          <p:pipe port="source" step="hub2epub"/>
         </p:input>
       </p:identity>
+      
+      <hub2htm:convert name="hub2html">
+        <p:input port="paths">
+          <p:pipe port="params" step="hub2epub"/>
+        </p:input>
+        <p:input port="other-params">
+          <p:empty/>
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </hub2htm:convert>
+      
     </p:otherwise>
   </p:choose>
   
@@ -137,14 +177,15 @@
     <p:when test="/*/c:param[@name = 'create-epub']/@value = 'yes'">
       <p:xpath-context><p:pipe port="params" step="hub2epub"/></p:xpath-context>
       <p:output port="result">
-        <p:pipe port="result" step="tei2epub"/>
+        <p:pipe port="result" step="html2epub"/>
       </p:output>
       <p:output port="html">
-        <p:pipe port="html" step="tei2epub"/>
+        <p:pipe port="html" step="html2epub"/>
       </p:output>
-      <tx:tei2epub name="tei2epub">
+      
+      <tx:html2epub name="html2epub">
         <p:input port="source">
-          <p:pipe port="result" step="hub2tei"/>
+          <p:pipe port="html" step="choose-output-xml"/>
         </p:input>
         <p:input port="params">
           <p:pipe port="params" step="hub2epub"/>
@@ -156,27 +197,23 @@
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-      </tx:tei2epub>
+      </tx:html2epub>
+      
     </p:when>
     <p:otherwise>
       <p:output port="result">
         <p:inline><c:result os-path="bogo"/></p:inline>
       </p:output>
       <p:output port="html">
-        <p:pipe port="result" step="tei2html"/>
+        <p:pipe port="result" step="identity-html"/>
       </p:output>
-      <tei2html:tei2html name="tei2html">
+      
+      <p:identity name="identity-html">
         <p:input port="source">
-          <p:pipe port="result" step="hub2tei"/>
+          <p:pipe port="html" step="choose-output-xml"/>
         </p:input>
-        <p:input port="paths">
-          <p:pipe port="params" step="hub2epub"/>
-        </p:input>
-        <p:with-option name="srcpaths" select="'yes'"/>
-        <p:with-option name="debug" select="$debug"/>
-        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-      </tei2html:tei2html>
+      </p:identity>
+      
     </p:otherwise>  
   </p:choose>
   
