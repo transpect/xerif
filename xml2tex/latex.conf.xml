@@ -1787,6 +1787,7 @@
   </template>-->
   
   <template context="dbk:imagedata[@fileref]">
+    <xsl:sequence select="ancestor::dbk:figure/@xlink:href/concat('\imgHref{', ancestor::dbk:figure/@xlink:href, '}{')"/>
     <rule name="includegraphics" type="cmd">
       <xsl:if test="xml2tex:image-option(.)[normalize-space()]">
         <option select="xml2tex:image-option(.)"/>
@@ -1798,6 +1799,7 @@
                        [..[not(@css:display eq 'grid')]]">
       <xsl:text>&#xa;</xsl:text>
     </xsl:if>
+    <xsl:sequence select="ancestor::dbk:figure/@xlink:href/'}'"/>
   </template>
   
   <xsl:function name="xml2tex:get-image-url" as="xs:string">
