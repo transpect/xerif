@@ -2125,8 +2125,6 @@
   <!--  *
         * empty lines
         * -->
-  <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
-  
   
   <template context="dbk:para[matches(@role, $empty-line-style)]" priority="900">
     <xsl:variable name="line-count-str" as="xs:string?" 
