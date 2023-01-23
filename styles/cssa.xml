@@ -25,6 +25,7 @@
   <css:rule layout-type="para" native-name="ts_motto" name="tsmotto" regex="^[a-z]{1,3}motto$"/>
   <css:rule layout-type="para" native-name="ts_motto_source" name="tsmottosource" regex="^[a-z]{1,3}mottosource$"/>
   <css:rule layout-type="para" native-name="ts_figure" name="tsfigure" regex="^[a-z]{1,3}figure([A-Z]\d)?"/>
+  <css:rule layout-type="para" native-name="ts_figure_link" name="tsfigurelink" regex="^[a-z]{1,3}tsfigurelink$"/>
   <css:rule layout-type="para" native-name="ts_figure_caption" name="tsfigurecaption" regex="^[a-z]{1,3}figurecaption$"/>
   <css:rule layout-type="para" native-name="ts_figure_source" name="tsfiguresource" regex="^[a-z]{1,3}figuresource$"/>
   <css:rule layout-type="para" native-name="ts_box_border_start" name="tsboxborderstart" regex="^[a-z]{1,3}boxborderstart$"/>
