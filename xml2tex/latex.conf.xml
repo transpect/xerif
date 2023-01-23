@@ -714,7 +714,7 @@
       <!-- Endnoten an der Position des Absatzes mit Endnotenüberschrift -->
       <xsl:when test="$context[self::dbk:chapter
                               |self::dbk:section]
-                              [matches(dbk:info/dbk:title/@role, $endnotes-heading-style) ]">
+                              [dbk:info/dbk:title/@role[matches(., $endnotes-heading-style)]]">
         <rule name="printnotes" type="cmd" break-before="1"/>                              
       </xsl:when>
     </xsl:choose>
@@ -1703,13 +1703,15 @@
                                                                                                                                             'hub:caption-numtext-separator', 'identifier', 
                                                                                                                                             'caption-number', 'caption-numtext-separator')]])]" 
                       as="node()*"/>
-      <rule name="tpCaption" type="cmd" break-before="1" break-after="0">
+      <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
         <param select="$caption-nodes-without-num"/>
       </rule>
-      <xsl:if test="descendant::dbk:footnote">
-        <rule name="tpListofCaption" type="cmd" break-before="1" break-after="0">
+      <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
+                                                                      [@xml:id = $link-refs]">
+        <rule name="tpListofCaption" type="cmd" break-before="0" break-after="1">
           <param select="$caption-nodes-without-num">
             <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
           </param>
         </rule>
       </xsl:if>
@@ -2545,11 +2547,14 @@
   <template context="dbk:anchor[@role eq 'start' or not(@role)]
                                [@xml:id = $link-refs]">
     <xsl:param name="as-title-param" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="remove-ref-target" as="xs:boolean?" tunnel="yes"/>
     <xsl:variable name="index" select="index-of($anchor-ids, @xml:id)" as="xs:integer?"/>
     <xsl:variable name="label" select="concat('ref-', string-join(for $i in (string-length(xs:string($index)) to $anchor-digits) return '0', ''), $index)" as="xs:string"/>
     <xsl:choose>
+      <xsl:when test="$remove-ref-target"><!-- in figure/table captions: discard in \tpListofCaption--></xsl:when>
       <xsl:when test="$as-title-param"><xsl:value-of select="$label"/></xsl:when>
-      <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]"/>
+      <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]
+                                 [not(..[self::dbk:figure|self::*:table])]"/>
       <xsl:otherwise>
         <xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/>
       </xsl:otherwise>
