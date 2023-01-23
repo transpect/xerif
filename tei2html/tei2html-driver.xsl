@@ -23,4 +23,8 @@
     <!--https://redmine.le-tex.de/issues/13166-->
   </xsl:template>
   
+  <xsl:template match="css:rule[@native-name[matches(., '^[a-z]{1,3}_figure')]]/@*[name() = ('css:font-style', 'css:font-weight')]" mode="epub-alternatives">
+    <!-- avoid wrapping of elements in img tags -->
+  </xsl:template>
+
 </xsl:stylesheet>
