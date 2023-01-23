@@ -432,9 +432,16 @@
   
   <xsl:variable name="src-dir-uri" select="/hub/info/keywordset[@role eq 'hub']/keyword[@role eq 'source-dir-uri']" as="xs:string"/>
   
-  <xsl:template match="imagedata/@fileref[not(contains(., '192.168'))]" mode="hub:hierarchy">
+  <xsl:template match="imagedata/@fileref[starts-with(., 'container:')]
+    [not(contains(., '192.168'))]" mode="hub:hierarchy">
     <xsl:attribute name="fileref" 
-                   select="hub:container-path-to-uri(., /hub/info/keywordset[@role eq 'hub']/keyword[@role eq 'source-dir-uri'])"/>
+      select="hub:container-path-to-uri(., /hub/info/keywordset[@role eq 'hub']/keyword[@role eq 'source-dir-uri'])"/>
+  </xsl:template>
+  
+  <xsl:template match="imagedata/@fileref[not(matches(., '^(file|https?|container):'))]
+    [not(contains(., '192.168'))]" mode="hub:hierarchy">
+    <xsl:attribute name="fileref" 
+                   select="concat($s9y1-path, 'images/', .)"/>
   </xsl:template>
   
   <!-- group multiple adjacent images in one figure environment -->
