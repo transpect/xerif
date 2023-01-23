@@ -1809,7 +1809,6 @@
     <xsl:param name="image-dir" as="xs:string?"/>
     <xsl:sequence select="replace(
                                   string-join(($image-dir,
-                                               'print'[$imagedata/@role eq 'archive'],
                                                replace($imagedata/@fileref, '^.+/(.+?)$', '$1')), 
                                                '/'),
                                   '(^(file|https?)://)?((.+/)/)+', '$1$4')"/>
