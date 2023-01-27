@@ -215,7 +215,18 @@
     <xsl:for-each select="$authors">
       <xsl:variable name="pos" select="position()" as="xs:integer"/>
       <xsl:text>&#xa;\begin{tpAuthor}</xsl:text>
-      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
+      <xsl:choose>
+        <xsl:when test="dbk:personname/dbk:firstname and dbk:personname/dbk:surname">
+          <xsl:value-of select="concat('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}')"/>
+          <xsl:value-of select="concat('&#xa;\tpSurName{',   xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
+        </xsl:when>
+        <xsl:when test="dbk:personname">
+          <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname), '}')"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
+        </xsl:otherwise>  
+      </xsl:choose>
       <xsl:if test="$author-info">
         <xsl:value-of select="concat('&#xa;\tpBio{', normalize-space($author-info[$pos]), '}')"/>
       </xsl:if>
