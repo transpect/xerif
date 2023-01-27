@@ -218,7 +218,7 @@
       <xsl:choose>
         <xsl:when test="dbk:personname/dbk:firstname and dbk:personname/dbk:surname">
           <xsl:value-of select="concat('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}')"/>
-          <xsl:value-of select="concat('&#xa;\tpSurName{',   xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
+          <xsl:value-of select="concat('&#xa;\tpLastName{',   xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
         </xsl:when>
         <xsl:when test="dbk:personname">
           <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname), '}')"/>
