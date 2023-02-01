@@ -294,10 +294,10 @@
     \tp@flt@check@empty{Source}{source}%
     \expandafter\ifx\csname tp@#2@attr@nolist\endcsname\@empty\else
       \let\@tp@listof@entry\relax
-      \tpIfComp{ListofCaption}{\csgappto{@tp@listof@entry}{\tpUseComp{ListofCaption}}}{}%
-      \tpIfComp{ListofNumber}{\csgappto{@tp@listof@entry}{\tpUseComp{ListofNumber}}}{}%
-      \tpIfComp{ListofLegend}{\csgappto{@tp@listof@entry}{\tpUseComp{ListofLegend}}}{}%
-      \tpIfComp{ListofSource}{\csgappto{@tp@listof@entry}{\tpUseComp{ListofSource}}}{}%
+      \tpIfComp{ListofCaption}{\csgappto{@tp@listof@entry}{\string\tpListofCaption{\tpUseComp{ListofCaption}}}}{}%
+      \tpIfComp{ListofNumber}{\csgappto{@tp@listof@entry}{\string\tpListofNumber{\tpUseComp{ListofNumber}}}}{}%
+      \tpIfComp{ListofLegend}{\csgappto{@tp@listof@entry}{\string\tpListofLegend{\tpUseComp{ListofLegend}}}}{}%
+      \tpIfComp{ListofSource}{\csgappto{@tp@listof@entry}{\string\tpListofSource{\tpUseComp{ListofSource}}}}{}%
       \ifx\@tp@listof@entry\relax\else
         \protected@edef\tp@listof@entry{\@tp@listof@entry}%
         \ifx\tp@captype\tp@str@figure
