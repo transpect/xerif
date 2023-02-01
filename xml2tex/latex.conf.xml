@@ -2570,8 +2570,8 @@
       <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]
                                  [not(..[self::dbk:figure|self::*:table])]"/>
       <xsl:when test="key('item-by-linkend', @xml:id)[@role = 'page']">
-        <!-- pageref -->
-        <xsl:value-of select="concat('\label{', $label, '}')"/>
+        <!-- pageref, https://redmine.le-tex.de/issues/14169 -->
+        <xsl:value-of select="concat('\tpPageLabel{', $label, '}')"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/>
