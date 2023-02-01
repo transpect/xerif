@@ -33,6 +33,9 @@
   <xsl:variable name="hub:blockquote-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation)$'"/>
   
+  <xsl:variable name="hub:blockquote-source-role-regex" as="xs:string" 
+                select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation)source$'"/>
+  
   <xsl:variable name="hub:list-by-indent-exception-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(literature|body|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula)'"/>  
   

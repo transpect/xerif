@@ -1905,24 +1905,15 @@
   <!--  *
         * quotation
         * -->
-  <xsl:variable name="dialogue-style" select="'^[a-z]+dialogue'" as="xs:string"/>
   
    <template context="dbk:blockquote[not(..[self::dbk:info])]">
     <rule name="quote" type="env" break-before="1">
+      <xsl:if test="dbk:attribution">
+        <xsl:text>[</xsl:text>
+        <xsl:apply-templates select="dbk:attribution/node()" mode="#current"/>
+        <xsl:text>]</xsl:text>
+      </xsl:if>
       <text/>
-    </rule>
-  </template>
-  
-  <template context="dbk:blockquote[dbk:para][count(*) = 1]">
-    <rule name="quote" type="env" break-before="1" break-after="1">
-      <param/>
-    </rule>
-  </template>
-
-  <template context="dbk:blockquote[dbk:para][count(*) gt 1][not(..[self::dbk:info])] 
-                    |dbk:blockquote[matches(@role, $dialogue-style)]">
-    <rule name="quotation" type="env" break-before="1"  break-after="1">
-      <param/>
     </rule>
   </template>
   
