@@ -310,7 +310,7 @@
         \ifx\tp@is@subflt\relax
           \tp@savecontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
         \else
-          \addcontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
+          \tp@flt@addcontentsline{#1}{\tp@captype}{\expandonce{\tp@listof@entry}}%
           \tp@@savecontentsline
         \fi
       \fi
