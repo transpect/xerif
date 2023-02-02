@@ -60,7 +60,7 @@
   <p:choose name="validate-xml">
     <p:when test="/*:TEI">
       <p:xpath-context>
-        <p:pipe port="source" step="validate"></p:pipe>
+        <p:pipe port="source" step="validate"/>
       </p:xpath-context>
       <p:output port="result" primary="true" />
       <p:output port="reports" sequence="true">
@@ -69,50 +69,39 @@
       </p:output>
   
       <tr:validate-with-rng-svrl name="validate-tei-schema">
-    <p:input port="schema">
-      <p:pipe port="schema" step="validate"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </tr:validate-with-rng-svrl>
+        <p:input port="schema">
+          <p:pipe port="schema" step="validate"/>
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </tr:validate-with-rng-svrl>
   
-  <tr:validate-with-schematron name="validate-business-rules">
-    <p:input port="parameters">
-      <p:pipe port="paths" step="validate"/>
-    </p:input>
-    <p:input port="html-in">
-      <p:empty/>
-    </p:input>
-    <p:with-param name="family" select="'business-rules'"/>
-    <p:with-param name="step-name" select="'validate-business-rules'"/>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-    <p:with-option name="schematron-rule-msg" select="'yes'"/>
-  </tr:validate-with-schematron>
+      <tr:validate-with-schematron name="validate-business-rules">
+        <p:input port="parameters">
+          <p:pipe port="paths" step="validate"/>
+        </p:input>
+        <p:input port="html-in">
+          <p:empty/>
+        </p:input>
+        <p:with-param name="family" select="'business-rules'"/>
+        <p:with-param name="step-name" select="'validate-business-rules'"/>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+        <p:with-option name="schematron-rule-msg" select="'yes'"/>
+      </tr:validate-with-schematron>
   
     </p:when>
     <p:when test="/*:hub or /*:book">
       <p:xpath-context>
-        <p:pipe port="source" step="validate"></p:pipe>
+        <p:pipe port="source" step="validate"/>
       </p:xpath-context>
       <p:output port="result" primary="true" />
       <p:output port="reports" sequence="true">
         <p:pipe port="report" step="validate-bits-schema"/>
         <p:pipe port="report" step="validate-bits-business-rules"/>
       </p:output>
-      
-      <p:delete match="@css:* | css:rules | @srcpath | @c:*"/>
-      
-       <tr:validate-with-rng-svrl name="validate-bits-schema">
-        <p:input port="schema">
-          <p:document href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng"/>
-        </p:input>
-        <p:with-option name="debug" select="$debug"/>
-        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-      </tr:validate-with-rng-svrl>
       
       <tr:validate-with-schematron name="validate-bits-business-rules">
         <p:input port="parameters">
@@ -128,6 +117,18 @@
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
         <p:with-option name="schematron-rule-msg" select="'yes'"/>
       </tr:validate-with-schematron>
+      
+      <p:delete match="@css:* | css:rules | @srcpath | @c:*"/>
+      
+      <tr:validate-with-rng-svrl name="validate-bits-schema">
+        <p:input port="schema">
+          <p:document href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng"/>
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </tr:validate-with-rng-svrl>
+      
     </p:when>
     <p:otherwise>
       <p:output port="result" primary="true" />
