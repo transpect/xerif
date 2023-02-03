@@ -143,7 +143,7 @@
                             )[1],
                            para[matches(@role, $info-subtitle-role)],
                            title,
-                           abbrev,
+                           titleabbrev,
                            epigraph,
                            biblioset,
                            abstract,
@@ -249,7 +249,7 @@
                            blockquote[para[matches(@role, '^[a-z]{1,3}motto$')]],
                            para[matches(@role, $info-subtitle-role)],
                            title,
-                           abbrev,
+                           titleabbrev,
                            epigraph,
                            biblioset,
                            abstract,
@@ -868,7 +868,7 @@
   <xsl:template match="*[local-name() = ('chapter', 'section', 'appendix')]
                         [title]
                         [bibliomixed]
-                        [every $i in *[not(self::title|self::bridgehead|self::abbrev)]
+                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev)]
                          satisfies $i/local-name() eq 'bibliomixed']" 
                 mode="custom-1" priority="5">
     <bibliography>
@@ -890,7 +890,7 @@
                         [bibliomixed]
                         [count(distinct-values(*[not(self::title
                                                     |self::bridgehead
-                                                    |self::abbrev
+                                                    |self::titleabbrev
                                                     |self::info)]/local-name())) gt 1]" 
                 mode="custom-1" priority="3">
     <xsl:variable name="chapter-info" as="element()*" 
@@ -899,7 +899,7 @@
                             )[1],
                            para[matches(@role, $info-subtitle-role)],
                            title,
-                           abbrev,
+                           titleabbrev,
                            epigraph,
                            biblioset,
                            abstract,
@@ -1427,9 +1427,9 @@
  <!-- sort metadata in chapter  -->
   <xsl:template match="*[sidebar[@role = 'chunk-metadata']]" mode="hub:process-meta-sidebar" priority="5">
     <xsl:copy>
-      <xsl:apply-templates select="@*, (title | abbrev | subtitle | author | para[@role[matches(.,'^(tsauthor|tssubheading)')]])" mode="#current"/>
+      <xsl:apply-templates select="@*, (title | titleabbrev | subtitle | author | para[@role[matches(.,'^(tsauthor|tssubheading)')]])" mode="#current"/>
       <xsl:apply-templates select="sidebar[@role = 'chunk-metadata']" mode="#current"/>
-      <xsl:apply-templates select="node() except (title | abbrev | subtitle | author | para[@role[matches(.,'^(tsauthor|tssubheading)')]] | sidebar[@role = 'chunk-metadata'])" mode="#current"/>
+      <xsl:apply-templates select="node() except (title | titleabbrev | subtitle | author | para[@role[matches(.,'^(tsauthor|tssubheading)')]] | sidebar[@role = 'chunk-metadata'])" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   
