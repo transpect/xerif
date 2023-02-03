@@ -395,9 +395,9 @@
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $running-header-regex)]" mode="running-header">
-    <abbrev role="{@role}">
+    <titleabbrev role="{@role}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </abbrev>
+    </titleabbrev>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $running-header-regex)]" mode="hub:clean-hub"/>
