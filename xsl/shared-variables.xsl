@@ -184,6 +184,8 @@
 
   <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
 
+  <xsl:variable name="dialogue-style" select="'^[a-z]+dialogue'" as="xs:string"/>
+
   <!-- the following variables are mainly for the idml conversion and checking pipelines -->
 
   <xsl:key name="tr:rule-definition-in-document" match="css:rule" use="@name"/>
