@@ -47,7 +47,7 @@
   
   <xsl:template name="publication-stm">
     <xsl:if test="not(info/publisher)">
-      <publisher>transcript</publisher>
+      <publisher>xerif</publisher>
     </xsl:if>
     <xsl:apply-templates select="info/publisher,
                                  info/legalnotice,
@@ -150,7 +150,7 @@
     </titlePart>
   </xsl:template>
 
-  <xsl:template match="dbk:abbrev" mode="hub2tei:dbk2tei">
+  <xsl:template match="dbk:titleabbrev" mode="hub2tei:dbk2tei">
     <head>
       <xsl:attribute name="type" select="'titleabbrev'"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
