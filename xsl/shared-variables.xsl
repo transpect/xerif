@@ -99,6 +99,21 @@
   <xsl:variable name="poem-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
   
+  <xsl:variable name="verse-style" as="xs:string"
+                select="'^[a-z]+_?verse$'"/>
+  
+  <xsl:variable name="verse-centered-style" as="xs:string"
+                select="'^[a-z]+_?verse_\-_centered$'"/>
+
+  <xsl:variable name="verse-misc-style" as="xs:string"
+                select="'^[a-z]+_?verse.*$'" />
+  
+  <xsl:variable name="letter-para-style" as="xs:string" 
+                select="'ts_letter$'"/>
+  
+  <xsl:variable name="letter-spacing-para-style" as="xs:string" 
+                select="'ts_letter_spacing$'"/>
+  
   <!-- role for para that contains image or file reference, first 
        regex group identifies class, second group represents position -->
   <xsl:variable name="figure-image-role-regex" as="xs:string"

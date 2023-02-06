@@ -1977,9 +1977,6 @@
   <!--  *
         * verse
         * -->
-  <xsl:variable name="verse-style" select="'^[a-z]+_?verse$'" as="xs:string"/>
-  <xsl:variable name="verse-centered-style" select="'^[a-z]+_?verse_\-_centered$'" as="xs:string"/>
-  <xsl:variable name="verse-misc-style" select="'^[a-z]+_?verse.*$'" as="xs:string"/>
 
   <template context="dbk:blockquote[matches(@role, $verse-style)]">
     <rule name="verse" type="env" break-after="1" break-before="1">
@@ -1994,10 +1991,7 @@
   </template>
 
     <!-- letters -->
-  
-  <xsl:variable name="letter-para-style" as="xs:string" select="'ts_letter$'"/>
-  <xsl:variable name="letter-spacing-para-style" as="xs:string" select="'ts_letter_spacing$'"/>
-  
+    
   <template context="dbk:div[@role = ('letter', 'poem')] | dbk:sidebar[@role = ('letter', 'poem')]">
     <rule name="letter" type="env" break-after="1"  break-before="1">
       <text/>
