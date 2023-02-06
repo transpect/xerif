@@ -28,7 +28,7 @@
 
   <xsl:template match="title[phrase[matches(@role, 'berschrift1')]]" mode="hub:postprocess-hierarchy">
     <xsl:next-match/>
-    <xsl:element name="abbrev">
+    <xsl:element name="titleabbrev">
       <xsl:attribute name="role" select="'tsheadlineright'"/>
       <xsl:apply-templates select="phrase[matches(@role, 'berschrift1')]/node()[not(self::br[. is ../node()[last()]])]" mode="#current"/>
     </xsl:element>
