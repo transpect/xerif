@@ -2419,7 +2419,7 @@
     <xsl:text>}</xsl:text>
   </template>
   
-  <!-- override from docx2tex for chinese -->
+  <!-- override from docx2tex for arabic and chinese -->
   
   <template context="dbk:phrase[@css:text-decoration-line ne 'none']
                                [(@css:text-decoration-line[. eq 'underline'] 
@@ -2428,10 +2428,10 @@
                                [not(@role eq 'Hyperlink')] 
                                [not(parent::dbk:link)]
                                [not(.//dbk:link)]
-                               [matches(., '[&#x600;-&#x6ff;&#x4e00;-&#x9fff;]')]">
-    <rule name="underline" type="cmd">
-      <xsl:next-match/>
-    </rule>
+                               [matches(., concat('[', string-join(($scripts[@name = ('arabic', 'chinese')]/@unicode-range)), ']'))]">
+    <xsl:text>\underline{</xsl:text>
+    <xsl:apply-templates mode="#current"/>
+    <xsl:text>}</xsl:text>
   </template>
   
   <!-- suppress hyphenation -->
