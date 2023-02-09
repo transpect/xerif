@@ -1849,7 +1849,13 @@
     <xsl:text>&#x20;</xsl:text>
   </template>
   
-    <!-- list terms with fixed width: https://redmine.le-tex.de/issues/9844 -->
+  <!-- override template above to remove leading whitespace in tpCaption
+       https://redmine.le-tex.de/issues/14282
+  -->
+  
+  <template context="dbk:figure/dbk:title/dbk:phrase[@role eq 'hub:caption-text']/dbk:tab[not(preceding-sibling::node())]"/>
+  
+  <!-- list terms with fixed width: https://redmine.le-tex.de/issues/9844 -->
   
   <template context="dbk:variablelist[matches(@role, '^[a-z]{1,3}abbreviations$')]">
     <rule name="description" type="env" break-before="1">
