@@ -229,8 +229,8 @@
   
   <xsl:template match="@xml:lang[. = ../../@xml:lang]" mode="hub:preprocess-hierarchy"/>
 
-  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())] | 
-                       para[@xml:lang][(ancestor::*[@xml:lang])[1][@xml:lang = current()/@xml:lang]] " mode="hub:preprocess-hierarchy">
+  <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]
+                      |para[@xml:lang][(ancestor::*[@xml:lang])[1][@xml:lang = current()/@xml:lang]] " mode="hub:preprocess-hierarchy">
     <xsl:copy>
       <!-- discard lang on paras without text, discard lang on para whose ancestor has same lang -->
       <xsl:apply-templates select="@* except @xml:lang, node()" mode="#current"/>
@@ -241,6 +241,9 @@
                            [not((ancestor::*[@xml:lang])[1][@xml:lang ne $doc-lang])]/@xml:lang" mode="hub:preprocess-hierarchy">
     <!-- discard lang on para if it is the same as doc lang. except if ancestor has another language. -->
   </xsl:template>
+  
+  <xsl:template match="entry[@xml:lang eq $doc-lang]
+                            [not((ancestor::*[@xml:lang])[1][@xml:lang ne $doc-lang])]/@xml:lang" mode="hub:preprocess-hierarchy"/>
   
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
