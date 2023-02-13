@@ -12,7 +12,7 @@
   <p:input port="parameters" kind="parameter" primary="true"/>
   <p:output port="result" primary="true"/>
   <p:output port="report" primary="false" sequence="true">
-    <p:pipe port="report" step="validate-hub"/>
+    <p:pipe port="report" step="evolve-hub-dyn"/>
   </p:output>
   
   <p:option name="debug" required="false" select="'no'"/>
@@ -23,7 +23,6 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/dynamic-transformation-pipeline.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
-  <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
   
   <tr:dynamic-transformation-pipeline name="evolve-hub-dyn" 
                                       load="evolve-hub/driver-docx"
@@ -41,20 +40,5 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tr:dynamic-transformation-pipeline>
-  
-  <tr:validate-with-schematron name="validate-hub">
-    <p:input port="parameters">
-      <p:pipe port="parameters" step="tx-evolve-hub"/>
-    </p:input>
-    <p:input port="html-in">
-      <p:empty/>
-    </p:input>
-    <p:with-param name="family" select="'formatting'"/>
-    <p:with-param name="step-name" select="'validate-formatting'"/>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-    <p:with-option name="schematron-rule-msg" select="'yes'"/>
-  </tr:validate-with-schematron>
   
 </p:declare-step>

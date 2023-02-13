@@ -32,6 +32,7 @@
   <p:output port="report" sequence="true">
     <p:pipe port="report" step="docx2hub"/>
     <p:pipe port="report" step="check-styles"/>
+    <p:pipe port="report" step="check-formatting"/>
     <p:pipe port="report" step="evolve-hub-dyn"/>
   </p:output>
   
@@ -48,6 +49,7 @@
   <p:import href="http://transpect.io/docx2hub/xpl/docx2hub.xpl"/>
   <p:import href="http://transpect.io/evolve-hub/xpl/evolve-hub.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/check-styles.xpl"/>
+  <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
   
   <p:import href="evolve-hub.xpl"/>
   <p:import href="copy-images.xpl"/>
@@ -81,7 +83,22 @@
     <p:with-option name="cssa" select="'styles/cssa.xml'"/>
     <p:with-option name="differentiate-by-style" select="'true'"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </tr:check-styles>     
+  </tr:check-styles>
+  
+  <tr:validate-with-schematron name="check-formatting">
+    <p:input port="parameters">
+      <p:pipe port="source" step="docx2evolve"/>
+    </p:input>
+    <p:input port="html-in">
+      <p:empty/>
+    </p:input>
+    <p:with-param name="family" select="'check-formatting'"/>
+    <p:with-param name="step-name" select="'check-formatting'"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+    <p:with-option name="schematron-rule-msg" select="'yes'"/>
+  </tr:validate-with-schematron>
   
   <tx:evolve-hub name="evolve-hub-dyn">
     <p:input port="parameters">
