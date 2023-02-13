@@ -445,13 +445,13 @@
   <xsl:variable name="src-dir-uri" select="/hub/info/keywordset[@role eq 'hub']/keyword[@role eq 'source-dir-uri']" as="xs:string"/>
   
   <xsl:template match="imagedata/@fileref[starts-with(., 'container:')]
-    [not(contains(., '192.168'))]" mode="hub:hierarchy">
+                                         [not(contains(., '192.168'))]" mode="hub:hierarchy">
     <xsl:attribute name="fileref" 
       select="hub:container-path-to-uri(., /hub/info/keywordset[@role eq 'hub']/keyword[@role eq 'source-dir-uri'])"/>
   </xsl:template>
   
   <xsl:template match="imagedata/@fileref[not(matches(., '^(file|https?|container):'))]
-    [not(contains(., '192.168'))]" mode="hub:hierarchy">
+                                         [not(contains(., '192.168'))]" mode="hub:hierarchy">
     <xsl:attribute name="fileref" 
                    select="concat($s9y1-path, 'images/', .)"/>
   </xsl:template>
@@ -470,7 +470,8 @@
                                ')')" />
   
   <xsl:template match="*[   para[.//mediaobject]
-                         or para[matches(@role, $figure-image-role-regex, 'i')]][normalize-space()]" mode="hub:split-at-tab">
+                         or para[matches(@role, $figure-image-role-regex, 'i')]]
+                                [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]" mode="hub:split-at-tab">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
@@ -481,18 +482,19 @@
           -->
           <xsl:when test="current-grouping-key()">
             <xsl:variable name="one-caption-for-multiple-images" as="xs:boolean" 
-                         select="not(   count(current-group()[matches(@role, $figure-caption-role-regex, 'i')]) gt 1
-                                     or count(current-group()[matches(@role, $figure-source-role-regex, 'i')])  gt 1)"/>
+                          select="not(   count(current-group()[matches(@role, $figure-caption-role-regex, 'i')][normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]) gt 1
+                                      or count(current-group()[matches(@role, $figure-source-role-regex, 'i')][normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))])  gt 1)"/>
             <xsl:variable name="is-grid-group" as="xs:boolean"
                           select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])
-                                  and (   count(current-group()//dbk:mediaobject) gt 1
+                                  and (   count(current-group()//mediaobject) gt 1
                                        or count(current-group()[matches(@role, $figure-image-role-regex)]) gt 1)"/>
             <xsl:variable name="image-object-or-file-reference" as="element()*" 
                           select="if(not(current-group()//mediaobject))
                                   then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                                   else current-group()//mediaobject"/>
             <xsl:variable name="float-pos" as="xs:string?" 
-                          select=".//phrase[matches(@role, $pi-style-regex, 'i')][matches(., concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
+                          select=".//phrase[matches(@role, $pi-style-regex, 'i')]
+                                           [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
@@ -549,8 +551,9 @@
   
   <!-- create mediaobject from file reference text -->
   
-  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
-                           [not(.//mediaobject)]" mode="figures">
+  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')]
+                           [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]
+                           [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
       <imageobject>
         <imagedata role="archive" fileref="{normalize-space(.)}"/>
