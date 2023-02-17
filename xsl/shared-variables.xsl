@@ -195,7 +195,12 @@
   
   <xsl:variable name="endnotes-heading-style" select="'^[a-z]{1,3}listofendnotes$'" as="xs:string"/>
 
-  <xsl:variable name="hub:article-keywords-role-regex" as="xs:string" select="'tsmeta(chunk)?keywords'"/>
+  <xsl:variable name="hub:headword-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?headword'"/>
+  <xsl:variable name="hub:keywords-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?keywords'"/>
+  <xsl:variable name="hub:abstract-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?abstract'"/>
+  <xsl:variable name="hub:trans-title-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?transtitle'"/>
+  <xsl:variable name="hub:keyword-abstract-transtitle-combined" as="xs:string" 
+              select="concat($hub:abstract-role-regex, '|', $hub:keywords-role-regex, '|', $hub:trans-title-role-regex)"/>
 
   <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
 
