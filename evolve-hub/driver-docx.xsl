@@ -488,7 +488,7 @@
             <xsl:variable name="is-grid-group" as="xs:boolean"
                           select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])
                                   and (   count(current-group()//mediaobject) gt 1
-                                       or count(current-group()[matches(@role, $figure-image-role-regex)]) gt 1)"/>
+                                       or count(current-group()[matches(@role, $figure-image-role-regex, 'i')]) gt 1)"/>
             <xsl:variable name="image-object-or-file-reference" as="element()*" 
                           select="if(not(current-group()//mediaobject))
                                   then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
