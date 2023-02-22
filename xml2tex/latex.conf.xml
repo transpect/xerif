@@ -2297,38 +2297,35 @@
       <param/>
     </rule>
   </template>
-  
-  <regex regex="([&#x4e00;-&#x9fff;]+)">
-    <rule name="foreignlanguage" type="cmd">
-      <param>chinese</param>
-      <param regex-group="1"/>
-    </rule>
-  </regex>
-  
-  <regex regex="([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)">
-    <rule name="foreignlanguage" type="cmd">
-      <param>hebrew</param>
-      <param regex-group="1"/>
-    </rule>
-  </regex>
-  
-  <regex regex="([&#x3040;-&#x309f;&#x30a0;-&#x30ff;]+)">
-    <rule name="foreignlanguage" type="cmd">
-      <param>japanese</param>
-      <param regex-group="1"/>
-    </rule>
-  </regex>
-  
+ 
   <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)">
     <rule name="armenian" type="cmd">
       <param regex-group="1"/>
     </rule>
   </regex>
 
-  <regex regex="([&#x600;-&#x6ff;]+)">
+  <regex regex="([&#x4e00;-&#x9fff;]+)|([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)|([&#x3040;-&#x309f;&#x30a0;-&#x30ff;]+)|([&#x600;-&#x6ff;]+)">
     <rule name="foreignlanguage" type="cmd">
-      <param>arabic</param>
-      <param regex-group="1"/>
+      <!-- merged 4 single language templates to this one to handle cases where several languages are contained in 
+           the same text node https://redmine.le-tex.de/issues/14343 -->
+      <xsl:choose>
+        <xsl:when test="regex-group(1)">      
+          <param>chinese</param>
+          <param regex-group="1"/>
+        </xsl:when>
+        <xsl:when test="regex-group(2)">      
+          <param>hebrew</param>
+          <param regex-group="2"/>
+        </xsl:when>
+        <xsl:when test="regex-group(3)">      
+          <param>japanese</param>
+          <param regex-group="3"/>
+        </xsl:when>
+        <xsl:when test="regex-group(4)">      
+          <param>arabic</param>
+          <param regex-group="4"/>
+        </xsl:when>
+      </xsl:choose>
     </rule>
   </regex>
   
