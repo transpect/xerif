@@ -2449,13 +2449,6 @@
   
   <!-- escape special characters in \url and \href inside footnotes
        https://redmine.le-tex.de/issues/5376 -->
-  <!-- insert conditional splits  -->
-  <template context="dbk:ulink[matches(@url, '^(https?|ftp):')]">
-    <rule name="href" type="cmd">
-      <param select="replace((@url, @xlink:href)[1], '(%|#|_|\\)', '\\$1' )"/>
-      <param select="xml2tex:add-tactical-break-chars-in-linktext(@url)"/>
-    </rule>
-  </template>
   
   <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'">
     <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
