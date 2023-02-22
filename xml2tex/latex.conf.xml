@@ -2453,17 +2453,7 @@
   <template context="dbk:ulink[matches(@url, '^(https?|ftp):')]">
     <rule name="href" type="cmd">
       <param select="replace((@url, @xlink:href)[1], '(%|#|_|\\)', '\\$1' )"/>
-      <param select="replace(
-                             replace(
-                                     replace((@url, .)[1],
-                                             '([-%_./=?])([^-%_./=?]{3,})',
-                                             '$1&#x21a9;$2'
-                                             ),
-                                     '\\?(&amp;)',
-                                     '&#x21a9;\\$1'
-                                     ), 
-                             '\\?_', '\\_'
-                             )"/>
+      <param select="xml2tex:add-tactical-break-chars-in-linktext(@url)"/>
     </rule>
   </template>
   
