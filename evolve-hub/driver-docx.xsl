@@ -496,6 +496,7 @@
             <xsl:variable name="float-pos" as="xs:string?" 
                           select=".//phrase[matches(@role, $pi-style-regex, 'i')]
                                            [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
+            
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
@@ -557,7 +558,7 @@
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
       <imageobject>
-        <imagedata role="archive" fileref="{normalize-space(.)}"/>
+        <imagedata role="archive" fileref="{normalize-space(replace(., concat($pi-mark, '[a-z]+'), ''))}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>
