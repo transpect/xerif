@@ -486,7 +486,7 @@
                           select="not(   count(current-group()[matches(@role, $figure-caption-role-regex, 'i')][normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]) gt 1
                                       or count(current-group()[matches(@role, $figure-source-role-regex, 'i')][normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))])  gt 1)"/>
             <xsl:variable name="is-grid-group" as="xs:boolean"
-                          select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, '\d+$')])
+                          select="    exists(current-group()[matches(@role, $figure-image-role-regex, 'i')][1][matches(@role, $figure-group-suffix-regex)])
                                   and (   count(current-group()//mediaobject) gt 1
                                        or count(current-group()[matches(@role, $figure-image-role-regex, 'i')]) gt 1)"/>
             <xsl:variable name="image-object-or-file-reference" as="element()*" 
@@ -500,7 +500,7 @@
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
-              <xsl:if test="exists($float-pos)">
+              <xsl:if test="$is-grid-group and exists($float-pos)">
                 <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
               </xsl:if>
               <xsl:if test="$is-grid-group">
@@ -526,7 +526,13 @@
                 <xsl:otherwise>
                     <xsl:for-each-group select="current-group()" 
                                         group-starting-with="self::para[matches(@role, $figure-image-role-regex, 'i')]">
+                      <xsl:variable name="float-pos" as="xs:string?" 
+                                    select=".//phrase[matches(@role, $pi-style-regex, 'i')]
+                                                     [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
                       <figure>
+                        <xsl:if test="not($is-grid-group) and exists($float-pos)">
+                          <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
+                        </xsl:if>
                         <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')][1]/@role" mode="figure-role-type">
                           <xsl:with-param name="is-grid-group" select="$is-grid-group" as="xs:boolean"/>
                         </xsl:apply-templates>
@@ -558,7 +564,7 @@
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
       <imageobject>
-        <imagedata role="archive" fileref="{normalize-space(replace(., concat($pi-mark, '[a-z]+'), ''))}"/>
+        <imagedata role="archive" fileref="{normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>

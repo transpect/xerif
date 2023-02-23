@@ -131,6 +131,9 @@
   <xsl:variable name="figure-link-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figurelink$'"/>
   
+  <xsl:variable name="figure-group-suffix-regex" as="xs:string"
+                select="'\d+$'"/>
+  
   <xsl:variable name="table-caption-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}tablecaption$'" />
   
