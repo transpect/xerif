@@ -2009,7 +2009,15 @@
     </rule>
   </template>
 
-    <!-- letters -->
+  <!-- transcripts -->
+
+  <template context="dbk:div[@role = 'transcription']">
+    <rule name="transcript" type="env" break-after="1"  break-before="1">
+      <text/>
+    </rule>
+  </template>
+
+  <!-- letters -->
     
   <template context="dbk:div[@role = ('letter', 'poem')] | dbk:sidebar[@role = ('letter', 'poem')]">
     <rule name="letter" type="env" break-after="1"  break-before="1">
