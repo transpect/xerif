@@ -929,9 +929,11 @@
   </template>
   
   <template context="dbk:index[empty(.//dbk:indexentry)]">
-   <xsl:apply-templates select="dbk:info" mode="#current">
+    <xsl:variable name="introduction-paras" as="xs:boolean" select="count(dbk:para) le 3"/>
+   <xsl:apply-templates select="dbk:info, if ($introduction-paras) then dbk:para else ()" mode="#current">
       <xsl:with-param name="discard-info" select="false()" as="xs:boolean" tunnel="yes"/>
     </xsl:apply-templates>
+    <xsl:if test="$introduction-paras"><xsl:text>&#xa;</xsl:text></xsl:if>
     <xsl:next-match>
       <xsl:with-param name="discard-info" select="true()" as="xs:boolean" tunnel="yes"/>
     </xsl:next-match>
@@ -1917,7 +1919,10 @@
         * quotation
         * -->
   
-   <template context="dbk:blockquote[not(..[self::dbk:info])]">
+  <template context="dbk:blockquote[not(..[self::dbk:info])]">
+    <xsl:if test="@xml:lang">
+      <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
+    </xsl:if>
     <rule name="quote" type="env" break-before="1">
       <xsl:if test="dbk:attribution">
         <xsl:text>[</xsl:text>
@@ -1926,6 +1931,9 @@
       </xsl:if>
       <text/>
     </rule>
+    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang])">
+      <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
+    </xsl:if>
   </template>
   
   <template context="dbk:info/dbk:epigraph">
