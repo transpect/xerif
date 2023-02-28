@@ -141,9 +141,9 @@
                   select="((author, 
                            para[matches(@role, $info-author-role)]
                             )[1],
-                           para[matches(@role, $info-subtitle-role)],
                            title,
                            titleabbrev,
+                           para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
                            abstract,
@@ -250,9 +250,9 @@
     <xsl:variable name="sec-info" as="element()*" 
                   select="((author, para[matches(@role, '^[a-z]{1,3}author$')])[1],
                            blockquote[para[matches(@role, '^[a-z]{1,3}motto$')]],
-                           para[matches(@role, $info-subtitle-role)],
                            title,
                            titleabbrev,
+                           para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
                            abstract,
@@ -912,9 +912,9 @@
                   select="((author, 
                             para[matches(@role, $info-author-role)]
                             )[1],
-                           para[matches(@role, $info-subtitle-role)],
                            title,
                            titleabbrev,
+                           para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
                            abstract,
