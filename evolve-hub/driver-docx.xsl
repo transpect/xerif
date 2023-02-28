@@ -1743,6 +1743,11 @@
 
   <!-- optional mode preprocesses whitespaces. based on mode docx2tex-preprocess in docx2tex/xsl/docx2tex-preprocess.xsl -->
 
+  <xsl:template match="div[@role = ('transcription', 'transcript')]" mode="preprocess-whitespaces">
+    <xsl:copy-of select="."/>
+    <!-- do not tocuh whitespaces in transcripts -->
+  </xsl:template>
+
   <xsl:template match="text()[parent::phrase]
                              [(matches(., '^(\s+).+') and ../node()[1][not(self::anchor | self::index-term)][self::text()]) or (matches(., '.+(\s+)$') and ../node()[not(self::anchor | self::index-term)][last()][self::text()])] (: leading or trailing whitespace :)
                              [string-length(normalize-space(.)) gt 0]
