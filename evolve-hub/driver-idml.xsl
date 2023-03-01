@@ -57,6 +57,19 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')]/mediaobject/@srcpath" mode="hub:split-at-tab">
+   <xsl:copy-of select="../../@role"/>
+   <xsl:next-match/>
+  </xsl:template>
+
+  <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')]/@role" mode="hub:split-at-tab">
+   <xsl:apply-templates select="." mode="figure-role-type"/>
+  </xsl:template>
+
+  <xsl:template match="para[matches(@role, $hub:figure-title-role-regex-x, 'i')]/@*" mode="hub:figure-captions">
+  <!-- simulate docx behaviour -->
+  </xsl:template>
+
   <xsl:variable name="hub:figure-title-role-regex-x" as="xs:string"
     select="$figure-caption-role-regex" />
     
@@ -93,6 +106,11 @@
         <xsl:sequence select="false()"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:function>
+
+  <xsl:function name="hub:create-figure-role" as="attribute(role)?">
+    <xsl:param name="figure-nodes" as="node()*"/>
+    <xsl:attribute name="role" select="($figure-nodes[self::*:para][*:mediaobject]/@role)[1]"/>
   </xsl:function>
 
 </xsl:stylesheet>
