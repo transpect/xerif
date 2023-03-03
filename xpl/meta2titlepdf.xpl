@@ -170,7 +170,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tx:insert-meta>
 
-  <tx:evolve-hub name="evolve-hub-dyn">
+<!--  <tx:evolve-hub name="evolve-hub-dyn">
     <p:input port="parameters">
       <p:pipe port="result" step="get-paths"/> 
     </p:input>
@@ -178,7 +178,15 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </tx:evolve-hub>
-  
+  if cover /logos are needed the have to be copied extra. perhaps sourcedir uri on skeleton must be inserted for that 
+  <tx:copy-images name="copy-images-and-patch-filerefs">
+    <p:input port="params">
+      <p:pipe port="result" step="get-paths"/>
+    </p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </tx:copy-images>-->
+
   <tx:xml2tex name="hub2tex">
     <p:input port="params">
       <p:pipe port="result" step="get-paths"/> 
