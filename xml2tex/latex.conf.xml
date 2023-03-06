@@ -963,7 +963,9 @@
     <xsl:choose>
       <xsl:when test="exists($runtitle-para)">
         <rule name="tpRunTitle" type="cmd" break-before="1">
-          <param select="$runtitle-para/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
+          <param select="$runtitle-para/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]
+                                              [not(following-sibling::dbk:tab)]
+                                              [not(self::dbk:tab)]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -1001,14 +1003,14 @@
     </xsl:if>
     <xsl:if test="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')] or $runtitle-para">
       <rule name="tpRunNumber" type="cmd" break-before="1">
-          <param select="if (exists($runtitle-para)) 
-                         then $runtitle-para/dbk:phrase[@role = ('identifier', 'hub:identifier')] (:if no identifier, suppress number:)
-                         else dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')][1]/node()">
+        <param select="if(exists($runtitle-para)) 
+                       then $runtitle-para//(dbk:phrase[@role = ('identifier', 'hub:identifier')], dbk:tab[1]/preceding-sibling::node())[1] (:if no identifier, suppress number:)
+                       else dbk:title//dbk:phrase[@role = ('identifier', 'hub:identifier')]">
            <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
            <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
-          </param>
-        </rule>
+        </param>
+      </rule>
     </xsl:if>
    </xsl:if>
   </template>
