@@ -540,7 +540,9 @@
        single element behaviour can be overwritten in customer template in mode strip-meta -->
   <xsl:function name="xml2tex:meta-remove-links-etc" as="xs:string?">
     <xsl:param name="context" as="node()*"/>
-    <xsl:variable name="content" as="node()*"><xsl:apply-templates select="$context" mode="strip-meta"/></xsl:variable>
+    <xsl:variable name="content" as="node()*">
+      <xsl:apply-templates select="$context" mode="strip-meta"/>
+    </xsl:variable>
     <xsl:value-of select="string-join($content)"/>
   </xsl:function>
   
@@ -582,7 +584,8 @@
   </xsl:template>
   
   <xsl:template match="text()" mode="strip-meta" priority="4">
-    <xsl:value-of select="."/>
+    <xsl:apply-templates select="." mode="xml2tex"/>
+    <!-- allow matching of regexes for example creating \foreignlangugage makros in \tpMeta items-->
   </xsl:template>
 
   <xsl:template match="dbk:phrase[@css:font-style = 'italic' or @role = ('citalic', 'kursiv')]" mode="strip-meta" priority="6">
