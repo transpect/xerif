@@ -588,7 +588,7 @@
     <!-- allow matching of regexes for example creating \foreignlangugage makros in \tpMeta items-->
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@css:font-style = 'italic' or @role = ('citalic', 'kursiv')]" mode="strip-meta" priority="6">
+  <xsl:template match="dbk:phrase[@css:font-style = 'italic' or @role = ('citalic', 'italic', 'kursiv')]" mode="strip-meta" priority="6">
     <xsl:text>\textit{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -602,7 +602,7 @@
     <xsl:apply-templates select="." mode="xml2tex"/>
   </xsl:template>
   
-  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = 'cfett']" mode="strip-meta" priority="6">
+  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = ('cbold', 'fett', 'bold')]" mode="strip-meta" priority="6">
     <xsl:text>\textbf{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -2429,7 +2429,10 @@
   
   
   <xsl:variable name="italic-style" select="'^[a-z]{1,3}italic$'" as="xs:string"/>
-  
+  <xsl:variable name="bold-style" select="'(^|_-_)fett(_-_.+)*$'" as="xs:string"/>
+  <xsl:variable name="strikethrough-style" select="'(^(typografisch_)?|_-_)?durchgestrichen($|_)'" as="xs:string"/>
+  <xsl:variable name="underline-style" select="'(^(typografisch_)?|_-_)?unter($|_)'" as="xs:string"/>
+
   <template context="dbk:phrase[matches(@role, $italic-style)]
                                [not(@css:font-style = 'italic')]
                                [empty(key('style', @role)[@css:font-style eq 'italic'])]">
