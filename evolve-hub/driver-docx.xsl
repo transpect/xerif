@@ -1298,8 +1298,8 @@
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="translate(upper-case(substring(normalize-space(primaryie), 1, 1)), 
-                                                          'ÄÅÃÀÁÂÆÖÒÓÔÕØÜÛÚÙÈÉÊËŽÇÌÍÎÏÐÑÝŸ', 
-                                                          'AAAAAAAOOOOOOUUUUEEEEZCIIIIDNYY')">
+                                                          'ÄÅÃÀÁÂÆÖÒÓÔÕØÜÛÚÙÈÉÊËŽÇÌÍÎÏÐḤÑÝŸ', 
+                                                          'AAAAAAAOOOOOOUUUUEEEEZCIIIIDHNYY')">
               <indexdiv>
                 <title><xsl:value-of select="current-grouping-key()"/></title>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -1320,6 +1320,7 @@
   <xsl:template match="index[not(indexentry)]" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type, $index-type-default-name)[1]"/>
+    <!--<xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
     <xsl:copy>
