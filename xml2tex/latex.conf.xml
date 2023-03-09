@@ -653,14 +653,14 @@
     <!-- delete index terms to avoid TeX errors if no index is created but indexterms are contained in document.-->
   </xsl:template>
 
-  <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][1]">
+  <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][1]" priority="301">
     <xsl:if test="$new-common"><xsl:text>&#xa;\mainmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
   
   <template context="/*/*[self::dbk:appendix|self::dbk:index|self::dbk:bibliography]
                          [matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]
-                         [not(//processing-instruction()[contains(., '\backmatter')])]">
+                         [not(//processing-instruction()[contains(., '\backmatter')])]" priority="302">
     <xsl:if test="$new-common"><xsl:text>&#xa;\backmatter&#xa;</xsl:text></xsl:if>
     <xsl:next-match/>
   </template>
