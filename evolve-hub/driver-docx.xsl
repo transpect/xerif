@@ -1195,7 +1195,7 @@
                              else $index-type-default-name"/>
       <primary>
         <xsl:if test="$generate-sortas eq 'yes'">
-          <xsl:attribute name="sortas" select="hub:sortkey(.)"/>
+          <xsl:call-template name="generate-sortas"/>
         </xsl:if>
         <xsl:value-of select="."/>
       </primary>
@@ -1239,7 +1239,7 @@
                                  else $index-type-default-name"/>
           <primary>
             <xsl:if test="$generate-sortas eq 'yes'">
-              <xsl:attribute name="sortas" select="hub:sortkey(.)"/>
+              <xsl:call-template name="generate-sortas"/>
             </xsl:if>
             <xsl:apply-templates select="$index-term/node()" mode="#current"/>
           </primary>
@@ -1306,10 +1306,7 @@
             <xsl:apply-templates select="$index-type, $index-title" mode="#current"/>
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
-                                group-adjacent="substring(
-                                                  hub:sortkey(primaryie)
-                                                  , 1, 1
-                                                )">
+                                group-adjacent="hub:sortkey(primaryie)">
               <indexdiv>
                 <title><xsl:value-of select="current-grouping-key()"/></title>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -1350,37 +1347,13 @@
   
   <xsl:function name="hub:sortkey" as="xs:string">
     <xsl:param name="indexterm" as="xs:string?"/>
-    <xsl:sequence>
+    <xsl:variable name="sortas" as="attribute(sortas)?">
       <xsl:call-template name="generate-sortas">
         <xsl:with-param name="indexterm" select="$indexterm"/>
       </xsl:call-template>
-    </xsl:sequence>
+    </xsl:variable>
+    <xsl:sequence select="substring((normalize-space($indexterm), $sortas)[1], 1, 1)"/>
   </xsl:function>
-  
-  <xsl:template name="generate-sortas" as="attribute(sortas)">
-    <xsl:param name="indexterm" as="xs:string?"/>
-    <xsl:attribute name="sortas">
-      <xsl:choose>
-        <xsl:when test="matches(normalize-space($indexterm), '^[a-z]', 'i')">
-          <xsl:sequence select="upper-case(normalize-space($indexterm))"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:sequence select="upper-case(
-                                  concat(
-                                    substring(
-                                      normalize-unicode(
-                                        normalize-space(
-                                          replace($indexterm, '^[\p{P}]+', '')
-                                        ), 'NFKD'
-                                      ), 1, 1
-                                    ),
-                                    substring($indexterm, 2, string-length($indexterm))
-                                  )
-                                )"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
-  </xsl:template>
   
   <!-- repair structure -->
   
