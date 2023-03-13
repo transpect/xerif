@@ -1352,7 +1352,7 @@
         <xsl:with-param name="indexterm" select="$indexterm"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:sequence select="substring((normalize-space($indexterm), $sortas)[1], 1, 1)"/>
+    <xsl:sequence select="upper-case(substring((normalize-space($indexterm), $sortas)[1], 1, 1))"/>
   </xsl:function>
   
   <!-- repair structure -->
