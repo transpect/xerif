@@ -2319,7 +2319,7 @@
   
   <template context="dbk:ulink">
     <rule name="href" type="cmd">
-      <param select="replace((@xlink:href, @url)[1], '([%#])', '\\$1')"/>
+      <param select="replace(xml2tex:optionally-encode-uri((@xlink:href, @url)[1]), '([%#])', '\\$1')"/>
       <param/>
     </rule>
   </template>
@@ -2330,31 +2330,36 @@
     </rule>
   </regex>
 
-  <regex regex="([&#x4e00;-&#x9fff;]+)|([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)|([&#x3040;-&#x309f;&#x30a0;-&#x30ff;]+)|([&#x600;-&#x6ff;]+)">
-    <rule name="foreignlanguage" type="cmd">
-      <!-- merged 4 single language templates to this one to handle cases where several languages are contained in 
-           the same text node https://redmine.le-tex.de/issues/14343 -->
-      <xsl:choose>
-        <xsl:when test="regex-group(1)">      
-          <param>chinese</param>
-          <param regex-group="1"/>
-        </xsl:when>
-        <xsl:when test="regex-group(2)">      
-          <param>hebrew</param>
-          <param regex-group="2"/>
-        </xsl:when>
-        <xsl:when test="regex-group(3)">      
-          <param>japanese</param>
-          <param regex-group="3"/>
-        </xsl:when>
-        <xsl:when test="regex-group(4)">      
-          <param>arabic</param>
-          <param regex-group="4"/>
-        </xsl:when>
-      </xsl:choose>
-    </rule>
-  </regex>
-  
+  <xsl:template match="text()[matches(., '([一-鿿]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ]+)|([؀-ۿ]+)')]"
+                mode="xml2tex">
+    <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
+    <xsl:analyze-string select="." regex="{'([一-鿿]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ]+)|([؀-ۿ]+)'}">
+      <xsl:matching-substring>
+        <xsl:choose>
+          <xsl:when test="regex-group(1)">      
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{chinese}{', ., '}', '}'[$double-parenthesis])"/>
+          </xsl:when>
+          <xsl:when test="regex-group(2)">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{hebrew}{', ., '}', '}'[$double-parenthesis])"/>
+            
+          </xsl:when>
+          <xsl:when test="regex-group(3)">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{japanese}{', ., '}', '}'[$double-parenthesis])"/>  
+            
+          </xsl:when>
+          <xsl:when test="regex-group(4)">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{arabic}{', ., '}', '}'[$double-parenthesis])"/>      
+            
+          </xsl:when>
+        </xsl:choose>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:value-of select="string-join(xml2tex:utf2tex((), ., $charmap, (), $texregex), '')"/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+    
+  </xsl:template>
+
   <!-- medieval font (junicode) -->
   <!-- use following regexes in your adaptations if medieval characters appear. map character ranges to your customer's font -->
   <!--  <regex regex="([&#x17f;-&#x233;&#x237;-&#x239;&#x248;&#x249;&#x250;-&#x2ad;&#x16a0;-&#x16f0;&#x1d00;-&#x1d6b;&#x1d79;&#x1e00;-&#x1eff;&#x20b0;&#x2108;&#x2114;&#x211e;&#x211f;&#x2123;&#x2125;&#x2132;&#x214e;&#x2c71;-&#x2c73;&#x2c75;&#x2c76;&#xa722;-&#xa729;&#xa730;-&#xa787;&#xa7fb;-&#xa7ff;&#xab57;&#x10190;-&#x1019a;&#xe000;-&#xf8ff;&#x10330;-&#x1034a;]+)">
@@ -2538,11 +2543,17 @@
   <template context="dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
     <!-- this only works if option 'collect-all-xsl' on xml2tex is set to yes. otherwise templates matching the same elements in different modes will not be considered -->
     <rule name="href" type="cmd">
-      <param select="replace((@url, @xlink:href)[1], '(%|#|_|\\)', '\\$1' )"/>
+      <param select="replace(xml2tex:optionally-encode-uri((@url, @xlink:href)[1]), '(%|#|_|\\)', '\\$1' )"/>
       <param select="xml2tex:replace-recursive-linktext(node())"/>
     </rule>
   </template>  
-  
+
+  <xsl:function name="xml2tex:optionally-encode-uri">
+    <!--if href contains non ascii characters for instance arabic characters it has to be encoded, https://redmine.le-tex.de/issues/14419-->
+    <xsl:param name="uri" as="xs:string"/>
+    <xsl:sequence select="if (matches($uri, '[^&#33;-&#127;]')) then escape-html-uri($uri) else $uri"/>
+  </xsl:function>  
+
   <template context="dbk:footnote//dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):')]
                     |dbk:footnote//dbk:ulink[matches(@url, '^(https?|ftp):')]" priority="15">
      <xsl:if test="string-length(@xlink:href) gt 60">
