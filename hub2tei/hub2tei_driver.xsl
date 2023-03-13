@@ -250,7 +250,9 @@
     </abstract>
   </xsl:template>
 
-  <xsl:template match="*:keywords[not(parent::*[self::*:textClass])]" mode="hub2tei:tidy"/>
+  <xsl:template match="*:keywords[not(parent::*[self::*:textClass])] | dbk:biblioset" mode="hub2tei:tidy">
+    <!-- bibliosets might be preserved in reviews, so discard them until further notuce-->
+  </xsl:template>
 
   <xsl:template match="dbk:epigraph" mode="hub2tei:dbk2tei">
     <xsl:choose>
@@ -271,6 +273,12 @@
         </floatingText>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="*:div[@rend = ('alternative-title', 'keywords')]" mode="hub2tei:tidy">
+    <argument>
+      <xsl:apply-templates select="@* except @type, node()" mode="#current"/>  
+    </argument>
   </xsl:template>
 
 </xsl:stylesheet>
