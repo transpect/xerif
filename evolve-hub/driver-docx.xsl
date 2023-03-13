@@ -413,7 +413,7 @@
         * special markup
         * -->
   
-  <xsl:template match="para[matches(@role, $info-subtitle-role)][preceding-sibling::*[1]/self::title]
+  <xsl:template match="para[matches(@role, $info-subtitle-role)][preceding-sibling::*[1][self::title|self::titleabbrev]]
                       |info/para[matches(@role, $info-subtitle-role)]" mode="custom-1" priority="2">
     <subtitle>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
