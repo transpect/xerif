@@ -96,6 +96,7 @@
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl" />
   <p:import href="export-chunks.xpl"/>  
   <p:import href="customer-outputs.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/xml-model/xpl/prepend-xml-model.xpl"/>
 
   <tr:resolve-params name="resolve-params"/>
 
@@ -213,6 +214,17 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </hub2tei:hub2tei>
+
+  <tr:prepend-xml-model name="prepend-model">
+    <p:input port="models">
+      <p:inline>
+        <c:models>
+          <c:model href="http://www.le-tex.de/resource/schema/tei-cssa/tei_allPlus-cssa.rng"
+            type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
+        </c:models>
+      </p:inline>
+    </p:input>
+  </tr:prepend-xml-model>
 
   <p:delete match="@srcpath" name="remove-srcpaths"/>
 
