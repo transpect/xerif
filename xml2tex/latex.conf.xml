@@ -1107,12 +1107,14 @@
 
   <xsl:variable name="general-heading-style" select="'^[a-z]{1,3}heading(enumerated)?'" as="xs:string"/>
   
-  <template context="dbk:title[matches(@role, $general-heading-style)]/dbk:phrase[@role eq 'hub:identifier']">
+  <!-- commented, see named template "create-caption" below -->
+  
+  <!--<template context="dbk:title[matches(@role, $general-heading-style)]/dbk:phrase[@role eq 'hub:identifier']">
     <xsl:param name="remove-footnote" as="xs:boolean?" tunnel="yes"/>
     <rule name="tpNumber" type="cmd" break-before="1">
       <param/>
     </rule>
-  </template>
+  </template>-->
   
   <xsl:function name="tr:heading-level" as="xs:string?">
     <xsl:param name="heading" as="element()"/>
@@ -1716,7 +1718,8 @@
     <!-- set this to true() if you want to generate empty \tpCaption macros in your project -->
   </xsl:variable>
   
-  <template context="dbk:figure/dbk:title | *:table/dbk:title">
+  <template context="dbk:figure/dbk:title
+                    |*:table/dbk:title">
     <xsl:call-template name="create-caption">
       <xsl:with-param name="context-nodes" select="dbk:phrase[@role = ('hub:identifier', 'hub:caption-number', 'identifier', 'caption-number')]" as="node()*"/>
     </xsl:call-template>
@@ -1759,7 +1762,7 @@
                      dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][1] | 
                      *:table/dbk:note | (:cals:)
                      *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][1] (:htmltable:)">
-    <rule name="tpLegend" break-before="1" break-after="0" type="cmd" >
+    <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
       <param select="if (self::dbk:para) then (node(), following-sibling::dbk:para[@role[matches(., $tab-legend-para-style-regex)]]) else dbk:para">
         <with-param name="already-merged" as="xs:boolean" select="true()" tunnel="yes"/>
       </param>
