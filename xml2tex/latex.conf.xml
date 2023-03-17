@@ -1107,14 +1107,12 @@
 
   <xsl:variable name="general-heading-style" select="'^[a-z]{1,3}heading(enumerated)?'" as="xs:string"/>
   
-  <!-- commented, see named template "create-caption" below -->
-  
-  <!--<template context="dbk:title[matches(@role, $general-heading-style)]/dbk:phrase[@role eq 'hub:identifier']">
+  <template context="dbk:title[matches(@role, $general-heading-style)]/dbk:phrase[@role eq 'hub:identifier']">
     <xsl:param name="remove-footnote" as="xs:boolean?" tunnel="yes"/>
     <rule name="tpNumber" type="cmd" break-before="1">
       <param/>
     </rule>
-  </template>-->
+  </template>
   
   <xsl:function name="tr:heading-level" as="xs:string?">
     <xsl:param name="heading" as="element()"/>
