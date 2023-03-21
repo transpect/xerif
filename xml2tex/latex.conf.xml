@@ -2332,7 +2332,7 @@
   </regex>
 
   <xsl:template match="text()[matches(., '([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)')]"
-                mode="xml2tex">
+                mode="xml2tex" priority="300">
     <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
     <xsl:analyze-string select="." regex="{'([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)'}">
       <xsl:matching-substring>
