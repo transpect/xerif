@@ -585,7 +585,7 @@
   
   <xsl:template match="text()" mode="strip-meta" priority="4">
     <xsl:apply-templates select="." mode="xml2tex"/>
-    <!-- allow matching of regexes for example creating \foreignlangugage makros in \tpMeta items-->
+    <!-- allow matching of regexes for example creating \foreignlanguage makros in \tpMeta items-->
   </xsl:template>
 
   <xsl:template match="dbk:phrase[@css:font-style = 'italic' or @role = ('citalic', 'italic', 'kursiv')]" mode="strip-meta" priority="6">
@@ -2331,10 +2331,10 @@
     </rule>
   </regex>
 
-  <xsl:template match="text()[matches(., '([一-鿿]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ]+)|([؀-ۿ]+)')]"
+  <xsl:template match="text()[matches(., '([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)')]"
                 mode="xml2tex">
     <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
-    <xsl:analyze-string select="." regex="{'([一-鿿]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ]+)|([؀-ۿ]+)'}">
+    <xsl:analyze-string select="." regex="{'([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)'}">
       <xsl:matching-substring>
         <xsl:choose>
           <xsl:when test="regex-group(1)">      
