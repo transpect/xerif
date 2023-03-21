@@ -1567,7 +1567,7 @@
 
   <xsl:template match="section[@role = 'keywords']" mode="hub:process-meta-sidebar">
   <xsl:variable name="keyword-role" as="xs:string?" select="if (title) 
-                                                         then replace(normalize-space(title), ':\s?$', '') 
+                                                         then normalize-space(title) 
                                                          else replace(descendant-or-self::para[matches(@role, $hub:keywords-role-regex)][1], '^(.+):.+$', '$1')"/>
       <keywordset role="{if ($keyword-role[normalize-space()]) then $keyword-role else 'Keywords'}">
         <xsl:apply-templates select="descendant-or-self::para[matches(@role, $hub:keywords-role-regex)]" mode="#current">
