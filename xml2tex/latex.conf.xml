@@ -2747,7 +2747,7 @@
           Example: A no-break Space has to be mapped to a tilde (https://redmine.le-tex.de/issues/13715) otherwise no space is displayed-->
     <xsl:choose>
       <xsl:when test="$toc-override eq true() or $bm-override eq true() or $run-override eq true()">
-        <xsl:analyze-string select="." regex="([&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+)">
+        <xsl:analyze-string select="." regex="{([&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+)}">
           <xsl:matching-substring>
             
             <xsl:value-of select="replace(
@@ -2761,7 +2761,8 @@
                                       )"/>
           </xsl:matching-substring>
           <xsl:non-matching-substring>
-            <xsl:value-of select="."/>
+           <xsl:variable name="text" as="node()"><tmp><xsl:sequence select="."/></tmp></xsl:variable>
+           <xsl:apply-templates select="$text/node()" mode="#current"/>
           </xsl:non-matching-substring>
         </xsl:analyze-string>
       </xsl:when>
