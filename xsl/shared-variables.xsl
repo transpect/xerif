@@ -102,6 +102,9 @@
   <xsl:variable name="verse-style" as="xs:string"
                 select="'^[a-z]+_?verse$'"/>
   
+  <xsl:variable name="verse-heading-style" as="xs:string"
+                select="'^[a-z]+_?verse-heading$'"/>
+  
   <xsl:variable name="verse-centered-style" as="xs:string"
                 select="'^[a-z]+_?verse_\-_centered$'"/>
 

@@ -92,7 +92,20 @@
     </para>
   </xsl:template>
   
-    
+  <xsl:template match="para[matches(@role, $verse-heading-style)]
+                           [following-sibling::*[1][self::blockquote[matches(@role, $verse-style)]]]" mode="custom-1"/>
+  
+  <xsl:template match="blockquote[matches(@role, $verse-style)]
+                                 [preceding-sibling::*[1][self::para[matches(@role, $verse-heading-style)]]]" mode="custom-1">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <title>
+        <xsl:apply-templates select="preceding-sibling::*[1][self::para[matches(@role, $verse-heading-style)]]/node()" mode="#current"/>
+      </title>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="*[not(self::blockquote)][para[matches(@role, $hub:blockquote-role-regex)]]" 
                 name="build-blockquotes" 
                 mode="hub:blockquotes" xmlns="http://docbook.org/ns/docbook">

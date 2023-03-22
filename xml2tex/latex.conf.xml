@@ -2005,7 +2005,11 @@
 
   <template context="dbk:blockquote[matches(@role, $verse-style)]">
     <rule name="verse" type="env" break-after="1" break-before="1">
-      <text/>
+      <xsl:if test="dbk:title">
+        <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
+        <xsl:text>\par&#xa;</xsl:text>
+      </xsl:if>
+      <text select="*[not(self::dbk:title)]"/>
     </rule>
   </template>
   
