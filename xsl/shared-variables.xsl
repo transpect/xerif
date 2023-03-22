@@ -31,7 +31,7 @@
                 select="'^toctitle$'"/>
 
   <xsl:variable name="hub:blockquote-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation)$'"/>
+                select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation|verse)$'"/>
   
   <xsl:variable name="hub:blockquote-source-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation)source$'"/>
