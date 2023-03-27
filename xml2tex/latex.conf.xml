@@ -1935,7 +1935,7 @@
         <xsl:apply-templates select="dbk:attribution/node()" mode="#current"/>
         <xsl:text>]</xsl:text>
       </xsl:if>
-      <text/>
+      <text select="* except dbk:attribution"/>
     </rule>
     <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang])">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
