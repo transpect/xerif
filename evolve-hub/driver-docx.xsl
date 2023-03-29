@@ -512,11 +512,10 @@
             <xsl:variable name="float-pos" as="xs:string?" 
                           select=".//phrase[matches(@role, $pi-style-regex, 'i')]
                                            [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
-            
             <xsl:element name="{if($one-caption-for-multiple-images) 
                                 then 'figure' 
                                 else 'informalfigure'}">
-              <xsl:if test="$is-grid-group and exists($float-pos)">
+              <xsl:if test="exists($float-pos)">
                 <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
               </xsl:if>
               <xsl:if test="$is-grid-group">
@@ -546,7 +545,7 @@
                                     select=".//phrase[matches(@role, $pi-style-regex, 'i')]
                                                      [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
                       <figure>
-                        <xsl:if test="not($is-grid-group) and exists($float-pos)">
+                        <xsl:if test="exists($float-pos)">
                           <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
                         </xsl:if>
                         <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')][1]/@role" mode="figure-role-type">
