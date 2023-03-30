@@ -2669,10 +2669,13 @@
   </template>
   
   <template context="dbk:indexterm[@remap]">
+    <xsl:param name="as-option" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="$as-option"><xsl:text>{</xsl:text></xsl:if>
     <rule name="index" type="cmd">
       <option select="@remap"/>
       <xsl:call-template name="index-content"/>
     </rule>
+    <xsl:if test="$as-option"><xsl:text>}</xsl:text></xsl:if>
   </template>
 
   <!-- move PI for Table break -->
