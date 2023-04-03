@@ -1879,6 +1879,9 @@
     <xsl:value-of select="hub:replace-hyphens(.)"/>
   </xsl:template>
   
+  <xsl:template match="table/@css:width
+                      |informaltable/@css:width" mode="custom-2"/>
+  
   <cases>
    <case id="1" char="‑">(inhaltlich-)thematischen</case> 
    <case id="2" char="‑">Privatisierungsbefürwortern und -befürworterinnen </case> 
