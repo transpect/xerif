@@ -804,10 +804,15 @@
         * dedication
         * -->
   
-  <xsl:template match="blockquote[para[matches(@role, $dedication-role-regex)]]
-                      |para[matches(@role, $dedication-role-regex)][not(parent::blockquote)]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dedication-role-regex)]]" mode="custom-1">
     <dedication>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </dedication>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $dedication-role-regex)][not(parent::blockquote)]" mode="custom-1">
+    <dedication><!-- preserve para in dedication -->
+      <xsl:next-match/>
     </dedication>
   </xsl:template>
   
