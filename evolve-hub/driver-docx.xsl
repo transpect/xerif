@@ -112,7 +112,7 @@
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="exists(self::para[matches(@role, $hub:blockquote-role-regex)])">
+      <xsl:for-each-group select="node()" group-adjacent="exists(self::para[matches(@role, $hub:blockquote-role-regex)])">
         <xsl:variable name="blockquote-source" as="element(dbk:para)*" 
                       select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
         <!-- all blockquote paras -->
