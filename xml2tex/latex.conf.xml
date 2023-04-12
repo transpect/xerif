@@ -215,18 +215,7 @@
     <xsl:for-each select="$authors">
       <xsl:variable name="pos" select="position()" as="xs:integer"/>
       <xsl:text>&#xa;\begin{tpAuthor}</xsl:text>
-      <xsl:choose>
-        <xsl:when test="dbk:personname/dbk:firstname and dbk:personname/dbk:surname">
-          <xsl:value-of select="concat('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}')"/>
-          <xsl:value-of select="concat('&#xa;\tpLastName{',   xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
-        </xsl:when>
-        <xsl:when test="dbk:personname">
-          <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname), '}')"/>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
-        </xsl:otherwise>  
-      </xsl:choose>
+      <xsl:call-template name="contributor-name"/>
       <xsl:if test="$author-info">
         <xsl:value-of select="concat('&#xa;\tpBio{', normalize-space($author-info[$pos]), '}')"/>
       </xsl:if>
@@ -234,13 +223,13 @@
     </xsl:for-each>
     <xsl:for-each select="$editors">
       <xsl:text>&#xa;\begin{tpEditor}</xsl:text>
-      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
-      <xsl:text>\end{tpEditor}&#xa;</xsl:text>
+      <xsl:call-template name="contributor-name"/>
+      <xsl:text>&#xa;\end{tpEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:for-each select="$series-editors">
       <xsl:text>&#xa;\begin{tpSeriesEditor}</xsl:text>
-      <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
-      <xsl:text>\end{tpSeriesEditor}&#xa;</xsl:text>
+      <xsl:call-template name="contributor-name"/>
+      <xsl:text>&#xa;\end{tpSeriesEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:if test="normalize-space($title) or normalize-space($title-for-running-head)">
       <xsl:value-of select="concat('&#xa;\tpTitle{', ($title, $title-for-running-head)[1], '}&#xa;')"/>
@@ -442,6 +431,21 @@
       <xsl:value-of select="concat('\setcounter{secnumdepth}{', $secnumdepth, '}&#xa;')"/>
     </xsl:if>
   </xsl:variable>
+  
+  <xsl:template name="contributor-name" as="xs:string">
+    <xsl:choose>
+      <xsl:when test="dbk:personname/dbk:firstname and dbk:personname/dbk:surname">
+        <xsl:value-of select="concat('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}', 
+                                     '&#xa;\tpLastName{',  xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
+      </xsl:when>
+      <xsl:when test="dbk:personname/dbk:othername">
+        <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:othername), '}')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
+      </xsl:otherwise>  
+    </xsl:choose>
+  </xsl:template>
   
   <preamble>%
     <xsl:message select="'&#xa;&#xa;Layout: ', $layout, '&#xa;Publikationstyp: ', $pubtype, '&#xa;Format: ', $format, '&#xa;Notentyp: ', $notes-type, '&#xa;Kapitelweise Endnoten: ', 
