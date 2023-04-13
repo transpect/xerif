@@ -1148,7 +1148,7 @@
         <xsl:variable name="index-type" select="." as="xs:string"/>
         <xsl:variable name="index-heading" as="xs:string"
                       select="($doc//*[self::para|self::title]
-                                      [matches(@role, string-join(($index-heading-regex, $index-type, '$'), ''), 'i')][string-length() gt 0]
+                                      [matches(@role, string-join(($index-heading-regex, replace($index-type, '\p{P}', ''), '$'), ''), 'i')][string-length() gt 0]
                                       [not(following-sibling::*[1][self::indexentry])]/node(),
                                'Index')[1]"/>
         <index type="{$index-type}" remap="{hub:index-letter($index-index)}">
