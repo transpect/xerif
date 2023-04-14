@@ -1223,6 +1223,9 @@
         <!-- in HTML tables-->
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
+      <xsl:when test="ancestor::dbk:dedication">
+        <xsl:text>\tpBreak&#xa;</xsl:text>
+      </xsl:when>
       <xsl:otherwise>
         <xsl:text>\newline&#xa;</xsl:text>
       </xsl:otherwise>
