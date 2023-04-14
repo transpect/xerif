@@ -2397,7 +2397,20 @@
   <xsl:variable name="non-latin-style" select="'^[a-z]{1,3}nonlatin$'" as="xs:string"/>
   
   <template context="dbk:phrase[matches(@role, $non-latin-style)]
-                               [not(matches(., concat('[', string-join($scripts/@unicode-range, '|'), ']')))]">
+                               [not(matches(., concat(
+                                                      '[', 
+                                                      string-join(
+                                                                  ($scripts/@unicode-range,
+                                                                   '&#x20;-&#xff;',
+                                                                   '&#x300;-&#x36f;',
+                                                                   '&#x2000;-&#x206f;'
+                                                                  )
+                                                      ),
+                                                      ']'
+                                                      )
+                                           )
+                                   )
+                               ]">
     <rule name="unichar" type="cmd">
       <param/>
     </rule>
