@@ -781,7 +781,7 @@
                               |self::dbk:tab
                               |self::dbk:anchor)])
                   or 
-                  matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]')">
+                  matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;&#xAE;]')">
       <rule name="tpBMTitle" type="cmd" break-before="1">
         <!-- Newlines in title items are discarded by default (remove-newline). 
              If they are preserved in your project remove '|self::dbk:br' from if-condition. 
