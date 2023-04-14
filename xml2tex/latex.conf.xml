@@ -1683,8 +1683,15 @@
   
   <xsl:function name="tr:determine-other-options" as="xs:string?">
     <xsl:param name="elt" as="element(*)"/>
-     <xsl:sequence select="if (exists($elt[dbk:title][normalize-space()])) then () else 'nolist'"/>
-   <!-- if not title → not in loi/lot. override this function for other options in your template -->
+    <xsl:choose>
+      <xsl:when test="$elt[self::dbk:informalfigure]">
+        <xsl:sequence select="if (exists($elt/dbk:figure[dbk:title][normalize-space()])) then () else 'nolist'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="if (exists($elt[dbk:title][normalize-space()])) then () else 'nolist'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+    <!-- if not title → not in loi/lot. override this function for other options in your template -->
   </xsl:function>
   
   <xsl:function name="tr:determine-float-pos" as="xs:string?">
