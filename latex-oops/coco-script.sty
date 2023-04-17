@@ -62,20 +62,21 @@
  WordSpace = 1.25]
 \DeclareTextFontCommand\textfallback{\fallbackfont}
 \DeclareTextFontCommand\textsffallback{\sffallbackfont}
-\def\tpDeclareBabelFont#1#2#3{%
-  \expandafter\ifx\csname use@script@#1\endcsname\@empty
-    \babelprovide{#1}%
-    \message{^^J  [coco-script Loaded Script: #1]^^J}%
+\def\tpDeclareBabelFont{\@ifnextchar[\tp@declare@babel@font{\tp@declare@babel@font[]}}%]
+\def\tp@declare@babel@font[#1]#2#3#4{%
+  \expandafter\ifx\csname use@script@#2\endcsname\@empty
+    \babelprovide[#1]{#2}%
+    \message{^^J  [coco-script Loaded Script: #2]^^J}%
     %%
-    \expandafter\gdef\csname tp@babel@rm@font@#1\endcsname{#2}%
-    \expandafter\gdef\csname tp@babel@sf@font@#1\endcsname{#3}%
+    \expandafter\gdef\csname tp@babel@rm@font@#2\endcsname{#3}%
+    \expandafter\gdef\csname tp@babel@sf@font@#2\endcsname{#4}%
     \if!#2!\else
-      \def\tp@tempa{\babelfont[#1]{rm}}%
-      \expandafter\expandafter\expandafter\tp@tempa\csname tp@babel@rm@font@#1\endcsname
+      \def\tp@tempa{\babelfont[#2]{rm}}%
+      \expandafter\expandafter\expandafter\tp@tempa\csname tp@babel@rm@font@#2\endcsname
     \fi
     \if!#3!\else
-      \def\tp@tempa{\babelfont[#1]{sf}}%
-      \expandafter\expandafter\expandafter\tp@tempa\csname tp@babel@sf@font@#1\endcsname
+      \def\tp@tempa{\babelfont[#2]{sf}}%
+      \expandafter\expandafter\expandafter\tp@tempa\csname tp@babel@sf@font@#2\endcsname
     \fi
   \fi
 }
@@ -158,6 +159,20 @@
     Path = ./fonts/Noto/,%
     WordSpace = 1.25%
     ]{NotoSans-Regular.ttf}%
+  }
+\tpDeclareBabelFont{syriac}{[%
+    BoldFont = NotoSansSyriac-Black.ttf,%
+    ItalicFont = NotoSansSyriac-Regular.ttf,%
+    BoldItalicFont = NotoSansSyriac-Black.ttf,%
+    Path = ./fonts/Noto/Syriac/,%
+    WordSpace = 1.25
+    ]{NotoSansSyriac-Regular.ttf}}
+  {[BoldFont = NotoSansSyriac-Black.ttf,%
+    ItalicFont = NotoSansSyriac-Regular.ttf,%
+    BoldItalicFont = NotoSansSyriac-Black.ttf,%
+    Path = ./fonts/Noto/Syriac/,%
+    WordSpace = 1.25%
+    ]{NotoSansSyriac-Regular.ttf}%
   }
 \babelfont{mdv}[%
 Path=fonts/Junicode/,%
