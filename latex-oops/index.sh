@@ -4,7 +4,7 @@ source paths.sh
 
 if [ $# != 2 ]; then
     if [ $# != 1 ]; then
-	echo "BBenutzung: $0 Dateiwurzel_ohne_endung [prefix]"
+	echo "Benutzung: $0 Dateiwurzel_ohne_endung [prefix]"
 	exit 1
     fi
 fi
