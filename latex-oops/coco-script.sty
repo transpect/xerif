@@ -160,7 +160,35 @@
     WordSpace = 1.25%
     ]{NotoSans-Regular.ttf}%
   }
-\tpDeclareBabelFont{syriac}{[%
+\expandafter\ifx\csname use@script@syriac\endcsname\@empty%
+\RequirePackage{filecontents}
+\begin{filecontents*}{babel-syriac.ini}
+[identification]
+charset = utf8
+version = 0.1
+date = 2019-08-25
+name.local = ܠܫܢܐ ܣܘܪܝܝܐ
+name.english = Classical Syriac
+name.babel = classicalsyriac
+tag.bcp47 = syc
+tag.opentype = SYR
+script.name = Syriac
+script.tag.bcp47 = Syrc
+script.tag.opentype = syrc
+level = 1
+encodings =
+derivate = no
+[captions]
+[date.gregorian]
+[date.islamic]
+[time.gregorian]
+[typography]
+[characters]
+[numbers]
+[counters]
+\end{filecontents*}
+\fi
+\tpDeclareBabelFont[import=syriac]{syriac}{[%
     BoldFont = NotoSansSyriac-Black.ttf,%
     ItalicFont = NotoSansSyriac-Regular.ttf,%
     BoldItalicFont = NotoSansSyriac-Black.ttf,%
