@@ -171,7 +171,7 @@
   <xsl:variable name="main-lang" select="/dbk:*/@xml:lang" as="attribute(xml:lang)"/>
   <xsl:variable name="all-langs" select="distinct-values(//@xml:lang)" as="xs:string*"/>
   <xsl:variable name="babel-langs" select="for $i in $all-langs
-                                           return xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese'))]" as="xs:string*"/>
+                                           return xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian'))]" as="xs:string*"/>
   <!-- pub type metadata -->
   <xsl:variable name="is-collection" as="xs:boolean" 
                 select="exists(//dbk:chapter/dbk:info/dbk:author)"/>
@@ -2350,27 +2350,36 @@
     </rule>
   </regex>
 
-  <xsl:template match="text()[matches(., '([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)')]"
+  <xsl:template match="text()[matches(., concat('[', string-join($scripts/@unicode-range), ']'))]"
                 mode="xml2tex" priority="300">
     <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
-    <xsl:analyze-string select="." regex="{'([一-鿿&#12288;-&#12351;]+)|([֐-׿יִ-ﭏ]+)|([぀-ゟ゠-ヿ&#12352;-&#12543;]+)|([؀-ۿ]+)'}">
+    <xsl:variable name="context-lang" as="attribute(xml:lang)?"
+                  select="ancestor::*[@xml:lang][1]/@xml:lang"/>
+    <xsl:analyze-string select="." regex="{concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')}">
       <xsl:matching-substring>
+        <!-- order of languages must match the order in $script var -->
         <xsl:choose>
-          <xsl:when test="regex-group(1)">      
+          <xsl:when test="regex-group(1) and not($context-lang = 'ar')">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{arabic}{', ., '}', '}'[$double-parenthesis])"/>      
+          </xsl:when>
+          <xsl:when test="regex-group(2) and not($context-lang = 'syr')">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{syriac}{', ., '}', '}'[$double-parenthesis])"/>      
+          </xsl:when>
+          <xsl:when test="regex-group(3) and not($context-lang = 'hy')">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\armenian{', ., '}', '}'[$double-parenthesis])"/>      
+          </xsl:when>
+          <xsl:when test="regex-group(4) and not($context-lang = 'zh')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{chinese}{', ., '}', '}'[$double-parenthesis])"/>
           </xsl:when>
-          <xsl:when test="regex-group(2)">
+          <xsl:when test="regex-group(5) and not($context-lang = 'he')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{hebrew}{', ., '}', '}'[$double-parenthesis])"/>
-            
           </xsl:when>
-          <xsl:when test="regex-group(3)">
+          <xsl:when test="regex-group(6) and not($context-lang = 'ja')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{japanese}{', ., '}', '}'[$double-parenthesis])"/>  
-            
           </xsl:when>
-          <xsl:when test="regex-group(4)">
-            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{arabic}{', ., '}', '}'[$double-parenthesis])"/>      
-            
-          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="."/>
+          </xsl:otherwise>
         </xsl:choose>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
