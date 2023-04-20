@@ -670,7 +670,11 @@
     <xsl:next-match/>
   </template>
     
-  <template context="*[not(self::dbk:book | self::dbk:hub | self::dbk:figure)][dbk:info][@xml:lang][@xml:lang ne /*/@xml:lang][not(../@xml:lang = current()/@xml:lang)]" priority="800">
+  <template context="*[not(self::dbk:book|self::dbk:hub|self::dbk:figure)]
+                      [dbk:info]
+                      [@xml:lang]
+                      [@xml:lang ne /*/@xml:lang]
+                      [not(../@xml:lang = current()/@xml:lang)]" priority="800">
     <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
     <xsl:next-match/>
     <xsl:if test="following-sibling::*[1][not(@xml:lang) 
@@ -680,6 +684,16 @@
                   not(following-sibling::*)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(/*/@xml:lang), '}')"/>
     </xsl:if>
+  </template>
+  
+  <!-- override for syriac -->
+  
+  <template context="dbk:para[@xml:lang eq 'syr'][not(@xml:lang = $langs[1])]">
+    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%&#xa;')"/>
+    <xsl:next-match>
+      <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="true()"/>
+    </xsl:next-match>
+    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang($langs[1]), '}')"/>
   </template>
 
   <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
