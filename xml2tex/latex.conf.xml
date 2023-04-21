@@ -686,9 +686,9 @@
     </xsl:if>
   </template>
   
-  <!-- override for syriac -->
+  <!-- https://redmine.le-tex.de/issues/14610 override for syriac, hebrew -->
   
-  <template context="dbk:para[@xml:lang eq 'syr'][not(@xml:lang = $langs[1])]">
+  <template context="dbk:para[@xml:lang = ('syr', 'he')][not(@xml:lang = $langs[1])]">
     <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%&#xa;')"/>
     <xsl:next-match>
       <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="true()"/>
