@@ -689,11 +689,11 @@
   <!-- https://redmine.le-tex.de/issues/14610 override for syriac, hebrew -->
   
   <template context="dbk:para[@xml:lang = ('syr', 'he')][not(@xml:lang = $langs[1])]">
-    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%&#xa;')"/>
+    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{')"/>
     <xsl:next-match>
       <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="true()"/>
     </xsl:next-match>
-    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang($langs[1]), '}')"/>
+    <xsl:text>}</xsl:text>
   </template>
 
   <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
