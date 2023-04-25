@@ -345,6 +345,16 @@
       <xsl:copy-of select="following-sibling::*[1][self::para[matches(@role, $info-blockquote-source-roles)]]"/>
     </epigraph>
   </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $info-blockquote-roles)]
+                           [not(parent::blockquote)]" mode="hub:clean-hub">
+    <epigraph role="motto">
+      <xsl:copy>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </xsl:copy>
+      <xsl:copy-of select="following-sibling::*[1][self::para[matches(@role, $info-blockquote-source-roles)]]"/>
+    </epigraph>
+  </xsl:template>
     
   <xsl:template match="para[matches(@role, $info-blockquote-source-roles)]
                       |*[self::bibliomixed|self::para]/node()[1][self::br]

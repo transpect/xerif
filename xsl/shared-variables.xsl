@@ -165,7 +165,7 @@
                 select="'^[a-z]{1,3}(subheading\d|journalreviewsubheading)$'"/>
   
   <xsl:variable name="info-blockquote-roles" as="xs:string"
-                select="'^[a-z]{1,3}(motto-zitat|motto)$'"/>
+                select="'^[a-z]{1,3}(motto-zitat|motto|epigraph)$'"/>
   
   <xsl:variable name="info-blockquote-source-roles" as="xs:string"
                 select="'^[a-z]{1,3}(motto-zitat|mottosource|epigraphsource)$'"/>
