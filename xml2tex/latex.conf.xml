@@ -2357,12 +2357,6 @@
       <param/>
     </rule>
   </template>
- 
-  <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)">
-    <rule name="armenian" type="cmd">
-      <param regex-group="1"/>
-    </rule>
-  </regex>
 
   <xsl:template match="text()[matches(., concat('[', string-join($scripts/@unicode-range), ']'))]"
                 mode="xml2tex" priority="300">
