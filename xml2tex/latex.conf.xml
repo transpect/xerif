@@ -516,14 +516,14 @@
     <xsl:sequence select="string-join(($fn-reset, $fn-or-en, $en-with-ch-h), '')"/>
     <!-- noch keine option um überschriften zu steuern.-->
   </xsl:function>
-  
+
   <xsl:variable name="scripts" as="element(script)*" xmlns="">
     <script name="arabic"   unicode-range="&#x600;-&#x6ff;&#x750;-&#x77f;"/>
     <script name="syriac"   unicode-range="&#x700;-&#x74f;"/>
     <script name="armenian" unicode-range="&#x530;-&#x58f;&#xfb13;-&#xfb17;"/>
-    <script name="chinese"  unicode-range="&#x3002;&#x4e00;-&#x9fff;"/>
+    <script name="chinese"  unicode-range="&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;"/>
     <script name="hebrew"   unicode-range="&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;"/>
-    <script name="japanese" unicode-range="&#x3040;-&#x309f;&#x30a0;-&#x30ff;"/>
+    <script name="japanese" unicode-range="&#x3040;-&#x309f;&#x30a0;-&#x30ff;&#12352;-&#12543;"/>
   </xsl:variable>
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
