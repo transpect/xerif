@@ -675,25 +675,21 @@
                       [@xml:lang]
                       [@xml:lang ne /*/@xml:lang]
                       [not(../@xml:lang = current()/@xml:lang)]" priority="800">
-    <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
-    <xsl:next-match/>
-    <xsl:if test="following-sibling::*[1][not(@xml:lang) 
+    <xsl:param name="suppress-selectlanguage" as="xs:boolean" select="false()"/>
+    <xsl:if test="not($suppress-selectlanguage)">
+      <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
+    </xsl:if>
+    <xsl:next-match>
+      <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="$suppress-selectlanguage"/>
+    </xsl:next-match>
+    <xsl:if test="(following-sibling::*[1][not(@xml:lang) 
                                           or 
                                           @xml:lang eq /*/@xml:lang]
-                  or 
-                  not(following-sibling::*)">
+                   or 
+                   not(following-sibling::*))
+                   and not($suppress-selectlanguage)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(/*/@xml:lang), '}')"/>
     </xsl:if>
-  </template>
-  
-  <!-- https://redmine.le-tex.de/issues/14610 override for syriac, hebrew -->
-  
-  <template context="dbk:para[@xml:lang = ('syr', 'he')][not(@xml:lang = $langs[1])]">
-    <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{')"/>
-    <xsl:next-match>
-      <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="true()"/>
-    </xsl:next-match>
-    <xsl:text>}</xsl:text>
   </template>
 
   <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
@@ -1955,7 +1951,8 @@
         * -->
   
   <template context="dbk:blockquote[not(..[self::dbk:info])]">
-    <xsl:if test="@xml:lang">
+    <xsl:param name="suppress-selectlanguage" as="xs:boolean" select="false()"/>
+    <xsl:if test="@xml:lang and not($suppress-selectlanguage)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
     </xsl:if>
     <rule name="quote" type="env" break-before="1">
@@ -1966,7 +1963,7 @@
       </xsl:if>
       <text select="* except dbk:attribution"/>
     </rule>
-    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang])">
+    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang]) and not($suppress-selectlanguage)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
     </xsl:if>
   </template>
