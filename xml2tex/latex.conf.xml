@@ -675,19 +675,19 @@
                       [@xml:lang]
                       [@xml:lang ne /*/@xml:lang]
                       [not(../@xml:lang = current()/@xml:lang)]" priority="800">
-    <xsl:param name="suppress-selectlanguage" as="xs:boolean" select="false()"/>
-    <xsl:if test="not($suppress-selectlanguage)">
+    <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
+    <xsl:if test="not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
     </xsl:if>
     <xsl:next-match>
-      <xsl:with-param name="suppress-selectlanguage" as="xs:boolean" select="$suppress-selectlanguage"/>
+      <xsl:with-param name="suppress-select-lang" as="xs:boolean" select="$suppress-select-lang"/>
     </xsl:next-match>
     <xsl:if test="(following-sibling::*[1][not(@xml:lang) 
                                           or 
                                           @xml:lang eq /*/@xml:lang]
                    or 
                    not(following-sibling::*))
-                   and not($suppress-selectlanguage)">
+                   and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(/*/@xml:lang), '}')"/>
     </xsl:if>
   </template>
@@ -1951,8 +1951,8 @@
         * -->
   
   <template context="dbk:blockquote[not(..[self::dbk:info])]">
-    <xsl:param name="suppress-selectlanguage" as="xs:boolean" select="false()"/>
-    <xsl:if test="@xml:lang and not($suppress-selectlanguage)">
+    <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
+    <xsl:if test="@xml:lang and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
     </xsl:if>
     <rule name="quote" type="env" break-before="1">
@@ -1963,7 +1963,7 @@
       </xsl:if>
       <text select="* except dbk:attribution"/>
     </rule>
-    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang]) and not($suppress-selectlanguage)">
+    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang]) and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
     </xsl:if>
   </template>
