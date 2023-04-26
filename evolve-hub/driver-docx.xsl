@@ -8,7 +8,7 @@
   xmlns:functx="http://www.functx.com"
   xmlns="http://docbook.org/ns/docbook" 
   xpath-default-namespace="http://docbook.org/ns/docbook"
-  exclude-result-prefixes="xs hub dbk" 
+  exclude-result-prefixes="xs hub dbk xlink functx" 
   version="2.0">
   
   <xsl:output indent="yes"/>
@@ -1896,6 +1896,26 @@
   
   <xsl:template match="table/@css:width
                       |informaltable/@css:width" mode="custom-2"/>
+  
+  <!-- https://redmine.le-tex.de/issues/14611 
+       fix displaced variablelists -->
+  
+  <xsl:template match="dbk:varlistentry[dbk:term[not(normalize-space())]]
+                                       [dbk:listitem/dbk:variablelist]" mode="hub:ids">
+      <xsl:apply-templates select="dbk:listitem/dbk:variablelist/dbk:varlistentry"  mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="dbk:varlistentry[dbk:term[normalize-space()]]
+                                       [dbk:listitem/dbk:variablelist]" mode="hub:ids">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, dbk:term" mode="#current"/>
+      <listitem>
+        <xsl:apply-templates select="dbk:listitem/@*, 
+                                     dbk:listitem/* except dbk:listitem/dbk:variablelist"/>
+      </listitem>
+    </xsl:copy>
+    <xsl:apply-templates select="dbk:listitem/dbk:variablelist/dbk:varlistentry" mode="#current"/>
+  </xsl:template>
   
   <xsl:function name="hub:replace-hyphens" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
