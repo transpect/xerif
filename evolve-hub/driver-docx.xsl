@@ -1144,7 +1144,8 @@
   <!-- (1) create index container and include index headlines -->
   
   <xsl:variable name="index-types" as="xs:string*"
-                select="distinct-values((//indexterm[not(@type)]/($index-type-default-name), //indexterm/@type))"/>
+                select="for $index-type in distinct-values((//indexterm[not(@type)]/($index-type-default-name), //indexterm/@type))
+                        return hub:normalize-index-type($index-type)"/>
   
   <xsl:template match="/*[.//indexterm]" mode="custom-2">
     <xsl:variable name="doc" select="." as="element()"/>
@@ -1198,7 +1199,7 @@
   
   <xsl:template match="indexterm" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string"
-                  select="(@type, $index-type-default-name)[1]"/>
+                  select="(hub:normalize-index-type(@type), $index-type-default-name)[1]"/>
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
     <xsl:copy>
@@ -1349,11 +1350,17 @@
     </xsl:for-each-group>
   </xsl:template>
   
+  <xsl:template match="index/@type" mode="custom-2">
+    <xsl:copy>
+      <xsl:value-of select="hub:normalize-index-type(.)"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <!-- pre-existing index containers -->
   
   <xsl:template match="index[not(indexentry)]" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string" 
-                  select="(@type, $index-type-default-name)[1]"/>
+                  select="(hub:normalize-index-type(@type), $index-type-default-name)[1]"/>
     <!--<xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
@@ -1366,6 +1373,11 @@
   <xsl:function name="hub:index-letter" as="xs:string">
     <xsl:param name="index" as="xs:integer"/>
     <xsl:value-of select="translate(xs:string($index), '123456789', 'abcdefghi')"/>
+  </xsl:function>
+  
+  <xsl:function name="hub:normalize-index-type" as="xs:string">
+    <xsl:param name="index-type" as="xs:string"/>
+    <xsl:value-of select="replace($index-type, '\p{P}', '')"/>
   </xsl:function>
   
   <!-- remove empty index terms early -->
