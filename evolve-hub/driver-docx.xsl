@@ -1199,7 +1199,7 @@
   
   <xsl:template match="indexterm" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string"
-                  select="(hub:normalize-index-type(@type), $index-type-default-name)[1]"/>
+                  select="hub:normalize-index-type((@type, $index-type-default-name)[1])"/>
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
     <xsl:copy>
@@ -1352,7 +1352,7 @@
   
   <xsl:template match="index/@type" mode="custom-2">
     <xsl:copy>
-      <xsl:value-of select="hub:normalize-index-type(.)"/>
+      <xsl:value-of select="hub:normalize-index-type((., $index-type-default-name)[1])"/>
     </xsl:copy>
   </xsl:template>
   
@@ -1360,7 +1360,7 @@
   
   <xsl:template match="index[not(indexentry)]" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string" 
-                  select="(hub:normalize-index-type(@type), $index-type-default-name)[1]"/>
+                  select="hub:normalize-index-type((@type, $index-type-default-name)[1])"/>
     <!--<xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
@@ -1376,7 +1376,7 @@
   </xsl:function>
   
   <xsl:function name="hub:normalize-index-type" as="xs:string">
-    <xsl:param name="index-type" as="xs:string"/>
+    <xsl:param name="index-type" as="xs:string?"/>
     <xsl:value-of select="replace($index-type, '\p{P}', '')"/>
   </xsl:function>
   
