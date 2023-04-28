@@ -2357,29 +2357,45 @@
 
   <xsl:template match="text()[matches(., concat('[', string-join($scripts/@unicode-range), ']'))]"
                 mode="xml2tex" priority="300">
+    <xsl:variable name="following-text" select="following-sibling::node()[self::text() | self::dbk:phrase][1]" as="node()?"/>
     <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
     <xsl:variable name="context-lang" as="attribute(xml:lang)?"
                   select="ancestor::*[@xml:lang][1]/@xml:lang"/>
-    <xsl:analyze-string select="." regex="{concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')}">
+<!--    <xsl:variable name="regex" as="xs:string" select="concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')"/>-->
+
+    <xsl:variable name="regex" as="xs:string"
+                select="string-join((for $l in $scripts return concat('(', 
+                                                                      if ($l/@name=('arabic', 'hebrew', 'syriac')) then '[\p{P}]?' else (), (:include punctuation for right-to-left languages:)
+                                                                      '[', 
+                                                                      $l/@unicode-range, 
+                                                                      ']+([\p{Zs}\p{P}]+[', (:summarize several words:)
+                                                                       $l/@unicode-range, 
+                                                                      ']+)*[:;…\p{Zs}',
+                                                                      if (matches($following-text, concat('^[\p{Zs}\p{P}]*[', $l/@unicode-range, ']'))) then ',\.' else (), (:include punctuation on end if next text has same language (comma after arabic must be included to render it in front. but if the comma belongs to surrounding language ignore it) :) 
+                                                                      ']*)'
+                                      )
+                                    ),
+                                    '|')"/>
+    <xsl:analyze-string select="." regex="{$regex}">
       <xsl:matching-substring>
         <!-- order of languages must match the order in $script var -->
         <xsl:choose>
           <xsl:when test="regex-group(1) and not($context-lang = 'ar')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{arabic}{', ., '}', '}'[$double-parenthesis])"/>      
           </xsl:when>
-          <xsl:when test="regex-group(2) and not($context-lang = 'syr')">
+          <xsl:when test="regex-group(3) and not($context-lang = 'syr')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{syriac}{', ., '}', '}'[$double-parenthesis])"/>      
           </xsl:when>
-          <xsl:when test="regex-group(3) and not($context-lang = 'hy')">
+          <xsl:when test="regex-group(5) and not($context-lang = 'hy')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\armenian{', ., '}', '}'[$double-parenthesis])"/>      
           </xsl:when>
-          <xsl:when test="regex-group(4) and not($context-lang = 'zh')">
+          <xsl:when test="regex-group(7) and not($context-lang = 'zh')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{chinese}{', ., '}', '}'[$double-parenthesis])"/>
           </xsl:when>
-          <xsl:when test="regex-group(5) and not($context-lang = 'he')">
+          <xsl:when test="regex-group(9) and not($context-lang = 'he')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{hebrew}{', ., '}', '}'[$double-parenthesis])"/>
           </xsl:when>
-          <xsl:when test="regex-group(6) and not($context-lang = 'ja')">
+          <xsl:when test="regex-group(11) and not($context-lang = 'ja')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{japanese}{', ., '}', '}'[$double-parenthesis])"/>  
           </xsl:when>
           <xsl:otherwise>
