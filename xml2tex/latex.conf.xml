@@ -2371,9 +2371,9 @@
                                                                       $l/@unicode-range, 
                                                                       ']+([\p{Zs}\p{P}]+[', (:summarize several words:)
                                                                        $l/@unicode-range, 
-                                                                      ']+)*[:;…',
+                                                                      ']+)*[…',
                                                                       if ($l/@name=('arabic', 'hebrew', 'syriac')) then '\p{Zs}' else (), (: whitespace on end only for right-to-left langs:)
-                                                                      if (matches($following-text, concat('^[\p{Zs}\p{P}]*[', $l/@unicode-range, ']'))) then ',\.' else (), (:include punctuation on end if next text has same language (comma after arabic must be included to render it in front. but if the comma belongs to surrounding language ignore it) :) 
+                                                                      if (matches($following-text, concat('^[\p{Zs}\p{P}]*[', $l/@unicode-range, ']'))) then ':;,\.' else (), (:include punctuation on end if next text has same language (comma after arabic must be included to render it in front. but if the comma belongs to surrounding language ignore it) :) 
                                                                       ']*)'
                                       )
                                     ),
