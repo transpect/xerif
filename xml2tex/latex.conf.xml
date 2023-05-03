@@ -2032,11 +2032,14 @@
 
   <template context="dbk:blockquote[matches(@role, $verse-style)]">
     <rule name="verse" type="env" break-after="1" break-before="1">
+      <xsl:if test="dbk:attribution">
+        <option select="dbk:attribution"/>
+      </xsl:if>
       <xsl:if test="dbk:title">
         <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
         <xsl:text>\par&#xa;</xsl:text>
       </xsl:if>
-      <text select="*[not(self::dbk:title)]"/>
+      <text select="*[not(self::dbk:title or self::dbk:attribution)]"/>
     </rule>
   </template>
   
