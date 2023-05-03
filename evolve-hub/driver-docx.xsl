@@ -112,16 +112,19 @@
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="node()" group-adjacent="exists(self::para[matches(@role, $hub:blockquote-role-regex)])">
+      <xsl:for-each-group select="*" group-adjacent="exists(self::para[matches(@role, $hub:blockquote-role-regex)])">
         <xsl:variable name="blockquote-source" as="element(dbk:para)*" 
                       select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
         <!-- all blockquote paras -->
         <xsl:choose>
           <xsl:when test="current-grouping-key()">
-            <xsl:for-each-group select="current-group()" group-starting-with="self::para[not(substring(@role, 1, 7) = substring(preceding-sibling::*[1][self::para]/@role, 1, 7))]">
+            <xsl:for-each-group select="current-group()" 
+                                group-starting-with="self::para[  not(substring(@role, 1, 6)
+                                                                = substring(preceding-sibling::*[1][self::para]/@role, 1, 6))]
+                                                               [normalize-space()]">
               <!-- splitted in different blockquote-types: '^([a-z]{1,3}motto|[a-z]{1,3}dialogue|[a-z]{1,3}quotation)$' -->
               <xsl:element name="blockquote">
-                <xsl:apply-templates select="current-group()[1]/@role" mode="#current"/>
+                <xsl:apply-templates select="current-group()[matches(@role, $hub:blockquote-role-regex)][1]/@role" mode="#current"/>
                 <xsl:if test="current-group()[1]/preceding-sibling::*[1]/self::para[matches(@role, $hub:blockquote-heading-role-regex)]">
                   <title>
                     <xsl:apply-templates select="current-group()[1]/preceding-sibling::node()[1]/node()" mode="#current"/>
@@ -132,7 +135,8 @@
                     <xsl:apply-templates select="$blockquote-source/@*, $blockquote-source/node()" mode="#current"/>
                   </attribution>
                 </xsl:if>
-                <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex))]" mode="#current"/>
+                <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex))]
+                                                            [normalize-space()]" mode="#current"/>
               </xsl:element>
             </xsl:for-each-group>
           </xsl:when>
@@ -328,9 +332,10 @@
        https://redmine.le-tex.de/issues/13193 -->
   
   <xsl:template match="blockquote[not(   para[matches(@role, $info-blockquote-roles)]
-                                      or para[matches(@role, $info-blockquote-source-roles)])]" mode="hub:clean-hub">
+                                      or para[matches(@role, $info-blockquote-source-roles)])]
+                                 [not(count(*) eq 1)]" mode="hub:clean-hub">
     <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex))
-                                                   then (preceding-sibling::*[1], following-sibling::*[1])[@role][1]/@role
+                                                   then (preceding-sibling::*[1], following-sibling::*[1])[1]/@role
                                                    else @role">
       <blockquote>
         <xsl:apply-templates select="current-group()[1]/@role, 
