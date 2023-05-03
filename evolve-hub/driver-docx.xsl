@@ -334,11 +334,12 @@
   <xsl:template match="blockquote[not(   para[matches(@role, $info-blockquote-roles)]
                                       or para[matches(@role, $info-blockquote-source-roles)])]
                                  [not(count(*) eq 1)]" mode="hub:clean-hub">
+    <xsl:variable name="role" select="@role" as="attribute(role)?"/>
     <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex))
                                                    then (preceding-sibling::*[1], following-sibling::*[1])[1]/@role
                                                    else @role">
       <blockquote>
-        <xsl:apply-templates select="current-group()[1]/@role, 
+        <xsl:apply-templates select="($role, current-group()[1]/@role)[1], 
                                      current-group()" mode="#current"/>
       </blockquote>
     </xsl:for-each-group>
