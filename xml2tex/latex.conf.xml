@@ -2116,10 +2116,7 @@
   <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para | dbk:para[matches(@role, $letter-para-style)]">
     <rule break-after="1">
       <text/>
-      <text>\\</text>
-     <!-- <xsl:if test="following-sibling::*[1][self::dbk:para][starts-with(., '[')]">
-        <text>{}</text>
-      </xsl:if>-->
+      <text>\tpBreak</text>
     </rule>
   </template>
   
