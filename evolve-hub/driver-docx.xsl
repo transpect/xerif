@@ -771,23 +771,8 @@
   <xsl:template match="para[matches(@role, $hub:table-rotated-role-regex)]
                            [following-sibling::*[position() = (1,2)][self::informaltable]]" mode="hub:hierarchy"/>
   
-  <!-- insert table source into table -->
-  
-  <xsl:template match="table[following-sibling::*[1][self::para][matches(@role, $table-source-role-regex)]]
-                      |figure[following-sibling::*[1][self::para][matches(@role, $figure-source-role-regex)]]" mode="custom-1">
-    <xsl:copy>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-      <caption>
-        <para>
-          <xsl:apply-templates select="following-sibling::*[1][matches(@role, $table-source-role-regex)]/node()
-                                      |following-sibling::*[1][matches(@role, $figure-source-role-regex)]/node()" mode="#current"/>  
-        </para>
-      </caption>
-    </xsl:copy>
-  </xsl:template>
-  
   <!-- assign thead. currently very basic stuff, needs to be refinded 
-       when more test data is available.-->
+       when more test data is available. -->
   
   <xsl:template match="tbody" mode="custom-1">
     <xsl:for-each-group select="row" group-adjacent="exists(.//para[matches(@role, $table-header-style-regex)])">
@@ -805,9 +790,6 @@
       </xsl:choose>
     </xsl:for-each-group>
   </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $table-source-role-regex)][preceding-sibling::*[1][self::table]]
-                      |para[matches(@role, $figure-source-role-regex)][preceding-sibling::*[1][self::figure]]" mode="custom-1"/>
   
   <!-- tabs cause compilation issues -->
   
