@@ -1782,21 +1782,23 @@
     </xsl:if>
   </template>  
   
-  <template context="dbk:figure/dbk:note | 
-                     dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][1] | 
-                     *:table/dbk:note | (:cals:)
-                     *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][1] (:htmltable:)">
+  <template context="dbk:figure/dbk:note 
+                    |dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][1]
+                    |*:table/dbk:caption/dbk:para[@role[matches(., $hub:table-note-style-regex-x)]][1]
+                    |dbk:informaltable/dbk:caption/dbk:para[@role[matches(., $hub:table-note-style-regex-x)]][1]">
     <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
-      <param select="if (self::dbk:para) then (node(), following-sibling::dbk:para[@role[matches(., $tab-legend-para-style-regex)]]) else dbk:para">
+      <param select="if (self::dbk:para) then (node(), following-sibling::dbk:para[@role[matches(., $hub:table-note-style-regex-x)]]) else dbk:para">
         <with-param name="already-merged" as="xs:boolean" select="true()" tunnel="yes"/>
       </param>
     </rule>
   </template>
   
-   <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][not(position() = 1)] | 
-                      *:table/dbk:caption/dbk:para[@role[matches(., $tab-legend-para-style-regex)]][not(position() = 1)] (:htmltable:) |
-                      dbk:figure/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)] | 
-                      *:table/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]">
+   <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][not(position() = 1)]
+                     |dbk:figure/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]
+                     |*:table/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]
+                     |dbk:informaltable/dbk:info/dbk:legalnotice/dbk:para[not(position() = 1)]
+                     |*:table/dbk:caption/dbk:para[not(position() eq 1)]
+                     |dbk:informaltable/dbk:caption/dbk:para[not(position() eq 1)]">
      <xsl:param name="already-merged" as="xs:boolean?" tunnel="yes"/>
      <xsl:if test="$already-merged">
        <xsl:text>&#xa;\tpBreak </xsl:text>
@@ -1804,11 +1806,15 @@
      </xsl:if>
    </template>
   
-  <template context="dbk:figure/dbk:info/dbk:legalnotice/dbk:para[1] | dbk:figure/dbk:caption | *:table/dbk:caption | *:table/dbk:info/dbk:legalnotice/dbk:para[1]">
+  <template context="dbk:figure/dbk:info/dbk:legalnotice/dbk:para[1] 
+                    |dbk:figure/dbk:caption
+                    |*:table/dbk:caption
+                    |*:table/dbk:info/dbk:legalnotice/dbk:para[1]">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
-      <param select="(node() except dbk:para[@role[matches(., $tab-legend-para-style-regex)]]), following-sibling::dbk:para[not(@role[matches(., $tab-legend-para-style-regex)])]"/>
+      <param select="(node() except dbk:para[@role[matches(., $hub:table-copyright-style-regex-x)]]),
+                      following-sibling::dbk:para[not(@role[matches(., $hub:table-copyright-style-regex-x)])]"/>
     </rule>
-    <xsl:apply-templates select="dbk:para[@role[matches(., $tab-legend-para-style-regex)]]" mode="#current"/>
+    <xsl:apply-templates select="dbk:para[@role[matches(., $hub:table-copyright-style-regex-x)]]" mode="#current"/>
   </template>
 
   <!--<template context="dbk:inlinemediaobject/dbk:imagedata[@fileref]">

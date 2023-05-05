@@ -39,11 +39,17 @@
   <xsl:variable name="hub:list-by-indent-exception-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(literature|body|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula)'"/>  
   
-  <xsl:variable name="hub:figure-title-role-regex-x"
-                select="'^([a-z]{1,3}figurecaption)$'" as="xs:string"/>
+  <xsl:variable name="hub:figure-title-role-regex-x" as="xs:string"
+                select="'^([a-z]{1,3}figurecaption)$'"/>
   
-  <xsl:variable name="hub:table-title-role-regex-x"
-                select="'^([a-z]{1,3}tablecaption)$'" as="xs:string"/>
+  <xsl:variable name="hub:table-title-role-regex-x" as="xs:string" 
+                select="'^[a-z]{1,3}tablecaption$'"/>
+  
+  <xsl:variable name="hub:table-note-style-regex-x" as="xs:string" 
+                select="'^[a-z]{1,3}tablelegend$'"/>
+  
+  <xsl:variable name="hub:table-copyright-style-regex-x" as="xs:string" 
+                select="'^[a-z]{1,3}tablesource$'"/>
   
   <xsl:variable name="hub:figure-caption-start-regex" as="xs:string" 
                 select="'[^\p{Zs}]+'"/>
@@ -245,11 +251,14 @@
   <xsl:variable name="hub:discard-para-regex" select="'tsheadline'" as="xs:string"/>
  
   <xsl:variable name="hub:table-rotated-role-regex" as="xs:string" select="'^[a-z]{1,3}tablerotated$'"/>
+  
+  <xsl:variable name="hub:table-caption-start-regex" as="xs:string"
+                select="'Tab\.|Tabellen?|Table|[tT]ables?'"/>
  
   <xsl:variable name="hub:figure-number-role-regex-x" as="xs:string" select="'Abbildung_BU_Num'"/>
   <xsl:variable name="hub:figure-note-role-regex" as="xs:string" select="'Abbildung_BU_Note'"/>
   <xsl:variable name="hub:figure-copyright-statement-role-regex"  as="xs:string" select="'tsfiguresource'" />
-  <xsl:variable name="hub:table-note-style-regex-x" as="xs:string" select="'Tabellenlegende_TU_Note'"/>
+  
 
   <xsl:variable name="hub:subtitle-role-regex" as="xs:string" select="'tssubheading[1-5]'" /> 
 

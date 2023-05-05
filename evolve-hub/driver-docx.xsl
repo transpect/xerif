@@ -769,7 +769,8 @@
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $hub:table-rotated-role-regex)]
-                           [following-sibling::*[position() = (1,2)][self::informaltable]]" mode="hub:hierarchy"/>
+                           [following-sibling::*[position() = (1,2)]
+                           [self::informaltable]]" mode="hub:hierarchy"/>
   
   <!-- assign thead. currently very basic stuff, needs to be refinded 
        when more test data is available. -->
