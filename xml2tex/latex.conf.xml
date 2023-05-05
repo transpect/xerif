@@ -1808,11 +1808,10 @@
   
   <template context="dbk:figure/dbk:info/dbk:legalnotice/dbk:para[1] 
                     |dbk:figure/dbk:caption
-                    |*:table/dbk:caption
-                    |*:table/dbk:info/dbk:legalnotice/dbk:para[1]">
+                    |*:table/dbk:info/dbk:legalnotice/dbk:para[1]
+                    |dbk:informaltable/dbk:info/dbk:legalnotice/dbk:para[1]">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
-      <param select="(node() except dbk:para[@role[matches(., $hub:table-copyright-style-regex-x)]]),
-                      following-sibling::dbk:para[not(@role[matches(., $hub:table-copyright-style-regex-x)])]"/>
+      <param select="if (self::dbk:para) then (node(), following-sibling::dbk:para[@role[matches(., $hub:table-copyright-style-regex-x)]]) else dbk:para"/>
     </rule>
     <xsl:apply-templates select="dbk:para[@role[matches(., $hub:table-copyright-style-regex-x)]]" mode="#current"/>
   </template>
