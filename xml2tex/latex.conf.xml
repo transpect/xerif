@@ -4,6 +4,7 @@
      xmlns:xml2tex="http://transpect.io/xml2tex" 
      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
      xmlns:tr="http://transpect.io" 
+     xmlns:hub="http://transpect.io/hub"
      table-model="htmltabs">
   
   <xsl:import href="http://transpect.io/xslt-util/functx/Sequences/Sorting-and-Grouping/sort.xsl"/>
