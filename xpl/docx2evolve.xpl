@@ -41,6 +41,7 @@
   
   <p:option name="file" required="true"/>
   <p:option name="out-dir-uri" select="'out'"/>
+  <p:option name="table-headers-and-footers-from-tblLook" select="'no'"/>
   <p:option name="debug" select="'yes'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
   <p:option name="status-dir-uri" select="'status'"/>
@@ -61,6 +62,7 @@
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
     <p:with-option name="mathtype2mml" select="'yes'"/>
     <p:with-option name="remove-biblioentry-paragraphs" select="'no'"/>
+    <p:with-option name="table-headers-and-footers-from-tblLook" select="'yes'"/>
   </docx2hub:convert>
   
   <tx:insert-meta name="insert-meta">

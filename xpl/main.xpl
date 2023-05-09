@@ -66,6 +66,7 @@
   
   <p:option name="file" required="true"/>
   <p:option name="out-dir-uri" select="'out'"/>
+  <p:option name="table-headers-and-footers-from-tblLook" select="'no'"/>
   <p:option name="debug" select="'yes'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
   <p:option name="status-dir-uri" select="'status'"/>
@@ -145,7 +146,6 @@
   <p:option name="idml-target-uri"/>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
-  
 
   <p:import href="http://transpect.io/xproc-util/file-uri/xpl/file-uri.xpl"/>
   <p:import href="http://transpect.io/xproc-util/resolve-params/xpl/resolve-params.xpl"/>
@@ -165,8 +165,7 @@
   <p:import href="insert-meta.xpl"/>
   <p:import href="load-meta.xpl"/>
   <p:import href="hub2epub.xpl"/>
-  <p:import href="generate-xmp.xpl"/>
-  
+  <p:import href="generate-xmp.xpl"/>  
 
   <p:string-replace name="start-msg-replace" match="file">
     <p:with-option name="replace" select="concat('''', replace($file, '^.+/', ''), '''')"/>
@@ -254,6 +253,7 @@
           <p:pipe port="result" step="load-meta-wrapper"/>
         </p:input>
         <p:with-option name="file" select="$file"/>
+        <p:with-option name="table-headers-and-footers-from-tblLook" select="$table-headers-and-footers-from-tblLook"/>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
