@@ -12,6 +12,7 @@
   
   <ns prefix="dc" uri="http://purl.org/dc/elements/1.1/"/>
   <ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+  <ns prefix="hub" uri="http://transpect.io/hub"/>
   
   <import href="../../../docx2tex/conf/conf.xml"/>
   
