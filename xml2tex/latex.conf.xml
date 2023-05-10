@@ -1588,9 +1588,11 @@
                                                                       ), ',')"/>
       <xsl:if test="matches($option, '\p{L}')"><option select="$option"></option></xsl:if>
       <xsl:apply-templates select="dbk:title, 
-                                   dbk:caption, 
+                                   dbk:caption,
+                                   dbk:info/dbk:legalnotice, 
                                    node() except (dbk:title, 
-                                                  dbk:caption)" mode="#current"/>
+                                                  dbk:caption,
+                                                  dbk:info)" mode="#current"/>
     </rule>
     <xsl:sequence select="xml2tex:generate-clear-after-p(.)"/>
   </template>
