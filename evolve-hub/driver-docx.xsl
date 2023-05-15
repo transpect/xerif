@@ -112,7 +112,11 @@
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="exists(self::para[matches(@role, $hub:blockquote-role-regex)])">
+      <xsl:for-each-group select="*|processing-instruction()" group-adjacent="self::para[matches(@role, $hub:blockquote-role-regex)] 
+                                                                              or
+                                                                              self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, $hub:blockquote-role-regex)]] 
+                                                                                                                    and
+                                                                                                                    following-sibling::*[1][self::para[matches(@role, $hub:blockquote-role-regex)]]]">
         <xsl:variable name="blockquote-source" as="element(dbk:para)*" 
                       select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
         <!-- all blockquote paras -->
@@ -549,7 +553,7 @@
               </xsl:if>
               <xsl:choose>
                 <xsl:when test="$one-caption-for-multiple-images">
-                  <xsl:apply-templates select="current-group()[matches(@role, $figure-caption-role-regex, 'i')],
+                  <xsl:apply-templates select="current-group()[matches(@role, $figure-caption-role-regex, 'i')][normalize-space()],
                                                $image-object-or-file-reference" mode="figures">
                     <xsl:with-param name="one-caption-for-multiple-images" as="xs:boolean" select="$one-caption-for-multiple-images"/>
                   </xsl:apply-templates>
@@ -567,16 +571,16 @@
                         <xsl:apply-templates select="current-group()[matches(@role, $figure-image-role-regex, 'i')][1]/@role" mode="figure-role-type">
                           <xsl:with-param name="is-grid-group" select="$is-grid-group" as="xs:boolean"/>
                         </xsl:apply-templates>
-                        <xsl:apply-templates select="(current-group()[matches(@role, $figure-link-role-regex, 'i')],
-                                                      current-group()[matches(@role, $figure-caption-role-regex, 'i')],
+                        <xsl:apply-templates select="(current-group()[matches(@role, $figure-link-role-regex, 'i')][normalize-space()],
+                                                      current-group()[matches(@role, $figure-caption-role-regex, 'i')][normalize-space()],
                                                       current-group()[matches(@role, $figure-image-role-regex, 'i')],
-                                                      current-group()[matches(@role, $figure-source-role-regex, 'i')])" mode="figures"/>
+                                                      current-group()[matches(@role, $figure-source-role-regex, 'i')][normalize-space()])" mode="figures"/>
                       </figure>
                     </xsl:for-each-group>
                 </xsl:otherwise>
               </xsl:choose>
               <xsl:if test="$one-caption-for-multiple-images">
-                <xsl:apply-templates select="current-group()[matches(@role, $figure-source-role-regex, 'i')]" mode="figures"/>
+                <xsl:apply-templates select="current-group()[matches(@role, $figure-source-role-regex, 'i')][normalize-space()]" mode="figures"/>
               </xsl:if>
             </xsl:element>
           </xsl:when>
@@ -769,11 +773,25 @@
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $hub:table-rotated-role-regex)]
-                           [following-sibling::*[position() = (1,2)]
-                           [self::informaltable]]" mode="hub:hierarchy"/>
+                           [following-sibling::*[position() = (1,2)][self::informaltable]]" mode="hub:hierarchy"/>
+  
+  <!-- insert table source into table -->
+  
+  <xsl:template match="table[following-sibling::*[1][self::para][matches(@role, $table-source-role-regex)]]
+                      |figure[following-sibling::*[1][self::para][matches(@role, $figure-source-role-regex)]]" mode="custom-1">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <caption>
+        <para>
+          <xsl:apply-templates select="following-sibling::*[1][matches(@role, $table-source-role-regex)]/node()
+                                      |following-sibling::*[1][matches(@role, $figure-source-role-regex)]/node()" mode="#current"/>  
+        </para>
+      </caption>
+    </xsl:copy>
+  </xsl:template>
   
   <!-- assign thead. currently very basic stuff, needs to be refinded 
-       when more test data is available. -->
+       when more test data is available.-->
   
   <xsl:template match="tbody" mode="custom-1">
     <xsl:for-each-group select="row" group-adjacent="exists(.//para[matches(@role, $table-header-style-regex)])">
@@ -791,6 +809,9 @@
       </xsl:choose>
     </xsl:for-each-group>
   </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $table-source-role-regex)][preceding-sibling::*[1][self::table]]
+                      |para[matches(@role, $figure-source-role-regex)][preceding-sibling::*[1][self::figure]]" mode="custom-1"/>
   
   <!-- tabs cause compilation issues -->
   
