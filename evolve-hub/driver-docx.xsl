@@ -1913,6 +1913,8 @@
     <xsl:value-of select="replace(., $pi-mark, '\\')"/>
   </xsl:template>
   
+  <xsl:template match="mediaobject[not(node())]" mode="hub:split-at-tab"/>
+  
   <xsl:function name="hub:gentle-normalize" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
     <xsl:sequence select="replace($text, '(\s)(\s)+', '$1')"/>
