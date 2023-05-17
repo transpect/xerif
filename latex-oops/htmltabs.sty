@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.7}%
-\def\filedate{2022-07-12}%
+\def\fileversion{0.2.8}%
+\def\filedate{2023-05-17}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -762,9 +762,17 @@
     \GetCascCellProp{hAlign}{text-align}%
     \GetCascCellProp{Hyphen}{hyphen}%
   \csname ht@halign@\hAlign @\Hyphen\endcsname}
+\def\ht@set@alignment{%
+  \let\centering\ht@halign@center@none
+  \let\raggedleft\ht@halign@right@none
+  \let\raggedright\ht@halign@left@none
+  \let\Centering\ht@halign@center@auto
+  \let\RaggedLeft\ht@halign@right@auto
+  \let\RaggedRight\ht@halign@left@auto
+  \let\justified\ht@halign@justified@auto
+}
 
 \def\ht@halign@center@none{%
-  \let\\\@centercr
   \rightskip\z@\@plus1fill\relax
   \leftskip\z@\@plus1fill\relax
   \parindent\z@
@@ -1626,6 +1634,7 @@
   \fi
 }
 \def\ht@transform@box#1#2{%
+  \ht@set@alignment
   \ifx\ht@scope\ht@str@td
     \IfCellPropEmpty{internal-rotate}{\ht@align@box{#2}}{%
       \GetCellProp{htRotate}{internal-rotate}%
