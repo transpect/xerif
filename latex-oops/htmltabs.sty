@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.8}%
-\def\filedate{2023-05-17}%
+\def\fileversion{0.2.9}%
+\def\filedate{2023-05-19}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -1005,6 +1005,8 @@
     \global\ht@row@insert@ht\z@
     %% 1. Durchlauf: nat. Höhen berechnen
     \ht@Iterate{\ht@curcol}{1}{\the\ht@maxcol}{{%
+      \ht@eval@props{tr-\the\ht@currow}%
+      \GetRowProp{ht@parent}{parent}%
       \HTEvalCellProps
       \GetCellProp{is@virtual}{virtual}%
       \ht@debugmsg{calcheight}{Calculating height\ifx\is@virtual\relax\else\space (is virtual)\fi.}%
