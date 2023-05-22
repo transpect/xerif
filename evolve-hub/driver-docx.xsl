@@ -1357,7 +1357,7 @@
     <xsl:variable name="pre-text" as="element(para)*" 
                   select="para[not(preceding-sibling::indexterm)]"/>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
-    <xsl:for-each-group select="* except info" group-starting-with="indexentry[not(preceding-sibling::*[1][self::indexentry]) or empty(preceding-sibling::*)]">
+    <xsl:for-each-group select="* except info" group-adjacent="local-name() ='indexentry'">
       <xsl:choose>
         <xsl:when test="current-group()[1][self::indexentry]">
           <!-- remap attribute is a letter and later needed to separate multiple indices -->
