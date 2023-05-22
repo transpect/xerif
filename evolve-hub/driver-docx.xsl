@@ -1354,13 +1354,15 @@
     <xsl:variable name="index-type" select="@type" as="attribute(type)?"/>
     <xsl:variable name="index-title" as="element(info)?" 
                   select="info[title[matches(@role, $index-heading-regex, 'i')]]"/>
+    <xsl:variable name="pre-text" as="element(para)*" 
+                  select="para[not(preceding-sibling::indexterm)]"/>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
-    <xsl:for-each-group select="* except info" group-adjacent="local-name() eq 'indexentry'">
+    <xsl:for-each-group select="* except info" group-starting-with="indexentry[not(preceding-sibling::*[1][self::indexentry]) or empty(preceding-sibling::*)]">
       <xsl:choose>
-        <xsl:when test="current-grouping-key() eq true()">
+        <xsl:when test="current-group()[1][self::indexentry]">
           <!-- remap attribute is a letter and later needed to separate multiple indices -->
           <index remap="{hub:index-letter($index-index)}">
-            <xsl:apply-templates select="$index-type, $index-title" mode="#current"/>
+            <xsl:apply-templates select="$index-type, $index-title, $pre-text" mode="#current"/>
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="hub:sortkey(primaryie)">
@@ -1372,7 +1374,7 @@
           </index>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates select="current-group()[not(matches(@role, $index-heading-regex, 'i'))]" 
+         <xsl:apply-templates select="current-group()[not(matches(@role, $index-heading-regex, 'i'))][not(. is $pre-text)]" 
                                mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
