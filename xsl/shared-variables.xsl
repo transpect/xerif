@@ -7,6 +7,7 @@
   xmlns:idml2xml="http://transpect.io/idml2xml"
   xmlns:schematron="http://purl.oclc.org/dsdl/schematron"
   xmlns:tei="http://www.tei-c.org/ns/1.0"
+  xmlns:tei2html="http://transpect.io/tei2html"
   exclude-result-prefixes="xs tei"
   version="2.0">
   
@@ -165,6 +166,10 @@
   
   <xsl:variable name="running-header-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(headingshort|headline(right|left|author|short)?)$'"/>
+
+  <xsl:variable name="info-meta-styles" as="xs:string"
+                select="'$[a-z]{1,3}meta'" ><!-- all meta style names, if they do not all begin with meta in your a9s, 
+      concat the important ones (info-licence-style, info-doi, etc.)--></xsl:variable>
   
   <xsl:variable name="info-keywords-role" as="xs:string"
                 select="'^[a-z]{1,3}keywords$'"/>
@@ -174,9 +179,21 @@
   
   <xsl:variable name="info-author-bio-role" as="xs:string"
                 select="'^[a-z]{1,3}author-bio'" />
+
+  <xsl:variable name="info-licence-style" as="xs:string"
+                select="'^[a-z]{2,3}metacontributionlicence'" />
+
+  <xsl:variable name="info-doi" as="xs:string"
+                select="'[a-z]{1,3}metadoi$'" />
+
+  <xsl:variable name="info-orcid-style" as="xs:string"
+                select="'^[a-z]{2,3}metacontributionorcid'" />
   
   <xsl:variable name="info-author-email-role" as="xs:string"
                 select="'^[a-z]{1,3}author-email'" />
+
+  <xsl:variable name="info-year" as="xs:string"
+                select="'^[a-z]{1,3}metacontributionyear'" />
   
   <xsl:variable name="info-author-affiliation-role" as="xs:string"
                 select="'^[a-z]{1,3}author-affiliation'"/> 
@@ -287,5 +304,7 @@
   <xsl:variable name="hub:container-styles" as="xs:string" select="'(tstable|tsfigure)$'"/>
 
   <xsl:variable name="tei:box-type-role" select="'box'" as="xs:string"/>
+
+  <xsl:variable name="tei2html:no-toc-style-regex" as="xs:string" select="'notoc'"/>
 
 </xsl:stylesheet>
