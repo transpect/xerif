@@ -172,8 +172,26 @@
                 select="'^[a-z]{1,3}(headingshort|headline(right|left|author|short)?)$'"/>
 
   <xsl:variable name="info-meta-styles" as="xs:string"
-                select="'^[a-z]{1,3}meta'" ><!-- all meta style names, if they do not all begin with meta in your a9s, 
-      concat the important ones (info-licence-style, info-doi, etc.)--></xsl:variable>
+                select="concat('(',
+                          string-join(
+                            ($info-keywords-role,
+                             $info-author-role,
+                             $info-author-bio-role,
+                             $info-author-email-role,
+                             $info-author-affiliation-role,
+                             $info-doi,
+                             $info-orcid-style,
+                             $info-licence-style,
+                             $info-year,
+                             $hub:keywords-role-regex,
+                             $hub:abstract-role-regex
+                            ), 
+                          ')|('
+                          ), ')'
+                        )" >
+    <!-- all meta style names, if they do not all begin with meta in your a9s, 
+      concat the important ones (info-licence-style, info-doi, etc.)-->
+  </xsl:variable>
   
   <xsl:variable name="info-keywords-role" as="xs:string"
                 select="'^[a-z]{1,3}keywords$'"/>
