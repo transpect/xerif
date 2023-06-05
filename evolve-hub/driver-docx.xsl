@@ -1780,6 +1780,12 @@
     </section>
   </xsl:template>
 
+  <xsl:template match="section[@role = ('keywords', 'abstract', 'alternative-title')]" mode="hub:twipsify-lengths">
+    <xsl:if test="$hub:preserve-abstract-as-text">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="*[para[matches(@role, $hub:keyword-abstract-transtitle-combined)]
     [not(parent::abstract)]]" mode="hub:repair-hierarchy" priority="2">
     <xsl:copy copy-namespaces="no">

@@ -164,6 +164,10 @@
   
   <!-- chapter/section metadata -->
   
+  <xsl:variable name="hub:preserve-abstract-as-text" as="xs:boolean" select="false()">
+    <!-- if set to true() abstract, keywords and alternatve-title section are preserved additionally to meta tags in info-->
+  </xsl:variable>
+
   <xsl:variable name="running-header-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(headingshort|headline(right|left|author|short)?)$'"/>
 
