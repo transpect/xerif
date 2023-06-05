@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.4}%
-\def\filedate{2022-12-15}%
+\def\fileversion{0.2.5}%
+\def\filedate{2023-06-05}%
 %%
 %% module for CoCoTeX that extends heading objects.
 %%
@@ -111,10 +111,10 @@
       \rightskip\tpUseProperty{margin-right}%
       \bgroup
         \tpUseProperty{heading-block}%
-        \tpIfProp{extended}{\tpUseProperty{extended-heading}}{}%
-      \egroup%
       \tpIfPropVal{no-toc}{true}{}{\tp@make@toc}% ToC entries
       \tpIfPropVal{no-BM}{true}{}{\tp@make@bookmarks}% Bookmarks
+        \tpIfProp{extended}{\tpUseProperty{extended-heading}}{}%
+      \egroup%
       \tp@make@run% Running headers
       \tpUseProperty{after-heading-block}%
     }%
