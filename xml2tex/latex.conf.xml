@@ -1312,12 +1312,20 @@
         * chapter and section authors
         * -->
   
-  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]">
+  <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
+                                                      |self::dbk:editor
+                                                      |self::dbk:othercredit]">
     <xsl:choose>
       <xsl:when test="$cocotex 
                       and 
-                      ((dbk:personname/dbk:surname and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]) or exists(*[not(self::dbk:personname)]))">
-        <!-- if author contains only name → tpAuthorNamelist. If name is structured though or if other metadata is present generate environment -->
+                      (
+                       (    dbk:personname/dbk:surname 
+                        and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]
+                       ) 
+                       or exists(*[not(self::dbk:personname)])
+                      )">
+        <!-- if author contains only name → tpAuthorNamelist. If name is structured though 
+             or if other metadata is present generate environment -->
         <rule name="tpAuthor" type="env" break-after="0" break-before="1">
           <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
@@ -2208,12 +2216,7 @@
     <text/>
     </rule>
   </template>
-
-  <template context="dbk:para[matches(@role, $author-desc-style)]">
-    <rule name="authorbio" break-after="1" break-before="1" type="env">
-      <text/>
-    </rule>
-  </template>
+  
 
   <!--  *
         * bibliography

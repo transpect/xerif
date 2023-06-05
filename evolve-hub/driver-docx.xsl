@@ -168,14 +168,13 @@
                       |appendix" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
     <xsl:variable name="chapter-info" as="element()*" 
-                  select="((author, 
-                           para[matches(@role, $info-author-role)]
-                            )[1],
+                  select="(author,
                            title,
                            titleabbrev,
                            para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
+                           bibliomisc,
                            abstract,
                            keywordset) (: must be placed below title :)"/>
     <xsl:choose>
@@ -452,21 +451,12 @@
         * special markup
         * -->
   
-  <xsl:template match="para[matches(@role, $info-subtitle-role)][preceding-sibling::*[1][self::title|self::titleabbrev]]
+  <xsl:template match="para[matches(@role, $info-subtitle-role)]
+                           [preceding-sibling::*[1][self::title or self::titleabbrev]]
                       |info/para[matches(@role, $info-subtitle-role)]" mode="custom-1" priority="2">
     <subtitle>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </subtitle>
-  </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $info-author-role)]" mode="custom-1">
-    <author>
-      <personname>
-        <othername>
-          <xsl:apply-templates select="@*, node()" mode="#current"/>
-        </othername>
-      </personname>
-    </author>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $info-subtitle-role)]" mode="custom-1">
@@ -1051,9 +1041,7 @@
                                                     |self::info)]/local-name())) gt 1]" 
                 mode="custom-1" priority="3">
     <xsl:variable name="chapter-info" as="element()*" 
-                  select="((author, 
-                            para[matches(@role, $info-author-role)]
-                            )[1],
+                  select="(author,
                            title,
                            titleabbrev,
                            para[matches(@role, $info-subtitle-role)],
@@ -1606,11 +1594,11 @@
       <xsl:for-each-group select="$meta-elts/node()" group-starting-with="*[self::*:personname]">
         <xsl:choose>
           <xsl:when test="current-group()[1][self::*:personname]">
-            <xsl:for-each-group select="current-group()" group-adjacent="exists(.[local-name() = ('personname', 'email', 'orgname', 'affiliation', 'uri') 
+            <xsl:for-each-group select="current-group()" group-adjacent="exists(.[local-name() = ('personname', 'personblurb', 'email', 'orgname', 'affiliation', 'uri') 
                                                                     or 
                                                                     self::text()[matches(., '^\p{Zs}+$', 'm')]
                                                                                 [preceding-sibling::node()[1]
-                                                                                                          [local-name() = ('personname', 'email', 'orgname', 'affiliation', 'uri')]
+                                                                                                          [local-name() = ('personname', 'personblurb', 'email', 'orgname', 'affiliation', 'uri')]
                                                                                 ]
                                                                     ])">
               <xsl:choose>
@@ -1658,7 +1646,7 @@
     </uri>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, '^[a-z]{2,3}metacontributionauthorname')]" mode="hub:process-meta-sidebar">
+  <xsl:template match="para[matches(@role, $info-author-role)]" mode="hub:process-meta-sidebar">
     <personname>
       <othername>  
         <xsl:apply-templates select="@*" mode="#current"/>
@@ -1676,10 +1664,10 @@
     </legalnotice>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, '^[a-z]{2,3}metacontributionauthoraffiliation')]" mode="hub:process-meta-sidebar">
+  <xsl:template match="para[matches(@role, $info-author-affiliation-role)]" mode="hub:process-meta-sidebar">
     <!-- if an author exists, affiliation will be grouped into it as affiliation. otherwise it is orgname -->
     <xsl:choose>
-      <xsl:when test="exists(..[para[matches(@role, '^[a-z]{2,3}metacontributionauthorname')]])">
+      <xsl:when test="exists(..[para[matches(@role, $info-author-role)]])">
         <affiliation>
           <orgname><xsl:apply-templates select="@*, node()" mode="#current"/></orgname>
         </affiliation>
@@ -1692,11 +1680,20 @@
     </xsl:choose>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, '^[a-z]{2,3}metacontributionauthorcontact')]" mode="hub:process-meta-sidebar">
+  <xsl:template match="para[matches(@role, $info-author-email-role)]" mode="hub:process-meta-sidebar">
     <email>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:value-of select="normalize-space(.)"/>
     </email>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $info-author-bio-role)]" mode="hub:process-meta-sidebar">
+    <personblurb>
+      <xsl:copy>
+        <xsl:apply-templates select="@*" mode="#current"/>  
+        <xsl:value-of select="normalize-space(.)"/>
+      </xsl:copy>
+    </personblurb>
   </xsl:template>
 
   <xsl:template match="section[@role = 'abstract']" mode="hub:process-meta-sidebar">
@@ -1737,15 +1734,16 @@
   </xsl:template>
 
   <xsl:template match="section[@role = 'keywords']" mode="hub:process-meta-sidebar">
-  <xsl:variable name="keyword-role" as="xs:string?" select="if (title) 
-                                                         then normalize-space(title) 
-                                                         else replace(descendant-or-self::para[matches(@role, $hub:keywords-role-regex)][1], '^(.+):.+$', '$1')"/>
-      <keywordset role="{if ($keyword-role[normalize-space()]) then $keyword-role else 'Keywords'}">
-        <xsl:apply-templates select="descendant-or-self::para[matches(@role, $hub:keywords-role-regex)]" mode="#current">
-          <xsl:with-param name="process-meta" tunnel="yes" as="xs:boolean?" select="true()"/>
-        </xsl:apply-templates>
-      </keywordset>
-      <xsl:copy copy-namespaces="no">
+    <xsl:variable name="keyword-role" as="xs:string?" 
+                  select="if(title) 
+                          then normalize-space(title) 
+                          else replace(descendant-or-self::para[matches(@role, $hub:keywords-role-regex)][1], '^(.+):.+$', '$1')"/>
+    <keywordset role="{if ($keyword-role[normalize-space()]) then $keyword-role else 'Keywords'}">
+      <xsl:apply-templates select="descendant-or-self::para[matches(@role, $hub:keywords-role-regex)]" mode="#current">
+        <xsl:with-param name="process-meta" tunnel="yes" as="xs:boolean?" select="true()"/>
+      </xsl:apply-templates>
+    </keywordset>
+    <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:if test="not(title)">
         <xsl:apply-templates select="para[matches(@role, $hub:keywords-role-regex)][1]/node()[1][self::phrase]" mode="#current">
@@ -1798,18 +1796,20 @@
   </xsl:template>
 
   <xsl:template match="*[para[matches(@role, $hub:keyword-abstract-transtitle-combined)]
-                             [not(parent::abstract)]]" mode="hub:repair-hierarchy" priority="2">
+    [not(parent::abstract)]]" mode="hub:repair-hierarchy" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" group-adjacent="exists(.[self::para][@role[matches(., concat($hub:headword-role-regex, '|', $hub:keyword-abstract-transtitle-combined))]])">
         <xsl:variable name="all-abstract-and-keyword-para" as="element(*)*" select="current-group()"/>
-        <xsl:for-each-group select="current-group()" group-starting-with="(para[@role[matches(., $hub:headword-role-regex)] 
-                                                                            or 
-                                                                            (@role[matches(., $hub:keyword-abstract-transtitle-combined)] 
-                                                                              and (. is $all-abstract-and-keyword-para[@role = current()/@role][1])
-                                                                                (:and empty($all-abstract-and-keyword-para[@role[matches(., '[a-z]{1,3}(abstract|meta(chunk)?keywords|alternativeheadline)heading')]]):)
-                                                                             and empty($all-abstract-and-keyword-para[@role[matches(., $hub:headword-role-regex)]]) 
-                                                                            )]|*[not(self::para)])">
+        <xsl:for-each-group select="current-group()" 
+                            group-starting-with="(para[@role[matches(., $hub:headword-role-regex)] 
+                                                       or 
+                                                       (@role[matches(., $hub:keyword-abstract-transtitle-combined)] 
+                                                        and (. is $all-abstract-and-keyword-para[@role = current()/@role][1])
+                                                        (:and empty($all-abstract-and-keyword-para[@role[matches(., '[a-z]{1,3}(abstract|meta(chunk)?keywords|alternativeheadline)heading')]]):)
+                                                        and empty($all-abstract-and-keyword-para[@role[matches(., $hub:headword-role-regex)]]) 
+                                                        )]
+                                                       |*[not(self::para)])">
           <xsl:choose>
             <xsl:when test="current-group()[self::para[@role[matches(., $hub:keywords-role-regex)]]]">
               <section role="keywords">

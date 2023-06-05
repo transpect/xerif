@@ -158,14 +158,28 @@
   <xsl:variable name="box-end-regex" as="xs:string" 
                 select="'^[a-z]{1,3}box[a-z]+end$'"/>
   
+  <xsl:variable name="author-desc-style" as="xs:string"
+                select="'^[a-z]{1,3}authordescription'" />
+  
+  <!-- chapter/section metadata -->
+  
   <xsl:variable name="running-header-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(headingshort|headline(right|left|author|short)?)$'"/>
+  
+  <xsl:variable name="info-keywords-role" as="xs:string"
+                select="'^[a-z]{1,3}keywords$'"/>
   
   <xsl:variable name="info-author-role" as="xs:string"
                 select="'^[a-z]{1,3}(author)$'"/>
   
-  <xsl:variable name="author-desc-style" as="xs:string"
-                select="'^[a-z]{1,3}authordescription'" />
+  <xsl:variable name="info-author-bio-role" as="xs:string"
+                select="'^[a-z]{1,3}author-bio'" />
+  
+  <xsl:variable name="info-author-email-role" as="xs:string"
+                select="'^[a-z]{1,3}author-email'" />
+  
+  <xsl:variable name="info-author-affiliation-role" as="xs:string"
+                select="'^[a-z]{1,3}author-affiliation'"/> 
   
   <xsl:variable name="info-subtitle-role" as="xs:string"
                 select="'^[a-z]{1,3}(subheading\d|journalreviewsubheading)$'"/>
