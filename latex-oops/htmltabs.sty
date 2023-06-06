@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.9}%
-\def\filedate{2023-05-19}%
+\def\fileversion{0.2.10}%
+\def\filedate{2023-06-06}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -773,33 +773,45 @@
 }
 
 \def\ht@halign@center@none{%
-  \rightskip\z@\@plus1fill\relax
+  \@rightskip\z@\@plus1fill\relax
+  \rightskip\@rightskip
   \leftskip\z@\@plus1fill\relax
   \parindent\z@
   \parfillskip\z@skip}
 \def\ht@halign@center@auto{%
-  \leftskip\@flushglue\relax
-  \rightskip\@flushglue\relax
+  \leftskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@\@plus\tw@ em\relax
+  \rightskip\@rightskip
   \parfillskip\z@skip\relax
   }
 \def\ht@halign@justified@auto{%
   \leftskip\z@\relax
-  \rightskip\z@\relax}
+  \@rightskip\z@\relax
+  \rightskip\@rightskip
+  \parfillskip\@flushglue
+}
 \let\ht@halign@justified@none\ht@halign@justified@auto
 \def\ht@halign@left@none{%
   \leftskip\z@\relax
-  \rightskip\z@\@plus1fill\relax}
+  \@rightskip\@flushglue
+  \rightskip\@rightskip
+  \relax}
 \def\ht@halign@left@auto{%
   \leftskip\z@skip\relax
-  \rightskip\@flushglue\relax
+  \@rightskip\z@\@plus\tw@ em\relax
+  \rightskip\@rightskip
   \parfillskip\@flushglue\relax
 }
 \def\ht@halign@right@none{%
-  \leftskip\z@\@plus1fill\relax
-  \rightskip\z@skip\relax}
-\def\ht@halign@right@auto{%
   \leftskip\@flushglue\relax
-  \rightskip\z@skip\relax
+  \@rightskip\z@skip\relax
+  \rightskip\@rightskip
+  \parfillskip\z@\relax
+}
+\def\ht@halign@right@auto{%
+  \leftskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@skip\relax
+  \rightskip\@rightskip
   \parfillskip\z@skip\relax
 }
 \def\ht@valign@box#1{%
