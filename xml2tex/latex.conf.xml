@@ -1211,7 +1211,7 @@
                        and not($bm-override eq true())
                        and not($run-override eq true())
                        and (   ancestor::*[self::dbk:epigraph|self::dbk:blockquote][..[self::dbk:info]] 
-                            or ancestor::*[self::dbk:colophon[@role = ('motto', 'dedication')]]
+                            or ancestor::*[self::dbk:colophon[@role = 'motto']]
                             or ancestor::dbk:keyword)">
        <xsl:text>\\&#xa;</xsl:text>
        </xsl:when>
@@ -1237,7 +1237,8 @@
         <!-- in HTML tables-->
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
-      <xsl:when test="ancestor::dbk:dedication">
+      <xsl:when test="ancestor::dbk:dedication or 
+                      ancestor::*[self::dbk:colophon[@role = 'dedication']]">
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
