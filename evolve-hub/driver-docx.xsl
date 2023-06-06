@@ -406,7 +406,7 @@
   <xsl:template match="/hub[para[matches(@role, '^[a-z]{1,3}box')]]" mode="hub:dissolve-sidebars-without-purpose">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
-      <xsl:for-each-group select="*" group-starting-with="para[matches(@role, $box-start-regex)]">
+      <xsl:for-each-group select="node()" group-starting-with="para[matches(@role, $box-start-regex)]">
         <xsl:variable name="start" select="current-group()[1][matches(@role, $box-start-regex)]" as="element()?"/>
         <xsl:choose>
           <xsl:when test="exists($start)">
@@ -450,7 +450,7 @@
   <!--  *
         * special markup
         * -->
-  
+
   <xsl:template match="para[matches(@role, $info-subtitle-role)]
                            [preceding-sibling::*[1][self::title or self::titleabbrev]]
                       |info/para[matches(@role, $info-subtitle-role)]" mode="custom-1" priority="2">
