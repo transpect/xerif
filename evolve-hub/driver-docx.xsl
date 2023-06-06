@@ -1835,7 +1835,7 @@
   <xsl:template match="/hub/info" mode="custom-2" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-      <xsl:for-each select="/hub/descendant::biblioset[1]/(issuenum | volumenum | biblioid[matches(@role, $info-doi)][@otherclass = 'book-doi'] | productname | pubdate)">
+      <xsl:for-each select="/hub/descendant::biblioset[1]/(issuenum | volumenum | biblioid[matches(@role, $info-doi)][not(@otherclass = 'chunk-doi')] | productname | pubdate)">
         <xsl:copy copy-namespaces="no">
           <xsl:apply-templates select="current()/@* except @srcpath" mode="#current"/>
           <xsl:value-of select="normalize-space(current())"/>
