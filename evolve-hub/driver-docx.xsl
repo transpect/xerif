@@ -322,12 +322,12 @@
     <!-- later in tex \selectlanguage{} will be generated -->
     <xsl:param name="sec" as="element()"/>
     <xsl:param name="first-lang" as="xs:string?"/>
-    <xsl:sequence select="every $p 
-                          in $sec/descendant::*[self::para[not(..[self::footnote])] | self::title] 
-                          satisfies($p[descendant::text()[..[@xml:lang=$first-lang or self::phrase[starts-with(@role,'hub:')]]]
-                                                         [hub:same-scope(., $p)]
-                                       ]
-                                    )"/>
+    <xsl:sequence select="if ($first-lang[normalize-space()]) 
+                          then (every $text in $sec//text()[matches(., '\S')]
+                                                           [not(ancestor::*[self::footnote|self::phrase[starts-with(@role,'hub:')]])]
+                                                           [ancestor::para or ancestor::title or ancestor::subtitle or ancestor::bibliomixed] 
+                          satisfies $text[ancestor::*[@xml:lang][1]/@xml:lang = $first-lang])
+                          else false()"/>
   </xsl:function>
   
   <xsl:template match="para[matches(@role, $hub:headword-role-regex)]
