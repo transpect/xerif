@@ -1913,6 +1913,13 @@
                       |info/biblioset/orgname
                       |info/biblioset/uri
                       |info/biblioset/person" mode="custom-2"/>
+  
+  <!-- https://redmine.le-tex.de/issues/14883
+       resolve biblioset that is interfering with xml2tex matching patterns
+  -->
+  <xsl:template match="info/biblioset" mode="custom-2">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
 
   <xsl:template match="hub/section[matches(@role, $hub:toc-heading)]" 
                 mode="hub:postprocess-hierarchy">

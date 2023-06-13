@@ -265,7 +265,7 @@
   <xsl:variable name="hub:abstract-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?abstract'"/>
   <xsl:variable name="hub:trans-title-role-regex" as="xs:string" select="'^[a-z]{1,3}(meta)?transtitle'"/>
   <xsl:variable name="hub:keyword-abstract-transtitle-combined" as="xs:string" 
-              select="concat($hub:abstract-role-regex, '|', $hub:keywords-role-regex, '|', $hub:trans-title-role-regex)"/>
+                select="concat($hub:abstract-role-regex, '|', $hub:keywords-role-regex, '|', $hub:trans-title-role-regex)"/>
 
   <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
 
