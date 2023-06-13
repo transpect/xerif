@@ -1917,7 +1917,8 @@
   <!-- https://redmine.le-tex.de/issues/14883
        resolve biblioset that is interfering with xml2tex matching patterns
   -->
-  <xsl:template match="info/biblioset" mode="custom-2">
+  <xsl:template match="info/biblioset[every $child in * satisfies $child[self::abstract]]" mode="custom-2">
+    <!-- preserve biblioset with DOIs, license info etc. if only an abstract is contained, dissolve it-->
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
