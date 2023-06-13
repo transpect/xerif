@@ -676,6 +676,9 @@
 \def\tpFigureRender{%
   \bgroup
     \let\includegraphics\tp@includesubgraphics
+    \expandafter\ifx\csname tp@\tp@captype @attr@orientation\endcsname\tp@str@landscape\relax
+      \let\hsize\textwidth%
+    \fi%
     \hskip\tp@flt@marg@l
     \strut\tpUseComp{Fig}\strut
   \egroup%
