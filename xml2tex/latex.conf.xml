@@ -674,6 +674,7 @@
   </template>
     
   <template context="*[not(self::dbk:book|self::dbk:hub|self::dbk:figure)]
+                      [not(@role = ('alternative-title', 'keywords'))]
                       [dbk:info]
                       [@xml:lang]
                       [@xml:lang ne /*/@xml:lang]
