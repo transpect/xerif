@@ -1220,7 +1220,7 @@
                        and not($bm-override eq true())
                        and not($run-override eq true()) 
                        and ancestor::*[local-name() = ('info', 'title')]
-                                                                     [parent::dbk:part | parent::dbk:chapter | parent::dbk:section]">
+                                      [parent::dbk:part | parent::dbk:chapter | parent::dbk:section]">
          <xsl:text>\tpBreak&#xa;</xsl:text>
        </xsl:when>
       <xsl:when test="not($remove-newline eq true()) 
@@ -1238,8 +1238,9 @@
         <!-- in HTML tables-->
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
-      <xsl:when test="ancestor::dbk:dedication or 
-                      ancestor::*[self::dbk:colophon[@role = 'dedication']]">
+      <xsl:when test="   ancestor::dbk:dedication 
+                      or ancestor::*[self::dbk:colophon[@role = 'dedication']]
+                      or ancestor::dbk:blockquote[matches(@role, $verse-style)]">
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
@@ -2132,7 +2133,7 @@
     …
     -->
   
-  <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para | dbk:para[matches(@role, $letter-para-style)]">
+  <template context="dbk:para[matches(@role, $letter-para-style)]">
     <rule break-after="1">
       <text/>
       <text>\tpBreak</text>

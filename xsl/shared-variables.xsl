@@ -107,7 +107,7 @@
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
   
   <xsl:variable name="verse-style" as="xs:string"
-                select="'^[a-z]+_?verse$'"/>
+                select="'^[a-z]+_?verse(-)source?$'"/>
   
   <xsl:variable name="verse-heading-style" as="xs:string"
                 select="'^[a-z]+_?verse-heading$'"/>
