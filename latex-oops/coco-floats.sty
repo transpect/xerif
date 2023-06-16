@@ -809,7 +809,7 @@
   \tpSetProperty{list-of-number-sep}{\enskip}%
   \tpSetProperty{list-of-number-align}{left}%
   \tpSetProperty{list-of-parfillskip}{-\rightskip}%
-  \tpSetProperty{list-of-margin-right}{\@pnumwidth}%
+  \tpSetProperty{list-of-margin-right}{\@pnumwidth \@plus 1fil}%
   \tpSetProperty{list-of-margin-left}{auto}%
   \tpSetProperty{list-of-indent}{auto}% list-of-float appearance
   \tpSetProperty{list-of-block}{%
@@ -823,7 +823,7 @@
   \tpSetProperty{list-of-before-entry}{%
     \tpGobble
     \leftskip\tpUseProperty{list-of-margin-left}\relax%
-    \rightskip \tpUseProperty{list-of-margin-right} \@plus 1fil\relax%
+    \rightskip \tpUseProperty{list-of-margin-right}\relax%
     \parfillskip \tpUseProperty{list-of-parfillskip}\relax
     \parindent\z@
     \@afterindenttrue
