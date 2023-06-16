@@ -2139,6 +2139,12 @@
       <text>\tpBreak</text>
     </rule>
   </template>
+
+  <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
+    <rule break-after="1">
+      <text/>
+    </rule>
+  </template>
   
   <template context=" dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para[position() eq last()] 
                     | dbk:para[matches(@role, $letter-para-style)][position() eq last()]">
