@@ -1806,7 +1806,7 @@
      </rule>
    </template>
   
-  <template context="dbk:figure/dbk:info/dbk:caption 
+  <template context="dbk:figure/dbk:caption 
                     |*:table/dbk:info/dbk:legalnotice
                     |dbk:informaltable/dbk:info/dbk:legalnotice">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
