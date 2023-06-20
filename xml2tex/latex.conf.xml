@@ -1797,7 +1797,8 @@
     </xsl:if>
   </template>  
   
-   <template context="dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][not(position() = 1)]
+   <template context="dbk:figure/dbk:note
+                     |dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][1]
                      |*:table/dbk:caption
                      |dbk:informaltable/dbk:caption">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
@@ -1805,7 +1806,7 @@
      </rule>
    </template>
   
-  <template context="dbk:figure/dbk:info/dbk:legalnotice 
+  <template context="dbk:figure/dbk:info/dbk:caption 
                     |*:table/dbk:info/dbk:legalnotice
                     |dbk:informaltable/dbk:info/dbk:legalnotice">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
