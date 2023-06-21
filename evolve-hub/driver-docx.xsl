@@ -1588,9 +1588,9 @@
                                                                     ])">
               <xsl:choose>
                 <xsl:when test="current-grouping-key()">
-                  <person>
+                  <author>
                     <xsl:sequence select="current-group()"/>
-                  </person>
+                  </author>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:sequence select="current-group()"/>
