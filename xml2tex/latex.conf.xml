@@ -366,7 +366,7 @@
       <xsl:value-of select="concat('&#xa;\tpCopyrightDisclaimer{', $copyright-note, '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($copyright-holder)">
-      <xsl:value-of select="concat('&#xa;\tpCopyright{', tokenize($copyright-holder, ',')[2], '}&#xa;')"/>
+      <xsl:value-of select="concat('&#xa;\tpCopyright{', $copyright-holder, '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($license-logo-href)">
       <xsl:value-of select="concat('&#xa;\tpLicenceLogo{', $license-logo-href, '}&#xa;')"/>
