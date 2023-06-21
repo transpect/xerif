@@ -49,7 +49,7 @@ sed -i -e 's/"~/-/g' $1.$idx
 
 perl -i -p -0 -e 's/(\\indexentry ?\{.+)(\|seealso\{.+\})\}\{(.+)\}/$1}{$3}\n$1$2}{$3}/g' $1.$idx #seealso-Eintrag verdoppeln, um Seitenzahl vor texindy zu retten
 perl -i -p -0 -e 's/\(hyperpage/\(/g' $1.$idx
-$XINDY -v -d script -L $lang -C utf8 -M tex/inputenc/utf8 -M texindy -M page-ranges -M word-order -M german-sty.xdy -I latex -M transpect.xdy -d level=3 -t xindy.log $1.$idx -o $1.$ind
+$XINDY -v -d script -L $lang -C utf8 -M tex/inputenc/utf8 -M texindy -M page-ranges -M word-order -M german-sty.xdy -I latex -M cocotex.xdy -d level=3 -t xindy.log $1.$idx -o $1.$ind
 perl -i -p -0 -e 's/(item[^\n]+)(\\enskip [0-9]{1,2}\n)/$1\\nobreak$2/g' $1.$ind
 
 perl -i -p -0 -e 's/(\n {2,2}\\item[^\n]+\n\n {2,2}\\indexspace)/\\nopagebreak$1/g' $1.$ind                    #kein Eintrag-Hurenkind
