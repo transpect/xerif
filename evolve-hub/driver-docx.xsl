@@ -981,14 +981,18 @@
                         |para[matches(@role, $poem-role-regex)]]" mode="custom-2">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" group-adjacent="(self::para[matches(@role, $dialogue-role-regex)][personname]/@role
-                                                          ,self::para[matches(@role, $poem-role-regex)]/@role,
-                                                          'false')[1]">
+      <xsl:for-each-group select="*" group-adjacent="(self::para[matches(@role, $dialogue-role-regex)][personname]/@role,
+                                                      self::para[matches(@role, $poem-role-regex)]/@role,
+                                                      'false')[1]">
         <xsl:choose>
           <xsl:when test="current-grouping-key() ne 'false'">
             <xsl:element name="blockquote">
+              <xsl:variable name="isolated-source" as="element(blockquote)?" 
+                            select="following-sibling::*[1][self::blockquote]
+                                                        [count(*) eq 1]
+                                                        [attribution]"/>
               <xsl:attribute name="role" select="current-grouping-key()"/>
-              <xsl:apply-templates select="current-group()" mode="#current"/>
+              <xsl:apply-templates select="$isolated-source/dbk:attribution, current-group()" mode="#current"/>
             </xsl:element>
           </xsl:when>
           <xsl:otherwise>
@@ -998,6 +1002,13 @@
       </xsl:for-each-group>
     </xsl:copy>
   </xsl:template>
+  
+  <!-- template is complementary to template above -->
+  
+  <xsl:template match="blockquote[count(*) eq 1]
+                                 [attribution]
+                                 [preceding-sibling::*[1][   self::para[matches(@role, $dialogue-role-regex)][personname]
+                                                          or self::para[matches(@role, $poem-role-regex)]]]" mode="custom-2"/>
   
   <!--  *
         * bibliographies
