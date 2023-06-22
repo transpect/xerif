@@ -1025,7 +1025,11 @@
   <xsl:template match="*[local-name() = ('chapter', 'section', 'appendix')]
                         [title]
                         [bibliomixed]
-                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev)]
+                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev|self::para[not(@role)]
+                                                                                                    [not(matches(., '\S'))]
+                                                                                                    [@css:page-break-before]
+                                          )
+                                      ]
                          satisfies $i/local-name() eq 'bibliomixed']" 
                 mode="custom-1" priority="5">
     <bibliography>
@@ -1599,9 +1603,9 @@
                                                                     ])">
               <xsl:choose>
                 <xsl:when test="current-grouping-key()">
-                  <author>
+                  <person>
                     <xsl:sequence select="current-group()"/>
-                  </author>
+                  </person>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:sequence select="current-group()"/>
