@@ -1053,6 +1053,7 @@
                         [count(distinct-values(*[not(self::title
                                                     |self::bridgehead
                                                     |self::titleabbrev
+                                                    |self::para[not(@role)][not(matches(., '\S'))][@css:page-break-before]
                                                     |self::info)]/local-name())) gt 1]" 
                 mode="custom-1" priority="3">
     <xsl:variable name="chapter-info" as="element()*" 
