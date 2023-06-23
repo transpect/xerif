@@ -1249,6 +1249,14 @@
     </xsl:choose>
   </template>
   
+  <!-- put footnotes in extra group in case they appear in optional arguments or other stuff -->
+  
+  <template context="dbk:footnote">
+    <xsl:text>{</xsl:text>
+    <xsl:next-match/>
+    <xsl:text>}</xsl:text>
+  </template>
+  
   <template context="dbk:footnote/dbk:para">
      <xsl:next-match/>
     <xsl:if test="exists(following-sibling::dbk:para)">
@@ -1267,7 +1275,6 @@
       <rule name="protect\footnote" type="cmd">
         <param/>
       </rule>
-<!--     <xsl:next-match/>-->
     </xsl:if>
   </template>
   
