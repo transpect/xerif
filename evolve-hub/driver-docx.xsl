@@ -1866,7 +1866,7 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="info[not(author) and biblioset[person]]/node()[1]" mode="custom-2" priority="15">
+  <xsl:template match="info[not(author) and biblioset[person]]/*[1]" mode="custom-2" priority="15">
     <!-- only author metadata in biblioset will not be overridden -->
     <xsl:choose>
       <xsl:when test="count(../biblioset/person) gt 1">
