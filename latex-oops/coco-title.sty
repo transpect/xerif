@@ -263,7 +263,6 @@
     \pagestyle{empty}%
     \parindent\z@
     \parskip\z@
-    %\raggedright
   }%
   \tpSetProperty{after-titlepage}{\pagestyle{headings}}%
   % Pages of title
@@ -272,14 +271,15 @@
     \bgroup
       \def\thepage{\@alph\c@page}%
       \smash{\rlap{%
-          \raise\dimexpr\topsep+\headheight+\headsep+\topmargin+\topskip-\paperheight\relax
+          \raise\dimexpr\headheight+\headsep+\topmargin+\topskip-\paperheight\relax
           \vtop{%
-            \hskip\dimexpr-\oddsidemargin\relax
+            \hskip-\oddsidemargin
             \includegraphics[width=\paperwidth,height=\paperheight]{\tpUseComp{Cover}}%
           }}}%
-      \cleardoublepage
+      \tpUseProperty{after-coverpage}%
     \egroup
   }%
+  \tpSetProperty{after-coverpage}{\cleardoublepage}%
   \tpSetProperty{titlepage-roman}{%
     \tpUsePropEnv{titlepage-i}%
     \clearpage
