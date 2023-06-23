@@ -182,14 +182,12 @@
                              $info-doi,
                              $info-orcid-style,
                              $info-licence-style,
-                             $info-year,
-                             $hub:keywords-role-regex,
-                             $hub:abstract-role-regex
+                             $info-year
                             ), 
                           ')|('
                           ), ')'
                         )" >
-    <!-- all meta style names, if they do not all begin with meta in your a9s, 
+    <!-- all meta style names that go into a bibloset, if they do not all begin with meta in your a9s, 
       concat the important ones (info-licence-style, info-doi, etc.)-->
   </xsl:variable>
   
