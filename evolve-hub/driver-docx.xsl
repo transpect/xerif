@@ -1025,11 +1025,7 @@
   <xsl:template match="*[local-name() = ('chapter', 'section', 'appendix')]
                         [title]
                         [bibliomixed]
-                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev|self::para[not(@role)]
-                                                                                                    [not(matches(., '\S'))]
-                                                                                                    [@css:page-break-before]
-                                          )
-                                      ]
+                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev|self::processing-instruction())]
                          satisfies $i/local-name() eq 'bibliomixed']" 
                 mode="custom-1" priority="5">
     <bibliography>
@@ -1053,7 +1049,7 @@
                         [count(distinct-values(*[not(self::title
                                                     |self::bridgehead
                                                     |self::titleabbrev
-                                                    |self::para[not(@role)][not(matches(., '\S'))][@css:page-break-before]
+                                                    |self::processing-instruction()
                                                     |self::info)]/local-name())) gt 1]" 
                 mode="custom-1" priority="3">
     <xsl:variable name="chapter-info" as="element()*" 
@@ -2019,6 +2015,11 @@
   
   <xsl:template match="text()[normalize-space()][matches(., '\s\s')]" mode="preprocess-whitespaces">
     <xsl:value-of select="hub:gentle-normalize(.)"/>
+  </xsl:template>
+
+  <xsl:template match="para[not(@role)][not(matches(., '\S'))][@css:page-break-before]" mode="hub:split-at-tab">
+    <xsl:text>&#xa;</xsl:text>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak'"/>
   </xsl:template>
   
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
