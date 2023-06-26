@@ -147,9 +147,9 @@
   <xsl:variable name="converter" as="element(dbk:keyword)?" 
                 select="$metadata/dbk:keyword[@role eq 'Konvertierung']"/>
   <!-- Licencing meta -->
-  <xsl:variable name="copyright-note" as="xs:string?"
+  <xsl:variable name="copyright-note" as="element(dbk:phrase)?"
                 select="$metadata/dbk:keyword[@role eq 'Copyright-Hinweis']/dbk:phrase[1]"/>
-  <xsl:variable name="copyright-holder" as="xs:string?" 
+  <xsl:variable name="copyright-holder" as="element(dbk:phrase)?" 
                 select="$metadata/dbk:keyword[@role eq 'Copyright-Hinweis']/dbk:phrase[2]"/>
   <xsl:variable name="license-logo-href" as="xs:string?" 
                 select="$metadata/dbk:keyword[@role eq 'Lizenzlogo']"/>
@@ -219,7 +219,9 @@
       <xsl:text>&#xa;\begin{tpAuthor}</xsl:text>
       <xsl:call-template name="contributor-name"/>
       <xsl:if test="$author-info">
-        <xsl:value-of select="concat('&#xa;\tpBio{', normalize-space($author-info[$pos]), '}')"/>
+        <xsl:text>&#xa;\tpBio{</xsl:text>
+        <xsl:apply-templates select="$author-info[$pos]" mode="xml2tex"/>
+        <xsl:text>}&#xa;</xsl:text>
       </xsl:if>
       <xsl:text>&#xa;\end{tpAuthor}&#xa;</xsl:text>
     </xsl:for-each>
@@ -364,9 +366,14 @@
     <!-- licensing meta -->
     <xsl:if test="normalize-space($copyright-note)">
       <xsl:value-of select="concat('&#xa;\tpCopyrightDisclaimer{', $copyright-note, '}&#xa;')"/>
+      <xsl:text>&#xa;\tpCopyrightDisclaimer{</xsl:text>
+      <xsl:apply-templates select="$copyright-note" mode="xml2tex"/>
+      <xsl:text>}&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="normalize-space($copyright-holder)">
-      <xsl:value-of select="concat('&#xa;\tpCopyright{', $copyright-holder, '}&#xa;')"/>
+      <xsl:text>&#xa;\tpCopyright{</xsl:text>
+      <xsl:apply-templates select="$copyright-holder" mode="xml2tex"/>
+      <xsl:text>}&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="normalize-space($license-logo-href)">
       <xsl:value-of select="concat('&#xa;\tpLicenceLogo{', $license-logo-href, '}&#xa;')"/>
