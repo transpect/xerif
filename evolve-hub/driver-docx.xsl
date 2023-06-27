@@ -2019,7 +2019,7 @@
 
   <xsl:template match="para[not(@role)][not(matches(., '\S'))][@css:page-break-before]" mode="hub:split-at-tab">
     <xsl:text>&#xa;</xsl:text>
-    <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak'"/>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak&#xa;'"/>
   </xsl:template>
   
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
