@@ -2362,7 +2362,7 @@
                                        'nonary', 
                                        'denary')]//text()[contains(., '!')]">
     <rule>
-      <text select="replace(., '!', '\\&quot;!')"/>
+      <text select="replace(., '!', '&quot;!')"/>
     </rule>
   </template>
   
