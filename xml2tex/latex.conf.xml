@@ -2857,7 +2857,7 @@
   </xsl:template>
   
   <xsl:template match="text()" mode="clean" priority="5">
-    <xsl:variable name="remove-whitespace-before-pagebreaks" select="replace(., '([^\p{{Zs}}])[\p{{Zs}}\n]\p{{Zs}}?(\\(pagebreak|break|newline|\\|tpBreak))', '$1$2', 'm')" as="xs:string"/>
+    <xsl:variable name="remove-whitespace-before-pagebreaks" select="replace(., '([^\p{Zs}])\p{Zs}*\n?\p{Zs}*(\\(pagebreak|break|newline|\\|tpBreak))', '$1$2', 'm')" as="xs:string"/>
     <xsl:value-of select="$remove-whitespace-before-pagebreaks"/>
   </xsl:template>
 
