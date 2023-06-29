@@ -145,7 +145,7 @@
   \tpDeclareHook{toc-after-hook-#1}%
   \tpDeclareHook{before-hook-#1}%
 }
-\def\tp@init@cnt#1{\@definecounter{#1}}
+\def\tp@init@cnt#1{\ifcsname c@#1\endcsname\else\@definecounter{#1}\fi}
 \tp@restore@init{heading}{toc-number-maxwd}
 \tp@restore@init{heading}{number-maxwd}
 \def\tp@auto@number#1#2{%
