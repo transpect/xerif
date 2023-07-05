@@ -173,7 +173,11 @@
   <xsl:variable name="main-lang" select="/dbk:*/@xml:lang" as="attribute(xml:lang)"/>
   <xsl:variable name="all-langs" select="distinct-values(//@xml:lang)" as="xs:string*"/>
   <xsl:variable name="babel-langs" select="for $i in $all-langs
-                                           return xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian'))]" as="xs:string*"/>
+                                           return replace(xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian'))],
+                                                         '(spanish)', 
+                                                         '$1,es-noindentfirst,es-noshorthands')" as="xs:string*">
+    <!--   spanish special handling: #13453, #15054-->
+  </xsl:variable>
   <!-- pub type metadata -->
   <xsl:variable name="is-collection" as="xs:boolean" 
                 select="exists(//dbk:chapter/dbk:info/dbk:author)"/>
@@ -184,7 +188,7 @@
   <xsl:variable name="doc-class"     as="xs:string" 
                 select="concat('\documentclass[',
                                string-join(($babel-langs[position() ne 1],
-                                            replace($babel-langs[1], '(spanish)', '$1,es-noindentfirst,es-noshorthands')), (: 1st lang is main lang and comes last :)
+                                            $babel-langs[1]), (: 1st lang is main lang and comes last :)
                                             ','),
                                $pubtype-value, 
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
