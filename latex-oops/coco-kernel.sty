@@ -34,18 +34,32 @@
    \GenericError{%
       (#1)\@spaces\@spaces\@spaces\@spaces
    }{%
-      [tp #1 #2 Error] #3%
+      [CoCoTeX #1 #2 Error] #3%
    }{}{#4}%
 }
 \def\tpPackageWarning#1#2#3{%
    \GenericWarning{%
       (#1)\@spaces\@spaces\@spaces\@spaces
    }{%
-      [tp #1 #2 Warning] #3%
+      [CoCoTeX #1 \if!#2!\else#2 \fi Warning] #3%
    }%
 }
+\def\tpPackageInfo#1#2#3{%
+   \GenericInfo{%
+      (#1)\@spaces\@spaces\@spaces\@spaces
+   }{%
+      [CoCoTeX #1 \if!#2!\else#2 \fi] #3%
+   }%
+}
+\def\tp@warningspaces{\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space\space}%
 \long\def\tpDeclareContainer#1#2{%
-  \ifcsdef{tp@container@#1}{\csdef{tp@app@container@#1}{}}{\csdef{tp@container@#1}{}}
+  \ifcsdef{tp@container@#1}
+    {\tpPackageWarning{Kernel}{}{`#1' has already been declared!^^J
+\tp@warningspaces Properties from the original Declaration may be^^J
+\tp@warningspaces overridden by the global defaults. Use \string\tpAddToType^^J
+\tp@warningspaces to add new Properties to pre-existing Containers!^^J
+}}
+    {\csdef{tp@container@#1}{}}%
   \csdef{tp@cur@cont}{#1}%
   \begingroup
     \def\tpInherit ##1 from ##2;{\@tp@inherit{##1}{##2}{#1}}%

@@ -109,7 +109,6 @@
     \tpParseAttributes{#2}{#1}%
     \expandafter\ifx\csname tp@#2@attr@class\endcsname\relax\else
       \expandafter\global\expandafter\let\expandafter\tp@current@class\csname tp@#2@attr@class\endcsname
-      \message{^^Jcoco-floats.sty: Class of float \tp@captype\space is: `\csname tp@#2@attr@class\endcsname'.}%
       \tpUseClass{default}{\tp@captype}%
       \expandafter\tpUseClass\expandafter{\csname tp@#2@attr@class\endcsname}{\tp@captype}%
     \fi
@@ -148,8 +147,8 @@
     }%
   \fi}
 \def\tp@flt@debug#1{%
-  \expandafter\ifx\csname tp@#1@attr@debug\endcsname\relax\else
-    \message{^^Jcoco-float debug:^^J
+  \ifcsdef{tp@#1@attr@debug}{%
+    \message{^^J[tp Float Debug]^^J
         Textheight:\space\the\textheight^^J
         Type:\space\space\space\space\space\space\space\tp@cur@cont^^J
 \ifx\tp@captype\tp@str@figure
@@ -168,9 +167,7 @@
         Height:\space\space\space\space\space     \expandafter\meaning\csname tp@\tp@cur@cont @height-\the\tpSubFloatCnt\endcsname^^J
         Depth:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @depth-\the\tpSubFloatCnt\endcsname^^J
 \fi
-}%
-  \fi
-}
+}}{}}
 \def\tp@get@seps{%
   \ifx\tp@fps\@empty
     \expandafter\tp@flt@sep@top\dimexpr\tpUseProperty{intext-skip-top}\relax%
@@ -226,8 +223,19 @@
 \long\def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
 \def\@tpDeclareFloat[#1]#2#3#4#5{%
   \def\tp@float@parent{#1}%
-  \tpDeclareContainer{#2}{%
-    \ifcsdef{tp@app@container@#2}{}{%
+  \ifcsdef{tp@container@#2}{%
+    \tpPackageInfo{Floats}{}{Appending to `#2'}%
+    \ifx\tp@float@parent\@empty\else
+      \tpInherit {Properties,Components} from \tp@float@parent;
+    \fi
+    \tpAddToType{Properties}{#2}{#5}%
+    \tpAddToType{FloatEnvInfo}{#2}{%
+      \def\tp@captype{#3}%
+      \def\tp@caplisttype{#4}%
+    }%
+  }{%
+    \tpDeclareContainer{#2}{%
+      \tpPackageInfo{Floats}{}{Declaring float `#2'}%
         \ifx\tp@float@parent\@empty
           \tpInherit {Properties,Components} from tpFloat;
         \else
@@ -251,15 +259,14 @@
           \tp@init@l@[Listof]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
           \tp@restore@init{#4}{number-1-maxwd}%
         \egroup
-      }%
-    \tpDeclareType{Properties}{#5}%
-  }% /container
+        \tpDeclareType{Properties}{#5}%
+      }% /container
+  }% /ifcsdef{tp@app@container@#2}
 }
 \def\tp@flt@generate@listof@handlers#1#2#3{%
   \expandafter\gdef\csname tp@#1@extract@data\endcsname##1##2##3##4{%
     \tpNamespace{#3}%
     \tpEvalType[#3]{Properties}%
-    %\tpCascadeProps{#3}{float}%
     \tpDeclareComp{ListofCaption}{}{}%
     \tpDeclareComp{ListofLegend}{}{}%
     \tpDeclareComp{ListofSource}{}{}%

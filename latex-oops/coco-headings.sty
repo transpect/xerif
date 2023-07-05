@@ -54,24 +54,44 @@
 }
 \long\def\tpDeclareHeading{\tp@opt@empty\@tpDeclareHeading}
 \long\def\@tpDeclareHeading[#1]#2#3#4{%
-  \tpDeclareContainer{#3}{%
-    \edef\@argi{#1}%
-    \tpDeclareType{Parent}{\tp@heading@create@parent{#1}{#3}}
-    \ifx\@argi\@empty
-      \tpInherit {Components,Properties} from tpHeading;
-    \else
-      \tpInherit {Components,Properties,Parent} from #1;
+  \ifcsdef{tp@container@#3}{%
+    \tpPackageInfo{Headings}{}{Appending to `#3'}%
+    \ifcsstring{tp@hdg@#3@level}{#2}{}{%
+        \tpPackageError{Headings}
+          {Level Mismatch}
+          {Level of heading `#3' cannot be altered!}
+          {The already existing heading `#3' has toc level `\csname tp@hdg@#3@level\endcsname', but your^^J%
+           re-declaration states `#2'.^^J%
+           ^^J%
+           Consider declaring a new heading alltogether with `#3' as parent,^^J%
+           or add Properties to the existing `#3' using \string\tpAddToType.}%
+       }%
+    \if!#1!\else
+      \tpInherit {Properties,Components,Parent} from #1;
     \fi
-    \tpDeclareType{Properties}{%
-      #4%
+    \tpAddToType{Properties}{#3}{#4}%
+  }{%
+    \tpDeclareContainer{#3}{%
+      \csgdef{tp@hdg@#3@level}{#2}%
+      \tpPackageInfo{Headings}{}{Declaring heading `#3'}%
+      \edef\@argi{#1}%
+      \tpDeclareType{Parent}{\tp@heading@create@parent{#1}{#3}}
+      \ifx\@argi\@empty
+        \tpInherit {Components,Properties} from tpHeading;
+      \else
+        \tpInherit {Components,Properties,Parent} from #1;
+      \fi
+      \tpDeclareType{Properties}{%
+        #4%
+      }%
+      \tpDeclareType{Init}{%
+        \tp@init@hooks{#3}%
+        \tp@init@l@{toc}{#2}{#3}%
+        \tp@init@cnt{#3}%
+        \tp@restore@init{heading}{number-#2-maxwd}%
+      }%
+      \tp@declare@heading{#2}{#3}%
     }%
-    \tpDeclareType{Init}{%
-      \tp@init@hooks{#3}%
-      \tp@init@l@{toc}{#2}{#3}%
-      \tp@init@cnt{#3}%
-      \tp@restore@init{heading}{number-#2-maxwd}%
-    }%
-    \tp@declare@heading{#2}{#3}%
   }%
 }
 \def\tp@heading@create@parent#1#2{%
