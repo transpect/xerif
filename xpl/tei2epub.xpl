@@ -33,6 +33,7 @@
     <p:documentation>
       The EPUB file URI
     </p:documentation>
+    <p:pipe port="epub-file-uri" step="create-epub"/>
   </p:output>
   
   <p:output port="html" primary="false">
@@ -82,6 +83,9 @@
   <p:group name="create-epub" cx:depends-on="load-epub-config">
     <p:output port="html">
       <p:pipe port="result" step="htmltemplates"/>
+    </p:output>
+    <p:output port="epub-file-uri">
+      <p:pipe port="result" step="epub-convert"/>
     </p:output>
     <p:variable name="basename" select="/c:param-set/c:param[@name='basename']/@value">
       <p:pipe port="params" step="tx-tei2epub"/>
