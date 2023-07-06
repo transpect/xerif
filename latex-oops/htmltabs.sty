@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.10}%
-\def\filedate{2023-06-06}%
+\def\fileversion{0.2.11}%
+\def\filedate{2023-07-06}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -2017,6 +2017,7 @@
   \SetCellProp{colspan}{\the\ht@tempcntb}%
   \SetCellProp{rowspan}{\the\ht@tempcnta}}
 
+\newdimen\ht@savsk \ht@savsk\z@
 \newdimen\ht@footnoteheight
 \def\ht@get@footnoteheight{%
   \bgroup
@@ -2040,7 +2041,11 @@
       \addpenalty \interlinepenalty
       \global \vsize \@colroom
     }%
-    \ifx\ht@omit@break\relax\else\pagebreak\fi
+    \ifx\ht@omit@break\relax\else
+      \ht@savsk\lastskip% saving \lastskip
+      \pagebreak
+      \vskip-\ht@savsk\vskip\ht@savsk% restoring \lastskip
+    \fi
   \egroup
   }
 \newtoks\HT@ftn
