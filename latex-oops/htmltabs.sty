@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.11}%
-\def\filedate{2023-07-06}%
+\def\fileversion{0.2.12}%
+\def\filedate{2023-07-10}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -1511,7 +1511,7 @@
          \csname internal-#1-border-width-left\endcsname
         +\csname internal-#1-border-width-right\endcsname
       \relax
-      \ht@build@padding@box{#1}{#2}%
+      \hb@xt@\hsize{\ht@build@padding@box{#1}{#2}\hss}%
     }%
     \ifx\ht@scope\ht@str@td
       \GetCellProp{internal-background-color}{internal-background-color}%
