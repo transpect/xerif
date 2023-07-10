@@ -151,11 +151,11 @@
   \char\count255%
 }
 \tpAddToDefault{list}{%
-  \tpSetProperty{after-skip}{\z@}
-  \tpSetProperty{before-skip}{\z@}
-  \tpSetProperty{item-indent}{0\p@}
+  \tpSetProperty{after-skip}{\z@}% Vertical space after the list.
+  \tpSetProperty{before-skip}{\z@}% Vertical space before the list.
+  \tpSetProperty{item-indent}{0\p@}% Vertical difference from property left-margin.
   \tpSetProperty{label-char}{} % Only applies with label-type »char« (or empty).
-  \tpSetProperty{label-prefix-delimiter}{} % The character/string between the prefix and the label. Used for numbered lists.
+  \tpSetProperty{label-prefix-delimiter}{} % The character/string between the prefix (inherited from list one level above) and the actual item’s label. Used for numbered lists.
   \tpSetProperty{label-sep}{5mm}
   \tpSetProperty{label-suffix}{}
   \tpSetProperty{label-type}{char} % Label types: char (use label-char; default), number, Alpha, alpha, Roman, roman.
@@ -176,6 +176,9 @@
     \tpNamespace{list}%
     \tpCascadeProps{#2}{list} % Load the namespace defaults defined in \tpAddToDefault, the parent properties (if any), and the specific list properties.
   }
+}
+\tpDeclareContainer{tpList}{%
+  \tpDeclareType{Properties}{\tp@list@default}%
 }
 \def\tpList{\@ifnextchar [{\tp@list}{\tp@list[]}}%]
 \def\endtpList{%
