@@ -64,12 +64,21 @@
            re-declaration states `#2'.^^J%
            ^^J%
            Consider declaring a new heading alltogether with `#3' as parent,^^J%
-           or add Properties to the existing `#3' using \string\tpAddToType.}%
+           or add Properties to `#3' using \string\tpAddToType\string{Properties\string}\string{#3\string}.}%
        }%
     \if!#1!\else
-      \tpInherit {Properties,Components,Parent} from #1;
+      \ifcsstring{tp@parent@#3}{#1}{}{%
+        \tpPackageError{Headings}
+          {Parent Mismatch}
+          {Parent of heading `#3'^^J cannot be altered!}
+          {The already existing heading `#3' inherits from `\csname tp@parent@#3\endcsname',^^J%
+           but your re-declaration sets Parent to `#1'.^^J%
+           ^^J%
+           Consider declaring a new heading alltogether with `#1' as parent.}%
+      }%
     \fi
     \tpAddToType{Properties}{#3}{#4}%
+    \tp@declare@heading{#2}{#3}%
   }{%
     \tpDeclareContainer{#3}{%
       \csgdef{tp@hdg@#3@level}{#2}%
