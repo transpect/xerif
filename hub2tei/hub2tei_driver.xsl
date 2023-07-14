@@ -178,7 +178,7 @@
       <xsl:if test="@role">
         <xsl:attribute name="rendition" select="encode-for-uri(@role)"/>
       </xsl:if>
-      <xsl:attribute name="corresp" select="concat('#', ancestor::dbk:chapter[1]/@xml:id)"/>
+      <xsl:attribute name="corresp" select="concat('#', ancestor::*[self::dbk:chapter|self::dbk:bibliography][1]/@xml:id)"/>
       <xsl:for-each select="dbk:keyword">
         <term>
           <xsl:if test="@role[normalize-space()]">
@@ -207,7 +207,7 @@
       <xsl:if test="@xml:lang">
         <xsl:apply-templates select="@xml:lang" mode="#current"/>
       </xsl:if>
-      <xsl:attribute name="corresp" select="concat('#', ancestor::*[self::dbk:chapter| self::dbk:toc | self::dbk:part][1]/@xml:id)"/>
+      <xsl:attribute name="corresp" select="concat('#', ancestor::*[self::dbk:chapter | self::dbk:bibliography | self::dbk:toc | self::dbk:part][1]/@xml:id)"/>
       <xsl:for-each select="*, ../(dbk:author|dbk:authorgroup/dbk:author)/(dbk:personname/othername[@role = 'tsmetacontributionauthorname'], dbk:affiliation/dbk:orgname, dbk:email, dbk:uri)">
         <term>
           <xsl:if test="@role">
