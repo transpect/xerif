@@ -1029,6 +1029,7 @@
                          satisfies $i/local-name() eq 'bibliomixed']" 
                 mode="custom-1" priority="5">
     <bibliography>
+      <xsl:apply-templates select="@xml:id" mode="#current"/>
       <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title[1]/@role))[1]"/>
       <xsl:next-match>
         <xsl:with-param name="remove-wrapper" as="xs:boolean" select="true()"/>
