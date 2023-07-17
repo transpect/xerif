@@ -50,7 +50,7 @@
                 select="'^[a-z]{1,3}tablelegend$'"/>
   
   <xsl:variable name="hub:table-copyright-style-regex-x" as="xs:string" 
-                select="'^[a-z]{1,3}tablesource$'"/>
+                select="'^[a-z]{1,3}tablecopyright$'"/>
   
   <xsl:variable name="hub:figure-caption-start-regex" as="xs:string" 
                 select="'[^\p{Zs}]+'"/>
