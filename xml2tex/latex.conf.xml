@@ -142,6 +142,8 @@
                 select="$metadata/dbk:keyword[@role eq 'Umschlagcredit']"/>
   <xsl:variable name="cover-art" as="element(dbk:keyword)?" 
                 select="$metadata/dbk:keyword[@role eq 'Umschlaggestaltung']"/>
+  <xsl:variable name="cover-concept" as="element(dbk:keyword)?" 
+                select="$metadata/dbk:keyword[@role eq 'Umschlagkonzept']"/>
   <xsl:variable name="copy-editing" as="element(dbk:keyword)?" 
                 select="$metadata/dbk:keyword[@role eq 'Korrektorat']"/>
   <xsl:variable name="converter" as="element(dbk:keyword)?" 
@@ -354,6 +356,9 @@
     </xsl:if>
     <xsl:if test="normalize-space($cover-art)">
       <xsl:value-of select="concat('&#xa;\tpCoverImage{', $cover-art, '}&#xa;')"/>
+    </xsl:if>
+    <xsl:if test="normalize-space($cover-concept)">
+      <xsl:value-of select="concat('&#xa;\tpCoverConcept{', $cover-concept, '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($typesetter)">
       <xsl:value-of select="concat('&#xa;\tpTypesetter{', $typesetter, '}&#xa;')"/>
