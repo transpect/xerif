@@ -2714,7 +2714,11 @@
             <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', index-of($anchor-ids-in-chapter, $linkend),  '}}')"/>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', string-join(.//text(), ' '), '}}')"/>
+          <!--  keep formatting  https://redmine.le-tex.de/issues/15153 and duplicate curled brackets -->
+            <xsl:variable name="content-with-formatting" as="node()*">
+              <xsl:apply-templates select="node()" mode="#current"/>
+            </xsl:variable>
+            <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', replace(replace(string-join($content-with-formatting, ''), '(\\[a-z])', '{$1'), '\}', '}}'), '}}')"/>
           </xsl:otherwise>
         </xsl:choose>  
       </xsl:when>
