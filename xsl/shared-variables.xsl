@@ -32,13 +32,13 @@
                 select="'^toctitle$'"/>
 
   <xsl:variable name="hub:blockquote-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation|verse)$'"/>
+                select="'^[a-z]{1,3}_?(motto|epigraph|dialogue|quotation|verse)(_-_.+)?$'"/>
   
   <xsl:variable name="hub:blockquote-source-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}(motto|epigraph|dialogue|quotation|verse)-?source$'"/>
+                select="'^[a-z]{1,3}_?(motto|epigraph|dialogue|quotation|verse)-?source$'"/>
   
   <xsl:variable name="hub:list-by-indent-exception-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}(literature|body|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula)'"/>  
+                select="'^[a-z]{1,3}_?(literature|body|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula)'"/>  
   
   <xsl:variable name="hub:figure-title-role-regex-x" as="xs:string"
                 select="'^([a-z]{1,3}figurecaption)$'"/>
