@@ -792,10 +792,10 @@
   
   <template name="create-bookmark-content">
     <xsl:if test="exists(*[not(self::dbk:footnote
-                          |self::dbk:br
-                          |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
-                          |self::dbk:tab
-                          |self::dbk:anchor)])
+                              |self::dbk:br
+                              |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
+                              |self::dbk:tab
+                              |self::dbk:anchor)])
                   and 
                   exists(dbk:phrase[@role = ('identifier', 'hub:identifier')])">
       <!-- if title contains markup, create \tpBM-Makros. if \tpBMTitle is created, also a \tpNumber is generated. empty or -->
@@ -807,7 +807,6 @@
       </rule>
     </xsl:if>
     <xsl:if test="exists(*[not(self::dbk:footnote
-                              |self::dbk:br
                               |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
                               |self::dbk:tab
                               |self::dbk:anchor)])
