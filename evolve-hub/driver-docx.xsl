@@ -146,7 +146,7 @@
                   </attribution>
                 </xsl:if>
                 <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex))]
-                                                            [normalize-space()]" mode="#current"/>
+                                                            [normalize-space() or processing-instruction()]" mode="#current"/>
               </xsl:element>
             </xsl:for-each-group>
           </xsl:when>
