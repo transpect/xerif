@@ -142,6 +142,7 @@
         \tpUseProperty{heading-block}%
       \tpIfPropVal{no-toc}{true}{}{\tp@make@toc}% ToC entries
       \tpIfPropVal{no-BM}{true}{}{\tp@make@bookmarks}% Bookmarks
+      \tpUseProperty{toc-hook}%
         \tpIfProp{extended}{\tpUseProperty{extended-heading}}{}%
       \egroup%
       \tp@make@run% Running headers
@@ -467,6 +468,7 @@
   \tpSetProperty{before-skip}{\z@skip}% TODOC: values < 0pt use \minusvspace, else \addvspace. LaTeX's default behaviour of @afterindent is relocated to the after-indent property.
   \tpSetProperty{after-heading-block}{}%
   \tpSetProperty{before-heading-block}{\parindent\z@ \parskip\z@}%
+  \tpSetProperty{toc-hook}{}% Called, after toc ans BM entries have been written to the .aux file
   \tpSetProperty{after-indent}{}%
   \tpSetProperty{margin-left}{\z@}%
   \tpSetProperty{margin-right}{\@flushglue}%
