@@ -208,6 +208,7 @@
     <p:with-option name="mathtype2mml" select="'yes'"/>
     <p:with-option name="mml-version" select="'4-core'"/>
     <p:with-option name="remove-biblioentry-paragraphs" select="'no'"/>
+    <p:with-option name="create-svg" select="'false'"/>
   </docx2hub:convert>
   
   <tr:check-styles name="check-styles">
