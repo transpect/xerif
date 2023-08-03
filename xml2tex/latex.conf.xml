@@ -44,6 +44,7 @@
   <xsl:variable name="client-options" as="xs:string*"/>
   <xsl:variable name="secnumdepth" as="xs:string" 
                 select="xs:string(xs:integer($numbering-depth) - 1)"/>
+  <xsl:variable name="letter-spacing-def" select="'soul'" as="xs:string?"/>
 
   <!-- see the wiki link below for details
        https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Titelei -->
@@ -202,6 +203,9 @@
                                '}&#xa;')"/>
   <xsl:variable name="doc-pkg"       as="xs:string*">
     <xsl:text>\usepackage{htmltabs}&#xa;</xsl:text>
+    <xsl:if test="//*[@css:letter-spacing or exists(key('style', @role)[@css:letter-spacing])] and $letter-spacing-def[normalize-space()]">
+      <xsl:value-of select="concat('\usepackage{', $letter-spacing-def,'}&#xa;')"/>
+    </xsl:if>
     <xsl:for-each select="xml2tex:rgb-to-tex-color( $colors)">
       <xsl:value-of select="concat('\define', ., '&#xa;')"/>
     </xsl:for-each>
