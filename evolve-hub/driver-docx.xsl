@@ -58,7 +58,7 @@
   </xsl:template>
   
   <xsl:template match="hub/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1|journalreviewheading)$')]
-                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}heading(enumerated)?1$')]
+                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}heading(enumerated)?1(notoc)?$')]
                       |hub/section[not(matches(@role, $part-heading-role-regex))]" 
                 mode="hub:postprocess-hierarchy">
     <chapter>
