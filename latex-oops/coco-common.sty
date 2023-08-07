@@ -187,6 +187,7 @@
   \fi}
 \def\tp@format@number#1#2#3{%
   \tpSetProperty{#1formatted-number}{}%
+  \tpSetValProp{#1curr-number-level}{#3}%
   \tpIfComp{#2Number}{%
     \tpSetProperty{#1formatted-number}{%
       \bgroup
