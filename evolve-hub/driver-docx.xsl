@@ -415,7 +415,7 @@
               <xsl:choose>
                 <xsl:when test="exists($start) and exists($end)">
                   <div role="{replace($start/@role, 'start$', '')}">
-                    <xsl:apply-templates select="current-group()" mode="#current"/>
+                    <xsl:apply-templates select="current-group()[not(matches(@role, $box-start-regex) or matches(@role, $box-end-regex))]" mode="#current"/>
                   </div>
                 </xsl:when>
                 <xsl:otherwise>
