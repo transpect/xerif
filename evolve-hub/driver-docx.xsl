@@ -403,7 +403,7 @@
   
   <!-- group boxes by start and end para style -->
   
-  <xsl:template match="/hub[para[matches(@role, '^[a-z]{1,3}box')]]" mode="hub:dissolve-sidebars-without-purpose">
+  <xsl:template match="/hub[para[matches(@role, $box-start-regex) or matches(@role, $box-end-regex)]]" mode="hub:dissolve-sidebars-without-purpose">
     <xsl:copy>
       <xsl:copy-of select="@*"/>
       <xsl:for-each-group select="node()" group-starting-with="para[matches(@role, $box-start-regex)]">
