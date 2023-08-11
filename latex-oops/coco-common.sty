@@ -181,7 +181,7 @@
   \sbox\z@{\def\numberline##1{\expandafter\gdef\csname tp@#2@#3Number\endcsname{##1}}#1}%
   \ifdim\wd\z@>\z@
     \let\numberline\@gobble%
-    \expandafter\xdef\csname tp@#2@#3#4\endcsname{#1}%
+    \protected@csxdef{tp@#2@#3#4}{#1}%
   \else
     #1%
   \fi}
