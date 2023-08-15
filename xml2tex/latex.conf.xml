@@ -546,6 +546,7 @@
     <script name="chinese"  unicode-range="&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;"/>
     <script name="hebrew"   unicode-range="&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;"/>
     <script name="japanese" unicode-range="&#x3040;-&#x309f;&#x30a0;-&#x30ff;&#12352;-&#12543;"/>
+    <script name="greek"    unicode-range="&#x370;-&#x3ff;&#7936;-&#8191;"/>
   </xsl:variable>
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
