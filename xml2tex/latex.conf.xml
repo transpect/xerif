@@ -2432,6 +2432,9 @@
           <xsl:when test="regex-group(11) and not($context-lang = 'ja')">
             <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{japanese}{', ., '}', '}'[$double-parenthesis])"/>  
           </xsl:when>
+          <xsl:when test="regex-group(13) and not($context-lang = 'el')">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{greek}{', ., '}', '}'[$double-parenthesis])"/>  
+          </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="."/>
           </xsl:otherwise>
