@@ -551,12 +551,10 @@
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
     <xsl:param name="root" as="document-node(element())"/>
-    <xsl:variable name="unicode-range-in-doc" 
-                  select="codepoints-to-string(functx:sort(distinct-values(for $i in $root//text() 
-                                                                           return string-to-codepoints($i))))" as="xs:string"/>
-    <xsl:variable name="other-scripts-in-doc" as="xs:string*"
-                  select="for $i in $scripts
-                          return $i[matches($unicode-range-in-doc, concat('[', @unicode-range, ']'))]/@name"/>
+    <!-- adds usescripts for langgages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
+         if that is not wanted because the glyphs are already contained in the main font (like greek for brill/Campus) then overwrite this function to exclude the langugage-->
+    <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root)"/>
+    
     <xsl:sequence select="if(exists($other-scripts-in-doc))
                           then concat(',usescript={',
                                       string-join($other-scripts-in-doc, ','), 
@@ -564,6 +562,13 @@
                           else ()"/>
   </xsl:function>
   
+  <xsl:function name="xml2tex:determine-other-langs" as="xs:string*">
+    <xsl:param name="root" as="document-node(element())"/>
+    <xsl:variable name="unicode-range-in-doc" 
+                select="codepoints-to-string(functx:sort(distinct-values(for $i in $root//text() return string-to-codepoints($i))))" as="xs:string"/>
+    <xsl:sequence select="for $i in $scripts return $i[matches($unicode-range-in-doc, concat('[', @unicode-range, ']'))]/@name"/>
+  </xsl:function>
+
   <!-- use this function for metadata entries: links, footnotes etc. are discarded etc. 
        single element behaviour can be overwritten in customer template in mode strip-meta -->
   <xsl:function name="xml2tex:meta-remove-links-etc" as="xs:string?">
