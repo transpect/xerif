@@ -1064,6 +1064,7 @@
                            keywordset) (: must be placed below title :)"/>
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title[1]/@role))[1]"/>
       <xsl:if test="exists($chapter-info)">
         <info>
           <xsl:apply-templates select="$chapter-info" mode="#current"/>
