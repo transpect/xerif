@@ -1641,20 +1641,21 @@
   </template>
 
 
-
+<!--
   <template context="*[self::*:td | self::*:th]/dbk:para[not(parent::dbk:footnote)]
                                                         [following-sibling::dbk:para]//dbk:br">
     <rule>
       <text> \linebreak </text>
     </rule>
-  </template>
+  </template>-->
   
   <template context="*[self::*:td | self::*:th]/dbk:para[not(parent::dbk:footnote)]
                                                         [following-sibling::dbk:para]">
     <rule>
       <xsl:next-match/>
-      <text> \linebreak </text>
+      <text> \tpBreak </text>
     </rule>
+    <!--https://redmine.le-tex.de/issues/15354#note-14-->
   </template>
 
  
