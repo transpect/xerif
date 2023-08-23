@@ -551,7 +551,7 @@
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
     <xsl:param name="root" as="document-node(element())"/>
-    <!-- adds usescripts for langgages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
+    <!-- adds usescripts for languages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
          if that is not wanted because the glyphs are already contained in the main font (like greek for brill/Campus) then overwrite this function to exclude the langugage-->
     <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root)"/>
     
@@ -1679,7 +1679,8 @@
 
   <template context="dbk:figure[not(   parent::dbk:figure 
                                     or parent::dbk:informalfigure)]
-                    |dbk:informalfigure">
+                    |dbk:informalfigure
+                    |dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]">
     <xsl:sequence select="xml2tex:generate-clear-before-last-float(.)"/>
     <rule name="tpFigure" type="env" break-after="2" break-before="2">
       <option select="string-join((tr:determine-float-pos(.), 
@@ -1760,16 +1761,33 @@
   
   <xsl:function name="tr:determine-float-pos" as="xs:string?">
     <xsl:param name="elt" as="element(*)"/>
-     <xsl:sequence select="if ($elt[   dbk:title 
-                                    or dbk:info 
-                                    or dbk:caption 
-                                    or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
-                                    or ancestor::dbk:footnote]) 
-                           then ('float-pos=t'[$elt/@floatstyle eq 'top'],
-                                 'float-pos=b'[$elt/@floatstyle eq 'bottom'],
-                                 'float-pos=h!'[$elt/@floatstyle eq 'fixed'],
-                                 'float-pos=h!')[1]
-                           else ()"/>
+     <xsl:choose>
+       <xsl:when test="$elt[local-name() = ('table', 'informaltable')]
+                           [matches(@role, $rotated-table-style)
+                             or exists(.//dbk:entry[   matches(@css:transform, 'rotate\((90|270)deg\)')
+                                              or @css:writing-mode eq 'bt-lr']
+                             )]
+                        or
+                        $elt[self::dbk:figure[dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')]]
+                                             [not(parent::dbk:figure)]
+                            ]
+                        or 
+                        $elt[self::dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]]">
+         <xsl:sequence select="'orientation=landscape'"/>
+       </xsl:when>
+       <xsl:otherwise>
+        <xsl:sequence select="if ($elt[   dbk:title 
+                                            or dbk:info 
+                                            or dbk:caption 
+                                            or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
+                                            or ancestor::dbk:footnote]) 
+                                   then ('float-pos=t'[$elt/@floatstyle eq 'top'],
+                                         'float-pos=b'[$elt/@floatstyle eq 'bottom'],
+                                         'float-pos=h!'[$elt/@floatstyle eq 'fixed'],
+                                         'float-pos=h!')[1]
+                                   else ()"/>
+      </xsl:otherwise>
+    </xsl:choose>
     <!-- other options are: 
      t = "oben",
      b = "unten", 
@@ -1965,7 +1983,7 @@
   
   <xsl:variable name="rotated-table-style" select="'([a-z]{1,3})?tablerotated'" as="xs:string"/>
   
-  <template context="*[local-name() = ('table', 'informaltable')]
+<!--  <template context="*[local-name() = ('table', 'informaltable')]
                       [   matches(@role, $rotated-table-style)
                        or exists(.//dbk:entry[   matches(@css:transform, 'rotate\((90|270)deg\)')
                                               or @css:writing-mode eq 'bt-lr']
@@ -1974,15 +1992,16 @@
       <option select="'orientation=landscape'"/>
       <text/>
     </rule>
-  </template>
+    <!-\- will now be handled via function tr:determine-float-pos -\->
+  </template>-->
   
-  <template context="dbk:figure[dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')]][not(parent::dbk:figure)]
-                    |dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]">
+    <!--  <template context="dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]">
     <rule name="tpFigure" type="env">
       <param select="'orientation=landscape'"/>
       <text/>
     </rule>
-  </template>
+    dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]
+  </template>-->
   
   <!--  *
         * quotation
