@@ -40,7 +40,8 @@
     <!-- As long as tables with PI orientation=landscape cannot be split automatically via the framework, they may be split via converter. 
         how the splitting is done exactly, should in most cases be adapted in customer code to make sure that the position of titles, sources etc. is according to styles -->
   </xsl:variable>
-
+  <xsl:variable name="repeat-split-table-head" select="false()" as="xs:boolean"/>
+  
   <!--  *
         * create hierarchy
         * -->
@@ -826,7 +827,8 @@
     <xsl:call-template name="split-table">
       <xsl:with-param name="table" as="element()" select="."/>
     </xsl:call-template>
-    <!-- overwrite this in your adaptations to position titles/sources in first or last table fragment-->
+    <!-- overwrite this in your adaptations to position titles/sources in first or last table fragment. 
+         be aware that it splits tables also if the hub is further processed to XML/HTML.-->
   </xsl:template>
   
   <xsl:template name="split-table" as="node()*">
@@ -839,7 +841,10 @@
     <xsl:variable name="caption" as="element(caption)?" select="$table/caption">
       <!--additional descriptions/legends -->
     </xsl:variable>
-    
+    <xsl:variable name="table-head" as="element(thead)*" select="$table/tgroup/thead">
+      <!--additional descriptions/legends -->
+    </xsl:variable>
+
     <xsl:variable name="splitted-tables">
         <xsl:for-each-group select="$table/tgroup/*/row" 
                group-starting-with=".[.//processing-instruction()[some $t in tokenize(., '\s+') satisfies $t = '\doTableBreak']]">
@@ -866,7 +871,7 @@
                            or
                           (current-group()[last()] is $table/tgroup[1]/descendant::row[last()](: last table:) and not($table-caption-pos = 'top'))">
               <!-- insert title if its position is above or below table in PDF -->
-              <xsl:apply-templates select="$title, $info" mode="#current"/>
+              <xsl:apply-templates select="$title" mode="#current"/>
             </xsl:if>
             
             <xsl:if test="some $e in current-group()/entry satisfies xs:integer($e/@rowspan) gt count($e/../following-sibling::row) +1">
@@ -875,7 +880,12 @@
             
             <tgroup>
               <xsl:apply-templates select="current-group()[1]/../..[self::tgroup]/@*, current-group()[1]/../..[self::tgroup]/colspec" mode="#current"/>
+
               <xsl:for-each-group select="current-group()" group-adjacent="../name()">
+                <xsl:if test="exists($table-head) and $repeat-split-table-head and not(current-grouping-key() = 'thead')">
+                  <!-- -repeat table heads if wanted -->
+                  <xsl:sequence select="$table-head"/>
+                </xsl:if>
                 <xsl:element name="{current-grouping-key()}">
                   <xsl:apply-templates select="current-group()"/>
                 </xsl:element>
@@ -892,7 +902,9 @@
             <!-- insert caption. default: bottom (last table) -->
             <xsl:apply-templates select="$caption" mode="#current"/>
           </xsl:if>
-            
+          <xsl:if test="current-group()[last()] is $table/tgroup[1]/descendant::row[last()]">
+            <xsl:apply-templates select="$info" mode="#current"/>
+          </xsl:if>
           </xsl:element>
         </xsl:for-each-group>
       </xsl:variable>
