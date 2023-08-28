@@ -188,9 +188,15 @@
   <xsl:variable name="layout-value"  as="xs:string?" select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
   <xsl:variable name="pubtype-value" as="xs:string?" select="if ($pubtype = ('article','collection', 'mono')) then concat(',pubtype=', $pubtype) else ()"/>
   <xsl:variable name="format-value"  as="xs:string?" select="if ($format) then concat('format=', $format)  else ()"/>
+  <xsl:variable name="greek" as="xs:string?" 
+                  select="if (some $l in xml2tex:determine-other-langs(root()) satisfies $l = 'greek' 
+                                       and 
+                                       not(some $b in $all-langs satisfies $b = 'el')) 
+                                   then 'greek' else ()"/>
   <xsl:variable name="doc-class"     as="xs:string" 
                 select="concat('\documentclass[',
                                string-join(($babel-langs[position() ne 1],
+                                            $greek,
                                             $babel-langs[1]), (: 1st lang is main lang and comes last :)
                                             ','),
                                $pubtype-value, 
@@ -551,13 +557,15 @@
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
     <xsl:param name="root" as="document-node(element())"/>
-    <!-- adds usescripts for languages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
-         if that is not wanted because the glyphs are already contained in the main font (like greek for brill/Campus) then overwrite this function to exclude the langugage-->
+    <!-- adds usescripts for lanugages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
+         For greek this is overridden because most fonts contain greek characters already. If not, overwrite this function and deleted the 
+         condition for greek as well as the variable $greek in the documentclass definitiOn -->
+
     <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root)"/>
     
-    <xsl:sequence select="if(exists($other-scripts-in-doc))
+    <xsl:sequence select="if(exists($other-scripts-in-doc[not(. = 'greek')]))
                           then concat(',usescript={',
-                                      string-join($other-scripts-in-doc, ','), 
+                                      string-join($other-scripts-in-doc[not(. = 'greek')], ','), 
                                       '}')
                           else ()"/>
   </xsl:function>
