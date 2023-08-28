@@ -33,10 +33,12 @@
 \ProvidesPackage{coco-notes}
     [\filedate \fileversion le-tex coco notes module]
 \newif\ifendnotes \endnotesfalse
+\newif\ifendnotelinks \endnotelinksfalse
 \DeclareOption{endnotes}{\global\endnotestrue}
 \DeclareOption{ennotoc}{\global\let\tp@ennotoc\relax}
 \DeclareOption{resetnotesperchapter}{\global\let\reset@notes@per@chapter\relax}
 \DeclareOption{endnoteswithchapters}{\global\endnotestrue\global\let\endnotes@with@chapters\relax}
+\DeclareOption{endnotelinks}{\global\endnotelinkstrue}
 \ProcessOptions
 \RequirePackage{footnote}
 \newif\if@enotesopen
@@ -44,13 +46,38 @@
 \ifendnotes
   \RequirePackage{endnotes}
   \@ifpackageloaded{coco-headings}{\let\tp@useTeXHeading\relax}{}
+  % Allow linking endnotes to their respective occurrence in the document.
+  \ifendnotelinks
+    \global\newcount\endnoteLinkCnt \global\endnoteLinkCnt\z@
+    \def\@endnotemark{%
+      \leavevmode
+      \ifhmode\edef\@x@sf{\the\spacefactor}\nobreak\fi
+      \phantomsection%
+      \label{endnote-\the\endnoteLinkCnt}%
+      \hyperref[endnotetext-\the\endnoteLinkCnt]{\makeenmark}%
+      \ifhmode\spacefactor\@x@sf\fi%
+      \relax%
+    }
+  \fi
   \let\footnote=\endnote
   \def\enotesize{\normalsize}%
   \def\enoteformat{%
+    % Create the label right at the start of the endnote text to prevent erroneous pointing to the next page.
+    \ifendnotelinks%
+      \phantomsection%
+      \label{endnotetext-\currentEndnote}%
+    \fi
     \noindent
     \leavevmode
-    \hskip-2em\hb@xt@2em{\@theenmark\hss}%
-    \expandafter\parindent\tpfn@parindent\relax\expandafter}%
+    \hskip-2em\hb@xt@2em{%
+      \ifendnotelinks
+        \hyperref[endnote-\currentEndnote]{\@theenmark}\hss%
+      \else
+        \@theenmark\hss%
+      \fi%
+    }%
+    \expandafter\parindent\tpfn@parindent\relax\expandafter%
+  }%
   \gdef\enoteheading{%
     \leftskip2em
   }%
@@ -148,7 +175,24 @@
        \unrestored@protected@xdef\@thefnmark{\thempfn}%
      \fi
    \endgroup
-   \@footnotemark\@footnotetext}
+   \@footnotemark\@footnotetext%
+}
+\global\newif\if@haveenotes
+\long\def\@endnotetext#1{%
+  \global\@haveenotestrue
+  \if@enotesopen \else \@openenotes \fi
+  \immediate\write\@enotes{%
+    \string\def\string\currentEndnote{\the\endnoteLinkCnt}%
+    \@doanenote{\@theenmark}%
+  }%
+  \begingroup
+     \def\next{#1}%
+     \newlinechar='40
+     \immediate\write\@enotes{\meaning\next}%
+  \endgroup
+  \immediate\write\@enotes{\@endanenote}%
+  \global\advance\endnoteLinkCnt\@ne%
+}
 \endinput
 %%
 %% End of file `coco-notes.sty'.
