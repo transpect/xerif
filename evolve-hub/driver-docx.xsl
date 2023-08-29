@@ -882,8 +882,11 @@
               <xsl:apply-templates select="current-group()[1]/../..[self::tgroup]/@*, current-group()[1]/../..[self::tgroup]/colspec" mode="#current"/>
 
               <xsl:for-each-group select="current-group()" group-adjacent="../name()">
-                <xsl:if test="exists($table-head) and $repeat-split-table-head and not(current-grouping-key() = 'thead')">
-                  <!-- -repeat table heads if wanted -->
+                <xsl:if test="    exists($table-head) 
+                              and $repeat-split-table-head 
+                              and not(current-grouping-key() = 'thead') 
+                              and current-group()[1]//processing-instruction()[some $t in tokenize(., '\s+') satisfies $t = '\doTableBreak']">
+                  <!-- -repeat table heads if wanted, but only on split points -->
                   <xsl:sequence select="$table-head"/>
                 </xsl:if>
                 <xsl:element name="{current-grouping-key()}">
