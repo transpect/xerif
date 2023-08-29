@@ -182,7 +182,9 @@
   \global\@haveenotestrue
   \if@enotesopen \else \@openenotes \fi
   \immediate\write\@enotes{%
-    \string\def\string\currentEndnote{\the\endnoteLinkCnt}%
+    \ifendnotelinks
+      \string\def\string\currentEndnote{\the\endnoteLinkCnt}%
+    \fi%
     \@doanenote{\@theenmark}%
   }%
   \begingroup
@@ -191,7 +193,9 @@
      \immediate\write\@enotes{\meaning\next}%
   \endgroup
   \immediate\write\@enotes{\@endanenote}%
-  \global\advance\endnoteLinkCnt\@ne%
+  \ifendnotelinks
+    \global\advance\endnoteLinkCnt\@ne%
+  \fi%
 }
 \endinput
 %%
