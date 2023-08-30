@@ -887,10 +887,10 @@
                               and not(current-grouping-key() = 'thead') 
                               and current-group()[1]//processing-instruction()[some $t in tokenize(., '\s+') satisfies $t = '\doTableBreak']">
                   <!-- -repeat table heads if wanted, but only on split points -->
-                  <xsl:sequence select="$table-head"/>
+                  <xsl:apply-templates select="$table-head" mode="#current"/>
                 </xsl:if>
                 <xsl:element name="{current-grouping-key()}">
-                  <xsl:apply-templates select="current-group()"/>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
                 </xsl:element>
               </xsl:for-each-group>
             </tgroup>
