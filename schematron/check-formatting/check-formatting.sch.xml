@@ -57,5 +57,20 @@
       </assert>
     </rule>
   </pattern>
+  
+  <pattern id="unusual">
+    <rule context="dbk:*[@css:display]">
+      <assert test="not(@css:display eq 'none')" role="warning" id="hidden-text" diagnostics="hidden-text_de">
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Hidden text</span>
+        This text is marked as hidden and will most likely not appear in the output: "<value-of select="."/>"</assert>
+    </rule>
+  </pattern>
+  
+  <diagnostics>
+    <diagnostic id="hidden-text_de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Versteckter Text</span>
+      Dieser Text wurde als versteckt ausgezeichnet und wird höchstwahrscheinlich nicht in der Ausgabe erscheinen: "<value-of select="."/>"
+    </diagnostic>
+  </diagnostics>
 
 </schema>
