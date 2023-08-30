@@ -159,7 +159,7 @@
     </xsl:element>
   </xsl:template>
   
-  <xsl:template match="blockquote[@role eq 'hub:lists']" mode="hub:blockquotes">
+  <xsl:template match="blockquote[@role eq 'hub:lists']" mode="hub:postprocess-lists">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
