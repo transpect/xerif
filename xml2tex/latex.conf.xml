@@ -1463,7 +1463,7 @@
         </rule>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="some $a in $all-aff//*:tmp-aff-group/dbk:affiliation[1]/dbk:orgname/@srcpath satusfies $a = current()/dbk:orgname/@srcpath">
+        <xsl:if test="current()/dbk:orgname/@srcpath = $all-aff//*:tmp-aff-group/dbk:affiliation[1]/dbk:orgname/@srcpath">
           <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
           <rule name="tpAffilID" type="cmd" break-before="1">
             <!-- To Do: generate index from Affiliation list -->
