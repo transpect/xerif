@@ -58,8 +58,8 @@
     </part>
   </xsl:template>
   
-  <xsl:template match="hub/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1|journalreviewheading)$')]
-                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1(notoc)?|journalreviewheading)$')]
+  <xsl:template match="hub/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1(notoc|review)?|journalreviewheading)$')]
+                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1(notoc|review)?|journalreviewheading)$')]
                       |hub/section[not(matches(@role, $part-heading-role-regex))]" 
                 mode="hub:postprocess-hierarchy">
     <chapter>
@@ -436,8 +436,8 @@
   <!-- abbrev for running headers -->
   
   <xsl:template match="title[following-sibling::para[matches(@role, $running-header-regex)]]" mode="hub:clean-hub">
-    <xsl:apply-templates select="following-sibling::para[matches(@role, $running-header-regex)]" mode="running-header"/>
     <xsl:next-match/>
+    <xsl:apply-templates select="following-sibling::para[matches(@role, $running-header-regex)]" mode="running-header"/>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $running-header-regex)]" mode="running-header">
