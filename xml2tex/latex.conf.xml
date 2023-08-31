@@ -963,11 +963,7 @@
           <xsl:apply-templates select="../dbk:section[@role = 'alternative-title']/dbk:para[normalize-space()]" mode="#current"/>
           <xsl:text>}</xsl:text>
         </xsl:if>
-        <xsl:for-each select=".//dbk:affiliation">
-          <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
-          <xsl:apply-templates select="." mode="#current"/>
-          <xsl:text>&#xa;\end{tpAffil}</xsl:text>
-        </xsl:for-each>
+        <xsl:apply-templates select=".//dbk:affiliation" mode="#current"/>
       </rule>
       <xsl:apply-templates select="* except (dbk:author,
                                              dbk:authorgroup, 
@@ -1446,23 +1442,39 @@
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author
                                                       |self::dbk:editor
                                                       |self::dbk:othercredit]/dbk:affiliation">
-    <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/> 
+    <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/>
+    <xsl:variable name="all-aff" as="element()">
+      <tmp>
+        <xsl:for-each-group group-by="dbk:orgname" select="ancestor::dbk:info//dbk:affiliation">
+          <tmp-aff-group>
+            <xsl:attribute name="tmp-id" select="generate-id(current-group()[1])"/>
+            <xsl:sequence select="current-group()"/>
+          </tmp-aff-group>
+        </xsl:for-each-group>
+      </tmp>
+    </xsl:variable>
+    <xsl:variable name="position" select="index-of($all-aff//*:tmp-aff-group/@tmp-id, $all-aff//*:tmp-aff-group[dbk:affiliation/dbk:orgname/@srcpath = current()/dbk:orgname/@srcpath]/@tmp-id)"/>
+    <xsl:message   select="'all-aff: ', $all-aff//*:tmp-aff-group/*, '--', $position, '-- (', dbk:orgname, ')'"/>
     <xsl:choose>
       <xsl:when test="$in-author">
         <rule name="tpAffil" type="cmd" break-before="1">
           <!-- To Do: generate index from Affiliation list -->
-          <param select="index-of(ancestor::dbk:info[1]//dbk:orgname, .)"/>
+          <param select="$position"/>
         </rule>
       </xsl:when>
       <xsl:otherwise>
-         <rule name="tpAffilID" type="cmd" break-before="1">
-          <!-- To Do: generate index from Affiliation list -->
-           <param select="index-of(ancestor::dbk:info[1]//dbk:orgname, .)"/>
-        </rule>
-        <rule name="tpAffiliation" type="cmd" break-before="1">
-          <!-- To Do: generate index from Affiliation list -->
-          <param select="node()"/>
-        </rule>
+        <xsl:if test="some $a in $all-aff//*:tmp-aff-group/dbk:affiliation[1]/dbk:orgname/@srcpath satusfies $a = current()/dbk:orgname/@srcpath">
+          <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
+          <rule name="tpAffilID" type="cmd" break-before="1">
+            <!-- To Do: generate index from Affiliation list -->
+            <param select="$position"/>
+          </rule>
+          <rule name="tpAffiliation" type="cmd" break-before="1">
+            <!-- To Do: generate index from Affiliation list -->
+            <param select="node()"/>
+          </rule>
+          <xsl:text>&#xa;\end{tpAffil}</xsl:text>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </template>
@@ -1678,6 +1690,7 @@
       \tpSource{<Quelle>}                           % ...     dbk:legalnotice
       \tpLegend{<Legende>}                          % ...     dbk:caption
       \tpNumber{<Nummer>}                           % ...     dbk:title/dbk:phrase[@role eq 'hub:identifier']
+      \tpAltText{}                                  % ...     dbk:alt
       \tpFig{\includegraphics[<optionen>]{<pfad>}}  % ...     dbk:mediaobject
     \end{tpFigure}
 
@@ -1699,7 +1712,8 @@
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
                     dbk:note,
-                    dbk:para[matches(@role, $fig-legend-para-style-regex)]"/>
+                    dbk:para[matches(@role, $fig-legend-para-style-regex)],
+                    dbk:mediaobject/dbk:alt"/>
       <xsl:call-template name="handle-mediaobjects"/>
       <text select="dbk:figure"/>
       
@@ -1742,6 +1756,12 @@
     </xsl:choose>
   </template>
   
+  <template context="dbk:mediaobject/dbk:alt">
+    <rule name="tpAltText" type="cmd" break-before="1" break-after="0">
+      <param/>
+    </rule>
+  </template>
+
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
     <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
       <text select="dbk:title,
