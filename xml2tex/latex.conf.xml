@@ -1756,11 +1756,12 @@
     </xsl:choose>
   </template>
   
-  <template context="dbk:mediaobject/dbk:alt">
+<!--  <template context="dbk:mediaobject/dbk:alt">
     <rule name="tpAltText" type="cmd" break-before="1" break-after="0">
       <param/>
     </rule>
-  </template>
+  <!-\- https://redmine.le-tex.de/issues/14731 -\->
+  </template>-->
 
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
     <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
