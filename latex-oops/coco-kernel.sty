@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-08-03}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-kernel}
     [\filedate \fileversion cocotex kernel]
@@ -128,7 +128,7 @@
     \tpKernelDebugMsg{value tp@type@#1@#3:^^J \expandafter\meaning\csname tp@type@#1@#3\endcsname}%
   \fi
 }
-\def\tpDeclareComp{\@dblarg\@tpDeclareComp}
+\def\tpDeclareComp{\tp@opt@second\@tpDeclareComp}
 \def\@tpDeclareComp[#1]#2#3#4{%
   \ltx@LocalExpandAfter\global\expandafter\let\csname tp@\tp@cur@cont @#1\endcsname\relax
   \expandafter\long\expandafter\def\csname tp#2\endcsname##1{%
@@ -164,13 +164,13 @@
        {}}}
 \def\tpDeclareComponentGroup#1#2{%
   \csnumgdef{#1Cnt}{\z@}%
-  \csdef{#1}{\expandafter\tp@opt@empty\csname @#1\endcsname}%
+  \csdef{#1}{\tp@opt@empty{\csname @#1\endcsname}}%
   \csdef{@#1}[##1]{%
     \def\tp@cnt@grp{#1}%
     \csxdef{#1Cnt}{\expandafter\the\expandafter\numexpr\csname #1Cnt\endcsname+\@ne\relax}%
-    \if!##1!\else
-      \csgdef{tp@\tp@cur@cont @#1-\csname #1Cnt\endcsname @attrs}{##1}\fi
+    \if!##1!\else\csgdef{tp@\tp@cur@cont @#1-\csname #1Cnt\endcsname @attrs}{##1}\fi
     #2%
+    \csname @#1@hook\endcsname
   }%
   \csdef{end#1}{{\tpToggleCountedCond\csname tp@compose@group@#1\endcsname}}%
 }
@@ -182,7 +182,7 @@
     {\tpPackageError{Kernel}{Type}{Component Group `#1' unknown!}{You tried to declare a Group Handler for a Component Group that has not been declared, yet! Use \string\tpDeclareComponentGroup{#1}{} to declare the Component Group first.}}%
 }
 \let\tp@cnt@grp\@empty
-\def\tpUseGroupComp#1#2{{\def\tp@cnt@grp{#1}\csname\tp@cnt@grp-#2-\csname \tp@cnt@grp Cnt\endcsname}}
+\def\tpUseGCompIdx#1#2#3{\csname tp@\tp@cur@cont @#1-#3-#2\endcsname}
 \def\tpUseGroupProp#1#2#3{%
   \begingroup
     \@tempcnta\numexpr#2\relax
@@ -270,7 +270,6 @@
      \expandafter\expandafter\expandafter\csgappto\expandafter\@tempa\expandafter{\@tempb}%
      \egroup}%
   #4\expandafter\long\expandafter\def\csname tp@\tp@cur@cont @#2\endcsname{\csname tp@\tp@cur@cont @#1\endcsname}%
-  %%\csgappto{@tp@reset@components@\tp@cur@cont}{\csname tp@\tp@cur@cont @#2\endcsname{}}%
 }
 \def\tp@reset@components#1{%
   \csname @tp@reset@components@#1\endcsname
@@ -297,6 +296,7 @@
 \def\tp@use@hook[#1]#2{\csuse{tp@hook@#1@#2}}
 \long\def\tpSetProperty#1#2{\long\csdef{tp@\tp@cur@cont @#1}{#2}}
 \long\def\tpPropertyLet#1#2{\long\csdef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
+\long\def\tpPropertyLetX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
 \long\def\tpSetValProp#1#2{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
 \long\def\tpSetPropertyX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{#2}}
 \long\def\tpAddToDefault#1#2{\csgappto{tp@#1@default}{#2}}
@@ -317,15 +317,16 @@
   \fi
   \csname tp@#2@#1@properties\endcsname
 }
-\long\def\tpIfProp#1#2#3{\long\def\@tempa{}%
-    \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa #3\else#2\fi
+\long\def\tpIfProp#1#2#3{%
+  \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else
+    \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\long@empty #3\else#2\fi
+  \fi
 \ignorespaces}
 \long\def\tpIfPropVal#1#2#3#4{\long\def\@tempa{#2}%
   \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa\relax#3\else#4\fi\ignorespaces}
-\def\tp@opt@curcont#1{\@ifnextchar[{#1}{#1[\tp@cur@cont]}}%]
-\def\tp@opt@empty#1{\@ifnextchar[{#1}{#1[]}}%]
-\def\tp@opt@second#1{\def\@tempa[##1]##2{#1[##1\if!##1!##2\fi]{##2}}%
-  \@ifnextchar[{\@tempa}{\@tempa[]}}%
+\long\def\tp@opt@curcont#1{\@ifnextchar[{#1}{#1[\tp@cur@cont]}}%]
+\long\def\tp@opt@empty#1{\@ifnextchar[{#1}{#1[]}}%]
+\let\tp@opt@second\@dblarg
 \long\def\tp@iterate{\@ifnextchar[{\@tp@iterate}{\@tp@iterate[\@ne]}}%]
 \long\def\@tp@iterate[#1]#2#3#4#5{%
   \advance#2 by #1\relax
@@ -360,6 +361,10 @@
       \expandafter\def\csname tp@\tp@cur@node @attr@#1\endcsname{#2}%
     \fi
   \fi}
+\def\tpGetAttr#1#2{\csuse{tp@#1@attr@#2}}
+\def\tpIfAttr#1#2#3#4{\ifcsdef{tp@#1@attr@#2}{#3}{#4}}
+\def\tpIfAttrStr#1#2#3#4#5{\tpIfAttr{#1}{#2}{\ifcsstring{tp@#1@attr@#2}{#3}{#4}{#5}}{#5}}
+\def\tpIfAttrIsset#1#2#3#4{\tpIfAttr{#1}{#2}{\expandafter\ifx\csname tp@#1@attr@#2\endcsname\@empty#3\else#4\fi}{#4}}
 \long\def\tpDeclareClass{\@ifnextchar [{\@tp@set@class}{\@tp@set@class[default]}}%]
 \long\def\@tp@set@class[#1]#2{\tp@opt@empty{\tp@set@class[#1]{#2}}}%
 \long\gdef\tp@default@class@default{}

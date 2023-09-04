@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-08-03}%
 %%
 %% module for CoCoTeX that provides handling of a document's meta data.
 %%
@@ -37,6 +37,7 @@
   \tpDeclareType{Components}{%
     \tpDeclareRole[author]{Author}%
     \tp@declare@meta@comp
+    \tp@declare@meta@affils
   }%
   \tpDeclareType{Properties}{%
     \tp@Meta@default
@@ -56,49 +57,212 @@
 \def\tp@declare@role[#1]#2{%
   \tpDeclareComponentGroup{tp#2}{%
     \tpDeclareCountedComp{FullName}%
+    \tpDeclareCountedComp{CiteName}%
+    \tpDeclareCountedComp{ShortCiteName}%
+    \tpDeclareCountedComp{PDFInfoName}%
+    \tpDeclareCountedComp{Initial}%
     \tpDeclareCountedComp{LastName}%
     \tpDeclareCountedComp{FirstName}%
     \tpDeclareCountedComp{MidName}%
     \tpDeclareCountedComp{PersonPrefix}%
     \tpDeclareCountedComp{ORCID}%
-    \tpDeclareCountedComp{Affil}%
+    \tpDeclareCountedComp{AffilRef}%
+    \tpDeclareCountedComp{Affiliation}%
     \tpDeclareCountedComp{Email}%
   }%
   \tpGroupHandler{tp#2}{%
-    \tpIfComp{FullName}{}{\tpFullName{\tpUseProperty{name-format}}}%
+    \tpIfComp{FullName}{}{\tpFullName{\tpUseProperty{#1-full-name-format}}}%
+    \tpIfComp{Initial}{}{\tpInitial{\tpUseProperty{initials-format}}}%
+    \tpIfComp{CiteName}{}{\tpCiteName{\tpUseProperty{#1-cite-name-format}}}%
+    \tpIfComp{ShortCiteName}{}{\tpShortCiteName{\tpUseProperty{#1-short-cite-name-format}}}%
+    \tpIfComp{PDFInfoName}{}{\tpPDFInfoName{\tpUseProperty{#1-pdfinfo-name-format}}}%
+    \tpIfComp{AffilRef}{\tpIfComp{Affiliation}{%
+        \tpPackageError{Meta}{Ambiguity}
+          {You cannot use both Containers \string\tpAffilRef\space and \string\tpAffiliation\space in the same `tpAuthor' Sub-Container}
+          {At least one `tpAuthor' Sub-Container contains both \string\tpAffilRef\space and \string\tpAffiliation. This is not allowed. Please decide for one affiliation strategy: Either two lists with cross-references, or affiliations directly as an author's meta-data.}}{}}{}%
   }%
-  \tpDeclareRoleBlock{#2}{NameList}{#1-list-format}%
+  \tpDeclareRoleBlock{#2}{NameList}{#1-list-print-format}%
+  \tpDeclareRoleBlock{#2}{CitationList}{#1-list-cite-format}%
+  \tpDeclareRoleBlock{#2}{ShortCitationList}{#1-list-short-cite-format}%
+  \tpDeclareRoleBlock{#2}{PDFInfo}{#1-list-pdfinfo-format}%
 }
-\def\tpAddToRole#1#2{\csgappto{tp#1}{#2}}
+\def\tpAddToRole#1#2{%
+  \csgappto{@tp#1@hook}{#2}%
+}
 \def\tpDeclareRoleBlock#1#2#3{%
   \tpDeclareComp{#1#2}{\expandafter\global}{}%
   \csgdef{tp@meta@role@#1@#2}{#3}}
 \def\tp@meta@role@eval#1{{%
-  \tpIfComp{#1NameList}{}{%
-    \ifcsdef{tp#1Cnt}
-      {\expandafter\ifnum\csname tp#1Cnt\endcsname>\z@
-          \tp@eval@role@attrs{#1}%
-          \tpApplyCollection{tp#1}{\csname tp@meta@role@#1@NameList\endcsname}{#1NameList}%
+    \tp@meta@role@compose{#1}{NameList}%
+    \tp@meta@role@compose{#1}{CitationList}%
+    \tp@meta@role@compose{#1}{ShortCitationList}%
+    \tp@meta@role@apply{#1}{PDFInfo}%
+  }}
+\def\@tp@meta@role@eval#1#2#3{%
+  \tpIfComp{#2#3}{}{%
+    \ifcsdef{tp#2Cnt}
+      {\expandafter\ifnum\csname tp#2Cnt\endcsname>\z@
+          \tp@eval@role@attrs{#2}%
+          #1{tp#2}{\csname tp@meta@role@#2@#3\endcsname}{#2#3}%
         \fi
-      }{}}}}%
+      }{}}}
+\def\tp@meta@role@apply#1#2{\@tp@meta@role@eval\tpApplyCollection{#1}{#2}}
+\def\tp@meta@role@compose#1#2{\@tp@meta@role@eval\tpComposeCollection{#1}{#2}}
 \def\tp@eval@role@attrs#1{%
     \tp@iterate{\@tempcnta}{\@ne}{\csname tp#1Cnt\endcsname}{%
       \ifcsdef{tp@meta@#1-\the\@tempcnta @attrs\endcsname}{%
         \tpParseAttributes{#1-\the\@tempcnta }{\csname tp@meta@#1-\the\@tempcnta @attrs\endcsname}%
       }{}}}
+\def\tpDeclareLabeledComp{\tp@opt@empty\tp@declare@labeled@comp}
+\def\tp@declare@labeled@comp[#1]#2#3{%
+  \tpDeclareComp{#2}{\expandafter\global}{}%
+  \tpDeclareComp{#2Label}{\expandafter\global}{}%
+  \csxdef{labeled-meta-property-infix-\tp@cur@cont-#2}{#3}%
+  \if!#1!\else
+    \long\csgdef{tp@\tp@cur@cont @#2Label}{#1}%
+  \fi
+}
+\def\tpUseLabeledComp#1{%
+  \tpIfComp{#1}{%
+    \letcs\tpCurInfix{labeled-meta-property-infix-\tp@cur@cont-#1}%
+    \def\tpCurComp{#1}%
+    \tpIfProp{labeled-meta-\tpCurInfix-format}
+      {\tpUseProperty{labeled-meta-\tpCurInfix-format}}
+      {\tpUseProperty{labeled-meta-format}}%
+  }{}}
 \def\tp@declare@meta@comp{%
     \tpDeclareComp{Copyright}{\expandafter\global}{}% Copyright text
     \tpDeclareComp{DOI}{\expandafter\global}{}%         DOI
 }%
+\def\tp@extended@meta@macros{%
+  \tpDeclareLabeledComp[Abstract]{Abstract}{abstract}%
+  \tpDeclareLabeledComp[Keywords]{Keywords}{keyword}%
+  \tpDeclareLabeledComp{DOI}{doi}%
+  \tpDeclareLabeledComp{TitleEn}{title-en}%
+}
+\def\tp@declare@meta@affils{%
+  \tpDeclareComp{AffilBlock}{\expandafter\global}{}%
+  \tpDeclareComponentGroup{tpAffil}{%
+    \tpDeclareCountedComp{Affiliation}%
+    \tpDeclareCountedComp{Address}%
+    \tpDeclareCountedComp{Institute}%
+    \tpDeclareCountedComp{Country}%
+    \tpDeclareCountedComp{Department}%
+    \tpDeclareCountedComp{AffilID}%
+  }%
+  \tpGroupHandler{tpAffil}{%
+    \tpIfComp{AffilID}{}{\expandafter\tpAffilID\expandafter{\tpAffilCnt}}%
+    \tpIfComp{Affiliation}{}{\tpAffiliation{\tpUseProperty{affiliation-format}}}%
+  }%
+}
 \tpAddToDefault{Meta}{%
-  \tpSetProperty{name-format}{\tpUseComp{FirstName}\space\tpUseComp{LastName}}%
-  \tpSetProperty{name-list-format}{\tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}%
+  \tpSetProperty{initials-format}{%
+    \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-FirstName-\the\tpCurCount\endcsname\long@empty\else
+      \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-FirstName-\the\tpCurCount\endcsname\relax\else
+        \expandafter\expandafter\expandafter\@car\csname tp@\tp@cur@cont @\tp@cnt@grp-FirstName-\the\tpCurCount\endcsname\relax\@nil\tpUseProperty{initials-period}%
+      \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-MidName-\the\tpCurCount\endcsname\long@empty\else
+        \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-MidName-\the\tpCurCount\endcsname\relax\else
+          \tpUseProperty{initials-sep}%
+          \expandafter\expandafter\expandafter\@car\csname tp@\tp@cur@cont @\tp@cnt@grp-MidName-\the\tpCurCount\endcsname\relax\@nil\tpUseProperty{initials-period}%
+        \fi\fi
+    \fi\fi
+  }
+  \tpSetProperty{initials-sep}{~}
+  \tpSetProperty{initials-period}{.}
+  %
+  %% Properties that control how the composed compoents WITHIN each item in a Role are formatted:
+  %
+  \tpSetProperty{role-full-name-format}{\tpUseComp{FirstName}\space\tpUseComp{LastName}}% How FullName for each name is built
+  \tpSetProperty{role-cite-name-format}{\tpUseComp{LastName},~\tpUseComp{Initial}}% How CiteName for each name is built
+  \tpSetProperty{role-short-cite-name-format}{\tpUseComp{LastName}}% how ShortCiteName for each name is built
+  \tpPropertyLet{role-pdfinfo-name-format}{role-cite-name-format}% How PDFInfoName for each item is built
+  %% Properties that control how the single items in a compoent list are formatted:
+  \tpSetProperty{role-block-print-format}{\tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How <Role>NameList for each name is build
+  \tpSetProperty{role-block-cite-format}{\tpUseComp{CiteName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How each item in Component <Role>CitationList is formatted
+  \tpSetProperty{role-block-short-cite-format}{\tpUseComp{ShortCiteName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}%  How each item in the Component <Role>ShortCitationList is formatted
+  \tpSetProperty{role-block-pdfinfo-format}{\tpUseComp{PDFInfoName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How each item in the Component <Role>PDFInfo is formatted
+  % Aliasses
+  % for Role "Author":
+  \tpPropertyLet{author-cite-name-format}            {role-cite-name-format}%
+  \tpPropertyLet{author-short-cite-name-format}      {role-short-cite-name-format}%
+  \tpPropertyLet{author-full-name-format}            {role-full-name-format}%
+  \tpPropertyLet{author-pdfinfo-name-format}         {role-pdfinfo-name-format}%
+  %
+  \tpPropertyLet{author-list-print-format}      {role-block-print-format}%
+  \tpPropertyLet{author-list-cite-format}       {role-block-cite-format}%
+  \tpPropertyLet{author-list-short-cite-format} {role-block-short-cite-format}%
+  \tpPropertyLet{author-list-pdfinfo-format}    {role-block-pdfinfo-format}%
+  %
   \tpSetProperty{counted-name-sep}{,\space}%
-  \tpPropertyLet{author-format}{name-format}% Override for single author names
   \tpSetProperty{name-and}{\space and\space}%
   \tpSetProperty{name-etal}{\space et~al.}%
   \tpSetProperty{name-sep}{,\space}%
   \tpSetProperty{corresp-mark}{*}%
+  %
+  % Affiliation Properties
+  %
+  \tpSetProperty{affiliation-format}{% Format of the  affiliation block
+    \tpIfComp{Institute}{\tpUseComp{Institute}}{}%
+    \tpIfComp{Department}{, \tpUseComp{Department}}{}%
+    \tpIfComp{Address}{, \tpUseComp{Address}}{}%
+  }%
+  \tpSetProperty{affil-sep}{\par}
+  \tpSetProperty{affil-block-item-face}{}% Font of a single item in the affiliation list
+  \tpSetProperty{affil-block-item-format}{% Format of a single item in the affiliation list
+    \textsuperscript{\tpUseComp{AffilID}}%
+    \bgroup
+      \tpUseProperty{affil-block-item-face}%
+      \tpUseComp{Affiliation}
+    \egroup%
+    \ifnum\tpCurCount<\tpTotalCount\relax\tpUseProperty{affil-sep}\fi%
+  }
+  \tpSetProperty{affil-block-face}{\small\normalfont}%
+  \tpSetProperty{affil-block-format}{%
+    \tpIfComp{AffilBlock}
+      {\bgroup
+         \tpUseProperty{affil-block-face}%
+         \tpUseComp{AffilBlock}%
+       \egroup
+       \par
+     }{}}
+  %
+  % Labeled Meta Properties
+  %
+  \tpSetProperty{labeled-meta-format}{%
+    \tpIfProp{labeled-meta-before-\tpCurInfix}
+      {\tpUseProperty{labeled-meta-before-\tpCurInfix}}
+      {\tpUseProperty{labeled-meta-before}}%
+    \bgroup
+      \tpIfProp{labeled-meta-\tpCurInfix-face}
+        {\tpUseProperty{labeled-meta-\tpCurInfix-face}}
+        {\tpUseProperty{labeled-meta-face}}%
+      \tpIfProp{labeled-meta-\tpCurInfix-label-format}
+        {\tpUseProperty{labeled-meta-\tpCurInfix-label-format}}
+        {\tpUseProperty{labeled-meta-label-format}}%
+      \tpUseComp{\tpCurComp}%
+    \egroup
+    \tpIfProp{labeled-meta-after-\tpCurInfix}
+      {\tpUseProperty{labeled-meta-after-\tpCurInfix}}
+      {\tpUseProperty{labeled-meta-after}}%
+  }
+  \tpSetProperty{labeled-meta-label-format}{%
+    \tpIfComp{\tpCurComp Label}{%
+      \bgroup
+        \tpUseProperty{labeled-meta-before-\tpCurInfix-label}%
+        \tpIfProp{labeled-meta-\tpCurInfix-label-face}
+          {\tpUseProperty{labeled-meta-\tpCurInfix-label-face}}
+          {\tpUseProperty{labeled-meta-label-face}}%
+        \tpUseComp{\tpCurComp Label}%
+        \tpIfProp{labeled-meta-\tpCurInfix-label-sep}
+          {\tpUseProperty{labeled-meta-\tpCurInfix-label-sep}}
+          {\tpUseProperty{labeled-meta-label-sep}}%
+      \egroup
+    }{}}
+  \tpSetProperty{labeled-meta-label-face}{\bfseries}
+  \tpSetProperty{labeled-meta-label-sep}{:\enskip}
+  \tpSetProperty{labeled-meta-face}{}
+  \tpSetProperty{labeled-meta-before}{}
+  \tpSetProperty{labeled-meta-after}{\par}
 }
 \endinput
 %%

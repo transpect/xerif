@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-08-03}%
 %%
 %% module for CoCoTeX for maketitle.
 %%
@@ -38,6 +38,7 @@
   \tpDeclareType{Components}{%
     \tp@title@simple@comps
     \tp@meta@generic@comp
+    \tp@extended@meta@macros
     \tp@title@fundings@comp
     \tp@title@role@handlers{author}{Author}%
     \tp@titlepage@role{editor}{Editor}%
@@ -53,11 +54,10 @@
 \def\tp@title@role@handlers#1#2{%
   \tpAddToRole{#2}{%
     \tpDeclareCountedComp{Bio}%
-    \tpDeclareCountedComp{BioBlock}%
-  }%
-  \tpDeclareRoleBlock{#2}{BioBlock}{#1-bio-block-format}%
+    \tpDeclareCountedComp{BioBlock}}%
+  \tpDeclareRoleBlock{#2}{BioBlock}{#1-bio-format}%
   \tpGroupHandler{tp#2}{%
-    \tpIfComp{BioBlock}{}{\tpIfComp{Bio}{\tpBioBlock{\tpUseProperty{#1-bio-format}}}{}}%
+    \tpIfComp{BioBlock}{}{\tpIfComp{Bio}{\tpBioBlock{\tpUseProperty{#1-list-bio-format}}}{}}%
   }%
 }
 \long\def\tpDeclareTitlepage#1{%
@@ -77,6 +77,7 @@
   \tp@maketitle
   \tp@meta@role@eval{Author}%
   \tpApplyCollection{tpAuthor}{\tp@meta@role@Author@BioBlock}{AuthorBioBlock}%
+  \tpApplyCollection{tpAffil}{affil-block-item-format}{AffilBlock}%
   \tp@title@eds@eval{Editor}%
   \tp@title@eds@eval{SeriesEditor}%
   \tp@meta@generic@eval
@@ -89,10 +90,11 @@
   \tp@title@process@bkt
   \tp@title@process@bka
   \tp@title@process@bkc
+  \tpUseHook{document-meta-hook}%
 }
 \def\tp@title@process@bkt{%
   \let\tpBreak\space
-  \expandafter\title\expandafter{\tpUseComp{Title}}%
+  \xdef\@title{\tpUseComp{Title}}%
   \tp@write@pdf@meta{pdftitle}{\tpUseComp{Title}}%
   \protected@edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
   \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
@@ -104,10 +106,10 @@
     \renewcommand\foreignlanguage[2]{{##2}}%
     \ifnum\tpAuthorCnt>\z@
       \@setpar{\@@par}%
-      \tpCompGDef\tpRunBookName{tpAuthor}{author-list-format}%
+      \tpCompGDef\tpRunBookName{tpAuthor}{author-list-pdfinfo-format}%
     \else
       \ifnum\tpEditorCnt>\z@
-        \tpCompGDef\tpRunBookName{tpEditor}{editor-list-format}%
+        \tpCompGDef\tpRunBookName{tpEditor}{editor-list-pdfinfo-format}%
       \else
         \tpPackageWarning{transcript-title}{Meta Data}{No author or editor given!}%
         \@tempswafalse
@@ -123,16 +125,25 @@
   \tp@write@pdf@meta{pdfcreator}{\tpIfComp{PDFCreator}{\tpUseComp{PDFCreator}}{\tpUseComp{Publisher}\tpIfComp{PubPlace}{, \tpUseComp{PubPlace}}{}}}%
   \tp@write@pdf@meta{pdfproducer}{\tpUseComp{PDFProducer}}%
 }
+\tpDeclareHook[titlepage]{before-maketitle-hook}
+\tpDeclareHook[titlepage]{document-meta-hook}
 \def\tp@maketitle{%
   %\csname tp@titlepage\endcsname
   \ifarticle
     \gdef\tpMaketitle{%
-      \csname tp@titlepage\endcsname
-      \tpUseProperty{article-title}%
+      \let\tp@cnt@grp\@empty
+      \tpUseHook[titlepage]{before-maketitle-hook}%
+      \bgroup
+        \tpNamespace{titlepage}%
+        \tpEvalType{Properties}%
+        \tpUseProperty{article-title}%
+      \egroup
+      \tpUseHook[titlepage]{after-maketitle-hook}%
     }%
   \else
     \gdef\tpMaketitle{%
       \let\tp@cnt@grp\@empty
+      \tpUseHook[titlepage]{before-maketitle-hook}%
       \bgroup
         \tpNamespace{titlepage}%
         \tpEvalType{Properties}%
@@ -160,7 +171,9 @@
     \tpComposeCollection{tpFunding}{fund-format}{FundingBlock}%
 }}
 \def\tp@title@eval@corresp#1#2{%
-  \expandafter\ifx\csname tp@#1-#2@attr@corresp\endcsname\relax\else\tpUseProperty{corresp-mark}\fi}
+  \tpIfAttr{#1-#2}{corresp}
+    {\tpUseProperty{corresp-mark}}
+    {}}
 \def\tp@title@eds@eval#1{%
   \tp@meta@role@eval{#1}%
   \tpApplyCollection{tp#1}{\csname tp@meta@role@#1@BioBlock\endcsname}{#1BioBlock}%
@@ -170,7 +183,7 @@
     \csgappto{tp@\tp@cur@cont @#1NameList}{{\letcs\tpTotalCount{tp#1Cnt}\tpUseProperty{editor-suffix}}}%
   \fi
 }%
-\def\tp@title@macro{\@ifnextchar[\@tp@title@macro{\@tp@title@macro[]}}%]
+\def\tp@title@macro{\tp@opt@empty\@tp@title@macro}%
 \def\@tp@title@macro[#1]#2{%
   \tpDeclareComp{#2}{\expandafter\global}{}%
   \if!#1!\else\csname tp#2\endcsname{#1}\fi%
@@ -252,6 +265,17 @@
   \tp@title@macro{PubCycle}                      % Publication cycle
   \tp@title@macro{Prices}                        % Prices of the journal issues or subscription models
   \tp@title@macro{MemberList}                    % In case of publishing organizations, this macro may hold a list of members.
+  %% for single articles
+  \tp@title@macro{StartPage}                     % Start page of a single article
+  \tp@title@macro{EndPage}                       % End page of a single article
+  \tpDeclareLabeledComp[Cite as]{CiteAs}{cite-as}          % As what the article should be cited
+  \tpDeclareLabeledComp[Submitted]{Submitted}{sumbitted}   % Date the article was submitted
+  \tpDeclareLabeledComp[Received]{Received}{received}      % Date the article was recieved
+  \tpDeclareLabeledComp[Revised]{Revised}{revised}         % Date the article was revised
+  \tpDeclareLabeledComp[Reviewed]{Reviewed}{reviewed}      % Date the article was reviewed
+  \tpDeclareLabeledComp[Accepted]{Accepted}{accepted}      % Date the article was accepted
+  \tpDeclareLabeledComp[Published]{Published}{published}   % Date the article was published
+  \tpDeclareLabeledComp[Conflict of Interest]{COIStatement}{coi-statement}% Conflict of Interest statement
   %% Generic additional information
   \tp@title@macro{AddNoteI}                      % Additional information, title page I
   \tp@title@macro{AddNoteII}                     % Additional information, title page II
@@ -261,6 +285,7 @@
 \def\tp@titlepage@default{%
   \tpSetProperty{article-title}{}%
   % Title page hooks
+  % Before \tpMaketitle and outside the group
   \tpSetProperty{before-titlepage}{%
     \pagestyle{empty}%
     \parindent\z@
@@ -344,8 +369,10 @@
       \tpUseProperty{EditorNameList}%
     \fi%
     \vskip\baselineskip
-    \tpUseComp{Title}%
-    \expandafter\meaning\csname tp@titlepage@editor-2@FullName\endcsname
+    \bgroup
+      \tpUseProperty{title-face}\tpUseComp{Title}%
+    \egroup
+    %\expandafter\meaning\csname tp@titlepage@editor-2@FullName\endcsname
   }%
   \tpSetProperty{titlepage-ii}{%
     \tpGetComp{Editorial}%
@@ -361,10 +388,7 @@
       \tpUseProperty{EditorNameList}%
     \fi%
     \par
-    \tpUseComp{Title}\par
-    \tpGetComp{Subtitle}%
-    \tpGetComp{Statement}%
-    \vskip\baselineskip
+    \tpUseProperty{title-format}
     \tpGetComp{Edition}%
     \tpGetComp{EditionNote}%
     \vfill
@@ -383,6 +407,25 @@
       \tpUseProperty{imprint}%
     \egroup
     \clearpage
+  }%
+  %% predefined face and format Properties
+  \tpSetProperty{title-face}{\Huge\sffamily\bfseries}%
+  \tpSetProperty{title-format}{%
+    \bgroup
+      \tpUseProperty{title-face}%
+      \tpUseComp{Title}\par
+    \egroup
+    \tpIfComp{Subtitle}{\tpUseProperty{subtitle-format}}{}%
+    \tpGetComp{Statement}%
+    \vskip\baselineskip
+  }%
+  \tpSetProperty{subtitle-face}{\Large\sffamily\bfseries}%
+  \tpSetProperty{subtitle-format}{%
+    \bgroup
+      \tpUseProperty{subtitle-face}%
+      \tpUseComp{Subtitle}%
+    \egroup
+    \par
   }%
   %% Imprint
   \tpSetProperty{imprint-face}{\footnotesize}%
@@ -412,15 +455,25 @@
     \tpUseProperty{imprint-sep}%
     \tpGetComp{EnvDisclaimer}%
   }%
+  \tpSetProperty{journal-meta}{%
+    \tpUseLabeledComp{Submitted}%
+    \tpUseLabeledComp{Received}%
+    \tpUseLabeledComp{Revised}%
+    \tpUseLabeledComp{Accepted}%
+    \tpUseLabeledComp{Published}%
+    \tpUseLabeledComp{Copyright}%
+    \tpUseLabeledComp{COIStatement}%
+    \tpUseLabeledComp{Keywords}
+  }%
   \tpSetProperty{licence}{%
     \tpIfComp{LicenceLogo}{\includegraphics{\tpUseComp{LicenceLogo}}\par}{}%
     \tpGetComp{LicenceText}%
-  }
+  }%
   \tpSetProperty{copyright}{%
     \tpIfComp{Copyright}
       {\tpUseComp{Copyright}\par}
       {\textcopyright\space\tpUseComp{Year}\space\tpUseComp{Publisher},\space\tpUseComp{PubPlace}\par}%
-    }
+    }%
   \tpSetProperty{publisher}{%
     \tpGetComp{PubDivInfo}%
     \tpUseProperty{copyright}%
@@ -428,8 +481,8 @@
     \tpGetComp{PubWeb}%
   }%
   % Name Formats
-  \tpSetProperty{counted-meta-sep}{\ifnum\tpCurCount<\tpTotalCount\relax\vskip\baselineskip\fi}%
-  \tpSetProperty{counted-name-sep}{%
+  \tpSetProperty{counted-meta-sep}{\ifnum\tpCurCount<\tpTotalCount\relax\vskip\baselineskip\fi}% separator between multiple instances of the same meta datum
+  \tpSetProperty{counted-name-sep}{% Separator between multiple names; titlepage-specific override of the same Property in coco-meta!
     \ifnum\tpTotalCount>1\relax
       \ifnum\tpCurCount<\tpTotalCount\relax
         \ifnum\tpCurCount<\numexpr\tpTotalCount-1\relax
@@ -440,23 +493,28 @@
       \fi
     \fi
   }%
-  \tpSetProperty{name-bio-block-format}{\tpUseComp{BioBlock}\par}
-  \tpSetProperty{name-bio-format}{%
-    {\bfseries\tpUseComp{FullName}:}\space%
-    \tpUseComp{Bio}%
-  }%
-  \tpPropertyLet{author-list-format}            {name-list-format}% Override for single author names
-  \tpPropertyLet{author-bio-format}             {name-bio-format}% Override for single author meta info (this one is titlepage specific and may look different in other places where tpAuthor is used!)
-  \tpPropertyLet{author-bio-block-format}       {name-bio-block-format}% Override for single author meta info (this one is titlepage specific and may look different in other places where tpAuthor is used!)
-  \tpPropertyLet{editor-format}                 {name-format}% Override for single editor names
-  \tpPropertyLet{editor-list-format}            {name-list-format}% Override for single editor names
-  \tpPropertyLet{editor-bio-format}             {name-bio-format}% Override for single editor meta info
-  \tpPropertyLet{editor-bio-block-format}       {name-bio-block-format}% Override for single editor meta info
-  \tpPropertyLet{series-editor-format}          {name-format}% Override for single series editor names
-  \tpPropertyLet{series-editor-list-format}     {name-list-format}% Override for single editor names
-  \tpPropertyLet{series-editor-bio-format}      {name-bio-format}% Override for single series editor meta info
-  \tpPropertyLet{series-editor-bio-block-format}{name-bio-block-format}% Override for single series editor meta info
-  % name Separators
+  % Aliasses for different Roles, see coco-meta.sty for the actual Property values:
+  %% editors:
+  \tpPropertyLet{editor-cite-name-format}                 {role-cite-name-format}%
+  \tpPropertyLet{editor-short-cite-name-format}           {role-short-cite-name-format}%
+  \tpPropertyLet{editor-full-name-format}                 {role-full-name-format}%
+  \tpPropertyLet{editor-pdfinfo-name-format}              {role-pdfinfo-name-format}%
+  %
+  \tpPropertyLet{editor-list-print-format}                {role-block-print-format}%
+  \tpPropertyLet{editor-list-cite-format}                 {role-block-cite-format}%
+  \tpPropertyLet{editor-list-short-cite-format}           {role-block-short-cite-format}%
+  \tpPropertyLet{editor-list-pdfinfo-format}              {role-block-pdfinfo-format}%
+  %% series-editors:
+  \tpPropertyLet{series-editor-cite-name-format}          {role-cite-name-format}%
+  \tpPropertyLet{series-editor-short-cite-name-format}    {role-short-cite-name-format}%
+  \tpPropertyLet{series-editor-full-name-format}          {role-full-name-format}%
+  \tpPropertyLet{series-editor-pdfinfo-name-format}       {role-pdfinfo-name-format}%
+  %
+  \tpPropertyLet{series-editor-list-print-format}         {role-block-print-format}%
+  \tpPropertyLet{series-editor-list-cite-format}          {role-block-cite-format}%
+  \tpPropertyLet{series-editor-list-short-cite-format}    {role-block-short-cite-format}%
+  \tpPropertyLet{series-editor-list-pdfinfo-format}       {role-block-pdfinfo-format}%
+  %% name Separators
   \tpSetProperty{editor-suffix-sgl}{(Ed.)}%
   \tpSetProperty{editor-suffix-pl}{(Eds.)}%
   \tpSetProperty{editor-suffix}{%
@@ -467,7 +525,15 @@
       \tpUseProperty{editor-suffix-pl}%
     \fi
   }%
-  % Bio
+  % Biography
+  \tpSetProperty{role-block-bio-format}{\tpUseComp{BioBlock}\par}
+  \tpSetProperty{role-bio-format}{{\bfseries\tpUseComp{FullName}:}\space\tpUseComp{Bio}}%
+  \tpPropertyLet{author-bio-format}             {role-bio-format}%
+  \tpPropertyLet{author-list-bio-format}        {role-block-bio-format}%
+  \tpPropertyLet{editor-bio-format}             {role-bio-format}% Override for single series editor meta info
+  \tpPropertyLet{editor-list-bio-format}        {role-bio-block-format}% Override for single series editor meta info
+  \tpPropertyLet{series-editor-bio-format}      {role-bio-format}% Override for single series editor meta info
+  \tpPropertyLet{series-editor-list-bio-format} {role-bio-block-format}% Override for single series editor meta info
   \tpSetProperty{bio-block}{%
     \tpGetComp{AuthorBioBlock}%
     \tpGetComp{EditorBioBlock}%
