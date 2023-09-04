@@ -208,6 +208,8 @@
             \edef\@tempb{%
               %% top-level counter for user interaction
               \noexpand\tpCurCount=\the\@tempcnta
+              %% evaluating group attributes
+              \ifcsdef{tp@\tp@cur@cont @#1-\the\@tempcnta @attrs}{\noexpand\tpParseAttributes{#1-\the\@tempcnta}{\csname tp@\tp@cur@cont @#1-\the\@tempcnta @attrs\endcsname}}{}
               %% internal counter for macro grabbing
               \noexpand\csnumdef{#1Cnt}{\tpCurCount}%
               \noexpand\tpUseProperty{#2}}%
@@ -235,6 +237,7 @@
         \tpToggleCountedCond
         \def\tp@cnt@grp{#1}%
         \csnumdef{#1Cnt}{\the\@tempcnta}%
+        \ifcsdef{tp@\tp@cur@cont @#1-\the\@tempcnta @attrs}{\tpParseAttributes{#1-\the\@tempcnta}{\csname tp@\tp@cur@cont @#1-\the\@tempcnta @attrs\endcsname}}{}
         \tpCurCount=\the\@tempcnta
         \protected@xdef\@tempb{\csname tp@\tp@cur@cont @#2\endcsname}%
         \@temptokena \expandafter{\@tempb}%

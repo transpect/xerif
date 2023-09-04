@@ -66,9 +66,10 @@
     \tpDeclareCountedComp{MidName}%
     \tpDeclareCountedComp{PersonPrefix}%
     \tpDeclareCountedComp{ORCID}%
-    \tpDeclareCountedComp{AffilRef}%
-    \tpDeclareCountedComp{Affiliation}%
+    \tpDeclareCountedComp{AffilRef}% for references to the tpAffil Group
+    \tpDeclareCountedComp{Affiliation}% for affiliations  as direct tpAuthor meta data
     \tpDeclareCountedComp{Email}%
+    \tpDeclareCountedComp{CorrespondenceAs}%
   }%
   \tpGroupHandler{tp#2}{%
     \tpIfComp{FullName}{}{\tpFullName{\tpUseProperty{#1-full-name-format}}}%
@@ -76,15 +77,17 @@
     \tpIfComp{CiteName}{}{\tpCiteName{\tpUseProperty{#1-cite-name-format}}}%
     \tpIfComp{ShortCiteName}{}{\tpShortCiteName{\tpUseProperty{#1-short-cite-name-format}}}%
     \tpIfComp{PDFInfoName}{}{\tpPDFInfoName{\tpUseProperty{#1-pdfinfo-name-format}}}%
+    \tpIfComp{CorrespondenceAs}{}{\tpCorrespondenceAs{\tpUseProperty{#1-correspondence-as-format}}}%
     \tpIfComp{AffilRef}{\tpIfComp{Affiliation}{%
         \tpPackageError{Meta}{Ambiguity}
-          {You cannot use both Containers \string\tpAffilRef\space and \string\tpAffiliation\space in the same `tpAuthor' Sub-Container}
-          {At least one `tpAuthor' Sub-Container contains both \string\tpAffilRef\space and \string\tpAffiliation. This is not allowed. Please decide for one affiliation strategy: Either two lists with cross-references, or affiliations directly as an author's meta-data.}}{}}{}%
+          {You cannot use both Containers \string\tpAffilRef\space and \string\tpAffiliation\space in the same `tp#2' Sub-Container}
+          {At least one `tp#2' Sub-Container contains both \string\tpAffilRef\space and \string\tpAffiliation. This is not allowed. Please decide for one affiliation strategy: Either two lists with cross-references, or affiliations directly as an author's meta-data.}}{}}{}%
   }%
   \tpDeclareRoleBlock{#2}{NameList}{#1-list-print-format}%
   \tpDeclareRoleBlock{#2}{CitationList}{#1-list-cite-format}%
   \tpDeclareRoleBlock{#2}{ShortCitationList}{#1-list-short-cite-format}%
   \tpDeclareRoleBlock{#2}{PDFInfo}{#1-list-pdfinfo-format}%
+  \tpDeclareRoleBlock{#2}{Correspondence}{#1-list-correspondence-format}%
 }
 \def\tpAddToRole#1#2{%
   \csgappto{@tp#1@hook}{#2}%
@@ -96,23 +99,18 @@
     \tp@meta@role@compose{#1}{NameList}%
     \tp@meta@role@compose{#1}{CitationList}%
     \tp@meta@role@compose{#1}{ShortCitationList}%
+    \tp@meta@role@compose{#1}{Correspondence}%
     \tp@meta@role@apply{#1}{PDFInfo}%
   }}
 \def\@tp@meta@role@eval#1#2#3{%
   \tpIfComp{#2#3}{}{%
     \ifcsdef{tp#2Cnt}
       {\expandafter\ifnum\csname tp#2Cnt\endcsname>\z@
-          \tp@eval@role@attrs{#2}%
           #1{tp#2}{\csname tp@meta@role@#2@#3\endcsname}{#2#3}%
         \fi
       }{}}}
 \def\tp@meta@role@apply#1#2{\@tp@meta@role@eval\tpApplyCollection{#1}{#2}}
 \def\tp@meta@role@compose#1#2{\@tp@meta@role@eval\tpComposeCollection{#1}{#2}}
-\def\tp@eval@role@attrs#1{%
-    \tp@iterate{\@tempcnta}{\@ne}{\csname tp#1Cnt\endcsname}{%
-      \ifcsdef{tp@meta@#1-\the\@tempcnta @attrs\endcsname}{%
-        \tpParseAttributes{#1-\the\@tempcnta }{\csname tp@meta@#1-\the\@tempcnta @attrs\endcsname}%
-      }{}}}
 \def\tpDeclareLabeledComp{\tp@opt@empty\tp@declare@labeled@comp}
 \def\tp@declare@labeled@comp[#1]#2#3{%
   \tpDeclareComp{#2}{\expandafter\global}{}%
@@ -176,28 +174,41 @@
   \tpSetProperty{role-cite-name-format}{\tpUseComp{LastName},~\tpUseComp{Initial}}% How CiteName for each name is built
   \tpSetProperty{role-short-cite-name-format}{\tpUseComp{LastName}}% how ShortCiteName for each name is built
   \tpPropertyLet{role-pdfinfo-name-format}{role-cite-name-format}% How PDFInfoName for each item is built
+  \tpSetProperty{role-correspondence-as-format}{\tpUseComp{Email}}% How PDFInfoName for each item is built
   %% Properties that control how the single items in a compoent list are formatted:
   \tpSetProperty{role-block-print-format}{\tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How <Role>NameList for each name is build
   \tpSetProperty{role-block-cite-format}{\tpUseComp{CiteName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How each item in Component <Role>CitationList is formatted
   \tpSetProperty{role-block-short-cite-format}{\tpUseComp{ShortCiteName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}%  How each item in the Component <Role>ShortCitationList is formatted
   \tpSetProperty{role-block-pdfinfo-format}{\tpUseComp{PDFInfoName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi}% How each item in the Component <Role>PDFInfo is formatted
+  \tpSetProperty{role-block-correspondence-format}{%
+    \tpIfAttrIsset{\tp@cnt@grp-\the\tpCurCount}{corresp}
+      {\ifx\is@first@corresp\relax
+         \tpUseProperty{corresp-sep}%
+       \else
+         \global\let\is@first@corresp\relax
+       \fi
+       \tpUseComp{CorrespondenceAs}%
+     }{}}% How each item in the Component <Role>Correspondence is formatted
   % Aliasses
   % for Role "Author":
   \tpPropertyLet{author-cite-name-format}            {role-cite-name-format}%
   \tpPropertyLet{author-short-cite-name-format}      {role-short-cite-name-format}%
   \tpPropertyLet{author-full-name-format}            {role-full-name-format}%
   \tpPropertyLet{author-pdfinfo-name-format}         {role-pdfinfo-name-format}%
+  \tpPropertyLet{author-correspondence-as-format}    {role-correspondence-as-format}%
   %
-  \tpPropertyLet{author-list-print-format}      {role-block-print-format}%
-  \tpPropertyLet{author-list-cite-format}       {role-block-cite-format}%
-  \tpPropertyLet{author-list-short-cite-format} {role-block-short-cite-format}%
-  \tpPropertyLet{author-list-pdfinfo-format}    {role-block-pdfinfo-format}%
+  \tpPropertyLet{author-list-print-format}           {role-block-print-format}%
+  \tpPropertyLet{author-list-cite-format}            {role-block-cite-format}%
+  \tpPropertyLet{author-list-short-cite-format}      {role-block-short-cite-format}%
+  \tpPropertyLet{author-list-pdfinfo-format}         {role-block-pdfinfo-format}%
+  \tpPropertyLet{author-list-correspondence-format}  {role-block-correspondence-format}%
   %
   \tpSetProperty{counted-name-sep}{,\space}%
   \tpSetProperty{name-and}{\space and\space}%
   \tpSetProperty{name-etal}{\space et~al.}%
   \tpSetProperty{name-sep}{,\space}%
   \tpSetProperty{corresp-mark}{*}%
+  \tpSetProperty{corresp-sep}{,\space}%
   %
   % Affiliation Properties
   %

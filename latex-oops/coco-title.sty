@@ -170,10 +170,6 @@
     \def\tp@cur@cont{titlepage}%
     \tpComposeCollection{tpFunding}{fund-format}{FundingBlock}%
 }}
-\def\tp@title@eval@corresp#1#2{%
-  \tpIfAttr{#1-#2}{corresp}
-    {\tpUseProperty{corresp-mark}}
-    {}}
 \def\tp@title@eds@eval#1{%
   \tp@meta@role@eval{#1}%
   \tpApplyCollection{tp#1}{\csname tp@meta@role@#1@BioBlock\endcsname}{#1BioBlock}%
@@ -495,25 +491,29 @@
   }%
   % Aliasses for different Roles, see coco-meta.sty for the actual Property values:
   %% editors:
-  \tpPropertyLet{editor-cite-name-format}                 {role-cite-name-format}%
-  \tpPropertyLet{editor-short-cite-name-format}           {role-short-cite-name-format}%
-  \tpPropertyLet{editor-full-name-format}                 {role-full-name-format}%
-  \tpPropertyLet{editor-pdfinfo-name-format}              {role-pdfinfo-name-format}%
+  \tpPropertyLet{editor-cite-name-format}                   {role-cite-name-format}%
+  \tpPropertyLet{editor-short-cite-name-format}             {role-short-cite-name-format}%
+  \tpPropertyLet{editor-full-name-format}                   {role-full-name-format}%
+  \tpPropertyLet{editor-pdfinfo-name-format}                {role-pdfinfo-name-format}%
+  \tpPropertyLet{editor-correspondence-as-format}           {role-correspondence-string-format}%
   %
-  \tpPropertyLet{editor-list-print-format}                {role-block-print-format}%
-  \tpPropertyLet{editor-list-cite-format}                 {role-block-cite-format}%
-  \tpPropertyLet{editor-list-short-cite-format}           {role-block-short-cite-format}%
-  \tpPropertyLet{editor-list-pdfinfo-format}              {role-block-pdfinfo-format}%
+  \tpPropertyLet{editor-list-print-format}                  {role-block-print-format}%
+  \tpPropertyLet{editor-list-cite-format}                   {role-block-cite-format}%
+  \tpPropertyLet{editor-list-short-cite-format}             {role-block-short-cite-format}%
+  \tpPropertyLet{editor-list-pdfinfo-format}                {role-block-pdfinfo-format}%
+  \tpPropertyLet{editor-list-correspondence-format}         {role-block-correspondence-format}%
   %% series-editors:
-  \tpPropertyLet{series-editor-cite-name-format}          {role-cite-name-format}%
-  \tpPropertyLet{series-editor-short-cite-name-format}    {role-short-cite-name-format}%
-  \tpPropertyLet{series-editor-full-name-format}          {role-full-name-format}%
-  \tpPropertyLet{series-editor-pdfinfo-name-format}       {role-pdfinfo-name-format}%
+  \tpPropertyLet{series-editor-cite-name-format}            {role-cite-name-format}%
+  \tpPropertyLet{series-editor-short-cite-name-format}      {role-short-cite-name-format}%
+  \tpPropertyLet{series-editor-full-name-format}            {role-full-name-format}%
+  \tpPropertyLet{series-editor-pdfinfo-name-format}         {role-pdfinfo-name-format}%
+  \tpPropertyLet{series-editor-correspondence-as-format}    {role-correspondence-as-format}%
   %
-  \tpPropertyLet{series-editor-list-print-format}         {role-block-print-format}%
-  \tpPropertyLet{series-editor-list-cite-format}          {role-block-cite-format}%
-  \tpPropertyLet{series-editor-list-short-cite-format}    {role-block-short-cite-format}%
-  \tpPropertyLet{series-editor-list-pdfinfo-format}       {role-block-pdfinfo-format}%
+  \tpPropertyLet{series-editor-list-print-format}           {role-block-print-format}%
+  \tpPropertyLet{series-editor-list-cite-format}            {role-block-cite-format}%
+  \tpPropertyLet{series-editor-list-short-cite-format}      {role-block-short-cite-format}%
+  \tpPropertyLet{series-editor-list-pdfinfo-format}         {role-block-pdfinfo-format}%
+  \tpPropertyLet{series-editor-list-correspondence-format}  {role-block-correspondence-format}%
   %% name Separators
   \tpSetProperty{editor-suffix-sgl}{(Ed.)}%
   \tpSetProperty{editor-suffix-pl}{(Eds.)}%
