@@ -942,7 +942,7 @@
           <xsl:text>}]</xsl:text>
         </xsl:if>
         <xsl:if test="matches(parent::*/@renderas, 'hub:(no-toc|no-pdf-bookmarks)')">
-          <option select="replace(string-join(tokenize(parent::*/@renderas, '((hub:|sect\d)\s?)+' ), ''), '-', '')"/>
+          <option select="xml2tex:sect-renderas-to-option(parent::*/@renderas)"/>
         </xsl:if>
         <param select="tr:heading-level(parent::*)"/>
         <xsl:apply-templates select="(dbk:authorgroup | dbk:author), dbk:title" mode="#current"/>
@@ -1640,7 +1640,20 @@
     </xsl:if>
   </xsl:function>
 
-
+  <xsl:function name="xml2tex:sect-renderas-to-option" as="xs:string?">
+    <xsl:param name="renderas" as="attribute(renderas)?"/>
+    <xsl:sequence select="replace(
+                            string-join(
+                              for $opt in tokenize(
+                                            $renderas,
+                                            '((hub:|sect\d)\s*)+' 
+                                          )[normalize-space()]
+                              return if($opt eq 'no-pdf-bm') then 'noBM' else normalize-space($opt), 
+                              ','
+                            ), 
+                            '-', ''
+                          )"/>
+  </xsl:function>
 
   <template context="*:table">
     <!-- html or dbk tables-->
