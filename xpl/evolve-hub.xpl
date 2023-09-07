@@ -23,14 +23,27 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/dynamic-transformation-pipeline.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
+  
+  <tr:simple-progress-msg name="evolve-hub-start-msg" file="evolve-hub-start.txt">
+    <p:input port="source">
+      <p:pipe port="source" step="tx-evolve-hub"/>
+    </p:input>
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Starting flat Hub XML to evolved Hub XML conversion</c:message>
+          <c:message xml:lang="de">Beginne Konvertierung von flachem Hub XML zu angereichertem Hub XML</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:simple-progress-msg>
   
   <tr:dynamic-transformation-pipeline name="evolve-hub-dyn" 
                                       load="evolve-hub/driver-docx"
                                       fallback-xpl="http://this.transpect.io/a9s/common/evolve-hub/driver-docx.xpl"
                                       fallback-xsl="http://this.transpect.io/a9s/common/evolve-hub/driver-docx.xsl">
-    <p:input port="source">
-      <p:pipe port="source" step="tx-evolve-hub"/>
-    </p:input>
     <p:input port="paths">
       <p:pipe port="parameters" step="tx-evolve-hub"/>
     </p:input>
@@ -40,5 +53,17 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tr:dynamic-transformation-pipeline>
+
+  <tr:simple-progress-msg name="evolve-hub-end-msg" file="evolve-hub-end.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Successfully finished flat Hub XML to evolved Hub XML conversion</c:message>
+          <c:message xml:lang="de">Konvertierung von flachem Hub XML zu angereichertem Hub XML erfolgreich abgeschlossen</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:simple-progress-msg>
   
 </p:declare-step>

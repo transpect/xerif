@@ -30,6 +30,19 @@
   
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
   <p:import href="http://transpect.io/xml2tex/xpl/xml2tex.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
+
+  <tr:simple-progress-msg name="load-xml2tex-config-msg" file="load-xml2tex-config.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Loading xml2tex configuration</c:message>
+          <c:message xml:lang="de">Lade Konfiguration von xml2tex</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:simple-progress-msg>
   
   <tr:load-cascaded name="load-latex-conf" filename="xml2tex/latex.conf.xml">
     <p:with-option name="debug" select="$debug" />
@@ -40,6 +53,18 @@
   </tr:load-cascaded>
   
   <p:sink/>
+
+  <tr:simple-progress-msg name="xml2tex-start-msg" file="xml2tex-start.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Starting xml2tex conversion</c:message>
+          <c:message xml:lang="de">Beginne xml2tex-Konvertierung</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:simple-progress-msg>
   
   <xml2tex:convert name="hub2tex">
     <p:documentation>Converts the hub XML to TeX according to the xml2tex configuration file.</p:documentation>
@@ -61,5 +86,18 @@
                        should be yes if common framework latex is used</p:documentation>
     </p:with-option>
   </xml2tex:convert>
+
+  <tr:simple-progress-msg name="xml2tex-end-msg" file="xml2tex-end.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Successfully finished xml2tex conversion</c:message>
+          <c:message xml:lang="de">xml2tex-Konvertierung erfolgreich abgeschlossen</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:simple-progress-msg>
+
   
 </p:declare-step>
