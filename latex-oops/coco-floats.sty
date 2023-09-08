@@ -61,8 +61,8 @@
 \newdimen\tp@calc@flt@width   \tp@calc@flt@width=\tp@total@flt@width\relax
 \newdimen\tp@total@flt@height \tp@total@flt@height=\textwidth\relax
 \newdimen\tp@total@flt@depth  \tp@total@flt@depth=\textwidth\relax
-\newdimen\tp@flt@sep@top      \tp@flt@sep@top=\z@\relax
-\newdimen\tp@flt@sep@bottom   \tp@flt@sep@bottom=\z@\relax
+\newskip\tp@flt@sep@top      \tp@flt@sep@top=\z@\relax
+\newskip\tp@flt@sep@bottom   \tp@flt@sep@bottom=\z@\relax
 \newdimen\tp@flt@marg@r       \tp@flt@marg@r=\z@\relax
 \newdimen\tp@flt@marg@l       \tp@flt@marg@l=\z@\relax
 \newdimen\tp@flt@marg@i       \tp@flt@marg@i=\z@\relax
@@ -125,14 +125,18 @@
   \ifx\tp@do@dblfloat\relax
     \ifx\tp@fps\@empty\def\tp@fps{htpb!}\fi% 11514
     \linewidth\dimexpr2\columnwidth+\columnsep\relax
+    \hsize\linewidth\relax
   \fi
   \tpIfAttrStr{#1}{orientation}{landscape}
-  {\linewidth\textheight
-   \def\tp@fps{p}}{}}
+    {\linewidth\textheight
+     \hsize\linewidth
+     \def\tp@fps{p}}
+    {}}
 \def\tp@set@flt@env{%
   \ifx\tp@fps\@empty
     \let\tp@b@float\relax
     \let\tp@e@float\relax
+    \ifhmode\par\fi
   \else
     \let\tp@b@float\tp@captype%
     \tpIfAttrStr{\tp@captype}{orientation}{landscape}
@@ -170,8 +174,7 @@
   \else
     \expandafter\tp@flt@sep@top\dimexpr\tpUseProperty{float-skip-top}\relax%
   \fi
-    \tpIfAttrStr{\tp@captype}{orientation}{landscape}
-      {}
+    \tpIfAttrStr{\tp@captype}{orientation}{landscape}{}
       {\ifx\tp@fps\@empty
          \expandafter\tp@flt@sep@bottom\dimexpr\tpUseProperty{intext-skip-bottom}\relax%
        \else
@@ -211,13 +214,13 @@
     \tpMakeFltCompL{Legend}%
     \tpMakeFltCompL{Source}%
     \tpMakeFltCompL{Number}%
-    \tpMakeFltComp{label}%
+    \tpMakeFltComp{RefLabel}%
     \tpMakeFltComp{AltText}% neu: 2023-06-08; TODO: muss noch implementiert werden
   }%
   \tpDeclareType{Properties}{\tp@float@default}%
 }
-\long\def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
-\def\@tpDeclareFloat[#1]#2#3#4#5{%
+\def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
+\long\def\@tpDeclareFloat[#1]#2#3#4#5{%
   \def\tp@float@parent{#1}%
   \ifcsdef{tp@container@#2}{%
     \tpPackageInfo{Floats}{}{Appending to `#2'}%
@@ -243,7 +246,7 @@
           \def\tp@caplisttype{#4}%
         }% /FloatEnvInfo
         \tpDeclareEnv[#2]{\tp@float}{\endtp@float}%
-        \tpDeclareEnv[#2*]{\let\tp@do@dblfloat\relax\tp@float}{\let\tp@do@dblfloat\relax\endtp@float}%
+        \tpDeclareEnv[#2*]{\if@twocolumn\let\tp@do@dblfloat\relax\else\fi\tp@float}{\if@twocolumn\let\tp@do@dblfloat\relax\fi\endtp@float}%
         \tpDeclareType{Components}{%
           \tpUseProperty{float-handler}%
         }%
@@ -366,16 +369,16 @@
 \def\tp@make@anchor#1{%
   \bgroup
     \tpSubFloatCnt#1\relax
-    \tpIfComp{Label}
+    \tpIfComp{RefLabel}
       {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname}
       {\edef\@currentlabel{tp-\tp@cur@cont-number-\the\tp@int@flt@cnt}}%
     \expandafter\H@refstepcounter\expandafter{\tp@captype}%
     \expandafter\hyper@makecurrent\expandafter{\tp@captype}%
     \global\let\Hy@tempa\Hy@float@caption
     \expandafter\hyper@@anchor\expandafter{\@currentHref}{\relax}%
-    \tpIfComp{Label}
+    \tpIfComp{RefLabel}
       {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname
-       \edef\@tempa{\tpUseComp{Label}}%
+       \edef\@tempa{\tpUseComp{RefLabel}}%
        \expandafter\tpltx@label\expandafter{\@tempa}}{\relax}%
   \egroup}
 \def\tp@float{\tp@opt@empty\@tp@float}

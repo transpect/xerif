@@ -74,7 +74,7 @@
   \expandafter\x\endgroup
 }
 \@onlypreamble\tpDeclareContainer
-\def\tpAddToType#1#2#3{\csgappto{tp@type@#1@#2}{#3}}
+\def\tpAddToType#1#2{\csgappto{tp@type@#1@#2}}
 \def\tpEvalType{\tp@opt@curcont\tp@eval@type}
 \def\tp@eval@type[#1]#2{%
   \expandafter\ifx\csname tp@type@#2@#1\endcsname\relax
@@ -149,6 +149,8 @@
 \def\tpUseGComp#1#2{\csname tp@#1@#2\endcsname}
 \def\tpGetComp#1{\tpIfComp{#1}{\tpUseComp{#1}\par}{}}
 \long\def\tpIfComp#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else#2\fi}
+\long\def\tpWhenComp#1#2{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax\else#2\fi}
+\long\def\tpUnlessComp#1#2{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#2\fi}
 \long\def\tpIfGComp#1#2#3#4{\expandafter\ifx\csname tp@#1@#2\endcsname\relax#4\else#3\fi}
 \long\def\long@empty{}
 \long\def\tpIfCompEmpty#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\long@empty#2\else#3\fi}
