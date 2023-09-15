@@ -196,7 +196,7 @@
   <xsl:variable name="doc-class"     as="xs:string" 
                 select="concat('\documentclass[',
                                string-join(($babel-langs[position() ne 1],
-                                            $greek,
+                                            $greek[normalize-space()],
                                             $babel-langs[1]), (: 1st lang is main lang and comes last :)
                                             ','),
                                $pubtype-value, 
