@@ -2,7 +2,7 @@
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
   xmlns:c="http://www.w3.org/ns/xproc-step" 
   xmlns:cx="http://xmlcalabash.com/ns/extensions"
-  xmlns:cxf="http://xmlcalabash.com/ns/extensions/fileutils"
+  xmlns:pxf="http://exproc.org/proposed/steps/file"
   xmlns:tr="http://transpect.io"
   xmlns:hub="http://transpect.io/hub"
   xmlns:dbk="http://docbook.org/ns/docbook"
@@ -39,10 +39,20 @@
               select="/dbk:hub/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-basename']"/>
   <p:variable name="outdir" 
               select="replace(/dbk:hub/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri'], 
-                              '^(.+/).+?\.docx.tmp/', '$1')"/>
+                      '^(.+/).+?\.docx.tmp/', '$1')"/>
+  <p:variable name="image-dir"
+	      select="concat($outdir, 'images')"/>
   <p:variable name="format" select="'jpg'"/>
+
+  <pxf:mkdir name="create-image-dir">
+    <p:with-option name="fail-on-error" select="$fail-on-error"/>
+    <p:with-option name="href" select="$image-dir"/>
+  </pxf:mkdir>
   
   <tr:store-debug name="debug-before-copy-images" pipeline-step="copy-images/02_before">
+    <p:input port="source">
+      <p:pipe port="source" step="copy-images"/>
+    </p:input>
     <p:with-option name="active" select="$debug"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
@@ -51,7 +61,7 @@
   <p:viewport match="dbk:imagedata[@fileref]" name="single-image-scope">
     
     <cx:message name="msg">
-      <p:with-option name="message" select="'[info] ', dbk:imagedata[@fileref]/@fileref, ' => ', $outdir"/>
+      <p:with-option name="message" select="'[info] ', dbk:imagedata[@fileref]/@fileref, ' => ', $image-dir"/>
     </cx:message>
     
     <p:choose name="file-uri">
@@ -60,7 +70,7 @@
         
         <tr:file-uri name="download-file" fetch-http="true">
           <p:with-option name="filename" select="dbk:imagedata/@fileref"/>
-          <p:with-option name="tmpdir" select="concat($outdir, replace(dbk:imagedata/@fileref, '^.+/(.+?)$', '$1'))"/>
+          <p:with-option name="tmpdir" select="concat($image-dir, replace(dbk:imagedata/@fileref, '^.+/(.+?)$', '$1'))"/>
         </tr:file-uri>
         
       </p:when>
@@ -120,7 +130,7 @@
         
         <tr:imagemagick name="convert-image">
           <p:with-option name="href" select="/c:result/@local-href"/>
-          <p:with-option name="outdir" select="$outdir"/>
+          <p:with-option name="outdir" select="$image-dir"/>
           <p:with-option name="format" select="$format"/>
           <p:with-option name="imagemagick-options" select="'-colorspace rgb -background white -flatten'"/>
           <p:with-option name="debug" select="$debug"/>
@@ -130,7 +140,7 @@
         
         <p:group>
           <p:variable name="output-path" 
-                      select="concat($outdir,
+                      select="concat($image-dir,
 			             '/',
 			             $xml-basename,
 				     '_',
@@ -144,11 +154,11 @@
             <p:with-option name="message" select="concat('[info] move: ', /c:result/@os-path, ' => ', $output-path)"/>
           </cx:message>
           
-          <cxf:move cx:depends-on="convert-image" name="move">
+          <pxf:move cx:depends-on="convert-image" name="move">
             <p:with-option name="href" select="/c:result/@os-path"/>
             <p:with-option name="target" select="$output-path-normalized"/>
             <p:with-option name="fail-on-error" select="$fail-on-error"/>
-          </cxf:move>
+          </pxf:move>
           
           <p:string-replace match="dbk:imagedata/@fileref" name="replace">
             <p:input port="source">
