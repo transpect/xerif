@@ -1544,8 +1544,7 @@
         * -->
 
   <xsl:template match="dbk:info/dbk:biblioset" mode="xml2tex">
-    <!--<xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="#current"/>-->
-        <xsl:apply-templates select="dbk:biblioid[@role = 'tsmetachunkdoi']" mode="xml2tex"/>
+    <xsl:apply-templates select="dbk:biblioid[matches(@role, '^([a-z]{1,3})?metachunkdoi')]" mode="xml2tex"/>
     <xsl:if test="dbk:legalnotice[normalize-space()]">
       <!-- several paras have to be merged to one makro -->
       <xsl:text>&#xa;\tpCopyright{</xsl:text>
@@ -1558,7 +1557,7 @@
 
   </xsl:template>
 
-  <template context="dbk:info/dbk:biblioset/dbk:biblioid[@role = 'tsmetachunkdoi']">
+  <template context="dbk:info/dbk:biblioset/dbk:biblioid[matches(@role, '^([a-z]{1,3})?metachunkdoi')]">
    <!-- tpDOITitle also available-->
     <rule name="tpDOI" type="cmd" break-before="1" break-after="0">
       <param/>
