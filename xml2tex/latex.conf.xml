@@ -2252,7 +2252,7 @@
         * dialogue
         * -->
   
-  <template context="dbk:blockquote[@role='dialogue']">
+  <template context="dbk:blockquote[@role='dialogue' or @role[matches(., $dialogue-style)]]">
     <rule name="dialog" type="env">
       <text/>
     </rule>
