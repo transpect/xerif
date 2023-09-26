@@ -695,7 +695,7 @@
   </xsl:template>
 
   <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][empty(preceding-sibling::dbk:para)][1] | 
-                    /*/dbk:para[1][following-sibling::*[self::dbk:part | self::dbk:chapter | self::dbk:section]]" priority="301">
+                    /*/dbk:para[1][following-sibling::*[self::dbk:part | self::dbk:chapter | self::dbk:section]]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
