@@ -646,7 +646,7 @@
   \bgroup
     \let\includegraphics\tp@includesubgraphics
     \ifcsstring{tp@\tp@captype @attr@orientation}{landscape}
-      {\let\hsize\textwidth}%
+      {\hsize\dimexpr\textwidth-\tp@flt@marg@r\relax}%
       {}%
     \hskip\tp@flt@marg@l
     \strut\tpUseComp{Fig}\strut
