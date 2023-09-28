@@ -50,8 +50,6 @@
   <!-- https://redmine.le-tex.de/issues/12115 
        fix issue where list of tables was wrapped inside the section of list of figures -->
   
-  <xsl:variable name="part-heading-role-regex" select=" '^[a-z]{1,3}headingpart$'"/>
-  
   <xsl:template match="hub/section[matches(@role, $part-heading-role-regex)]" mode="hub:postprocess-hierarchy">
     <part>
       <xsl:apply-templates select="@*, node()" mode="#current"/>

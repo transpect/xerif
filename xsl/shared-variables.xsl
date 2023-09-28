@@ -85,6 +85,9 @@
   <xsl:variable name="list-of-tables-regex" as="xs:string"
                 select="'^[a-z]{1,3}listoftables$'"/>
   
+  <xsl:variable name="part-heading-role-regex" as="xs:string" 
+                select=" '^[a-z]{1,3}headingpart$'"/>
+  
   <xsl:variable name="frontmatter-heading-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}frontmatter\d$'"/>
   
