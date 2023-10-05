@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.12}%
-\def\filedate{2023-07-10}%
+\def\fileversion{0.2.13}%
+\def\filedate{2023-10-05}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -2279,7 +2279,13 @@
   \repeat
   \ifnum\ht@min@p@rows=\z@\relax\let\ht@min@p@rows\@ne\relax\fi
   \expandafter\ifnum\numexpr\ht@currow-\ht@theadrows-\ht@tfootrows\relax>\ht@min@p@rows\relax
-    \ifnum\ht@currow=\ht@last@break@row\else
+    \ifnum\ht@currow=\ht@last@break@row\relax
+      \ht@warnmsg{Spanned row block in \string##Tab\the\ht@curtab\space too large for page!}
+      \global\ht@init@pagegoal=\textheight\relax
+      \global\advance\ht@init@pagegoal-\htInitSkip\relax
+      \global\let\ht@used@footins@tolerance\@undefined
+      \global\ht@currow\numexpr\ht@tempcnta+\@ne\relax
+    \else
       \ht@prepare@break
     \fi
   \else
