@@ -355,7 +355,7 @@
   
   <xsl:template match="blockquote[para[matches(@role, $info-blockquote-roles)]]" mode="hub:clean-hub">
     <epigraph role="motto">
-      <xsl:apply-templates select="node()"/>
+      <xsl:apply-templates select="node()"  mode="#current"/>
       <xsl:copy-of select="following-sibling::*[1][self::para[matches(@role, $info-blockquote-source-roles)]]"/>
     </epigraph>
   </xsl:template>
