@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.7}%
-\def\filedate{2022-07-12}%
+\def\fileversion{0.2.13}%
+\def\filedate{2023-10-05}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -762,36 +762,56 @@
     \GetCascCellProp{hAlign}{text-align}%
     \GetCascCellProp{Hyphen}{hyphen}%
   \csname ht@halign@\hAlign @\Hyphen\endcsname}
+\def\ht@set@alignment{%
+  \let\centering\ht@halign@center@none
+  \let\raggedleft\ht@halign@right@none
+  \let\raggedright\ht@halign@left@none
+  \let\Centering\ht@halign@center@auto
+  \let\RaggedLeft\ht@halign@right@auto
+  \let\RaggedRight\ht@halign@left@auto
+  \let\justified\ht@halign@justified@auto
+}
 
 \def\ht@halign@center@none{%
-  \let\\\@centercr
-  \rightskip\z@\@plus1fill\relax
+  \@rightskip\z@\@plus1fill\relax
+  \rightskip\@rightskip
   \leftskip\z@\@plus1fill\relax
   \parindent\z@
   \parfillskip\z@skip}
 \def\ht@halign@center@auto{%
-  \leftskip\@flushglue\relax
-  \rightskip\@flushglue\relax
+  \leftskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@\@plus\tw@ em\relax
+  \rightskip\@rightskip
   \parfillskip\z@skip\relax
   }
 \def\ht@halign@justified@auto{%
   \leftskip\z@\relax
-  \rightskip\z@\relax}
+  \@rightskip\z@\relax
+  \rightskip\@rightskip
+  \parfillskip\@flushglue
+}
 \let\ht@halign@justified@none\ht@halign@justified@auto
 \def\ht@halign@left@none{%
   \leftskip\z@\relax
-  \rightskip\z@\@plus1fill\relax}
+  \@rightskip\@flushglue
+  \rightskip\@rightskip
+  \relax}
 \def\ht@halign@left@auto{%
   \leftskip\z@skip\relax
-  \rightskip\@flushglue\relax
+  \@rightskip\z@\@plus\tw@ em\relax
+  \rightskip\@rightskip
   \parfillskip\@flushglue\relax
 }
 \def\ht@halign@right@none{%
-  \leftskip\z@\@plus1fill\relax
-  \rightskip\z@skip\relax}
-\def\ht@halign@right@auto{%
   \leftskip\@flushglue\relax
-  \rightskip\z@skip\relax
+  \@rightskip\z@skip\relax
+  \rightskip\@rightskip
+  \parfillskip\z@\relax
+}
+\def\ht@halign@right@auto{%
+  \leftskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@skip\relax
+  \rightskip\@rightskip
   \parfillskip\z@skip\relax
 }
 \def\ht@valign@box#1{%
@@ -997,6 +1017,8 @@
     \global\ht@row@insert@ht\z@
     %% 1. Durchlauf: nat. Höhen berechnen
     \ht@Iterate{\ht@curcol}{1}{\the\ht@maxcol}{{%
+      \ht@eval@props{tr-\the\ht@currow}%
+      \GetRowProp{ht@parent}{parent}%
       \HTEvalCellProps
       \GetCellProp{is@virtual}{virtual}%
       \ht@debugmsg{calcheight}{Calculating height\ifx\is@virtual\relax\else\space (is virtual)\fi.}%
@@ -1489,7 +1511,7 @@
          \csname internal-#1-border-width-left\endcsname
         +\csname internal-#1-border-width-right\endcsname
       \relax
-      \ht@build@padding@box{#1}{#2}%
+      \hb@xt@\hsize{\ht@build@padding@box{#1}{#2}\hss}%
     }%
     \ifx\ht@scope\ht@str@td
       \GetCellProp{internal-background-color}{internal-background-color}%
@@ -1626,6 +1648,7 @@
   \fi
 }
 \def\ht@transform@box#1#2{%
+  \ht@set@alignment
   \ifx\ht@scope\ht@str@td
     \IfCellPropEmpty{internal-rotate}{\ht@align@box{#2}}{%
       \GetCellProp{htRotate}{internal-rotate}%
@@ -1994,6 +2017,7 @@
   \SetCellProp{colspan}{\the\ht@tempcntb}%
   \SetCellProp{rowspan}{\the\ht@tempcnta}}
 
+\newdimen\ht@savsk \ht@savsk\z@
 \newdimen\ht@footnoteheight
 \def\ht@get@footnoteheight{%
   \bgroup
@@ -2017,7 +2041,11 @@
       \addpenalty \interlinepenalty
       \global \vsize \@colroom
     }%
-    \ifx\ht@omit@break\relax\else\pagebreak\fi
+    \ifx\ht@omit@break\relax\else
+      \ht@savsk\lastskip% saving \lastskip
+      \pagebreak
+      \vskip-\ht@savsk\vskip\ht@savsk% restoring \lastskip
+    \fi
   \egroup
   }
 \newtoks\HT@ftn
@@ -2251,7 +2279,13 @@
   \repeat
   \ifnum\ht@min@p@rows=\z@\relax\let\ht@min@p@rows\@ne\relax\fi
   \expandafter\ifnum\numexpr\ht@currow-\ht@theadrows-\ht@tfootrows\relax>\ht@min@p@rows\relax
-    \ifnum\ht@currow=\ht@last@break@row\else
+    \ifnum\ht@currow=\ht@last@break@row\relax
+      \ht@warnmsg{Spanned row block in \string##Tab\the\ht@curtab\space too large for page!}
+      \global\ht@init@pagegoal=\textheight\relax
+      \global\advance\ht@init@pagegoal-\htInitSkip\relax
+      \global\let\ht@used@footins@tolerance\@undefined
+      \global\ht@currow\numexpr\ht@tempcnta+\@ne\relax
+    \else
       \ht@prepare@break
     \fi
   \else
