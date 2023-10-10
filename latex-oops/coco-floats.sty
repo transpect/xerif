@@ -67,6 +67,7 @@
 \newdimen\tp@flt@marg@l       \tp@flt@marg@l=\z@\relax
 \newdimen\tp@flt@marg@i       \tp@flt@marg@i=\z@\relax
 \newdimen\tp@flt@marg@o       \tp@flt@marg@o=\z@\relax
+\newif\if@tp@flt@break@capt   \@tp@flt@break@captfalse
 \def\tp@str@figure{figure}
 \def\tp@str@table{table}
 \def\tp@str@bottom{bottom}
@@ -114,6 +115,7 @@
        \tpUseClass{default}{\tp@captype}%
        \expandafter\tpUseClass\expandafter{\csname tp@#2@attr@class\endcsname}{\tp@captype}}
       {}%
+      \tpIfAttr{#2}{break-caption}{\@tp@flt@break@capttrue}{}%
   \fi
   \tp@get@flt@pos{#2}}
 \def\tp@get@flt@pos#1{%
@@ -225,7 +227,11 @@
   \ifcsdef{tp@container@#2}{%
     \tpPackageInfo{Floats}{}{Appending to `#2'}%
     \ifx\tp@float@parent\@empty\else
-      \tpInherit {Properties,Components} from \tp@float@parent;
+      \tpPackageError{Float}{Type}
+        {Attempt to change parent of pre-existing float^^JContainer `#2'}
+        {You cannot use the optional argument of \string\tpDeclareFloat\space for pre-existing^^J%
+float containers!^^J^^J%
+Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \fi
     \tpAddToType{Properties}{#2}{#5}%
     \tpAddToType{FloatEnvInfo}{#2}{%
@@ -235,29 +241,29 @@
   }{%
     \tpDeclareContainer{#2}{%
       \tpPackageInfo{Floats}{}{Declaring float `#2'}%
-        \ifx\tp@float@parent\@empty
-          \tpInherit {Properties,Components} from tpFloat;
-        \else
-          \tpInherit {Properties,Components} from \tp@float@parent;
-        \fi
-        \tpDeclareType{FloatEnvInfo}{%
-          \tpNamespace{#2}%
-          \def\tp@captype{#3}%
-          \def\tp@caplisttype{#4}%
-        }% /FloatEnvInfo
-        \tpDeclareEnv[#2]{\tp@float}{\endtp@float}%
-        \tpDeclareEnv[#2*]{\if@twocolumn\let\tp@do@dblfloat\relax\else\fi\tp@float}{\if@twocolumn\let\tp@do@dblfloat\relax\fi\endtp@float}%
-        \tpDeclareType{Components}{%
-          \tpUseProperty{float-handler}%
-        }%
-        \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
-        \bgroup
-          \def\tp@cur@cont{#2}%
-          \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
-          \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
-        \egroup
-        \tpDeclareType{Properties}{#5}%
-      }% /container
+      \ifx\tp@float@parent\@empty
+        \tpInherit {Properties,Components} from tpFloat;
+      \else
+        \tpInherit {Properties,Components} from \tp@float@parent;
+      \fi
+      \tpDeclareType{FloatEnvInfo}{%
+        \tpNamespace{#2}%
+        \def\tp@captype{#3}%
+        \def\tp@caplisttype{#4}%
+      }% /FloatEnvInfo
+      \tpDeclareEnv[#2]{\tp@float}{\endtp@float}%
+      \tpDeclareEnv[#2*]{\if@twocolumn\let\tp@do@dblfloat\relax\else\fi\tp@float}{\if@twocolumn\let\tp@do@dblfloat\relax\fi\endtp@float}%
+      \tpDeclareType{Components}{%
+        \tpUseProperty{float-handler}%
+      }%
+      \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
+      \bgroup
+        \def\tp@cur@cont{#2}%
+        \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
+        \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
+      \egroup
+      \tpDeclareType{Properties}{#5}%
+    }% /container
   }% /ifcsdef{tp@app@container@#2}
 }
 \def\tp@flt@generate@listof@handlers#1#2#3{%
@@ -473,9 +479,11 @@
     \par
   \egroup}
 \def\tp@test@caption#1#2#3{%
-  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt#1\relax\tpUseProperty{caption-#3}\relax}%
+  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt#10\relax\tpUseProperty{caption-#3}\relax}%
   \setbox\tp@tempboxb\hbox{\tpGobble\tpSubFloatCnt\m@ne\relax\tpUseProperty{caption-#3}\relax}%
-  \ifdim\wd\tp@tempboxa>\wd\tp@tempboxb\relax
+  \edef\my@wda{\expandafter\strip@pt\wd\tp@tempboxa sp}%
+  \edef\my@wdb{\expandafter\strip@pt\wd\tp@tempboxb sp}%
+  \ifdim\my@wda>\my@wdb\relax
     \expandafter\global\expandafter\let\csname tp@has@#2@#3\endcsname\@empty
   \fi
 }
@@ -488,7 +496,7 @@
 \def\tp@capt@top@offset{%
   \ifx\@argi\tp@str@top
   \else
-    \par\nopagebreak
+    \par\if@tp@flt@break@capt\else\nopagebreak\fi%
     \expandafter\@tempskipa\tpUseProperty{\tp@prefix caption-sep-bottom}\relax%
     \advance\@tempskipa\dimexpr-\topskip+\dp\strutbox\relax
     \ifx\tp@has@subcapt@bottom\@empty
@@ -516,7 +524,7 @@
       \fi
     \fi
     \vskip\@tempskipa
-    \par\nopagebreak
+    \par\if@tp@flt@break@capt\else\nopagebreak\fi
   \else
     \ifnum\tpSubFloatCnt>\z@
       \vskip\dp\strutbox
@@ -528,22 +536,23 @@
   \ifnum\tpSubFloatCnt=\z@
     \def\next{%
       \tpIfAttrStr{\tp@captype}{orientation}{landscape}
-        {\vbox\bgroup\hsize\textheight}
+        {\setbox\@tempboxa\vbox\bgroup\hsize\textheight}
         {\hskip\tp@flt@marg@l%
-         \vbox\bgroup\advance\hsize-\tp@flt@marg@l}%
+         \setbox\@tempboxa\vbox\bgroup\advance\hsize-\tp@flt@marg@l}%
       }%
   \else
     \expandafter\tp@tempskipa\csname tp@flt@capt@row@height@#1\endcsname\relax
     \expandafter\advance\expandafter\tp@tempskipa\dimexpr-\baselineskip+\topskip\relax
-    \def\next{\vbox to \tp@tempskipa\bgroup}%
+    \def\next{\setbox\@tempboxa\vbox to \tp@tempskipa\bgroup}%
   \fi
   \next%
     \ifx\@argii\tp@str@top\else\vss\fi
     \tpUseProperty{\tp@prefix caption-face}%
     \tpUseProperty{\tp@prefix caption-face-#1}%
     \tp@topstrut\tpUseProperty{caption-#1}\strut%
-    \ifx\@argii\tp@str@bottom\else\vss\fi%
+    \ifx\@argii\tp@str@bottom\else\if@tp@flt@break@capt\else\vss\fi\fi%
   \egroup%
+  \if@tp@flt@break@capt\unvbox\@tempboxa\else\box\@tempboxa\fi%
   \tp@capt@bottom@offset
 }
 \def\tp@make@outer@caption#1{%
@@ -557,12 +566,12 @@
     \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tpFloat\the\tp@int@flt@cnt Cap#1\string\endcsname{\the\dimexpr \ht\z@+\dp\z@\relax}}%
     \bgroup
       \savenotes
-      \nopagebreak
+      \if@tp@flt@break@capt\else\nopagebreak\fi
       \tpSubFloatCnt\z@
       \tp@make@caption{#1}{top}%
       \spewnotes
     \egroup
-    \ifx\@argi\tp@str@top\nopagebreak\fi
+    \ifx\@argi\tp@str@top\if@tp@flt@break@capt\else\nopagebreak\fi\fi
   \fi
 }
 \long\def\tpRenderSubFloats#1#2{%
@@ -725,7 +734,7 @@
   \tpGetTableContent
   \tpContent{\unvbox\tp@floatbox}%
   \tpUseComp{Content}%
-  \par\nopagebreak
+  \par\if@tp@flt@break@capt\else\nopagebreak\fi
   \vskip\dp\strutbox
 }
 \def\tpSubTableRender{%
