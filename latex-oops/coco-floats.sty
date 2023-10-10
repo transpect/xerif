@@ -499,6 +499,7 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \par\if@tp@flt@break@capt\else\nopagebreak\fi%
     \expandafter\@tempskipa\tpUseProperty{\tp@prefix caption-sep-bottom}\relax%
     \advance\@tempskipa\dimexpr-\topskip+\dp\strutbox\relax
+    \if@tp@flt@break@capt\advance\@tempskipa\dimexpr-\baselineskip-\ht\strutbox+\topskip\relax\fi
     \ifx\tp@has@subcapt@bottom\@empty
       \ifnum\tpSubFloatCnt=\z@
         %% subcapt-bot exists and capt-bot is rendered
@@ -546,7 +547,7 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \def\next{\setbox\@tempboxa\vbox to \tp@tempskipa\bgroup}%
   \fi
   \next%
-    \ifx\@argii\tp@str@top\else\vss\fi
+    \ifx\@argii\tp@str@top\else\if@tp@flt@break@capt\else\vss\fi\fi
     \tpUseProperty{\tp@prefix caption-face}%
     \tpUseProperty{\tp@prefix caption-face-#1}%
     \tp@topstrut\tpUseProperty{caption-#1}\strut%
