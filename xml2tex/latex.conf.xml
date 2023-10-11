@@ -8,6 +8,7 @@
      table-model="htmltabs">
   
   <xsl:import href="http://transpect.io/xslt-util/functx/Sequences/Sorting-and-Grouping/sort.xsl"/>
+  <xsl:import href="http://transpect.io/xslt-util/split-sequence/xsl/split-sequence-by-string-length.xsl"/>
   <xsl:import href="http://this.transpect.io/a9s/common/xsl/shared-variables.xsl"/>
   
   <ns prefix="dc" uri="http://purl.org/dc/elements/1.1/"/>
@@ -2656,15 +2657,16 @@
   <!-- escape special characters in \url and \href inside footnotes
        https://redmine.le-tex.de/issues/5376 -->
   
-  <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'">
-    <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
-  </xsl:variable>
+  <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
+  <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
+  <!-- character limit of url parts until tactical line breaks are inserted -->
+  <xsl:variable name="url-part-character-limit" as="xs:integer" select="40"/>
 
   <xsl:function name="xml2tex:replace-recursive-linktext" as="node()*">
     <xsl:param name="nodes" as="node()*"/>
      <xsl:for-each select="$nodes">
        <xsl:choose>
-         <xsl:when test=".[self::text()]"><xsl:sequence select="xml2tex:add-tactical-break-chars-in-linktext(.)"/></xsl:when>
+         <xsl:when test=".[self::text()]"><xsl:sequence select="xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(.))"/></xsl:when>
          <xsl:when test=".[self::dbk:indexterm | self::dbk:footnote]"><xsl:sequence select="."/></xsl:when>
          <xsl:otherwise>
            <xsl:apply-templates select="." mode="copy">
@@ -2684,7 +2686,7 @@
   <xsl:template match="text()" mode="copy" priority="100">
     <xsl:param name="replace-linktext" as="xs:boolean?" tunnel="yes"/>
     <xsl:value-of select="if ($replace-linktext) 
-                          then xml2tex:add-tactical-break-chars-in-linktext(.) 
+                          then xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(.)) 
                           else ."/>
   </xsl:template>
 
@@ -2695,23 +2697,40 @@
   <xsl:template match="dbk:link/@xml:lang
                       |dbk:link/*/@xml:lang" mode="copy"/>
   
+  <xsl:function name="xml2tex:add-tactical-breaks-by-string-length">
+    <xsl:param name="url" as="xs:string"/>
+    <xsl:value-of select="string-join(
+                            tr:tokenize-strings-by-string-length(
+                              tokenize($url, $tactical-break-character-for-urls),
+                              $url-part-character-limit
+                            ),
+                            $tactical-break-character-for-urls
+                          )"/>
+  </xsl:function>
+  
   <xsl:function name="xml2tex:add-tactical-break-chars-in-linktext">
-    <xsl:param name="text" as="xs:string"/>
-     <xsl:value-of select="replace(
+    <xsl:param name="url" as="xs:string"/>
+    <xsl:value-of select="replace(
                             replace(
-                             replace(
                               replace(
-                                      replace($text,
-                                              '([-%_./=?#])([^-%_./=?]{3})',
-                                              concat('$1',$tactical-break-character-for-urls, '$2')
-                                              ),
-                                      '\\?(&amp;)',
-                                      concat($tactical-break-character-for-urls, '\\$1')
-                                      ), 
-                              '\\?_', '\\_'),
-                            '\s+', '{\\space}'),
-                           '&#xad;',$tactical-break-character-for-urls)
-                          "/>
+                                replace(
+                                  replace(
+                                    $url,
+                                    '([-%_./=?#])([^-%_./=?]{3})',
+                                    concat('$1',$tactical-break-character-for-urls, '$2')
+                                  ),
+                                '\\?(&amp;)',
+                                concat($tactical-break-character-for-urls, '\\$1')
+                                ), 
+                                '\\?_', 
+                                '\\_'
+                              ),
+                              '\s+', 
+                              '{\\space}'
+                            ),
+                            '&#xad;',
+                            $tactical-break-character-for-urls
+                          )"/>
   </xsl:function>
   
   <template context="dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
