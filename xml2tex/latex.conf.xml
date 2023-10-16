@@ -2699,13 +2699,22 @@
   
   <xsl:function name="xml2tex:add-tactical-breaks-by-string-length">
     <xsl:param name="url" as="xs:string"/>
-    <xsl:value-of select="string-join(
+    
+    <xsl:variable select="string-join(
                             tr:tokenize-strings-by-string-length(
                               tokenize($url, $tactical-break-character-for-urls),
                               $url-part-character-limit
                             ),
                             $tactical-break-character-for-urls
-                          )"/>
+                          )" name="broken-link" as="xs:string"/>
+    <xsl:value-of select="replace(
+                                  replace($broken-link, 
+                                          '\\?_', 
+                                           '\\_'
+                                          ),
+                                  '\s+', 
+                                  '{\\space}'
+                                  )"/>
   </xsl:function>
   
   <xsl:function name="xml2tex:add-tactical-break-chars-in-linktext">
@@ -2713,21 +2722,13 @@
     <xsl:value-of select="replace(
                             replace(
                               replace(
-                                replace(
-                                  replace(
-                                    $url,
-                                    '([-%_./=?#])([^-%_./=?]{3})',
-                                    concat('$1',$tactical-break-character-for-urls, '$2')
-                                  ),
-                                '\\?(&amp;)',
-                                concat($tactical-break-character-for-urls, '\\$1')
-                                ), 
-                                '\\?_', 
-                                '\\_'
-                              ),
-                              '\s+', 
-                              '{\\space}'
-                            ),
+                                      $url,
+                                      '([-%_./=?#])([^-%_./=?]{3})',
+                                      concat('$1',$tactical-break-character-for-urls, '$2')
+                                     ),
+                              '\\?(&amp;)',
+                              concat($tactical-break-character-for-urls, '\\$1')
+                             ),
                             '&#xad;',
                             $tactical-break-character-for-urls
                           )"/>
