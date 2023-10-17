@@ -50,9 +50,16 @@
 
   <xsl:template match="*[   para[.//mediaobject]
                         or para[matches(@role, $figure-image-role-regex, 'i')]]
-                        [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]" mode="hub:split-at-tab">
+                        [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]" mode="hub:split-at-tab" priority="5">
     <xsl:copy>
       <!-- do not create figures like in docx -->
+      <xsl:apply-templates select="@*,node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="para[preceding-sibling::*[1][self::para][mediaobject]][not(normalize-space())]
+                      |para[matches(@role, '[a-z]{2,3}figurecaption')][matches(., '^[\p{Zs}]+$')]" mode="hub:split-at-tab" priority="100000">
+    <xsl:copy>
       <xsl:apply-templates select="@*,node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
