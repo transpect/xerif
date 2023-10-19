@@ -1209,8 +1209,8 @@
     <xsl:processing-instruction name="{$pi-xml-name}" select="'\printnotes'"/>
   </xsl:template>
 
-  <xsl:template match="phrase[@css:background-color eq '#FFFFFF']/@css:background-color" mode="custom-2"/>
-  <xsl:template match="phrase[@css:background-color eq '#FFFFFF'][count(@*) eq 2] " mode="custom-2" priority="4">
+  <xsl:template match="phrase[@css:background-color eq '#FFFFFF']/@css:background-color" mode="hub:preprocess-hierarchy"/>
+  <xsl:template match="phrase[@css:background-color eq '#FFFFFF'][count(@*) eq 2] " mode="hub:preprocess-hierarchy" priority="4">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
