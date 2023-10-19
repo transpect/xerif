@@ -1885,7 +1885,7 @@
     <xsl:param name="context-nodes" as="node()*"/>
     <xsl:if test="$context-nodes[self::dbk:phrase]">
       <rule name="tpNumber" type="cmd" break-before="1">
-        <param select="replace($context-nodes,'\.$','')"/>
+        <param select="replace(string-join($context-nodes, ''),'\.$','')"/>
       </rule>
     </xsl:if>
   </template>  
