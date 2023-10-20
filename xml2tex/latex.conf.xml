@@ -2311,7 +2311,7 @@
   
   <!-- main bibliographies -->
   
-  <template context="  dbk:bibliography[not(@role = ('Citavi', 'CSL', 'CSL-formatted'))][not(parent::dbk:bibliography)] 
+  <template context="  dbk:bibliography[not(@role = ('Citavi', 'Citavi-formatted', 'CSL', 'CSL-formatted'))][not(parent::dbk:bibliography)] 
                      | dbk:bibliodiv">
     <xsl:apply-templates select="dbk:info" mode="#current"/>
     <xsl:choose>
@@ -2377,7 +2377,7 @@
   <xsl:variable name="bibitem-ids" select="(//dbk:bibliomixed|//dbk:biblioentry)/generate-id()" as="xs:string*"/>
   
   <template context="dbk:bibliomixed
-                    |dbk:bibliography[not(@role = ('Citavi', 'CSL', 'CSL-formatted'))]/dbk:biblioentry">
+                    |dbk:bibliography[not(@role = ('Citavi', 'Citavi-formatted', 'CSL', 'CSL-formatted'))]/dbk:biblioentry">
     <rule break-after="2" type="cmd" name="bibitem">
       <option select="concat('a(', position(), ')')"/>
       <param select="(@xreflabel, concat('bib-', index-of($bibitem-ids, generate-id())))[1]"/>
@@ -2387,7 +2387,7 @@
     </rule>
   </template>
   
-  <template context="dbk:bibliography[@role = ('Citavi', 'CSL', 'CSL-formatted')]"/>
+  <template context="dbk:bibliography[@role = ('Citavi', 'Citavi-formatted', 'CSL', 'CSL-formatted')]"/>
   
   <template context="dbk:citation">
     <rule>
