@@ -1210,7 +1210,7 @@
   </xsl:template>
 
   <xsl:template match="phrase[@css:background-color eq '#FFFFFF']/@css:background-color" mode="hub:split-at-tab"/>
-  <xsl:template match="phrase[@css:background-color eq '#FFFFFF'][count(@*) eq 2] " mode="hub:split-at-tab" priority="4">
+  <xsl:template match="phrase[@css:background-color eq '#FFFFFF'][@srcpath][count(@*) eq 2] " mode="hub:split-at-tab" priority="4">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
@@ -1234,7 +1234,7 @@
                     <xsl:apply-templates select="." mode="varlistentry"/>
                   </listitem>
                 </varlistentry>                
-              </xsl:for-each>
+              </xsl:for-each>f
             </variablelist>
           </xsl:when>
           <xsl:otherwise>
