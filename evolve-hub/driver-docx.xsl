@@ -1234,7 +1234,7 @@
                     <xsl:apply-templates select="." mode="varlistentry"/>
                   </listitem>
                 </varlistentry>                
-              </xsl:for-each>f
+              </xsl:for-each>
             </variablelist>
           </xsl:when>
           <xsl:otherwise>
