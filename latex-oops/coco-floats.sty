@@ -166,9 +166,9 @@
       Height:\space\space\space\space\space\the\tp@total@flt@height^^J
       Depth:\space\space\space\space\space\space\the\tp@total@flt@depth^^J
 \else
-      Width:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @width-\the\tpSubFloatCnt\endcsname^^J
-      Height:\space\space\space\space\space     \expandafter\meaning\csname tp@\tp@cur@cont @height-\the\tpSubFloatCnt\endcsname^^J
-      Depth:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @depth-\the\tpSubFloatCnt\endcsname^^J
+      Width \the\tpSubFloatCnt:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @width-\the\tpSubFloatCnt\endcsname^^J
+      Height \the\tpSubFloatCnt:\space\space\space\space\space     \expandafter\meaning\csname tp@\tp@cur@cont @height-\the\tpSubFloatCnt\endcsname^^J
+      Depth \the\tpSubFloatCnt:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @depth-\the\tpSubFloatCnt\endcsname^^J
 \fi}}{}}
 \def\tp@get@seps{%
   \ifx\tp@fps\@empty
@@ -479,7 +479,7 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \par
   \egroup}
 \def\tp@test@caption#1#2#3{%
-  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt#10\relax\tpUseProperty{caption-#3}\relax}%
+  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt0#1\relax\tpUseProperty{caption-#3}\relax}%
   \setbox\tp@tempboxb\hbox{\tpGobble\tpSubFloatCnt\m@ne\relax\tpUseProperty{caption-#3}\relax}%
   \edef\my@wda{\expandafter\strip@pt\wd\tp@tempboxa sp}%
   \edef\my@wdb{\expandafter\strip@pt\wd\tp@tempboxb sp}%
