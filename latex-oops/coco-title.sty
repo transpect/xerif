@@ -54,11 +54,11 @@
 \def\tp@title@role@handlers#1#2{%
   \tpAddToRole{#2}{%
     \tpDeclareCountedComp{Bio}%
-    \tpDeclareCountedComp{BioBlock}}%
-  \tpDeclareRoleBlock{#2}{BioBlock}{#1-bio-format}%
+    \tpDeclareCountedComp{Biography}}%
   \tpGroupHandler{tp#2}{%
-    \tpIfComp{BioBlock}{}{\tpIfComp{Bio}{\tpBioBlock{\tpUseProperty{#1-list-bio-format}}}{}}%
+    \tpIfComp{Biography}{}{\tpIfComp{Bio}{\tpBiography{\tpUseProperty{#1-biography-format}}}{}}%
   }%
+  \tpDeclareRoleBlock{#2}{BioBlock}{#1-bio-block-format}%
 }
 \long\def\tpDeclareTitlepage#1{%
   \gdef\tp@titlepage{%
@@ -377,7 +377,7 @@
     \tpGetComp{SeriesNote}%
     \tpGetComp{GenericMetaBlock}%
     \vfill
-    \tpUseProperty{bio-block}%
+    \tpUseProperty{bio-output}%
   }%
   \tpSetProperty{titlepage-iii}{%
     \ifmonograph
@@ -528,15 +528,18 @@
     \fi
   }%
   % Biography
-  \tpSetProperty{role-block-bio-format}{\tpUseComp{BioBlock}\par}
-  \tpSetProperty{role-bio-format}{{\bfseries\tpUseComp{FullName}:}\space\tpUseComp{Bio}}%
-  \tpPropertyLet{author-bio-format}             {role-bio-format}%
-  \tpPropertyLet{author-list-bio-format}        {role-block-bio-format}%
-  \tpPropertyLet{editor-bio-format}             {role-bio-format}% Override for single series editor meta info
-  \tpPropertyLet{editor-list-bio-format}        {role-block-bio-format}% Override for single series editor meta info
-  \tpPropertyLet{series-editor-bio-format}      {role-bio-format}% Override for single series editor meta info
-  \tpPropertyLet{series-editor-list-bio-format} {role-block-bio-format}% Override for single series editor meta info
-  \tpSetProperty{bio-block}{%
+  % those Properties control how (Role specific) Biography Blocks are formatted, i.e. the list of all Biographies of a specific Role:
+  \tpSetProperty{role-bio-block-face}{}% face for the entire, role-specific, Biography Block
+  \tpSetProperty{role-bio-block-format}{{\tpUseProperty{role-bio-block-face}\tpUseComp{Biography}}\par}% Format of the whole, Role specific, Biography Block
+  \tpPropertyLet{author-bio-block-format}        {role-bio-block-format}% Override for single author meta info
+  \tpPropertyLet{editor-bio-block-format}        {role-bio-block-format}% Override for single editor meta info
+  \tpPropertyLet{series-editor-bio-block-format} {role-bio-block-format}% Override for single series editor meta info
+  % those Properties control how a (Role specific) Biography is formatted:
+  \tpSetProperty{role-biography-format}{{\bfseries\tpUseComp{FullName}:}\space\tpUseComp{Bio}\par}% Format of a single entry in the Role specific Biography
+  \tpPropertyLet{author-biography-format}        {role-biography-format}% Override for single author meta info
+  \tpPropertyLet{editor-biography-format}        {role-biography-format}% Override for single editor meta info
+  \tpPropertyLet{series-editor-biography-format} {role-biography-format}% Override for single series editor meta info
+  \tpSetProperty{bio-output-format}{%
     \tpGetComp{AuthorBioBlock}%
     \tpGetComp{EditorBioBlock}%
     \tpGetComp{SeriesEditorBioBlock}%
