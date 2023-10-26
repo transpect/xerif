@@ -71,6 +71,8 @@
 \def\tp@Meta{%
   \tpEvalType{Components}%
 }
+\def\tpAddTitleEval{\csgappto{tp@title@add@eval}}
+\def\tp@title@add@eval{}
 \def\tp@endMeta{%
   \tpNamespace{titlepage}%
   \tpEvalType{Properties}%
@@ -82,6 +84,7 @@
   \tp@title@eds@eval{SeriesEditor}%
   \tp@meta@generic@eval
   \tp@title@fundings@eval
+  \tp@title@add@eval
   \tp@title@set@pdfmeta
   \let\tp@cur@cont\@empty
 }
