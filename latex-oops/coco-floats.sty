@@ -653,10 +653,10 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
   \fi}
 \def\tpFigureRender{%
   \bgroup
-    \let\includegraphics\tp@includesubgraphics
     \tpIfAttrStr{\tp@captype}{orientation}{landscape}
-      {\let\hsize\textwidth}%
+      {\hsize\dimexpr\textwidth-\tp@flt@marg@r-\tp@flt@marg@l\relax}%
       {}%
+    \let\includegraphics\tp@includesubgraphics
     \hskip\tp@flt@marg@l
     \strut\tpUseComp{Fig}\strut
   \egroup}
