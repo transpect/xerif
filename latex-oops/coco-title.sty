@@ -70,6 +70,10 @@
 \def\tp@Meta{%
   \tpEvalType{Components}%
 }
+\def\tpAddTitleRole#1#2{%
+  \tpAddToType{Components}{titlepage}{\tp@titlepage@role{#1}{#2}}%
+  \tpAddTitleEval{\tp@title@eds@eval{#2}}%
+}
 \def\tpAddTitleEval{\csgappto{tp@title@add@eval}}
 \def\tp@title@add@eval{}
 \def\tp@endMeta{%
