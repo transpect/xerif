@@ -1458,7 +1458,7 @@
     <!--  <xsl:message   select="'all-aff: ', $all-aff//*:tmp-aff-group/*, '-\-', $position, '-\- (', dbk:orgname, ')'"/>-->
     <xsl:choose>
       <xsl:when test="$in-author">
-        <rule name="tpAffil" type="cmd" break-before="1">
+        <rule name="tpAffilRef" type="cmd" break-before="1">
           <!-- To Do: generate index from Affiliation list -->
           <param select="$position"/>
         </rule>
