@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
   xmlns:c="http://www.w3.org/ns/xproc-step" 
+  xmlns:cx="http://xmlcalabash.com/ns/extensions"
   xmlns:tr="http://transpect.io"
   xmlns:hub="http://transpect.io/hub"
   xmlns:docx2hub="http://transpect.io/docx2hub"
@@ -44,15 +45,18 @@
   <p:output port="result" primary="true"/>
   
   <p:output port="reports" primary="false" sequence="true">
+    <p:pipe port="report" step="validate-hub"/>
     <p:pipe port="reports" step="validate-xml"/>
     <p:pipe port="result" step="validate-with-epubcheck"/>
-    <p:pipe port="report" step="validate-hub"/>
+    <p:pipe port="result" step="a11y-check"/>
   </p:output>
   
   <p:option name="debug" select="'yes'"/>
   <p:option name="debug-dir-uri" select="'debug'"/>
   <p:option name="status-dir-uri" select="'status'"/>
+  <p:option name="interface-language" select="'de'"/>
   
+  <p:import href="http://transpect.io/ace-daisy/xpl/ace.xpl"/>
   <p:import href="http://transpect.io/epubcheck-idpf/xpl/epubcheck.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-rng.xpl"/>  
@@ -163,6 +167,55 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </tr:epubcheck-idpf>
+  
+  <p:choose name="a11y-check" cx:depends-on="validate-with-epubcheck">
+    <p:variable name="epub-is-valid" select="not(/*:schematron-output/*:failed-assert/@role[. = ('error', 'fatal-error')])"/>
+    <p:variable name="run-a11y-check" select="exists(/c:param-set/c:param[@name = 'epub-a11y-check'][@value eq 'yes'])">
+      <p:pipe port="paths" step="validate"/>
+    </p:variable>
+    <p:documentation>
+      Install NodeJS and run npm install <code xmlns="http://www.w3.org/1999/xhtml">@daisy/ace -g</code>
+      to install ACE on your system. Add the parameter $epub-a11y-check with value 'yes' 
+      to your transpect configuration to run this step.
+    </p:documentation>
+    <p:when test="$epub-is-valid = 'true' and $run-a11y-check = 'true'">
+      <p:output port="result"/>
+      
+      <tr:ace-daisy name="run-ace">
+        <p:with-option name="href" select="/c:result/@os-path">
+          <p:pipe port="epub-file-uri" step="validate"/>
+        </p:with-option>
+        <p:with-option name="ace" select="/c:param-set/c:param[@name = 'epub-a11y-ace-path']/@value">
+          <p:pipe port="paths" step="validate"/>
+        </p:with-option>
+        <p:with-option name="rule-family-name" select="/c:param-set/c:param[@name = 'epub-a11y-rule-family-name']/@value">
+          <p:pipe port="paths" step="validate"/>
+        </p:with-option>
+        <p:with-option name="a11y-htmlreport" select="/c:param-set/c:param[@name = 'epub-a11y-htmlreport']/@value">
+          <p:pipe port="paths" step="validate"/>
+        </p:with-option>
+        <p:with-option name="severity-override" select="/c:param-set/c:param[@name = 'epub-a11y-severity-override']/@value">
+          <p:pipe port="paths" step="validate"/>
+        </p:with-option>
+        <p:with-option name="lang" select="$interface-language"/>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+      </tr:ace-daisy>
+      
+    </p:when>
+    <p:otherwise>
+      <p:output port="result"/>
+      <p:identity>
+        <p:input port="source">
+          <p:inline>
+            <c:not-applicable tr:step-name="accessibility" tr:rule-family="accessibility">
+              <c:info>accessibility check is inactive.</c:info>
+            </c:not-applicable>
+          </p:inline>
+        </p:input>
+      </p:identity>
+    </p:otherwise>
+  </p:choose>
 
   <p:sink/>
   

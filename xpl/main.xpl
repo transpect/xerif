@@ -367,6 +367,7 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+    <p:with-option name="interface-language" select="$interface-language"/>
   </tx:validate>
   
   <p:sink/>
