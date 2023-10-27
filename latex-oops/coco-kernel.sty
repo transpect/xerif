@@ -196,6 +196,10 @@
     \csname tp@\tp@cur@cont @#3\endcsname%
   \endgroup}
 \newcount\tpCurCount
+\def\tp@assign@res#1{%
+  \expandafter\csname #1\expandafter\endcsname\expandafter{\tp@iterate@res}%
+  \global\let\tp@iterate@res\relax
+}
 \def\tpComposeCollection#1#2#3{%
   \tpIfComp{#3}{}{%
     \ifcsdef{#1Cnt}{%
@@ -220,14 +224,14 @@
             \expandafter\expandafter\expandafter{\expandafter\tp@iterate@res\@tempb}%
           }%
           \expandafter\def\expandafter\tp@iterate@res\expandafter{\tp@iterate@res\egroup}%
-        \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+          \tp@assign@res{tp#3}%
       \fi
     }{}}%
 }
 \def\tpApplyCollection#1#2#3{%
   \tpIfComp{#3}{}
     {\tp@apply@collection{#1}{#2}%
-     \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+     \tp@assign@res{tp#3}%
    }%
 }
 \def\tp@apply@collection#1#2{%
@@ -255,7 +259,7 @@
     #1\let#2\relax%
   \else
     \def\@tempa{#1\def#2}%
-    \expandafter\@tempa\expandafter{\tp@iterate@res}%
+    \tp@assign@res{@tempa}%
   \fi
 }
 \def\tpCompDef{\tp@comp@def[]}
