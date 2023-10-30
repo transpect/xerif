@@ -197,7 +197,11 @@
   \endgroup}
 \newcount\tpCurCount
 \def\tp@assign@res#1{%
-  \expandafter\csname #1\expandafter\endcsname\expandafter{\tp@iterate@res}%
+  \ifx\tp@iterate@res\relax
+    \cslet{#1}\relax
+  \else
+    \expandafter\csname #1\expandafter\endcsname\expandafter{\tp@iterate@res}%
+  \fi
   \global\let\tp@iterate@res\relax
 }
 \def\tpComposeCollection#1#2#3{%
