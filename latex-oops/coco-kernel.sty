@@ -146,11 +146,14 @@
 }
 \let\tpSetComp\tpComp
 \def\tpUseComp#1{\csname tp@\tp@cur@cont @#1\endcsname}
-\def\tpStoreComp{\tp@opt@empty\tp@store@comp}
-\def\tpGStoreComp{\tpStoreComp[\global]}
-\def\tp@store@comp[#1]#2#3{%
-  \def\@tempa{#1\edef#2}%
-  \expandafter\@tempa\expandafter{\expandafter\expandafter\expandafter\relax\csname tp@\tp@cur@cont @#3\endcsname}}%
+\def\tpStoreComp#1#2{%
+  \def\@tempa{\protected@edef#1}%
+  \expandafter\@tempa\expandafter{\expandafter\expandafter\expandafter\noexpand\csname tp@\tp@cur@cont @#2\endcsname}
+}
+\def\tpGStoreComp#1#2{%
+  \def\@tempa{\protected@xdef#1}%
+  \expandafter\@tempa\expandafter{\expandafter\expandafter\expandafter\noexpand\csname tp@\tp@cur@cont @#2\endcsname}
+}
 \def\tpUseGComp#1#2{\csname tp@#1@#2\endcsname}
 \def\tpGetComp#1{\tpIfComp{#1}{\tpUseComp{#1}\par}{}}
 \long\def\tpIfComp#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else#2\fi}
