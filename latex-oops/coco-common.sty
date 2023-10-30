@@ -138,11 +138,6 @@
   \protected@write\@auxout{\def\the@tp@cur@cont{\tp@cur@cont}\let\thetp@abspage\relax}{%
     \string\expandafter\string\gdef\string\csname\space \tp@cur@cont-\the@tp@thispage-\the@tp@atthispage\string\endcsname{\thetp@abspage}}%
 }
-\def\tp@restore@init#1#2{%
-  \AtBeginDocument{%
-    \expandafter\ifx\csname tp-#1-#2\endcsname\relax\else
-      \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-#1-#2\string\endcsname{\csname tp-#1-#2\endcsname}}%
-    \fi}}
 \DeclareRobustCommand{\tpBreak}{\hfill\break}
 \def\tp@init@l@{\tp@opt@empty\@tp@init@l@}%
 \def\@tp@init@l@[#1]#2#3#4{%
@@ -150,8 +145,6 @@
     \expandafter\global\expandafter\newcount\csname c@#2depth\endcsname
     \expandafter\global\csname c@#2depth\endcsname=0\relax
   \fi
-  \expandafter\tp@restore@init\expandafter{\tp@cur@cont}{#1\if!#1!#2\fi-number-#3-maxwd}%
-  \expandafter\tp@restore@init\expandafter{\tp@cur@cont}{#1\if!#1!#2\fi-number-#3-indent}%
   \expandafter\ifx\csname tp@#2@extract@data\endcsname\relax
     \expandafter\let\csname tp@#2@extract@data\endcsname\tp@extract@generic
   \fi
@@ -178,104 +171,99 @@
 \def\tp@extract@generic#1#2#3#4{}
 \def\tp@print@generic#1{}
 \def\tp@expand@l@contents#1#2#3#4{%
-  \sbox\z@{\def\numberline##1{\expandafter\gdef\csname tp@#2@#3Number\endcsname{##1}}#1}%
+  \global\let\tp@tempa\relax
+  \sbox\z@{\def\numberline##1{\xdef\tp@tempa{\noexpand\csdef{tp@#2@#3Number}{##1}}}#1}%
   \ifdim\wd\z@>\z@
     \let\numberline\@gobble%
-    \protected@csxdef{tp@#2@#3#4}{#1}%
+    \protected@csedef{tp@#2@#3#4}{#1}%
+    \tp@tempa
   \else
     #1%
-  \fi}
+  \fi
+  \global\let\tp@tempa\relax
+}
+\def\tp@store@latest#1#2{%
+  \expandafter\ifx\csname tp-\tp@cur@cont-#1\endcsname\relax
+    \csxdef{tp-\tp@cur@cont-#1}{#2}%
+  \else
+    \expandafter\ifdim\csname tp-\tp@cur@cont-#1\endcsname<#2\relax
+      \csxdef{tp-\tp@cur@cont-#1}{#2}%
+    \fi
+  \fi
+  \expandafter\ifx\csname tp-\tp@cur@cont-#1-local\endcsname\relax
+    \csxdef{tp-\tp@cur@cont-#1-local}{#2}%
+  \else
+    \expandafter\ifdim\csname tp-\tp@cur@cont-#1-local\endcsname<#2\relax
+      \csxdef{tp-\tp@cur@cont-#1-local}{#2}%
+    \fi
+  \fi
+  \ifcsdef{tp-\tp@cur@cont-#1-stored-trigger}{}
+    {\edef\@tempa{%
+       \noexpand\immediate\noexpand\write\noexpand\@auxout{%
+         \noexpand\string\noexpand\csgdef{tp-\tp@cur@cont-#1}{%
+           \noexpand\csname tp-\tp@cur@cont-#1-local\noexpand\endcsname}}}%
+     \expandafter\AtEndDocument\expandafter{\@tempa}%
+     \csgdef{tp-\tp@cur@cont-#1-stored-trigger}{\@empty}}}
 \def\tp@format@number#1#2#3{%
-  \tpSetProperty{#1formatted-number}{}%
   \tpSetValProp{#1curr-number-level}{#3}%
-  \tpIfComp{#2Number}{%
-    \tpSetProperty{#1formatted-number}{%
-      \bgroup
-        \tpUseProperty{#1title-format}%
-        \tpUseProperty{#1number-format}%
-        \tpUseComp{#2Number}%
-        \tpUseProperty{#1number-sep}%
-      \egroup}%
-    \sbox\z@{\tpUseProperty{#1formatted-number}}%
-  }{%
-    \sbox\z@{}%
-  }%
-  \tp@store@maxwd{#1number-#3-maxwd}{\the\wd\z@}%
-  \tpSetValProp{#1number-width-level-max}{\csname tp-heading-#1number-#3-maxwd\endcsname}%
-  \tp@store@maxwd{#1number-maxwd}{\the\wd\z@}%
-  \tpSetValProp{#1number-width-max}{\csname tp-heading-#1number-#3-maxwd\endcsname}%
+  \tpIfComp{#2Number}
+    {\sbox\z@{\tpUseProperty{#1number-format}}}
+    {\sbox\z@{}}%
+  \tp@store@latest{#1number-#3-maxwd}{\the\wd\z@}%
+  \tp@store@latest{#1number-maxwd}{\the\wd\z@}%
+  \tpSetValProp{#1number-width-level-max}{\csname tp-\tp@cur@cont-#1number-#3-maxwd\endcsname}%
+  \tpSetValProp{#1number-width-max}{\csname tp-\tp@cur@cont-#1number-maxwd\endcsname}%
   \tpSetValProp{#1number-width}{\the\wd\z@}%
   \tp@get@indent{#1}{#3}%
   \tp@set@hang{#1}%
 }
 \def\tp@set@hang#1{%
-  \tpSetProperty{#1hang-number}{\tpUseProperty{#1formatted-number}}%
+  \tpPropertyLet{#1hang-number}{#1number-format}%
   \tpIfProp{#1indent}
     {\ifdim\tpUseProperty{#1indent}<\z@
-        \tpSetProperty{#1hang-number}{%
-          \hskip\tpUseProperty{#1indent}%
-          \hbox to -\tpUseProperty{#1indent}{%
-            \tpIfPropVal{#1number-align}{left}{}{\hss}%
-            \tpUseProperty{#1formatted-number}%
-            \tpIfPropVal{#1number-align}{right}{}{\hss}}}%
-      \fi}{}}
-\def\tp@det@prev@indent#1#2{%
+       \tpSetProperty{#1hang-number}{%
+         \hskip\tpUseProperty{#1indent}%
+         \hbox to -\tpUseProperty{#1indent}{%
+           \tpIfPropVal{#1number-align}{left}{}{\hss}%
+           \tpUseProperty{#1number-format}%
+           \tpIfPropVal{#1number-align}{right}{}{\hss}}}%
+     \fi}{}}
+\def\tp@calc@margin@left#1#2{%
   \@tempcnta\numexpr#2-1\relax
-  \ifdim\tpUseProperty{#1indent}<\z@\relax
-    \@tempdimb=-\tpUseProperty{#1indent}\relax
+  \expandafter\ifx\csname tp-\tp@cur@cont-#1\the\@tempcnta-margin-left\endcsname\relax
+    \@tempdima=-\tpUseProperty{#1indent}\relax%
   \else
-    \@tempdimb=\tpUseProperty{#1indent}\relax
+    \@tempdima=\dimexpr\csname tp-\tp@cur@cont-#1\the\@tempcnta-margin-left\endcsname-\tpUseProperty{#1indent}\relax
   \fi
-  \expandafter\ifx\csname tp-\tp@cur@cont-#1\the\@tempcnta-indent\endcsname\relax
-    \@tempdima=\@tempdimb\relax%
-  \else
-    \@tempdima\dimexpr \csname tp-\tp@cur@cont-#1\the\@tempcnta-indent\endcsname+\@tempdimb\relax
-  \fi
-  \tp@store@maxwd{#1#2-indent}{\the\@tempdima}%
-  \tpSetProperty{#1margin-left}{\csname tp-\tp@cur@cont-#1#2-indent\endcsname}}
-\def\tp@store@maxwd#1#2{%
-  \expandafter\ifx\csname tp-\tp@cur@cont-#1\endcsname\relax
-    \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@cur@cont-#1\string\endcsname{#2}}
-    \expandafter\xdef\csname tp-\tp@cur@cont-#1\endcsname{#2}%
-  \else
-    \expandafter\ifdim\csname tp-\tp@cur@cont-#1\endcsname>#2\relax
-    \else
-      % Store the value in case of <= #2. In case of < instead of <=,
-      % used values might alternate between TeX runs due to not
-      % having been stored in the run before.
-      \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tp-\tp@cur@cont-#1\string\endcsname{#2}}%
-      \expandafter\xdef\csname tp-\tp@cur@cont-#1\endcsname{#2}%
-    \fi
-  \fi}
+  \tp@store@latest{#1#2-margin-left}{\the\@tempdima}%
+  \tpSetProperty{#1margin-left}{\the\@tempdima}}
 \def\tp@get@indent#1#2{%
-  \tpSetPropertyX{int-#1margin-left}{\tpUseProperty{#1margin-left}}%
-  \tpSetPropertyX{int-#1indent}{\tpUseProperty{#1indent}}%
-  \expandafter\let\expandafter\tp@tmp@numwd\csname tp-\tp@cur@cont-#1number-#2-maxwd\endcsname\relax
-  \tpIfPropVal{int-#1margin-left}{auto-global}
-    {\tpSetProperty{#1indent}{-\csname tp-\tp@cur@cont-#1number-maxwd\endcsname}%
-     \tpSetProperty{#1margin-left}{\csname tp-\tp@cur@cont-#1number-maxwd\endcsname}}
+  \tpPropertyLetX{int-#1margin-left}{#1margin-left}%
+  \tpPropertyLetX{int-#1indent}{#1indent}%
+  \tpIfPropVal{#1indent}{auto-global}
+    {\tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-max}}%
+     \tpSetPropertyX{#1margin-left}{\dimexpr\tpUseProperty{#1number-width-max}+\tpUseProperty{int-#1margin-left}\relax}}
     {\tpIfPropVal{int-#1margin-left}{auto}
        {\tpIfPropVal{int-#1indent}{auto}
-          {\tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+          {\tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-level-max}}}
           {\tpIfProp{int-#1indent}
              {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}}
              {\tpSetProperty{#1indent}{\z@}}}%
-        \tp@det@prev@indent{#1}{#2}}
+        \tp@calc@margin@left{#1}{#2}}
        {\tpIfProp{int-#1margin-left}
           {\tpIfPropVal{int-#1indent}{auto}
-            {\tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+            {\tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-level-max}}}
             {\tpIfProp{int-#1indent}
                {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}}
                {\tpSetProperty{#1indent}{\z@}}}}
          {\tpIfPropVal{int-#1indent}{auto}
-            {\tpSetProperty{#1margin-left}{\tp@tmp@numwd}%
-             \tpSetProperty{#1indent}{-\tp@tmp@numwd}}
+            {\tpPropertyLetX{#1margin-left}{#1number-width-level-max}%
+             \tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-level-max}}}
             {\tpIfProp{int-#1indent}
                {\tpSetPropertyX{#1indent}{\tpUseProperty{int-#1indent}}%
                 \tpSetProperty{#1margin-left}{\z@}}
                {\tpSetProperty{#1indent}{\z@}%
-                \tpSetProperty{#1margin-left}{\z@}}}}}}%
-    }
+                \tpSetProperty{#1margin-left}{\z@}}}}}}}
 \def\tpSetBabelLabel#1#2#3{%
   \def\@lang{#1}%
   \expandafter\def\expandafter\@tempa\expandafter{\expandafter\def\csname #2name\endcsname{#3}}%

@@ -297,6 +297,7 @@
 \def\tp@use@hook[#1]#2{\csuse{tp@hook@#1@#2}}
 \long\def\tpSetProperty#1#2{\long\csdef{tp@\tp@cur@cont @#1}{#2}}
 \long\def\tpPropertyLet#1#2{\long\csdef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
+\long\def\tpPropertyLetX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
 \long\def\tpSetValProp#1#2{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
 \long\def\tpSetPropertyX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{#2}}
 \long\def\tpAddToDefault#1#2{\csgappto{tp@#1@default}{#2}}

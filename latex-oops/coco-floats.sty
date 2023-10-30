@@ -52,6 +52,7 @@
 \@fpbot\@flushglue
 \newbox  \tp@floatbox
 \newbox  \tp@subfltbox
+\newbox  \tp@calcfltbox
 \newcount\tpSubFloatCnt       \tpSubFloatCnt=\z@\relax
 \newcount\tp@int@flt@cnt      \tp@int@flt@cnt\z@
 \newdimen\tp@subflt@maxheight \tp@subflt@maxheight=\z@\relax
@@ -84,14 +85,15 @@
        %\advance\linewidth-\leftskip
        \advance\linewidth-\rightskip
      }%
-   }{}%
-   \gappto\@endfloatbox{%
-     \global\tp@total@flt@height=\ht\@currbox\relax%
-     \global\tp@total@flt@depth=\dp\@currbox\relax%
-   }%
- }%
+    }{}%
+  \gappto\@endfloatbox{%
+    \global\tp@total@flt@height=\ht\@currbox\relax%
+    \global\tp@total@flt@depth=\dp\@currbox\relax%
+  }%
+}%
 \def\tp@flt@reset@defaults{%
   \global\tpSubFloatCnt=\z@
+  \global\tp@total@flt@width=\z@
   \global\let\tp@has@capt@top\@undefined
   \global\let\tp@has@capt@bottom\@undefined
   \global\let\tp@has@subcapt@top\@undefined
@@ -191,13 +193,13 @@
   \tpMakeFltComp{Listof#1}}
 \def\tp@flt@set@hsize{%
   \expandafter\tp@subflt@sep\tpUseProperty{sub-float-sep}\relax%
-  \tp@total@flt@width=\hsize\relax
+  \global\tp@total@flt@width=\hsize\relax
   \expandafter\tp@flt@marg@l\tpUseProperty{margin-left}\relax
   \expandafter\tp@flt@marg@r\tpUseProperty{margin-right}\relax
   \expandafter\tp@flt@marg@i\tpUseProperty{margin-inner}\relax
   \expandafter\tp@flt@marg@o\tpUseProperty{margin-outer}\relax
   \tp@flt@set@margins
-  \advance\tp@total@flt@width-\tp@flt@marg@r\relax
+  \global\advance\tp@total@flt@width-\tp@flt@marg@r\relax
   }
 \def\tp@flt@set@margins{%
   \tp@test@page
@@ -254,10 +256,8 @@
         \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
         \bgroup
           \def\tp@cur@cont{#2}%
-          \tp@init@l@[Listof]{#4}{0}{#3}% Generate listof-Entries for first level floats
-          \tp@restore@init{#4}{number-0-maxwd}%
-          \tp@init@l@[Listof]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
-          \tp@restore@init{#4}{number-1-maxwd}%
+          \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
+          \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
         \egroup
         \tpDeclareType{Properties}{#5}%
       }% /container
@@ -273,7 +273,7 @@
     \tpDeclareComp{ListofNumber}{}{}%
     \tpDeclareComp{ListofPage}{}{}%
     \tpListofPage{\tpUseProperty{list-of-page-face}##4}%
-    \tp@expand@l@contents{##3}{#2}{Listof}{Caption}%%
+    \tp@expand@l@contents{##3}{#3}{Listof}{Caption}%%
     \tp@format@number{list-of-}{Listof}{##1}%
   }%
   \expandafter\gdef\csname tp@#1@print@entry\endcsname##1{%
@@ -368,7 +368,7 @@
       \csname @\tpUseProperty{sub-number-style}\endcsname{#1}%
       \tpUseProperty{sub-number-after}%
     \endgroup}%
-  \expandafter\expandafter\expandafter\edef\expandafter\csname tp@\tp@cur@cont @number-#1\expandafter\endcsname\expandafter{\tpUseProperty{sub-number-block}}%
+  \expandafter\expandafter\expandafter\edef\expandafter\csname tp@\tp@cur@cont @number-#1\expandafter\endcsname\expandafter{\tpUseProperty{sub-number-format}}%
 }
 \def\tp@make@anchors{\@tempcnta\z@\tp@iterate{\@tempcnta}{\z@}{\tpSubFloatCnt}{\tp@make@anchor{\the\@tempcnta}}}
 \def\tp@make@anchor#1{%
@@ -416,6 +416,12 @@
     \tp@flt@debug{\tp@captype}%
     \ifx\tp@fps\@empty\else\spewnotes\fi
   \endgroup
+  \immediate\write\@auxout
+    {\string\expandafter\string\gdef\string\csname\space tp-float-\the\tp@int@flt@cnt-dimens\string\endcsname{%
+        {\the\tp@total@flt@width}%
+        {\the\tp@total@flt@height}%
+        {\the\tp@total@flt@depth}%
+      }}%
   \global\let\tp@current@class\relax
 }
 \def\tpSubFloat{%
@@ -541,7 +547,7 @@
   \next%
     \ifx\@argii\tp@str@top\else\vss\fi
     \tpUseProperty{\tp@prefix caption-face}%
-    \tpUseProperty{\tp@prefix caption-format-#1}%
+    \tpUseProperty{\tp@prefix caption-face-#1}%
     \tp@topstrut\tpUseProperty{caption-#1}\strut%
     \ifx\@argii\tp@str@bottom\else\vss\fi%
   \egroup%
@@ -596,7 +602,7 @@
       \expandafter\hsize\expandafter\dimexpr\csname tp@\tp@cur@cont @res@width-\the\@tempcnta\endcsname\relax
       \tpGobble
       \tpUseProperty{\tp@prefix caption-face}%
-      \tpUseProperty{\tp@prefix caption-format-#1}%
+      \tpUseProperty{\tp@prefix caption-face-#1}%
       \leavevmode
       \strut\tpUseProperty{caption-#1}\strut%
       }%
@@ -754,8 +760,8 @@
   \tpSetProperty{subfloat-same-height}{}% if true, the subfloat must/can be adjusted to the same heights
   %% captions
   \tpSetProperty{caption-face}{}% style applied to top and bottom captions
-  \tpSetProperty{caption-format-top}{}%% style applied to top captions
-  \tpSetProperty{caption-format-bottom}{}%% style applied to bottom captions
+  \tpSetProperty{caption-face-top}{}%% style applied to top captions
+  \tpSetProperty{caption-face-bottom}{}%% style applied to bottom captions
   \tpSetProperty{source-face}{}% Format of source, additional to caption-format
   \tpSetProperty{legend-face}{}% Format of legend, additional to caption-format
   \tpSetProperty{caption-sep-top}{\z@}%% vertical space between top caption and content
@@ -771,8 +777,8 @@
       {\tpUseProperty{source-face}%
        \tpUseComp{Source}}}{}}%
   \tpPropertyLet{subcaption-face}{caption-face}% style applied to top and bottom captions
-  \tpSetProperty{subcaption-format-top}{\tpUseProperty{caption-format-top}}%% style applied to top captions
-  \tpSetProperty{subcaption-format-bottom}{\tpUseProperty{caption-format-bottom}}%% style applied to bottom captions
+  \tpSetProperty{subcaption-face-top}{\tpUseProperty{caption-face-top}}%% style applied to top captions
+  \tpSetProperty{subcaption-face-bottom}{\tpUseProperty{caption-face-bottom}}%% style applied to bottom captions
   \tpSetProperty{subcaption-add-sep-top}{\z@}%% additional vertical space between top caption and top sub-caption
   \tpSetProperty{subcaption-add-sep-bottom}{\z@}%% additional vertical space between bottom sub-caption and bottom caption
   \tpSetProperty{subcaption-sep-top}{\tpUseProperty{caption-sep-top}}%% vertical space between top sub-caption and content
@@ -790,11 +796,21 @@
   \tpSetProperty{sub-number-face}{}%% format of subcaption counters
   \tpSetProperty{sub-number-before}{(}% stuff that is put immediately before the sub counter
   \tpSetProperty{sub-number-after}{)}% stuff that is put immediately after the sub counter
-  \tpSetProperty{sub-number-block}{\tpUseProperty{float-number}\tpUseProperty{sub-number-sep}\tpUseProperty{sub-number}}%% Format of sub numbers
+  \tpSetProperty{sub-number-format}{% Format of the sub number
+    \tpUseProperty{float-number}%
+    \tpUseProperty{sub-number-sep}%
+    \tpUseProperty{sub-number}}%
   %% List-of entries
   \tpSetProperty{list-of-page-sep}{\dotfill}%
+  \tpPropertyLet{list-of-number-face}{list-of-caption-face}%
   \tpSetProperty{list-of-number-sep}{\enskip}%
   \tpSetProperty{list-of-number-align}{left}%
+  \tpSetProperty{list-of-number-format}{%
+    \bgroup
+      \tpUseProperty{list-of-number-face}%
+      \tpUseComp{ListofNumber}%
+      \tpUseProperty{list-of-number-sep}%
+    \egroup}%
   \tpSetProperty{list-of-parfillskip}{-\rightskip}%
   \tpSetProperty{list-of-margin-right}{\@pnumwidth \@plus 1fil}%
   \tpSetProperty{list-of-margin-left}{auto}%

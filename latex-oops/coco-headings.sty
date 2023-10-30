@@ -95,9 +95,11 @@
       }%
       \tpDeclareType{Init}{%
         \tp@init@hooks{#3}%
+        \let\@tp@cur@cont\tp@cur@cont
+        \def\tp@cur@cont{heading}%
         \tp@init@l@{toc}{#2}{#3}%
+        \let\tp@cur@cont\@tp@cur@cont
         \tp@init@cnt{#3}%
-        \tp@restore@init{heading}{number-#2-maxwd}%
       }%
       \tp@declare@heading{#2}{#3}%
     }%
@@ -176,8 +178,6 @@
   \tpDeclareHook{before-hook-#1}%
 }
 \def\tp@init@cnt#1{\ifcsname c@#1\endcsname\else\@definecounter{#1}\fi}
-\tp@restore@init{heading}{toc-number-maxwd}
-\tp@restore@init{heading}{number-maxwd}
 \def\tp@auto@number#1#2{%
   \tpIfPropVal{numbering}{auto}
     {\expandafter\ifx\csname c@#2\endcsname\relax\tp@init@cnt{#2}\fi
@@ -263,7 +263,7 @@
   \bgroup
     \tpUseHook{toc-before-hook-#1}%
     \tpUseProperty{toc-before-entry}%
-    \tpUseProperty{toc-heading}%
+    \tpUseProperty{toc-format}%
     \tpUseHook{toc-after-hook-#1}%
     \tpUseProperty{toc-after-entry}%
   \egroup}
@@ -470,13 +470,20 @@
   \tpSetProperty{before-heading-block}{\parindent\z@ \parskip\z@}%
   \tpSetProperty{toc-hook}{}% Called, after ToC and BM entries have been written to the .aux file
   \tpSetProperty{after-indent}{}%
-  \tpSetProperty{margin-left}{\z@}%
+  \tpSetProperty{margin-left}{}%
   \tpSetProperty{margin-right}{\@flushglue}%
   \tpSetProperty{after-skip}{1sp}%
   \tpSetProperty{indent}{auto}%
   \tpSetProperty{number-width}{}%
   \tpSetProperty{number-sep}{\space}%
   \tpSetProperty{number-align}{left}%
+  \tpSetProperty{number-format}{%
+    \bgroup
+      \tpUseProperty{title-face}%
+      \tpUseProperty{number-face}%
+      \tpUseComp{Number}%
+      \tpUseProperty{number-sep}%
+    \egroup}
   \tpSetProperty{numbering}{auto}%
   %% running header
   \tpSetProperty{running-level}{}% override level for running title, name
@@ -487,20 +494,32 @@
   %% ToC
   \tpSetProperty{no-toc}{false}% toc entries are generally disabled iff true
   \tpSetProperty{no-BM}{false}% bookmark entries are generally disabled, iff true
-  \tpSetProperty{toc-page-sep}{\dotfill}% between toc-title and page
-  \tpSetProperty{toc-page-face}{}%
-  \tpSetProperty{toc-number-width}{}% current width of number
-  \tpSetProperty{toc-number-align}{left}% alignment of number within hbox when hanging
-  \tpSetProperty{toc-title-face}{}% face of title
-  \tpPropertyLet{toc-number-face}{toc-title-face}% format of number
-  \tpSetProperty{toc-number-sep}{\enskip}% thing between numebr and toc-title
   \tpSetProperty{toc-margin-top}{\z@}% left indent of the whole entry
   \tpSetProperty{toc-margin-bottom}{\z@}% right margin of the whole entry
   \tpSetProperty{toc-margin-left}{auto}% left indent of the whole entry
   \tpSetProperty{toc-margin-right}{\@pnumwidth}% right margin of the whole entry
+  \tpSetProperty{toc-title-face}{}% appearance of title
+  \tpSetProperty{toc-indent}{auto}% offset of the first line of the entry. auto: hang indent by max-number-width for the level
+  \tpSetProperty{toc-number-width}{}% current width of the TocNumber
+  \tpSetProperty{toc-number-align}{left}% alignment of TocNumber within the hbox when hanging
+  \tpPropertyLet{toc-number-face}{toc-title-face}% appearance of the TocNumber
+  \tpSetProperty{toc-number-sep}{\enskip}% thing between TocNumber and TocTitle
+  \tpSetProperty{toc-number-format}{% Format of the TocNumber
+    \bgroup
+      \tpUseProperty{toc-number-face}%
+      \tpUseComp{TocNumber}%
+      \tpUseProperty{toc-number-sep}%
+    \egroup}
+  \tpSetProperty{toc-page-sep}{\dotfill}% between TocTitle and the page counter
+  \tpSetProperty{toc-page-face}{}% appearance of the page value
+  \tpSetProperty{toc-page-format}{% format of the page value
+    \tpUseProperty{toc-page-sep}%
+    \bgroup
+      \tpUseProperty{toc-page-face}%
+      \tpUseComp{TocPage}%
+    \egroup}%
   \tpSetProperty{toc-link}{none}% should toc entries be linked? values: none,title,page,all
   \tpSetProperty{toc-level}{}% override heading level for ToC, name!
-  \tpSetProperty{toc-indent}{auto}% offset of the first line of the entry. auto: hang indent by max-number-width for the level
   \tpSetProperty{toc-before-entry}{% stuff before anything is output; used to setup margins, alignment, line-breaking rules, etc.
     \addvspace{\tpUseProperty{toc-margin-top}}%
     \parindent \z@
@@ -511,14 +530,14 @@
     \leftskip\tpUseProperty{toc-margin-left}%
   }%
   \tpSetProperty{toc-after-entry}{\par\addvspace{\tpUseProperty{toc-margin-bottom}}}% Thing at the end of the entry, after the page number
-  \tpSetProperty{toc-heading}{% Order and formatting of the entry itself
+  \tpSetProperty{toc-format}{% Order and formatting of the entry itself
     \tpUseProperty{toc-title-face}%
     \tpIfComp{TocNumber}
       {\tpUseProperty{toc-hang-number}}
       {\leftskip0pt\leavevmode}%
     \tpIfComp{TocAuthorNameList}{\tpUseComp{TocAuthorNameList}:\space}{}%
     \tpUseComp{TocTitle}%
-    \tpUseProperty{toc-page-sep}\tpUseComp{TocPage}%
+    \tpUseProperty{toc-page-format}%
   }%
   %% PDF-Bookmarks
   \tpSetProperty{bookmark-level}{}% override heading level for PDF bookmarks, numeric!
