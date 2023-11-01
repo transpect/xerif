@@ -242,6 +242,9 @@
   \tpPropertyLetX{int-#1indent}{#1indent}%
   \tpIfPropVal{#1indent}{auto-global}
     {\tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-max}}%
+     \tpIfPropVal{#1margin-left}{}
+       {\tpSetProperty{int-#1margin-left}{\z@}}
+       {\tpPropertyLetX{int-#1margin-left}{#1margin-left}}%
      \tpSetPropertyX{#1margin-left}{\dimexpr\tpUseProperty{#1number-width-max}+\tpUseProperty{int-#1margin-left}\relax}}
     {\tpIfPropVal{int-#1margin-left}{auto}
        {\tpIfPropVal{int-#1indent}{auto}
