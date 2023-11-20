@@ -28,7 +28,7 @@
       
     <rule context="/tei:TEI">
       
-      <assert test="matches(@xml:base, $cascade-paths-regex)" role="error" id="Dateiname">
+      <assert test="matches(replace(@xml:base, '^./([^\.]+)\..+$', '$1'), $cascade-paths-regex)" role="error" id="Dateiname">
         Der Dateiname entspricht nicht der Dateinamenskonvention.
       </assert>
       
