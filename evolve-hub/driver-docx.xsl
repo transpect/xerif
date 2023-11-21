@@ -1641,8 +1641,18 @@
       <xsl:apply-templates select="node() except (title | titleabbrev | subtitle | author | para[@role[matches(.,$info-author-role)]] | para[@role[matches(.,$info-subtitle-role)]] | sidebar[@role = 'chunk-metadata'])" mode="#current"/>
     </xsl:copy>
   </xsl:template>
+
+
+ <!-- unite separated metadata sections to one  -->
+  <xsl:template match="sidebar[@role = 'chunk-metadata'][following-sibling::sidebar[@role = 'chunk-metadata']]" mode="hub:repair-hierarchy" priority="3">
+    <xsl:copy>
+      <xsl:apply-templates select="@*,node(), following-sibling::sidebar[@role = 'chunk-metadata']/node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="sidebar[@role = 'chunk-metadata'][preceding-sibling::sidebar[@role = 'chunk-metadata']]" mode="hub:repair-hierarchy" priority="3"/>
   
- <xsl:template match="para[matches(@role, $info-meta-styles)][not(matches(., '\S'))]" mode="hub:repair-hierarchy"/>
+  <xsl:template match="para[matches(@role, $info-meta-styles)][not(matches(., '\S'))]" mode="hub:repair-hierarchy"/>
 
   <xsl:template match="para[matches(@role, $info-doi)]" mode="hub:process-meta-sidebar">
     <biblioid otherclass="{if(../..[self::hub]) then 'book-doi' else 'chunk-doi'}">
