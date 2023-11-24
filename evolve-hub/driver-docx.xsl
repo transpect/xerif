@@ -1038,7 +1038,7 @@
   <xsl:template match="*[local-name() = ('chapter', 'section', 'appendix')]
                         [title]
                         [bibliomixed]
-                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev|self::processing-instruction())]
+                        [every $i in *[not(self::title|self::bridgehead|self::titleabbrev)]
                          satisfies $i/local-name() eq 'bibliomixed']" 
                 mode="custom-1" priority="5">
     <bibliography>
@@ -1063,7 +1063,6 @@
                         [count(distinct-values(*[not(self::title
                                                     |self::bridgehead
                                                     |self::titleabbrev
-                                                    |self::processing-instruction()
                                                     |self::info)]/local-name())) gt 1]" 
                 mode="custom-1" priority="3">
     <xsl:variable name="chapter-info" as="element()*" 
