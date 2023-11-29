@@ -945,11 +945,17 @@
         * -->
   
   <xsl:template match="para[matches(@role, $codelisting-role-regex)]" mode="custom-1">
-    <programlisting role="{@role}">
-      <line>
-        <xsl:apply-templates mode="#current"/>
-      </line>
-    </programlisting>
+    <line>
+      <xsl:apply-templates select="@role, @srcpath, node()" mode="#current"/>
+    </line>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $codelisting-role-regex)]]" mode="custom-1">
+    <xsl:for-each-group select="para" group-adjacent="@role">
+      <programlisting role="{current-grouping-key()}">
+        <xsl:apply-templates select="current-group()" mode="#current"/>
+      </programlisting>
+    </xsl:for-each-group>
   </xsl:template>
   
   <!--  *
