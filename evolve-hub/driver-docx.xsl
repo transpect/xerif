@@ -951,6 +951,7 @@
   </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $codelisting-role-regex)]]" mode="custom-1">
+    <!--  https://redmine.le-tex.de/issues/15896-->
     <xsl:for-each-group select="para" group-adjacent="@role">
       <programlisting role="{current-grouping-key()}">
         <xsl:apply-templates select="current-group()" mode="#current"/>
