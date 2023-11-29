@@ -332,6 +332,7 @@
   \tpUseProperty{after-heading-par}%
   \tpIfProp{after-indent}{\global\@afterindenttrue}{\global\@afterindentfalse}%
   \gdef\next{%
+    \ifdim\parskip>\z@\relax\advance\@tempskipa-\parskip\relax\fi
     \vskip \@tempskipa
     \@afterheading
     \ignorespaces}}
@@ -495,7 +496,7 @@
   \tpSetProperty{no-toc}{false}% toc entries are generally disabled iff true
   \tpSetProperty{no-BM}{false}% bookmark entries are generally disabled, iff true
   \tpSetProperty{toc-margin-top}{\z@}% left indent of the whole entry
-  \tpSetProperty{toc-margin-bottom}{\z@}% right margin of the whole entry
+  \tpSetProperty{toc-margin-bottom}{\z@}% bottom margin of the whole entry
   \tpSetProperty{toc-margin-left}{auto}% left indent of the whole entry
   \tpSetProperty{toc-margin-right}{\@pnumwidth}% right margin of the whole entry
   \tpSetProperty{toc-title-face}{}% appearance of title
