@@ -68,6 +68,16 @@
    <xsl:copy-of select="../../@role"/>
    <xsl:next-match/>
   </xsl:template>
+  
+  <xsl:template match="*:para[..[self::*:sidebar]
+                                [@remap='Group']
+                                [key('hub:linking-item-by-linkend', ./@linkend)[..[self::*:para][@role[matches(., $figure-image-role-regex, 'i')]]]]
+                             ]
+                           [not(@role)]/*:mediaobject/@srcpath" mode="hub:split-at-tab" priority="6">
+    <!-- https://redmine.le-tex.de/issues/15915 group with img and caption anchored in para with image type name -.- -->
+   <xsl:apply-templates select="key('hub:linking-item-by-linkend', ../../../@linkend)/../@role" mode="figure-role-type"/>
+    <xsl:next-match/>
+  </xsl:template>
 
   <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')]/@role" mode="hub:split-at-tab">
    <xsl:apply-templates select="." mode="figure-role-type"/>
