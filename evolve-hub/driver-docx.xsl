@@ -946,6 +946,7 @@
   
   <xsl:template match="para[matches(@role, $codelisting-role-regex)]" mode="custom-1">
     <line>
+      <xsl:attribute name="xml:space" select="'preserve'"/>
       <xsl:apply-templates select="@role, @srcpath, node()" mode="#current"/>
     </line>
   </xsl:template>
@@ -957,6 +958,11 @@
         <xsl:apply-templates select="current-group()" mode="#current"/>
       </programlisting>
     </xsl:for-each-group>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $codelisting-role-regex)]/phrase" mode="custom-1" priority="5">
+    <!--  https://redmine.le-tex.de/issues/15896-->
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
   <!--  *
