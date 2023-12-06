@@ -268,7 +268,7 @@
   <xsl:variable name="hub:keyword-abstract-transtitle-combined" as="xs:string" 
                 select="concat($hub:abstract-role-regex, '|', $hub:keywords-role-regex, '|', $hub:trans-title-role-regex)"/>
 
-  <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}lineskip(\d)?$'" as="xs:string"/>
+  <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}(lineskip(\d)?|codeblock[a-z0-9]+)$'" as="xs:string"/>
 
   <xsl:variable name="dialogue-style" select="'^[a-z]+dialogue'" as="xs:string"/>
 
