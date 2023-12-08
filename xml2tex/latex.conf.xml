@@ -464,8 +464,10 @@
   <xsl:template name="contributor-name" as="xs:string">
     <xsl:choose>
       <xsl:when test="dbk:personname/dbk:firstname and dbk:personname/dbk:surname">
-        <xsl:value-of select="concat('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}', 
-                                     '&#xa;\tpLastName{',  xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}')"/>
+        <xsl:value-of select="string-join(('&#xa;\tpFirstName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), '}',
+                                           '&#xa;\tpLastName{',  xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname), '}',
+                                           if(dbk:personname/dbk:lineage) then ('&#xa;\tpLineage{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:lineage), '}') else ()
+                                          ))"/>
       </xsl:when>
       <xsl:when test="dbk:personname/dbk:othername">
         <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:othername), '}')"/>
@@ -1420,14 +1422,14 @@
   </template>
 
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:lineage">
-    <rule name="tpPersonSuffix" type="cmd" break-before="1">
+    <rule name="tpLineage" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
 
 
   <template context="*[not(self::dbk:hub)]/dbk:info//*[self::dbk:author|self::dbk:editor]/dbk:personname[dbk:surname]/dbk:honorific">
-    <rule name="tpPersonPrefix" type="cmd" break-before="1">
+    <rule name="tpHonorific" type="cmd" break-before="1">
       <param/>
     </rule>
   </template>
