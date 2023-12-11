@@ -172,7 +172,22 @@
   %
   %% Properties that control how the composed compoents WITHIN each item in a Role are formatted:
   %
-  \tpSetProperty{role-full-name-format}{\tpUseComp{FirstName}\space\tpUseComp{LastName}}% How FullName for each name is built
+  \tpSetProperty{role-full-name-format}{%
+    \if\tpUseComp{PersonPrefix}\relax
+    \else
+      \tpUseComp{PersonPrefix}\space
+    \fi
+    \tpUseComp{FirstName}\space
+    \if\tpUseComp{MidName}\relax
+    \else
+      \tpUseComp{MidName}\space
+    \fi
+    \tpUseComp{LastName}%
+    \if\tpUseComp{Lineage}\relax
+    \else
+      \space\tpUseComp{Lineage}%
+    \fi%
+  }% How FullName for each name is built
   \tpSetProperty{role-cite-name-format}{\tpUseComp{LastName},~\tpUseComp{Initial}}% How CiteName for each name is built
   \tpSetProperty{role-short-cite-name-format}{\tpUseComp{LastName}}% how ShortCiteName for each name is built
   \tpPropertyLet{role-pdfinfo-name-format}{role-cite-name-format}% How PDFInfoName for each item is built
