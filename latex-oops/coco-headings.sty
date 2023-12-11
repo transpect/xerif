@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that extends heading objects.
 %%
@@ -44,9 +44,6 @@
     \tp@provide@hd@macros{Number}%
     \tp@provide@hd@macros{LicenceLogo}%
     \tp@provide@hd@macros{LicenceName}%
-    \tpIfProp{extended}{%
-      \tp@extended@ht@macros
-    }{}%
     \tp@heading@quotes
   }%
   \tpDeclareType{Properties}{\tp@heading@default}%
@@ -142,9 +139,9 @@
       \rightskip\tpUseProperty{margin-right}%
       \bgroup
         \tpUseProperty{heading-block}%
-      \tpIfPropVal{no-toc}{true}{}{\tp@make@toc}% ToC entries
-      \tpIfPropVal{no-BM}{true}{}{\tp@make@bookmarks}% Bookmarks
-      \tpUseProperty{toc-hook}%
+        \tpIfPropVal{no-toc}{true}{}{\tp@make@toc}% ToC entries
+        \tpIfPropVal{no-BM}{true}{}{\tp@make@bookmarks}% Bookmarks
+        \tpUseProperty{toc-hook}%
         \tpIfProp{extended}{\tpUseProperty{extended-heading}}{}%
       \egroup%
       \tp@make@run% Running headers
@@ -181,17 +178,16 @@
 \def\tp@auto@number#1#2{%
   \tpIfPropVal{numbering}{auto}
     {\expandafter\ifx\csname c@#2\endcsname\relax\tp@init@cnt{#2}\fi
-     \expandafter\ifx\csname tp@heading@attr@nonumber\endcsname\@empty
-     \else
-       \tpIfComp{Number}
+     \tpIfAttrIsset{heading}{nonumber}
+       {}
+       {\tpIfComp{Number}
          {}
          {\ifnum #1>\c@secnumdepth\relax\else
             \stepcounter{#2}%
             \edef\@tempa{\csname the#2\endcsname}%
             \expandafter\tpNumber\expandafter{\@tempa}%
-          \fi}%
-     \fi}{}%
-}
+          \fi}}
+     }{}}
 \def\@tp@heading@parse@label#1,#2,\@nil{%
   \@tp@heading@create@labels{#1}%
   \if!#2!\else
@@ -202,10 +198,8 @@
     \Hy@MakeCurrentHrefAuto{tp.#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
-  \expandafter\ifx\csname tp@heading@attr@label\endcsname\relax\else
-    \expandafter\@tp@heading@parse@label\tp@heading@attr@label,,\@nil
-  \fi
-}
+  \tpIfAttr{heading}{label}
+    {\expandafter\@tp@heading@parse@label\tp@heading@attr@label,,\@nil}{}}
 \def\@tp@heading@create@labels#1{%
   \if!#1!\else
     \tpIfComp{Number}
@@ -234,18 +228,19 @@
   \tp@check@empty{heading}{Number}{Toc}%
   \tp@check@empty{heading}{Subtitle}{Toc}%
   \tp@check@author{Toc}%
-  \expandafter\ifx\csname tp@heading@attr@notoc\endcsname\@empty\else
-    \protected@edef\tp@heading@toc@entry{%
-      \tpIfComp{TocTitle}{\string\tpTocTitle{\string\ignorespaces\space\expandonce{\tp@heading@TocTitle}}}{}%
-      \tpIfComp{TocNumber}{\string\tpTocNumber{\string\ignorespaces\space\expandonce{\tp@heading@TocNumber}}}{}%
-      \tpIfComp{TocAuthorNameList}{\string\tpTocAuthorNameList{\string\ignorespaces\space\expandonce{\tp@heading@TocAuthorNameList}}}{}%
-      \tpIfComp{TocSubtitle}{\string\tpTocSubtitle{\string\ignorespaces\space\expandonce{\tp@heading@TocSubtitle}}}{}%
-    }%
-    \tpIfProp{toc-level}{\edef\tp@heading@name{\tpUseProperty{toc-level}}}{}%
-    \protected@write\@auxout
-      {\tpGobble}%
-      {\string\@writefile{toc}{\protect\tpContentsline{\tp@heading@name}{\tp@heading@toc@entry}{\thepage}{\@currentHref}\protected@file@percent}}\relax
-  \fi
+  \tpIfAttrIsset{heading}{notoc}
+    {}
+    {\protected@edef\tp@heading@toc@entry{%
+       \tpIfComp{TocTitle}{\string\tpTocTitle{\string\ignorespaces\space\expandonce{\tp@heading@TocTitle}}}{}%
+       \tpIfComp{TocNumber}{\string\tpTocNumber{\string\ignorespaces\space\expandonce{\tp@heading@TocNumber}}}{}%
+       \tpIfComp{TocAuthorNameList}{\string\tpTocAuthorNameList{\string\ignorespaces\space\expandonce{\tp@heading@TocAuthorNameList}}}{}%
+       \tpIfComp{TocSubtitle}{\string\tpTocSubtitle{\string\ignorespaces\space\expandonce{\tp@heading@TocSubtitle}}}{}%
+     }%
+     \tpIfProp{toc-level}{\edef\tp@heading@name{\tpUseProperty{toc-level}}}{}%
+     \protected@write\@auxout
+       {\tpGobble}%
+       {\string\@writefile{toc}{\protect\tpContentsline{\tp@heading@name}{\tp@heading@toc@entry}{\thepage}{\@currentHref}\protected@file@percent}}\relax
+    }
 }
 \def\tp@toc@extract@data#1#2#3#4{%
   \tpNamespace{heading}%
@@ -295,15 +290,15 @@
   \tp@check@empty[Toc]{heading}{Number}{BM}%
   \tp@check@empty[Toc]{heading}{AuthorNameList}{BM}%
   \tp@check@empty[Toc]{heading}{Subtitle}{BM}%
-  \expandafter\ifx\csname tp@heading@attr@noBM\endcsname\@empty\else
-    \tpIfProp{bookmark-level}{\edef\Hy@toclevel{\tpUseProperty{bookmark-level}}}{}%
-    \begingroup
-      \tpGobble
-      \protected@edef\@tempa{\csname tp@heading@bookmark\endcsname}%
-      \bookmark[level=\Hy@toclevel,dest=\@currentHref]{\expandonce{\@tempa}}%
-    \endgroup
-  \fi
-}
+  \tpIfAttrIsset{heading}{noBM}
+    {}
+    {\tpIfProp{bookmark-level}{\edef\Hy@toclevel{\tpUseProperty{bookmark-level}}}{}%
+     \begingroup
+       \tpGobble
+       \protected@edef\@tempa{\csname tp@heading@bookmark\endcsname}%
+       \bookmark[level=\Hy@toclevel,dest=\@currentHref]{\expandonce{\@tempa}}%
+     \endgroup
+   }}
 \newbox\tp@inlinesecbox
 \def\tp@inline@heading{%
   \tpIfProp{after-indent}{\global\@afterindenttrue}{\global\@afterindentfalse}%
@@ -370,16 +365,6 @@
   \let\tp@heading@name\relax
   \let\tp@heading@label\relax
   }
-\def\tp@extended@ht@macros{%
-  \tp@provide@ext@hd@macros{Abstract}%
-  \tp@provide@ext@hd@macros{Keywords}%
-  \tp@provide@ext@hd@macros{DOI}%
-  \tp@provide@ext@hd@macros{TitleEn}%
-}
-\def\tp@provide@ext@hd@macros#1{%
-  \tpDeclareComp{#1}{}{}%
-  \tpDeclareComp{#1Title}{}{}%
-}
 \def\tp@heading@quotes{%
   \tpDeclareComp{QuoteBlock}{}{}%
   \tpDeclareComponentGroup{tpQuote}{%
@@ -396,22 +381,6 @@
     \tpIfComp{AuthorContact}{}{\csname tpAuthorContact\endcsname{\tpUseProperty{author-contact-format}}}{}%
   }%
   \tp@provide@hd@overrides{AuthorNameList}%
-  \tp@heading@affils
-}
-\def\tp@heading@affils{%
-  \tpDeclareComp{AffilBlock}{\expandafter\global}{}%
-  \tpDeclareComponentGroup{tpAffil}{%
-    \tpDeclareCountedComp{Affiliation}%
-    \tpDeclareCountedComp{Address}%
-    \tpDeclareCountedComp{Institute}%
-    \tpDeclareCountedComp{Country}%
-    \tpDeclareCountedComp{Department}%
-    \tpDeclareCountedComp{AffilID}%
-  }%
-  \tpGroupHandler{tpAffil}{%
-    \tpIfComp{AffilID}{}{\expandafter\tpAffilID\expandafter{\tpAffilCnt}}%
-    \tpIfComp{Affiliation}{}{\tpAffiliation{\tpUseProperty{affiliation-format}}}%
-  }%
 }
 \def\tp@provide@hd@macros#1{%
   \tpDeclareComp{#1}{}{}%
@@ -457,12 +426,12 @@
   \tpSetProperty{extended-heading}{%
     \tpIfComp{Abstract}
       {\par\vskip\baselineskip
-       {\bfseries\tpIfComp{AbstractTitle}{\tpUseComp{AbstractTitle}}{Abstract}}\par
+       {\bfseries\tpIfComp{AbstractLabel}{\tpUseComp{AbstractLabel}}{Abstract}}\par
        {\itshape\small\tpUseComp{Abstract}}\par}
       {}%
     \tpIfComp{Keywords}
       {\par\vskip\baselineskip
-       {\bfseries\tpIfComp{KeywordsTtitle}{\tpUseComp{KeywordsTitle}}{Keywords}}\par
+       {\bfseries\tpIfComp{KeywordsLabel}{\tpUseComp{KeywordsLabel}}{Keywords}}\par
        {\itshape\small\tpUseComp{Keywords}\par}}
      {}%
    }%
@@ -561,15 +530,6 @@
   \tpSetProperty{author-contact-block-format}{% Format of the whole contact information block
     \tpUseComp{AuthorContact}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi
   }%
-  \tpSetProperty{affiliation-format}{% Format of the  affiliation block
-    \tpIfComp{Institute}{\tpUseComp{Institute}}{}%
-    \tpIfComp{Department}{, \tpUseComp{Department}}{}%
-    \tpIfComp{Address}{, \tpUseComp{Address}}{}%
-    \tpUseProperty{affil-sep}%
-  }%
-  \tpSetProperty{affil-sep}{\par}
-  \tpSetProperty{affil-block-format}{\textsuperscript{\tpUseComp{AffilID}}\tpUseComp{Affiliation}}
-  \tpSetProperty{affil-block-face}{\small\normalfont}
 }
 \newdimen\tpnewparskip \AtBeginDocument{\ifdim\tpnewparskip=\z@\relax \tpnewparskip=1\baselineskip\relax\fi}
 \def\tpNewPar{\@ifnextchar[{\@tpnewpar}{\@tpnewpar[\the\tpnewparskip]}}%]

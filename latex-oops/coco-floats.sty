@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that extends floating objects.
 %%
@@ -61,12 +61,13 @@
 \newdimen\tp@calc@flt@width   \tp@calc@flt@width=\tp@total@flt@width\relax
 \newdimen\tp@total@flt@height \tp@total@flt@height=\textwidth\relax
 \newdimen\tp@total@flt@depth  \tp@total@flt@depth=\textwidth\relax
-\newdimen\tp@flt@sep@top      \tp@flt@sep@top=\z@\relax
-\newdimen\tp@flt@sep@bottom   \tp@flt@sep@bottom=\z@\relax
+\newskip\tp@flt@sep@top      \tp@flt@sep@top=\z@\relax
+\newskip\tp@flt@sep@bottom   \tp@flt@sep@bottom=\z@\relax
 \newdimen\tp@flt@marg@r       \tp@flt@marg@r=\z@\relax
 \newdimen\tp@flt@marg@l       \tp@flt@marg@l=\z@\relax
 \newdimen\tp@flt@marg@i       \tp@flt@marg@i=\z@\relax
 \newdimen\tp@flt@marg@o       \tp@flt@marg@o=\z@\relax
+\newif\if@tp@flt@break@capt   \@tp@flt@break@captfalse
 \def\tp@str@figure{figure}
 \def\tp@str@table{table}
 \def\tp@str@bottom{bottom}
@@ -109,80 +110,78 @@
 \def\tp@get@flt@attr#1#2{%
   \if!#1!\else
     \tpParseAttributes{#2}{#1}%
-    \expandafter\ifx\csname tp@#2@attr@class\endcsname\relax\else
-      \expandafter\global\expandafter\let\expandafter\tp@current@class\csname tp@#2@attr@class\endcsname
-      \tpUseClass{default}{\tp@captype}%
-      \expandafter\tpUseClass\expandafter{\csname tp@#2@attr@class\endcsname}{\tp@captype}%
-    \fi
+    \tpIfAttr{#2}{class}
+      {\global\letcs\tp@current@class{tp@#2@attr@class}%
+       \tpUseClass{default}{\tp@captype}%
+       \expandafter\tpUseClass\expandafter{\csname tp@#2@attr@class\endcsname}{\tp@captype}}
+      {}%
+      \tpIfAttr{#2}{break-caption}{\@tp@flt@break@capttrue}{}%
   \fi
   \tp@get@flt@pos{#2}}
 \def\tp@get@flt@pos#1{%
-  \expandafter\ifx\csname tp@#1@attr@float-pos\endcsname\relax
-    \let\tp@fps\@empty
-  \else
-    \letcs\tp@fps{tp@#1@attr@float-pos}%
-  \fi
+  \tpIfAttr{#1}{float-pos}
+    {\letcs\tp@fps{tp@#1@attr@float-pos}}
+    {\let\tp@fps\@empty}%
   \def\@tempa{h!}\ifx\tp@fps\@tempa\let\tp@fps\@empty\fi
   \def\@tempa{h}\ifx\tp@fps\@tempa\def\tp@fps{htbp!}\fi
   \ifx\tp@do@dblfloat\relax
     \ifx\tp@fps\@empty\def\tp@fps{htpb!}\fi% 11514
     \linewidth\dimexpr2\columnwidth+\columnsep\relax
+    \hsize\linewidth\relax
   \fi
-  \ifcsstring{tp@#1@attr@orientation}{landscape}{%
-    \linewidth\textheight
-    \def\tp@fps{p}%
-  }{}}
+  \tpIfAttrStr{#1}{orientation}{landscape}
+    {\linewidth\textheight
+     \hsize\linewidth
+     \def\tp@fps{p}}
+    {}}
 \def\tp@set@flt@env{%
   \ifx\tp@fps\@empty
     \let\tp@b@float\relax
     \let\tp@e@float\relax
+    \ifhmode\par\fi
   \else
     \let\tp@b@float\tp@captype%
-    \ifcsstring{tp@\tp@captype @attr@orientation}{landscape}{%
-      \edef\@tp@b@float{sideways\tp@b@float}%
-      \edef\tp@b@float{\noexpand\begin{\@tp@b@float\ifx\tp@do@dblfloat\relax*\fi}}
-      \edef\tp@e@float{\noexpand\end{\@tp@b@float\ifx\tp@do@dblfloat\relax*\fi}}
-    }{%
-      \edef\tp@flt@env{\ifx\tp@do@dblfloat\relax dbl\fi}
-      \edef\tp@b@float{\expandafter\noexpand\csname @x\tp@flt@env float\endcsname {\tp@captype}[\tp@fps]}
-      \edef\tp@e@float{\expandafter\noexpand\csname end@\tp@flt@env float\endcsname}
-    }%
-  \fi}
+    \tpIfAttrStr{\tp@captype}{orientation}{landscape}
+      {\edef\@tp@b@float{sideways\tp@b@float}%
+       \edef\tp@b@float{\noexpand\begin{\@tp@b@float\ifx\tp@do@dblfloat\relax*\fi}}%
+       \edef\tp@e@float{\noexpand\end{\@tp@b@float\ifx\tp@do@dblfloat\relax*\fi}}}
+      {\edef\tp@flt@env{\ifx\tp@do@dblfloat\relax dbl\fi}%
+       \edef\tp@b@float{\expandafter\noexpand\csname @x\tp@flt@env float\endcsname {\tp@captype}[\tp@fps]}%
+       \edef\tp@e@float{\expandafter\noexpand\csname end@\tp@flt@env float\endcsname}}%
+   \fi}
 \def\tp@flt@debug#1{%
-  \ifcsdef{tp@#1@attr@debug}{%
-    \message{^^J[tp Float Debug]^^J
-        Textheight:\space\the\textheight^^J
-        Type:\space\space\space\space\space\space\space\tp@cur@cont^^J
+  \tpIfAttr{#1}{debug}
+  {\message{^^J[tp Float Debug]^^J
+      Textheight:\space\the\textheight^^J
+      Type:\space\space\space\space\space\space\space\tp@cur@cont^^J
 \ifx\tp@captype\tp@str@figure
-        Path: \space\space\space\space\space\space\@tp@fig@path^^J
+      Path: \space\space\space\space\space\space\@tp@fig@path^^J
 \fi
-        Class:\space\space\space\space\space\space\tp@current@class^^J
-        Floatpos:\space\space\space\tp@fps^^J
-        Environ:\space\space\space\space\expandafter\noexpand\tp@b@float...\expandafter\noexpand\tp@e@float^^J
-        Subfloat:\space\space\space               \the\tpSubFloatCnt^^J
+      Class:\space\space\space\space\space\space\tp@current@class^^J
+      Floatpos:\space\space\space\tp@fps^^J
+      Environ:\space\space\space\space\expandafter\noexpand\tp@b@float...\expandafter\noexpand\tp@e@float^^J
+      Subfloat:\space\space\space               \the\tpSubFloatCnt^^J
 \ifnum\tpSubFloatCnt=\z@
-        Width:\space\space\space\space\space\space\the\tp@total@flt@width^^J
-        Height:\space\space\space\space\space\the\tp@total@flt@height^^J
-        Depth:\space\space\space\space\space\space\the\tp@total@flt@depth^^J
+      Width:\space\space\space\space\space\space\the\tp@total@flt@width^^J
+      Height:\space\space\space\space\space\the\tp@total@flt@height^^J
+      Depth:\space\space\space\space\space\space\the\tp@total@flt@depth^^J
 \else
-        Width:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @width-\the\tpSubFloatCnt\endcsname^^J
-        Height:\space\space\space\space\space     \expandafter\meaning\csname tp@\tp@cur@cont @height-\the\tpSubFloatCnt\endcsname^^J
-        Depth:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @depth-\the\tpSubFloatCnt\endcsname^^J
-\fi
-}}{}}
+      Width \the\tpSubFloatCnt:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @width-\the\tpSubFloatCnt\endcsname^^J
+      Height \the\tpSubFloatCnt:\space\space\space\space\space     \expandafter\meaning\csname tp@\tp@cur@cont @height-\the\tpSubFloatCnt\endcsname^^J
+      Depth \the\tpSubFloatCnt:\space\space\space\space\space\space\expandafter\meaning\csname tp@\tp@cur@cont @depth-\the\tpSubFloatCnt\endcsname^^J
+\fi}}{}}
 \def\tp@get@seps{%
   \ifx\tp@fps\@empty
     \expandafter\tp@flt@sep@top\dimexpr\tpUseProperty{intext-skip-top}\relax%
   \else
     \expandafter\tp@flt@sep@top\dimexpr\tpUseProperty{float-skip-top}\relax%
   \fi
-    \ifcsstring{tp@\tp@captype @attr@orientation}{landscape}{}{%
-    \ifx\tp@fps\@empty
-      \expandafter\tp@flt@sep@bottom\dimexpr\tpUseProperty{intext-skip-bottom}\relax%
-    \else
-      \expandafter\tp@flt@sep@bottom\dimexpr\tpUseProperty{float-skip-bottom}\relax%
-    \fi
-  }}
+    \tpIfAttrStr{\tp@captype}{orientation}{landscape}{}
+      {\ifx\tp@fps\@empty
+         \expandafter\tp@flt@sep@bottom\dimexpr\tpUseProperty{intext-skip-bottom}\relax%
+       \else
+         \expandafter\tp@flt@sep@bottom\dimexpr\tpUseProperty{float-skip-bottom}\relax%
+       \fi}}
 \def\tp@set@top@sep{\addvspace{\tp@flt@sep@top}}
 \def\tp@set@bot@sep{\addvspace{\tp@flt@sep@bottom}}
 \def\tpMakeFltComp#1{%
@@ -217,18 +216,22 @@
     \tpMakeFltCompL{Legend}%
     \tpMakeFltCompL{Source}%
     \tpMakeFltCompL{Number}%
-    \tpMakeFltComp{label}%
+    \tpMakeFltComp{RefLabel}%
     \tpMakeFltComp{AltText}% neu: 2023-06-08; TODO: muss noch implementiert werden
   }%
   \tpDeclareType{Properties}{\tp@float@default}%
 }
-\long\def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
-\def\@tpDeclareFloat[#1]#2#3#4#5{%
+\def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
+\long\def\@tpDeclareFloat[#1]#2#3#4#5{%
   \def\tp@float@parent{#1}%
   \ifcsdef{tp@container@#2}{%
     \tpPackageInfo{Floats}{}{Appending to `#2'}%
     \ifx\tp@float@parent\@empty\else
-      \tpInherit {Properties,Components} from \tp@float@parent;
+      \tpPackageError{Float}{Type}
+        {Attempt to change parent of pre-existing float^^JContainer `#2'}
+        {You cannot use the optional argument of \string\tpDeclareFloat\space for pre-existing^^J%
+float containers!^^J^^J%
+Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \fi
     \tpAddToType{Properties}{#2}{#5}%
     \tpAddToType{FloatEnvInfo}{#2}{%
@@ -238,29 +241,29 @@
   }{%
     \tpDeclareContainer{#2}{%
       \tpPackageInfo{Floats}{}{Declaring float `#2'}%
-        \ifx\tp@float@parent\@empty
-          \tpInherit {Properties,Components} from tpFloat;
-        \else
-          \tpInherit {Properties,Components} from \tp@float@parent;
-        \fi
-        \tpDeclareType{FloatEnvInfo}{%
-          \tpNamespace{#2}%
-          \def\tp@captype{#3}%
-          \def\tp@caplisttype{#4}%
-        }% /FloatEnvInfo
-        \tpDeclareEnv[#2]{\tp@float}{\endtp@float}%
-        \tpDeclareEnv[#2*]{\let\tp@do@dblfloat\relax\tp@float}{\let\tp@do@dblfloat\relax\endtp@float}%
-        \tpDeclareType{Components}{%
-          \tpUseProperty{float-handler}%
-        }%
-        \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
-        \bgroup
-          \def\tp@cur@cont{#2}%
-          \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
-          \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
-        \egroup
-        \tpDeclareType{Properties}{#5}%
-      }% /container
+      \ifx\tp@float@parent\@empty
+        \tpInherit {Properties,Components} from tpFloat;
+      \else
+        \tpInherit {Properties,Components} from \tp@float@parent;
+      \fi
+      \tpDeclareType{FloatEnvInfo}{%
+        \tpNamespace{#2}%
+        \def\tp@captype{#3}%
+        \def\tp@caplisttype{#4}%
+      }% /FloatEnvInfo
+      \tpDeclareEnv[#2]{\tp@float}{\endtp@float}%
+      \tpDeclareEnv[#2*]{\if@twocolumn\let\tp@do@dblfloat\relax\else\fi\tp@float}{\if@twocolumn\let\tp@do@dblfloat\relax\fi\endtp@float}%
+      \tpDeclareType{Components}{%
+        \tpUseProperty{float-handler}%
+      }%
+      \tp@flt@generate@listof@handlers{#4}{#3}{#2}%
+      \bgroup
+        \def\tp@cur@cont{#2}%
+        \tp@init@l@[list-of]{#4}{0}{#3}% Generate listof-Entries for first level floats
+        \tp@init@l@[list-of]{#4}{1}{sub#3}% Generate listof-Entries for sub-floats
+      \egroup
+      \tpDeclareType{Properties}{#5}%
+    }% /container
   }% /ifcsdef{tp@app@container@#2}
 }
 \def\tp@flt@generate@listof@handlers#1#2#3{%
@@ -290,8 +293,8 @@
     \tp@flt@check@empty{Caption}{caption}%
     \tp@flt@check@empty{Legend}{legend}%
     \tp@flt@check@empty{Source}{source}%
-    \expandafter\ifx\csname tp@#2@attr@nolist\endcsname\@empty\else
-      \let\@tp@listof@entry\relax
+    \tpIfAttrIsset{#2}{nolist}{}
+      {\let\@tp@listof@entry\relax
       \tpIfComp{ListofCaption}{\csgappto{@tp@listof@entry}{\string\tpListofCaption{\tpUseComp{ListofCaption}}}}{}%
       \tpIfComp{ListofNumber}{\csgappto{@tp@listof@entry}{\string\tpListofNumber{\tpUseComp{ListofNumber}}}}{}%
       \tpIfComp{ListofLegend}{\csgappto{@tp@listof@entry}{\string\tpListofLegend{\tpUseComp{ListofLegend}}}}{}%
@@ -309,7 +312,7 @@
           \tp@restore@contentsline
         \fi
       \fi
-    \fi
+    }%
   }%
 }
 \def\tp@store@sub@contentsline#1#2#3{%
@@ -333,29 +336,27 @@
       {\csletcs{tp@\tp@cur@cont @Listof#1-\the\tpSubFloatCnt}{tp@\tp@cur@cont @#1-\the\tpSubFloatCnt}}
       {\csname Listof#1\endcsname{}}}}
 \def\tp@flt@create@counters{%
-  \expandafter\ifx\csname tp@\tp@captype @attr@nonumber\endcsname\relax
-    \tpIfPropVal{numbering}{auto}{%
-      \tpIfComp{number-0}
-        {}%
-        {\expandafter\advance\csname c@\tp@captype\endcsname\@ne\relax
-         \tp@set@label{0}%
-         \expandafter\advance\csname c@\tp@captype\endcsname\m@ne\relax
-       }%
-      \ifnum\tpSubFloatCnt=\z@\relax\else
-        \@tempcnta\z@
-        \tp@iterate{\@tempcnta}{\@ne}{\tpSubFloatCnt}{%
-          \tpIfComp{number-\the\@tempcnta}
-            {}%
-            {\expandafter\ifx\csname tp@\tp@captype @attr@subfloat\endcsname\relax
-               \expandafter\advance\csname c@\tp@captype\endcsname\@ne\relax
-               \tp@set@label{\the\@tempcnta}%
-               \expandafter\advance\csname c@\tp@captype\endcsname\m@ne\relax
-             \else
-               \tp@set@sublabel{\the\@tempcnta}%
-             \fi
-            }}%
-      \fi}{}%
-  \fi}
+  \tpIfAttrIsset{\tp@captype}{nonumber}{}
+    {\tpIfPropVal{numbering}{auto}
+      {\tpIfComp{number-0}
+         {}%
+         {\expandafter\advance\csname c@\tp@captype\endcsname\@ne\relax
+          \tp@set@label{0}%
+          \expandafter\advance\csname c@\tp@captype\endcsname\m@ne\relax
+         }%
+       \ifnum\tpSubFloatCnt=\z@\relax\else
+         \@tempcnta\z@
+         \tp@iterate{\@tempcnta}{\@ne}{\tpSubFloatCnt}{%
+           \tpIfComp{number-\the\@tempcnta}
+             {}%
+             {\tpIfAttr{\tp@captype}{subfloat}
+                {\tp@set@sublabel{\the\@tempcnta}}
+                {\expandafter\advance\csname c@\tp@captype\endcsname\@ne\relax
+                 \tp@set@label{\the\@tempcnta}%
+                 \expandafter\advance\csname c@\tp@captype\endcsname\m@ne\relax}}}%
+       \fi}
+      {}%
+   }}
 \def\tp@set@label#1{%
   \expandafter\expandafter\expandafter\edef\expandafter\csname tp@\tp@cur@cont @number-#1\expandafter\endcsname\expandafter{\csname the\tp@captype\endcsname}%
 }
@@ -374,16 +375,16 @@
 \def\tp@make@anchor#1{%
   \bgroup
     \tpSubFloatCnt#1\relax
-    \tpIfComp{Label}
+    \tpIfComp{RefLabel}
       {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname}
       {\edef\@currentlabel{tp-\tp@cur@cont-number-\the\tp@int@flt@cnt}}%
     \expandafter\H@refstepcounter\expandafter{\tp@captype}%
     \expandafter\hyper@makecurrent\expandafter{\tp@captype}%
     \global\let\Hy@tempa\Hy@float@caption
     \expandafter\hyper@@anchor\expandafter{\@currentHref}{\relax}%
-    \tpIfComp{Label}
+    \tpIfComp{RefLabel}
       {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname
-       \edef\@tempa{\tpUseComp{Label}}%
+       \edef\@tempa{\tpUseComp{RefLabel}}%
        \expandafter\tpltx@label\expandafter{\@tempa}}{\relax}%
   \egroup}
 \def\tp@float{\tp@opt@empty\@tp@float}
@@ -443,11 +444,9 @@
     \global\tp@subflt@maxheight=\@tempdima\relax
   \fi
   \ignorespaces
-  \expandafter\ifx\csname tp@\tp@captype @attr@subfloat\endcsname\relax
-    \csname tp@make@listof@\tp@captype\endcsname{\tp@captype}% subfloats are counted separately
-  \else
-    \csname tp@make@listof@\tp@captype\endcsname{sub\tp@captype}% real subfloats
-  \fi
+  \tpIfAttr{\tp@captype}{subfloat}
+    {\csname tp@make@listof@\tp@captype\endcsname{sub\tp@captype}}% real subfloats
+    {\csname tp@make@listof@\tp@captype\endcsname{\tp@captype}}% subfloats are counted separately
   \setbox\tp@subfltbox\box\voidb@x
   \let\tp@is@subflt\@undefined
 }
@@ -480,9 +479,11 @@
     \par
   \egroup}
 \def\tp@test@caption#1#2#3{%
-  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt#1\relax\tpUseProperty{caption-#3}\relax}%
+  \setbox\tp@tempboxa\hbox{\tpGobble\tpSubFloatCnt0#1\relax\tpUseProperty{caption-#3}\relax}%
   \setbox\tp@tempboxb\hbox{\tpGobble\tpSubFloatCnt\m@ne\relax\tpUseProperty{caption-#3}\relax}%
-  \ifdim\wd\tp@tempboxa>\wd\tp@tempboxb\relax
+  \edef\my@wda{\expandafter\strip@pt\wd\tp@tempboxa sp}%
+  \edef\my@wdb{\expandafter\strip@pt\wd\tp@tempboxb sp}%
+  \ifdim\my@wda>\my@wdb\relax
     \expandafter\global\expandafter\let\csname tp@has@#2@#3\endcsname\@empty
   \fi
 }
@@ -495,9 +496,10 @@
 \def\tp@capt@top@offset{%
   \ifx\@argi\tp@str@top
   \else
-    \par\nopagebreak
+    \par\if@tp@flt@break@capt\else\nopagebreak\fi%
     \expandafter\@tempskipa\tpUseProperty{\tp@prefix caption-sep-bottom}\relax%
     \advance\@tempskipa\dimexpr-\topskip+\dp\strutbox\relax
+    \if@tp@flt@break@capt\advance\@tempskipa\dimexpr-\baselineskip-\ht\strutbox+\topskip\relax\fi
     \ifx\tp@has@subcapt@bottom\@empty
       \ifnum\tpSubFloatCnt=\z@
         %% subcapt-bot exists and capt-bot is rendered
@@ -523,7 +525,7 @@
       \fi
     \fi
     \vskip\@tempskipa
-    \par\nopagebreak
+    \par\if@tp@flt@break@capt\else\nopagebreak\fi
   \else
     \ifnum\tpSubFloatCnt>\z@
       \vskip\dp\strutbox
@@ -534,23 +536,24 @@
   \tp@capt@top@offset
   \ifnum\tpSubFloatCnt=\z@
     \def\next{%
-      \ifcsstring{tp@\tp@captype @attr@orientation}{landscape}
-        {\vbox\bgroup\hsize\textheight}
+      \tpIfAttrStr{\tp@captype}{orientation}{landscape}
+        {\setbox\@tempboxa\vbox\bgroup\hsize\textheight}
         {\hskip\tp@flt@marg@l%
-        \vbox\bgroup\advance\hsize-\tp@flt@marg@l}%
-    }%
+         \setbox\@tempboxa\vbox\bgroup\advance\hsize-\tp@flt@marg@l}%
+      }%
   \else
     \expandafter\tp@tempskipa\csname tp@flt@capt@row@height@#1\endcsname\relax
     \expandafter\advance\expandafter\tp@tempskipa\dimexpr-\baselineskip+\topskip\relax
-    \def\next{\vbox to \tp@tempskipa\bgroup}%
+    \def\next{\setbox\@tempboxa\vbox to \tp@tempskipa\bgroup}%
   \fi
   \next%
-    \ifx\@argii\tp@str@top\else\vss\fi
+    \ifx\@argii\tp@str@top\else\if@tp@flt@break@capt\else\vss\fi\fi
     \tpUseProperty{\tp@prefix caption-face}%
     \tpUseProperty{\tp@prefix caption-face-#1}%
     \tp@topstrut\tpUseProperty{caption-#1}\strut%
-    \ifx\@argii\tp@str@bottom\else\vss\fi%
+    \ifx\@argii\tp@str@bottom\else\if@tp@flt@break@capt\else\vss\fi\fi%
   \egroup%
+  \if@tp@flt@break@capt\unvbox\@tempboxa\else\box\@tempboxa\fi%
   \tp@capt@bottom@offset
 }
 \def\tp@make@outer@caption#1{%
@@ -564,12 +567,12 @@
     \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space tpFloat\the\tp@int@flt@cnt Cap#1\string\endcsname{\the\dimexpr \ht\z@+\dp\z@\relax}}%
     \bgroup
       \savenotes
-      \nopagebreak
+      \if@tp@flt@break@capt\else\nopagebreak\fi
       \tpSubFloatCnt\z@
       \tp@make@caption{#1}{top}%
       \spewnotes
     \egroup
-    \ifx\@argi\tp@str@top\nopagebreak\fi
+    \ifx\@argi\tp@str@top\if@tp@flt@break@capt\else\nopagebreak\fi\fi
   \fi
 }
 \long\def\tpRenderSubFloats#1#2{%
@@ -650,10 +653,10 @@
   \fi}
 \def\tpFigureRender{%
   \bgroup
-    \let\includegraphics\tp@includesubgraphics
-    \ifcsstring{tp@\tp@captype @attr@orientation}{landscape}
-      {\hsize\dimexpr\textwidth-\tp@flt@marg@r\relax}%
+    \tpIfAttrStr{\tp@captype}{orientation}{landscape}
+      {\hsize\dimexpr\textwidth-\tp@flt@marg@r-\tp@flt@marg@l\relax}%
       {}%
+    \let\includegraphics\tp@includesubgraphics
     \hskip\tp@flt@marg@l
     \strut\tpUseComp{Fig}\strut
   \egroup}
@@ -732,7 +735,7 @@
   \tpGetTableContent
   \tpContent{\unvbox\tp@floatbox}%
   \tpUseComp{Content}%
-  \par\nopagebreak
+  \par\if@tp@flt@break@capt\else\nopagebreak\fi
   \vskip\dp\strutbox
 }
 \def\tpSubTableRender{%

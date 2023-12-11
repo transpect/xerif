@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that provides some commonly used base macros.
 %%
@@ -242,6 +242,9 @@
   \tpPropertyLetX{int-#1indent}{#1indent}%
   \tpIfPropVal{#1indent}{auto-global}
     {\tpSetPropertyX{#1indent}{-\tpUseProperty{#1number-width-max}}%
+     \tpIfPropVal{#1margin-left}{}
+       {\tpSetProperty{int-#1margin-left}{\z@}}
+       {\tpPropertyLetX{int-#1margin-left}{#1margin-left}}%
      \tpSetPropertyX{#1margin-left}{\dimexpr\tpUseProperty{#1number-width-max}+\tpUseProperty{int-#1margin-left}\relax}}
     {\tpIfPropVal{int-#1margin-left}{auto}
        {\tpIfPropVal{int-#1indent}{auto}

@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-12-11}%
 %%
 %% Common document class for \textit{xerif} projects.
 %%

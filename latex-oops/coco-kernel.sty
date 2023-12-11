@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.6}%
-\def\filedate{2023-07-05}%
+\def\fileversion{0.3.0}%
+\def\filedate{2023-12-11}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-kernel}
     [\filedate \fileversion cocotex kernel]
@@ -57,7 +57,7 @@
     {\tpPackageWarning{Kernel}{}{`#1' has already been declared!^^J
 \tp@warningspaces Properties from the original Declaration may be^^J
 \tp@warningspaces overridden by the global defaults. Use \string\tpAddToType^^J
-\tp@warningspaces to add new Properties to pre-existing Containers!^^J
+\tp@warningspaces to alter pre-existing Containers!^^J
 }}
     {\csdef{tp@container@#1}{}}%
   \csdef{tp@cur@cont}{#1}%
@@ -74,7 +74,7 @@
   \expandafter\x\endgroup
 }
 \@onlypreamble\tpDeclareContainer
-\def\tpAddToType#1#2#3{\csgappto{tp@type@#1@#2}{#3}}
+\def\tpAddToType#1#2{\csgappto{tp@type@#1@#2}}
 \def\tpEvalType{\tp@opt@curcont\tp@eval@type}
 \def\tp@eval@type[#1]#2{%
   \expandafter\ifx\csname tp@type@#2@#1\endcsname\relax
@@ -128,7 +128,7 @@
     \tpKernelDebugMsg{value tp@type@#1@#3:^^J \expandafter\meaning\csname tp@type@#1@#3\endcsname}%
   \fi
 }
-\def\tpDeclareComp{\@dblarg\@tpDeclareComp}
+\def\tpDeclareComp{\tp@opt@second\@tpDeclareComp}
 \def\@tpDeclareComp[#1]#2#3#4{%
   \ltx@LocalExpandAfter\global\expandafter\let\csname tp@\tp@cur@cont @#1\endcsname\relax
   \expandafter\long\expandafter\def\csname tp#2\endcsname##1{%
@@ -146,9 +146,19 @@
 }
 \let\tpSetComp\tpComp
 \def\tpUseComp#1{\csname tp@\tp@cur@cont @#1\endcsname}
+\def\tpStoreComp#1#2{%
+  \def\@tempa{\protected@edef#1}%
+  \expandafter\@tempa\expandafter{\expandafter\expandafter\expandafter\noexpand\csname tp@\tp@cur@cont @#2\endcsname}
+}
+\def\tpGStoreComp#1#2{%
+  \def\@tempa{\protected@xdef#1}%
+  \expandafter\@tempa\expandafter{\expandafter\expandafter\expandafter\noexpand\csname tp@\tp@cur@cont @#2\endcsname}
+}
 \def\tpUseGComp#1#2{\csname tp@#1@#2\endcsname}
 \def\tpGetComp#1{\tpIfComp{#1}{\tpUseComp{#1}\par}{}}
 \long\def\tpIfComp#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else#2\fi}
+\long\def\tpWhenComp#1#2{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax\else#2\fi}
+\long\def\tpUnlessComp#1#2{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#2\fi}
 \long\def\tpIfGComp#1#2#3#4{\expandafter\ifx\csname tp@#1@#2\endcsname\relax#4\else#3\fi}
 \long\def\long@empty{}
 \long\def\tpIfCompEmpty#1#2#3{\expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\long@empty#2\else#3\fi}
@@ -164,13 +174,13 @@
        {}}}
 \def\tpDeclareComponentGroup#1#2{%
   \csnumgdef{#1Cnt}{\z@}%
-  \csdef{#1}{\expandafter\tp@opt@empty\csname @#1\endcsname}%
+  \csdef{#1}{\tp@opt@empty{\csname @#1\endcsname}}%
   \csdef{@#1}[##1]{%
     \def\tp@cnt@grp{#1}%
     \csxdef{#1Cnt}{\expandafter\the\expandafter\numexpr\csname #1Cnt\endcsname+\@ne\relax}%
-    \if!##1!\else
-      \csgdef{tp@\tp@cur@cont @#1-\csname #1Cnt\endcsname @attrs}{##1}\fi
+    \if!##1!\else\csgdef{tp@\tp@cur@cont @#1-\csname #1Cnt\endcsname @attrs}{##1}\fi
     #2%
+    \csname @#1@hook\endcsname
   }%
   \csdef{end#1}{{\tpToggleCountedCond\csname tp@compose@group@#1\endcsname}}%
 }
@@ -182,7 +192,7 @@
     {\tpPackageError{Kernel}{Type}{Component Group `#1' unknown!}{You tried to declare a Group Handler for a Component Group that has not been declared, yet! Use \string\tpDeclareComponentGroup{#1}{} to declare the Component Group first.}}%
 }
 \let\tp@cnt@grp\@empty
-\def\tpUseGroupComp#1#2{{\def\tp@cnt@grp{#1}\csname\tp@cnt@grp-#2-\csname \tp@cnt@grp Cnt\endcsname}}
+\def\tpUseGCompIdx#1#2#3{\csname tp@\tp@cur@cont @#1-#3-#2\endcsname}
 \def\tpUseGroupProp#1#2#3{%
   \begingroup
     \@tempcnta\numexpr#2\relax
@@ -194,6 +204,14 @@
     \csname tp@\tp@cur@cont @#3\endcsname%
   \endgroup}
 \newcount\tpCurCount
+\def\tp@assign@res#1{%
+  \ifx\tp@iterate@res\relax
+    \cslet{#1}\relax
+  \else
+    \expandafter\csname #1\expandafter\endcsname\expandafter{\tp@iterate@res}%
+  \fi
+  \global\let\tp@iterate@res\relax
+}
 \def\tpComposeCollection#1#2#3{%
   \tpIfComp{#3}{}{%
     \ifcsdef{#1Cnt}{%
@@ -208,6 +226,8 @@
             \edef\@tempb{%
               %% top-level counter for user interaction
               \noexpand\tpCurCount=\the\@tempcnta
+              %% evaluating group attributes
+              \ifcsdef{tp@\tp@cur@cont @#1-\the\@tempcnta @attrs}{\noexpand\tpParseAttributes{#1-\the\@tempcnta}{\csname tp@\tp@cur@cont @#1-\the\@tempcnta @attrs\endcsname}}{}
               %% internal counter for macro grabbing
               \noexpand\csnumdef{#1Cnt}{\tpCurCount}%
               \noexpand\tpUseProperty{#2}}%
@@ -216,14 +236,14 @@
             \expandafter\expandafter\expandafter{\expandafter\tp@iterate@res\@tempb}%
           }%
           \expandafter\def\expandafter\tp@iterate@res\expandafter{\tp@iterate@res\egroup}%
-        \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+          \tp@assign@res{tp#3}%
       \fi
     }{}}%
 }
 \def\tpApplyCollection#1#2#3{%
   \tpIfComp{#3}{}
     {\tp@apply@collection{#1}{#2}%
-     \expandafter\csname tp#3\expandafter\endcsname\expandafter{\tp@iterate@res}%
+     \tp@assign@res{tp#3}%
    }%
 }
 \def\tp@apply@collection#1#2{%
@@ -235,6 +255,7 @@
         \tpToggleCountedCond
         \def\tp@cnt@grp{#1}%
         \csnumdef{#1Cnt}{\the\@tempcnta}%
+        \ifcsdef{tp@\tp@cur@cont @#1-\the\@tempcnta @attrs}{\tpParseAttributes{#1-\the\@tempcnta}{\csname tp@\tp@cur@cont @#1-\the\@tempcnta @attrs\endcsname}}{}
         \tpCurCount=\the\@tempcnta
         \protected@xdef\@tempb{\csname tp@\tp@cur@cont @#2\endcsname}%
         \@temptokena \expandafter{\@tempb}%
@@ -250,7 +271,7 @@
     #1\let#2\relax%
   \else
     \def\@tempa{#1\def#2}%
-    \expandafter\@tempa\expandafter{\tp@iterate@res}%
+    \tp@assign@res{@tempa}%
   \fi
 }
 \def\tpCompDef{\tp@comp@def[]}
@@ -270,7 +291,6 @@
      \expandafter\expandafter\expandafter\csgappto\expandafter\@tempa\expandafter{\@tempb}%
      \egroup}%
   #4\expandafter\long\expandafter\def\csname tp@\tp@cur@cont @#2\endcsname{\csname tp@\tp@cur@cont @#1\endcsname}%
-  %%\csgappto{@tp@reset@components@\tp@cur@cont}{\csname tp@\tp@cur@cont @#2\endcsname{}}%
 }
 \def\tp@reset@components#1{%
   \csname @tp@reset@components@#1\endcsname
@@ -318,15 +338,16 @@
   \fi
   \csname tp@#2@#1@properties\endcsname
 }
-\long\def\tpIfProp#1#2#3{\long\def\@tempa{}%
-    \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa #3\else#2\fi
+\long\def\tpIfProp#1#2#3{%
+  \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\relax#3\else
+    \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\long@empty #3\else#2\fi
+  \fi
 \ignorespaces}
 \long\def\tpIfPropVal#1#2#3#4{\long\def\@tempa{#2}%
   \expandafter\ifx\csname tp@\tp@cur@cont @#1\endcsname\@tempa\relax#3\else#4\fi\ignorespaces}
-\def\tp@opt@curcont#1{\@ifnextchar[{#1}{#1[\tp@cur@cont]}}%]
-\def\tp@opt@empty#1{\@ifnextchar[{#1}{#1[]}}%]
-\def\tp@opt@second#1{\def\@tempa[##1]##2{#1[##1\if!##1!##2\fi]{##2}}%
-  \@ifnextchar[{\@tempa}{\@tempa[]}}%
+\long\def\tp@opt@curcont#1{\@ifnextchar[{#1}{#1[\tp@cur@cont]}}%]
+\long\def\tp@opt@empty#1{\@ifnextchar[{#1}{#1[]}}%]
+\let\tp@opt@second\@dblarg
 \long\def\tp@iterate{\@ifnextchar[{\@tp@iterate}{\@tp@iterate[\@ne]}}%]
 \long\def\@tp@iterate[#1]#2#3#4#5{%
   \advance#2 by #1\relax
@@ -361,6 +382,10 @@
       \expandafter\def\csname tp@\tp@cur@node @attr@#1\endcsname{#2}%
     \fi
   \fi}
+\def\tpGetAttr#1#2{\csuse{tp@#1@attr@#2}}
+\def\tpIfAttr#1#2#3#4{\ifcsdef{tp@#1@attr@#2}{#3}{#4}}
+\def\tpIfAttrStr#1#2#3#4#5{\tpIfAttr{#1}{#2}{\ifcsstring{tp@#1@attr@#2}{#3}{#4}{#5}}{#5}}
+\def\tpIfAttrIsset#1#2#3#4{\tpIfAttr{#1}{#2}{\expandafter\ifx\csname tp@#1@attr@#2\endcsname\@empty#3\else#4\fi}{#4}}
 \long\def\tpDeclareClass{\@ifnextchar [{\@tp@set@class}{\@tp@set@class[default]}}%]
 \long\def\@tp@set@class[#1]#2{\tp@opt@empty{\tp@set@class[#1]{#2}}}%
 \long\gdef\tp@default@class@default{}
