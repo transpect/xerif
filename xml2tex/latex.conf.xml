@@ -1372,7 +1372,6 @@
         <rule name="tpAuthor" type="env" break-after="0" break-before="1">
           <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
-<!--            <with-param name="aff-as-ref" tunnel="yes" as="xs:boolean" select="$aff-as-ref"/>-->
           </text>
         </rule>
       </xsl:when>
@@ -1448,8 +1447,6 @@
                                                       |self::dbk:editor
                                                       |self::dbk:othercredit]/dbk:affiliation">
     <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/>
-<!--    <xsl:param name="aff-as-ref" as="xs:boolean?" tunnel="yes"/>-->
-    <xsl:message select="'#####', $aff-as-ref"/>
     <xsl:variable name="all-aff" as="element()">
       <tmp>
         <xsl:for-each-group group-by="string-join(dbk:orgname, '')" select="ancestor::dbk:info//dbk:affiliation">
