@@ -33,6 +33,7 @@
   <xsl:param name="notes-per-chapter-notoc" as="xs:string"/>
   <xsl:param name="endnotes-with-chapter" as="xs:string"/>
   <xsl:param name="running-header" as="xs:string"/>
+  <xsl:variable name="aff-as-ref" as="xs:boolean" select="true()"/>
   
   <xsl:param name="run-local" as="xs:string"/>
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
@@ -1371,6 +1372,7 @@
         <rule name="tpAuthor" type="env" break-after="0" break-before="1">
           <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
+<!--            <with-param name="aff-as-ref" tunnel="yes" as="xs:boolean" select="$aff-as-ref"/>-->
           </text>
         </rule>
       </xsl:when>
@@ -1446,6 +1448,8 @@
                                                       |self::dbk:editor
                                                       |self::dbk:othercredit]/dbk:affiliation">
     <xsl:param name="in-author" as="xs:boolean?" tunnel="yes"/>
+<!--    <xsl:param name="aff-as-ref" as="xs:boolean?" tunnel="yes"/>-->
+    <xsl:message select="'#####', $aff-as-ref"/>
     <xsl:variable name="all-aff" as="element()">
       <tmp>
         <xsl:for-each-group group-by="string-join(dbk:orgname, '')" select="ancestor::dbk:info//dbk:affiliation">
@@ -1459,15 +1463,19 @@
     <xsl:variable name="position" select="index-of($all-aff//*:tmp-aff-group/@tmp-id, $all-aff//*:tmp-aff-group[dbk:affiliation/dbk:orgname[1]/@srcpath = current()/dbk:orgname[1]/@srcpath]/@tmp-id)"/>
     <!--  <xsl:message   select="'all-aff: ', $all-aff//*:tmp-aff-group/*, '-\-', $position, '-\- (', dbk:orgname, ')'"/>-->
     <xsl:choose>
+      <xsl:when test="$in-author and not($aff-as-ref)">
+        <!-- affiliation directly after author, no summarizing and referencing -->
+        <rule name="tpAffiliation" type="cmd" break-before="1">
+          <param select="node()"/>
+        </rule>
+      </xsl:when>
       <xsl:when test="$in-author">
-        <!-- make commented code active when journal changes are implemented! 
-        <rule name="tpAffilRef" type="cmd" break-before="1">-->
-        <rule name="tpAffil" type="cmd" break-before="1">
+        <rule name="tpAffilRef" type="cmd" break-before="1">
           <!-- To Do: generate index from Affiliation list -->
           <param select="$position"/>
         </rule>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test="not($in-author) and $aff-as-ref">
         <xsl:if test="current()/dbk:orgname/@srcpath = $all-aff//*:tmp-aff-group/dbk:affiliation[1]/dbk:orgname/@srcpath">
           <xsl:text>&#xa;\begin{tpAffil}</xsl:text>
           <rule name="tpAffilID" type="cmd" break-before="1">
@@ -1480,7 +1488,7 @@
           </rule>
           <xsl:text>&#xa;\end{tpAffil}</xsl:text>
         </xsl:if>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </template>
   
