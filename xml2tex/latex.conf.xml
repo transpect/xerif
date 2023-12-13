@@ -959,7 +959,7 @@
                                      dbk:biblioset" mode="#current"/>
         <xsl:if test="../dbk:section[@role = 'alternative-title'][dbk:para[normalize-space()]]">
           <xsl:if test="../dbk:section[@role = 'alternative-title'][dbk:info/dbk:title[normalize-space()]]">
-            <xsl:text>&#xa;\tpTitleEnTitle{</xsl:text>
+            <xsl:text>&#xa;\tpTitleEnLabel{</xsl:text>
             <xsl:apply-templates select="../dbk:section[@role = 'alternative-title']/dbk:info/dbk:title[normalize-space()]/node()" mode="#current"/>
             <xsl:text>}</xsl:text>
           </xsl:if>
@@ -1527,7 +1527,7 @@
   
   <template context="dbk:abstract">
     <xsl:if test="dbk:title">
-      <rule name="tpAbstractTitle" type="cmd" break-before="1" break-after="0">
+      <rule name="tpAbstractLabel" type="cmd" break-before="1" break-after="0">
         <param select="dbk:title"/>
       </rule>
     </xsl:if>
@@ -1540,7 +1540,7 @@
 
   <template context="dbk:info/dbk:keywordset">
     <xsl:if test="@role">
-      <rule name="tpKeywordsTitle" type="cmd" break-before="1" break-after="0">
+      <rule name="tpKeywordsLabel" type="cmd" break-before="1" break-after="0">
          <param select="@role"/>
       </rule>
     </xsl:if>
