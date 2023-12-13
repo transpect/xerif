@@ -673,7 +673,7 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \def\@igopts{width=\hsize}%
   \fi
   \if!#1!\else
-    \def\@igopts{#1,width=\hsize}%
+    \def\@igopts{width=\hsize,#1}%
   \fi
   \gdef\@tp@fig@path{#2}%
   \expandafter\tpltx@includegraphics\expandafter[\@igopts]{#2}%
