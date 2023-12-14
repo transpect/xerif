@@ -212,8 +212,9 @@
   \fi
   \global\let\tp@iterate@res\relax
 }
+\def\tpIfCompOverride#1#2#3{\expandafter\ifx\csname tp@used@#1@override\endcsname\@empty#2\else#3\fi}
 \def\tpComposeCollection#1#2#3{%
-  \tpIfComp{#3}{}{%
+  \tpIfComp{#3}{\cslet{tp@used@#3@override}\@empty}{%
     \ifcsdef{#1Cnt}{%
       \expandafter\ifnum\csname #1Cnt\endcsname > \z@\relax
         \edef\tp@iterate@res{%
@@ -241,7 +242,7 @@
     }{}}%
 }
 \def\tpApplyCollection#1#2#3{%
-  \tpIfComp{#3}{}
+  \tpIfComp{#3}{\cslet{tp@used@#3@override}\@empty}
     {\tp@apply@collection{#1}{#2}%
      \tp@assign@res{tp#3}%
    }%

@@ -123,15 +123,12 @@
     \def\Hy@toclevel{#1}%
     \tp@auto@number{#1}{#2}%
     \tpUseProperty{heading-par}%
-    \expandafter\ifx\csname tp@parent@#2\endcsname\relax\else
-      \edef\@@parent{before-hook-\csname tp@parent@#2\endcsname}%
-      \expandafter\tpUseHook\expandafter{\@@parent}%
-    \fi
-    \tpUseHook{before-hook-\tp@heading@name}%
+    \tp@hd@use@hook{before-hook}{#2}%
     \tpUseProperty{before-heading}%
     \tp@do@before@skip
     \tp@format@number{}{}{#1}%
     \tpIfProp{after-skip}{\expandafter\global\expandafter\@tempskipa\expandafter=\tpUseProperty{after-skip}\relax}{\global\@tempskipa=1sp\relax}%
+    \tp@hd@use@hook{before-print-hook}{#2}%
     \def\@svsec{%
       \tpUseProperty{before-heading-block}%
       \tp@heading@create@labels{#2}% label facility
@@ -155,6 +152,13 @@
     \aftergroup\next%
   }%
 }
+\def\tp@hd@use@hook#1#2{%
+  \expandafter\ifx\csname tp@parent@#2\endcsname\relax\else
+    \edef\@@parent{#1-\csname tp@parent@#2\endcsname}%
+    \expandafter\tpUseHook\expandafter{\@@parent}%
+  \fi
+  \tpUseHook{#1-\tp@heading@name}%
+}
 \def\tp@do@before@skip{%
   \setlength\@tempskipa{\tpUseProperty{before-skip}}%
   \ifdim\@tempskipa<\z@\relax
@@ -170,9 +174,10 @@
     \do@skip
   \fi}
 \def\tp@init@hooks#1{%
-  \tpDeclareHook{toc-before-hook-#1}%
-  \tpDeclareHook{toc-after-hook-#1}%
-  \tpDeclareHook{before-hook-#1}%
+  \tpDeclareHook{toc-before-hook-#1}% Expanded before the toc entry is printed
+  \tpDeclareHook{toc-after-hook-#1}% Expanded after the toc entry is printed
+  \tpDeclareHook{before-hook-#1}% Expanded before before-heading property is expanded
+  \tpDeclareHook{before-print-hook-#1}% Expanded at the very beginning of the local definition of \@svsec
 }
 \def\tp@init@cnt#1{\ifcsname c@#1\endcsname\else\@definecounter{#1}\fi}
 \def\tp@auto@number#1#2{%

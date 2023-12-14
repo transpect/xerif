@@ -97,15 +97,15 @@
 \def\tpDeclareRoleBlock#1#2#3{%
   \tpDeclareComp{#1#2}{\expandafter\global}{}%
   \csgdef{tp@meta@role@#1@#2}{#3}}
-\def\tp@meta@role@eval#1{{%
+\def\tp@meta@role@eval#1{%
     \tp@meta@role@compose{#1}{NameList}%
     \tp@meta@role@compose{#1}{CitationList}%
     \tp@meta@role@compose{#1}{ShortCitationList}%
     \tp@meta@role@compose{#1}{Correspondence}%
     \tp@meta@role@apply{#1}{PDFInfo}%
-  }}
+  }
 \def\@tp@meta@role@eval#1#2#3{%
-  \tpIfComp{#2#3}{}{%
+  \tpIfComp{#2#3}{\cslet{tp@used@#2#3@override}\@empty}{%
     \ifcsdef{tp#2Cnt}
       {\expandafter\ifnum\csname tp#2Cnt\endcsname>\z@
           #1{tp#2}{\csname tp@meta@role@#2@#3\endcsname}{#2#3}%
