@@ -65,7 +65,7 @@
     \tpDeclareCountedComp{LastName}%
     \tpDeclareCountedComp{FirstName}%
     \tpDeclareCountedComp{MidName}%
-    \tpDeclareCountedComp{PersonPrefix}%
+    \tpDeclareCountedComp{Honorific}%
     \tpDeclareCountedComp{Lineage}%
     \tpDeclareCountedComp{ORCID}%
     \tpDeclareCountedComp{AffilRef}% for references to the tpAffil Group
@@ -173,9 +173,9 @@
   %% Properties that control how the composed compoents WITHIN each item in a Role are formatted:
   %
   \tpSetProperty{role-full-name-format}{%
-    \if\tpUseComp{PersonPrefix}\relax
+    \if\tpUseComp{Honorific}\relax
     \else
-      \tpUseComp{PersonPrefix}\space
+      \tpUseComp{Honorific}\space
     \fi
     \tpUseComp{FirstName}\space
     \if\tpUseComp{MidName}\relax
