@@ -671,7 +671,7 @@
 
   <xsl:template match="text()[matches(., '/[\p{Lu}]')]" mode="escape-bad-chars" priority="30">
     <xsl:variable name="content" select="xml2tex:escape-for-tex(replace( ., '\\', '\\textbackslash ' ))" as="xs:string"/>
-    <xsl:value-of select="if (ancestor::*[self::dbk:link|self::dbk:ulink]) 
+    <xsl:value-of select="if (ancestor::*[self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink']]) 
                           then $content
                           else replace($content, '/(\p{Lu})', '{\\slash}$1')"/>
     <!--   / → {\slash} -->
@@ -2988,14 +2988,14 @@
     <!--SOFT HYPHEN -->
     <char character="&#xad;" string="\-"/>
     <!--SOFT HYPHEN -->
-    <char character="&#xad;" string="&#xad;" context="dbk:phrase[@role eq 'Hyperlink']
+    <char character="&#xad;" string="&#xad;" context="dbk:phrase[@role = ('Hyperlink', 'pseudolink')]
                                                       |dbk:link"/>
     
     <!-- TILDE -->
     <!--  https://redmine.le-tex.de/issues/14615-->
     <char character="&#xAE;" string="\textregistered{}"/>
     <char character="&#x7e;" string="{\string~}"/>
-    <char character="&#x7e;" string="${\sim}$" context="*[not(self::dbk:link|self::dbk:ulink)]"/>
+    <char character="&#x7e;" string="${\sim}$" context="*[not(self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink'])]"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
     <char character="&#x2c6f;" string="$\forall$"/>
     <char character="&#x2200;" string="$\forall$"/>
