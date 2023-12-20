@@ -1182,12 +1182,12 @@
   <!-- markup links -->
   
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
-                select="'https?://[-a-z0-9\.:;#%_/\?=&amp;@]+[-a-z0-9:;#%_/=&amp;]'"/>
+                select="'(https?://|www\.)[-a-z0-9\.:;#%_/\?=&amp;@]+[-a-z0-9:;#%_/=&amp;]'"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., 'https?://')]" mode="hub:clean-hub">
     <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
       <xsl:matching-substring>
-        <link xlink:href="{.}">
+        <link xlink:href="{if(starts-with(., 'www')) then concat('https://', .) else .}">
           <xsl:value-of select="."/>
         </link>
       </xsl:matching-substring>
