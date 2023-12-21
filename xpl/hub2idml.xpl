@@ -21,6 +21,7 @@
   <p:input port="source" primary="true"><p:documentation>a Hub document</p:documentation></p:input>
   <p:input port="paths" primary="false"/>
 
+  <p:option name="template" select="'xml2idml/template.idml'"/>
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="resolve-uri('debug')"/>
   <p:option name="status-dir-uri" required="false" select="resolve-uri('status')"/>
@@ -35,7 +36,7 @@
   <p:output port="idml" sequence="true">
     <p:pipe port="result" step="xml2idml"/>
   </p:output>
-
+  
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl" />
   <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
@@ -87,11 +88,7 @@
       <p:pipe port="paths" step="hub2idml"/>
     </p:input>
     <p:with-option name="mapping" select="'xml2idml/mapping.xml'" />
-    <p:with-option name="template" select="if (matches(/*/c:param[@name = 'basename']/@value, '_(anth|mono)_')) 
-                                          then concat('xml2idml/', replace(/*/c:param[@name = 'basename']/@value, '\d{5}.*$', ''), lower-case(/*/c:param[@name = 'layout']/@value), '.idml')
-                                          else 'xml2idml/ts_std_anth_c.idml'">
-      <p:pipe port="paths" step="hub2idml"/>
-    </p:with-option>
+    <p:with-option name="template" select="$template"/>
     <p:with-option name="idml-target-uri" select="/*/c:param[@name = 'idml-target-uri']/@value">
       <p:pipe port="paths" step="hub2idml"/>
     </p:with-option>

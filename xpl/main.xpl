@@ -71,6 +71,7 @@
   <p:option name="debug-dir-uri" select="'debug'"/>
   <p:option name="status-dir-uri" select="'status'"/>
   <p:option name="interface-language" select="'de'"/>
+  <p:option name="template" select="'xml2idml/template.idml'"/>
   
   <p:option name="output-xml" select="'tei'">
     <p:documentation>preferred XML Output. possible values: "bits" or "tei"</p:documentation>
@@ -400,6 +401,9 @@
         <p:input port="paths">
           <p:pipe port="result" step="get-paths"/> 
         </p:input>
+        <p:with-option name="template" select="/*/c:param[@name = 'idml-template']/@value" >
+          <p:pipe port="result" step="get-paths"/>
+        </p:with-option>
         <p:with-option name="debug" select="$debug" />
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri" />
       </tx:hub2idml>

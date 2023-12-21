@@ -456,6 +456,11 @@
         <p:input port="paths">
           <p:pipe port="result" step="get-paths"/> 
         </p:input>
+        <p:with-option name="template" select="if (matches(/*/c:param[@name = 'basename']/@value, '_(anth|mono)_')) 
+                                          then concat('xml2idml/', replace(/*/c:param[@name = 'basename']/@value, '\d{5}.*$', ''), lower-case(/*/c:param[@name = 'layout']/@value), '.idml')
+                                          else 'xml2idml/ts_std_anth_c.idml'">
+          <p:pipe port="result" step="get-paths"/>
+        </p:with-option>
         <p:with-option name="debug" select="$debug" />
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri" />
       </tx:hub2idml>
