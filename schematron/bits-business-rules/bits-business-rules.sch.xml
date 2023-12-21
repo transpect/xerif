@@ -7,5 +7,38 @@
   xmlns:tr="http://transpect.io">
   
   <ns prefix="tr" uri="http://transpect.io"/>
+  <ns prefix="xlink" uri="http://www.w3.org/1999/xlink"/>
+  
+  <pattern id="dates">
+    <rule context="pub-date">
+      <assert test="concat(year, '-', month, '-', day) castable as xs:date" role="error" id="pub-date">
+        The date <code xmlns="http://www.w3.org/1999/xhtml">"<value-of select="concat(year, '-', month, '-', day)"/>"</code> does not correspond to any real date.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="contrib">
+    <rule context="book-meta/contrib-group">
+      <assert test="contrib[@contrib-type = 'author']" role="error" id="no-author">
+        There is no author in <code xmlns="http://www.w3.org/1999/xhtml">&lt;contrib-group/></code>.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="email">
+    <rule context="email">
+      <assert test="matches(@xlink:href, '^mailto:[a-z0-9\.\-_]+@[a-z0-9\-]+\.[a-z]+$')" role="error" id="email-invalid">
+        The email link is not valid.
+      </assert>
+    </rule>
+  </pattern>
+  
+  <pattern id="keywords">
+    <rule context="kwd-group">
+      <assert test="count(kwd) &gt; 3" role="error" id="keyword-count">
+        There must be at least three keywords in a <code xmlns="http://www.w3.org/1999/xhtml">&lt;kwd-group/></code>.
+      </assert>
+    </rule>
+  </pattern>
 
 </schema>
