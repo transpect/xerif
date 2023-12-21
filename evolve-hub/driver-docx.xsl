@@ -1182,13 +1182,13 @@
   <!-- markup links -->
   
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
-                select="'(https?://|www\.)[-a-z0-9\.:;#%_/\?=&amp;@]+[-a-z0-9:;#%_/=&amp;]'"/>
+                select="'(https?://|www\.)[-a-z0-9\.:;#%_/\?=&amp;@&#x200b;-&#x200d;]+[-a-z0-9:;#%_/=&amp;&#x200b;-&#x200d;]'"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., 'https?://')]" mode="hub:clean-hub">
     <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
       <xsl:matching-substring>
-        <link xlink:href="{if(starts-with(., 'www')) then concat('https://', .) else .}">
-          <xsl:value-of select="."/>
+        <link xlink:href="{if(starts-with(., 'www')) then concat('https://', hub:remove-prohibited-characters-from-url(.)) else hub:remove-prohibited-characters-from-url(.)}">
+          <xsl:value-of select="hub:remove-prohibited-characters-from-url(.)"/>
         </link>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
@@ -1196,7 +1196,12 @@
       </xsl:non-matching-substring>
     </xsl:analyze-string>
   </xsl:template>
-
+  
+  <xsl:function name="hub:remove-prohibited-characters-from-url" as="xs:string">
+    <xsl:param name="url" as="xs:string"/>
+    <xsl:value-of select="replace($url, '[&#x200b;-&#x200d;]', '')"/>
+  </xsl:function>
+  
   <!-- blind table for tab-like structures -->
   
   <xsl:template match="informaltable[matches(@role, '^[a-z]{1,3}tabulator$')]/tgroup" mode="custom-2">
