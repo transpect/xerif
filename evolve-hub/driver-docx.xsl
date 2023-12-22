@@ -1184,10 +1184,12 @@
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
                 select="'(https?://|www\.)[-a-z0-9\.:;#%_/\?=&amp;@&#x200b;-&#x200d;]+[-a-z0-9:;#%_/=&amp;&#x200b;-&#x200d;]'"/>
 
-  <xsl:template match="text()[not(ancestor::link)][matches(., 'https?://')]" mode="hub:clean-hub">
+  <xsl:template match="text()[not(ancestor::link)][matches(., '(https?://|www\.)')]" mode="hub:clean-hub">
     <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
       <xsl:matching-substring>
-        <link xlink:href="{if(starts-with(., 'www')) then concat('https://', hub:remove-prohibited-characters-from-url(.)) else hub:remove-prohibited-characters-from-url(.)}">
+        <link xlink:href="{if(starts-with(., 'www')) 
+                           then concat('https://', hub:remove-prohibited-characters-from-url(.)) 
+                           else hub:remove-prohibited-characters-from-url(.)}">
           <xsl:value-of select="hub:remove-prohibited-characters-from-url(.)"/>
         </link>
       </xsl:matching-substring>
@@ -1734,16 +1736,6 @@
       </xsl:copy>
     </personblurb>
   </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $info-keywords-role)]" mode="hub:process-meta-sidebar">
-    <keywordset>
-      <xsl:for-each select="tokenize(., '\p{Zs}*[;,&#x2013;-&#x2015;&#x2022;]\p{Zs}*')">
-        <keyword>
-          <xsl:value-of select="."/>
-        </keyword>
-      </xsl:for-each>
-    </keywordset>
-  </xsl:template>
 
   <xsl:template match="section[@role = 'abstract']" mode="hub:process-meta-sidebar">
     <abstract>
@@ -1758,7 +1750,7 @@
       </xsl:apply-templates>
     </abstract>
   </xsl:template>
-  
+
   <xsl:template match="section[@role = ('abstract', 'keywords', 'alternative-title')]
                               [not(title)]/para[matches(@role, $hub:keyword-abstract-transtitle-combined)][1]/node()[1][self::phrase]" mode="hub:process-meta-sidebar" priority="2">
     <xsl:param name="phrase-to-title" as="xs:boolean?" tunnel="yes"/>
