@@ -195,7 +195,7 @@
   </xsl:variable>
   
   <xsl:variable name="info-keywords-role" as="xs:string"
-                select="'^[a-z]{1,3}keywords$'"/>
+                select="'^[a-z]{1,3}keywords?$'"/>
   
   <xsl:variable name="info-author-role" as="xs:string"
                 select="'^[a-z]{1,3}(author)$'"/>
