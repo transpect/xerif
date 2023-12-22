@@ -114,8 +114,8 @@
         <p:input port="html-in">
           <p:empty/>
         </p:input>
-        <p:with-param name="family" select="'bits-business-rules'"/>
-        <p:with-param name="step-name" select="'validate-bits-business-rules'"/>
+        <p:with-param name="family" select="'bits'"/>
+        <p:with-param name="step-name" select="'validate-bits'"/>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
