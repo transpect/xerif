@@ -1734,6 +1734,16 @@
       </xsl:copy>
     </personblurb>
   </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $info-keywords-role)]" mode="hub:process-meta-sidebar">
+    <keywordset>
+      <xsl:for-each select="tokenize(., '\p{Zs}*[;,&#x2013;-&#x2015;&#x2022;]\p{Zs}*')">
+        <keyword>
+          <xsl:value-of select="."/>
+        </keyword>
+      </xsl:for-each>
+    </keywordset>
+  </xsl:template>
 
   <xsl:template match="section[@role = 'abstract']" mode="hub:process-meta-sidebar">
     <abstract>
@@ -1748,7 +1758,7 @@
       </xsl:apply-templates>
     </abstract>
   </xsl:template>
-
+  
   <xsl:template match="section[@role = ('abstract', 'keywords', 'alternative-title')]
                               [not(title)]/para[matches(@role, $hub:keyword-abstract-transtitle-combined)][1]/node()[1][self::phrase]" mode="hub:process-meta-sidebar" priority="2">
     <xsl:param name="phrase-to-title" as="xs:boolean?" tunnel="yes"/>
