@@ -3,7 +3,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
         xmlns:tr="http://transpect.io"
         xmlns:c="http://www.w3.org/ns/xproc-step"
-        queryBinding="xslt2">
+        queryBinding="xslt2" xml:lang="en">
 
   <ns prefix="idml2xml" uri="http://transpect.io/idml2xml"/>
   <ns prefix="hub2tei" uri="http://transpect.io/hub2tei"/>
@@ -52,6 +52,23 @@
     </rule>
   </pattern>
 
+  <pattern id="evolve-hub_heading-level">
+    <rule context="dbk:title[(..[not(self::dbk:info)]|..[self::dbk:info]/..)[@renderas]
+                                                                            [..[not(self::dbk:hub)]]]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1])[1]"/> 
+      <let name="pre" value="(..[not(self::dbk:info)]|..[self::dbk:info]/..)/(..[not(self::dbk:info)]|..[self::dbk:info]/..)"/>
+      <let name="renderas" value="(..[not(self::dbk:info)]|..[self::dbk:info]/..)/@renderas"/>
+      <let name="diff" value="xs:integer(replace($renderas, 'sect', '')) - xs:integer(if ($pre[self::dbk:part]) then '1' else replace($pre/@renderas, 'sect', '')) - 1"/>
+      <report test="$diff ge 1" id="incorrect_heading_level" role="warning" diagnostics="incorrect_heading_level_de">
+        <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
+        <span class="category">Document Structure</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Heading level omitted</span>
+        A heading level was omitted. This heading has style '<xsl:value-of select="@role"/>' and preceding heading has style 
+        '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Number of omitted levels: <xsl:value-of select="$diff"/>. This can result in incorrect structure/bookmarks. 
+      </report>
+    </rule>
+  </pattern>
+  
   <xsl:key name="idml2xml:styles-by-name" match="css:rule" use="(@role, @name)[1]"/>
 
   <pattern id="evolve-hub_images">
@@ -105,6 +122,11 @@
   </pattern>
 
   <diagnostics>
+    <diagnostic id="incorrect_heading_level_de" xml:lang="de">
+      <span class="category">Dokumentstruktur</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Überschriftsebene übersprungen</span>
+      Wurde hier eine Überschriftsebene ausgelassen? Diese Überschrift hat das Format '<xsl:value-of select="@role"/>', die darüberliegende 
+      Überschrift hat das Format '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Hier gibt es einen Sprung von <xsl:value-of select="$diff"/> Ebene(n). Dies kann zu Problemen in der XML- und Bookmark-Struktur im PDF führen. </diagnostic>
     <diagnostic id="suspiciously_long_identifier_de" xml:lang="de">
       <span class="category">Satzkonventionen</span>
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Viel Text vor Tabulator</span>
