@@ -1736,6 +1736,16 @@
       </xsl:copy>
     </personblurb>
   </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $info-keywords-role)]" mode="hub:process-meta-sidebar">
+    <keywordset>
+      <xsl:for-each select="tokenize(., '[&#x2d;&#x2013;&#x2014;;,]')">
+        <keyword>
+          <xsl:value-of select="normalize-space(.)"/>
+        </keyword>
+      </xsl:for-each>
+    </keywordset>
+  </xsl:template>
 
   <xsl:template match="section[@role = 'abstract']" mode="hub:process-meta-sidebar">
     <abstract>
