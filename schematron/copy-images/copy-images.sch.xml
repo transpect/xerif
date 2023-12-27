@@ -53,12 +53,22 @@
   </pattern>
 
   <pattern id="evolve-hub_heading-level">
-    <rule context="dbk:title[(..[not(self::dbk:info)]|..[self::dbk:info]/..)[@renderas]
-                                                                            [..[not(self::dbk:hub)]]]">
+    <rule context="dbk:title[(..[not(self::dbk:info)]
+                             |..[self::dbk:info]/..)[replace(@renderas, '(sect|hub:[-a-z]+)', '') castable as xs:integer][..[not(self::dbk:hub)]]
+                             and 
+                             (..[not(self::dbk:info)]
+                             |..[self::dbk:info]/..)/(..[not(self::dbk:info)]
+                                                     |..[self::dbk:info]/..)[replace(@renderas, '(sect|hub:[-a-z]+)', '') castable as xs:integer]]">
       <let name="srcpath" value="(@srcpath, .//@srcpath[1])[1]"/> 
-      <let name="pre" value="(..[not(self::dbk:info)]|..[self::dbk:info]/..)/(..[not(self::dbk:info)]|..[self::dbk:info]/..)"/>
-      <let name="renderas" value="(..[not(self::dbk:info)]|..[self::dbk:info]/..)/@renderas"/>
-      <let name="diff" value="xs:integer(replace($renderas, 'sect', '')) - xs:integer(if ($pre[self::dbk:part]) then '1' else replace($pre/@renderas, 'sect', '')) - 1"/>
+      <let name="pre" value="(..[not(self::dbk:info)]
+                             |..[self::dbk:info]/..)/(..[not(self::dbk:info)]
+                                                     |..[self::dbk:info]/..)"/>
+      <let name="renderas" value="(..[not(self::dbk:info)]
+                                  |..[self::dbk:info]/..)/@renderas"/>
+      <let name="diff" value="  xs:integer(replace($renderas, '(sect|hub:[-a-z]+)', '')) 
+                              - xs:integer(if ($pre[self::dbk:part]) 
+                                           then '1' 
+                                           else replace($pre/@renderas, '(sect|hub:[-a-z]+)', '')) - 1"/>
       <report test="$diff ge 1" id="incorrect_heading_level" role="warning" diagnostics="incorrect_heading_level_de">
         <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
         <span class="category">Document Structure</span>
