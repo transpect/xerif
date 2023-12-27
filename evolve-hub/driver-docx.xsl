@@ -1741,7 +1741,7 @@
     <keywordset>
       <xsl:for-each select="tokenize(., '[&#x2d;&#x2013;&#x2014;;,]')">
         <keyword>
-          <xsl:value-of select="normalize-space(.)"/>
+          <xsl:value-of select="replace(., '^\p{Zs}*(.+?)\p{Zs}*$', '$1')"/>
         </keyword>
       </xsl:for-each>
     </keywordset>
