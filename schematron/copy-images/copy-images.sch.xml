@@ -54,24 +54,30 @@
 
   <pattern id="evolve-hub_heading-level">
     <rule context="dbk:title[(..[not(self::dbk:info)]
-                             |..[self::dbk:info]/..)[replace(@renderas, '(sect|hub:[-a-z]+)', '') castable as xs:integer][..[not(self::dbk:hub)]]
-                             and 
-                             (..[not(self::dbk:info)]
-                             |..[self::dbk:info]/..)/(..[not(self::dbk:info)]
-                                                     |..[self::dbk:info]/..)[replace(@renderas, '(sect|hub:[-a-z]+)', '') castable as xs:integer]]">
-      <let name="srcpath" value="(@srcpath, .//@srcpath[1])[1]"/> 
+                             |..[self::dbk:info]/..)[some $r in tokenize(@renderas, '\s+') satisfies (replace($r, '(sect|hub:[-a-z]+)', '') castable as xs:integer)]
+                                                    [@renderas[contains(., 'sect')]]
+                                                    [..[not(self::dbk:hub)]]
+                             ]">
+      <let name="srcpath" value="(@srcpath, .//@srcpath[1])[1]"/>
+      <let name="top-level-elts" value="('acknowledgements', 'appendix', 'article', 'bibliography', 'chapter', 'colophon', 'dedication', 
+                                          'glossary', 'index', 'part', 'preface', 'reference', 'toc')"/>
       <let name="pre" value="(..[not(self::dbk:info)]
                              |..[self::dbk:info]/..)/(..[not(self::dbk:info)]
                                                      |..[self::dbk:info]/..)"/>
-      <let name="renderas" value="(..[not(self::dbk:info)]
-                                  |..[self::dbk:info]/..)/@renderas"/>
-      <let name="diff" value="  xs:integer(replace($renderas, '(sect|hub:[-a-z]+)', '')) 
-                              - xs:integer(if ($pre[self::dbk:part]) 
-                                           then '1' 
-                                           else replace($pre/@renderas, '(sect|hub:[-a-z]+)', '')) - 1"/>
+      <let name="renderas" value="(tokenize(
+                                    ( ..[not(self::dbk:info)]
+                                     |..[self::dbk:info]/..)/@renderas, '\s+')[contains(., 'sect')]
+                                  )[1]"/>
+      <let name="diff" value="  xs:integer(replace($renderas, 'sect', '')) -1 
+                              - xs:integer(if ($pre[local-name() = $top-level-elts]) 
+                                           then if ($pre[self::dbk:part]) 
+                                                then '1'
+                                                else '2'
+                                           else replace((tokenize($pre/@renderas,  '\s+')[contains(., 'sect')])[1], 'sect', ''))"/>
       <report test="$diff ge 1" id="incorrect_heading_level" role="warning" diagnostics="incorrect_heading_level_de">
         <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
         <span class="category">Document Structure</span>
+        
         <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Heading level omitted</span>
         A heading level was omitted. This heading has style '<xsl:value-of select="@role"/>' and preceding heading has style 
         '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Number of omitted levels: <xsl:value-of select="$diff"/>. This can result in incorrect structure/bookmarks. 
