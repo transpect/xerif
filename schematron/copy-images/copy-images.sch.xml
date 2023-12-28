@@ -64,23 +64,28 @@
       <let name="pre" value="(..[not(self::dbk:info)]
                              |..[self::dbk:info]/..)/(..[not(self::dbk:info)]
                                                      |..[self::dbk:info]/..)"/>
+      <let name="pre-level" value="if ($pre[@renderas[contains(., 'sect')]])
+                                   then xs:integer(replace((tokenize($pre/@renderas,  '\s+')[contains(., 'sect')])[1], 'sect', ''))
+                                   else if ($pre[local-name() = $top-level-elts]) 
+                                           then if ($pre[self::dbk:part]) 
+                                                then 1
+                                                else 2
+                                   else if (exists($pre/(.|dbk:info)/dbk:title/@role[matches(., 'heading(\d)')])) 
+                                        then xs:integer(replace($pre/(.|dbk:info)/dbk:title/@role, '^[a-z]{1,3}heading(\d).*$', '$1')) +2 (:parts + chapters:)
+                                        else 500"/>
       <let name="renderas" value="(tokenize(
                                     ( ..[not(self::dbk:info)]
                                      |..[self::dbk:info]/..)/@renderas, '\s+')[contains(., 'sect')]
                                   )[1]"/>
-      <let name="diff" value="  xs:integer(replace($renderas, 'sect', '')) -1 
-                              - xs:integer(if ($pre[local-name() = $top-level-elts]) 
-                                           then if ($pre[self::dbk:part]) 
-                                                then '1'
-                                                else '2'
-                                           else replace((tokenize($pre/@renderas,  '\s+')[contains(., 'sect')])[1], 'sect', ''))"/>
+      <let name="diff" value="  xs:integer(replace($renderas, 'sect', '')) -1
+                              - $pre-level"/>
       <report test="$diff ge 1" id="incorrect_heading_level" role="warning" diagnostics="incorrect_heading_level_de">
         <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
         <span class="category">Document Structure</span>
         
         <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Heading level omitted</span>
         A heading level was omitted. This heading has style '<xsl:value-of select="@role"/>' and preceding heading has style 
-        '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Number of omitted levels: <xsl:value-of select="$diff"/>. This can result in incorrect structure/bookmarks. 
+        '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Number of omitted levels: <xsl:value-of select="$diff "/>. This can result in incorrect structure/bookmarks. 
       </report>
     </rule>
   </pattern>
@@ -140,6 +145,8 @@
   <diagnostics>
     <diagnostic id="incorrect_heading_level_de" xml:lang="de">
       <span class="category">Dokumentstruktur</span>
+     <!-- <xsl:value-of select="replace($renderas, 'sect', '')"/>//
+      <xsl:value-of select="$pre-level"/>//-->
         <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Überschriftsebene übersprungen</span>
       Wurde hier eine Überschriftsebene ausgelassen? Diese Überschrift hat das Format '<xsl:value-of select="@role"/>', die darüberliegende 
       Überschrift hat das Format '<xsl:value-of select="$pre/(.|dbk:info)/dbk:title/@role"/>'. Hier gibt es einen Sprung von <xsl:value-of select="$diff"/> Ebene(n). Dies kann zu Problemen in der XML- und Bookmark-Struktur im PDF führen. </diagnostic>
