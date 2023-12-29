@@ -1737,7 +1737,8 @@
     </personblurb>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $info-keywords-role)]" mode="hub:process-meta-sidebar">
+  <xsl:template match="para[matches(@role, $info-keywords-role)]
+                           [not(parent::section[@role = ('abstract', 'keywords', 'alternative-title')])]" mode="hub:process-meta-sidebar">
     <keywordset>
       <xsl:for-each select="tokenize(., '[&#x2d;&#x2013;&#x2014;;,]')">
         <keyword>
