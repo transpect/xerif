@@ -451,6 +451,9 @@
   
   <tx:generate-xmp name="generate-xmp-wrapper">
     <p:input port="source">
+      <p:pipe port="result" step="create-hub"/> 
+    </p:input>
+    <p:input port="meta">
       <p:pipe port="result" step="load-meta-wrapper"/>
     </p:input>
     <p:input port="params">
