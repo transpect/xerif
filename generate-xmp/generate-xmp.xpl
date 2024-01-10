@@ -13,7 +13,7 @@
   name="generate-xmp">
   
   <p:documentation>
-    
+    Wraps source and metadata document together and generate XMP file from it.
   </p:documentation>
   
   <p:input port="source" primary="true"/>
@@ -28,6 +28,8 @@
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl"/>
   
+  <p:wrap-sequence wrapper-prefix="cx" wrapper="documents" wrapper-namespace="http://xmlcalabash.com/ns/extensions"/>
+  
   <tr:store-debug name="debug-before-generate-xmp" pipeline-step="generate-xmp/02_input">
     <p:with-option name="active" select="$debug"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
@@ -35,7 +37,7 @@
   
   <p:xslt name="generate-xmp-xsl">
     <p:input port="stylesheet">
-      <p:document href="generate-xmp.xsl"/>
+      <p:pipe port="stylesheet" step="generate-xmp"/>
     </p:input>
     <p:input port="parameters">
       <p:pipe port="parameters" step="generate-xmp"/>
