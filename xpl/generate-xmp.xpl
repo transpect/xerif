@@ -20,6 +20,13 @@
       Expects a hub document
     </p:documentation>
   </p:input>
+  
+  <p:input port="meta" primary="false">
+    <p:documentation>
+      Expects the metadata
+    </p:documentation>
+  </p:input>
+  
   <p:input port="params" primary="false">
     <p:documentation>
       Paths document
@@ -42,11 +49,14 @@
                                       fallback-xpl="http://this.transpect.io/a9s/common/generate-xmp/generate-xmp.xpl">
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:input port="paths">
-      <p:pipe port="params" step="tx-generate-xmp"/>
+    <p:input port="source">
+      <p:pipe port="source" step="tx-generate-xmp"/>
     </p:input>
     <p:input port="additional-inputs">
-      <p:empty/>
+      <p:pipe port="meta" step="tx-generate-xmp"/>
+    </p:input>
+    <p:input port="paths">
+      <p:pipe port="params" step="tx-generate-xmp"/>
     </p:input>
     <p:input port="options">
       <p:empty/>
