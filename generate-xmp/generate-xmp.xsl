@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:cx="http://xmlcalabash.com/ns/extensions"
   xmlns:x="adobe:ns:meta/"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
   xmlns:xap="http://ns.adobe.com/xap/1.0/"
@@ -20,7 +21,7 @@
   
   <xsl:output indent="yes"/>
   
-  <xsl:template match="/">
+  <xsl:template match="/cx:documents">
     <x:xmpmeta>
       <rdf:RDF>
         <rdf:Description rdf:about="">
@@ -78,7 +79,6 @@
           <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool>
           <xmp:ModifyDate><xsl:value-of select="current-dateTime()"/></xmp:ModifyDate>
           <xmp:MetadataDate><xsl:value-of select="current-dateTime()"/></xmp:MetadataDate>
-          <pdf:Keywords>anthropometry; Indian growth charts; growth references; growth standards; synthetic growth charts</pdf:Keywords>
           <pdf:Producer>le-tex xerif</pdf:Producer>
           <pdf:Keywords>
             <xsl:value-of select="string-join(ONIXmessage/product/subject[b067 eq '20']/b070, ', ')"/>
