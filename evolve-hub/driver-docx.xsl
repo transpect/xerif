@@ -1736,17 +1736,6 @@
       </xsl:copy>
     </personblurb>
   </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $info-keywords-role)]
-                           [not(parent::section[@role = ('abstract', 'keywords', 'alternative-title')])]" mode="hub:process-meta-sidebar">
-    <keywordset>
-      <xsl:for-each select="tokenize(., '[&#x2d;&#x2013;&#x2014;;,]')">
-        <keyword>
-          <xsl:value-of select="replace(., '^\p{Zs}*(.+?)\p{Zs}*$', '$1')"/>
-        </keyword>
-      </xsl:for-each>
-    </keywordset>
-  </xsl:template>
 
   <xsl:template match="section[@role = 'abstract']" mode="hub:process-meta-sidebar">
     <abstract>
