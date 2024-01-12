@@ -162,6 +162,9 @@
   <xsl:variable name="box-end-regex" as="xs:string" 
                 select="'^[a-z]{1,3}box[a-z]+end$'"/>
   
+   <xsl:variable name="box-heading-style" as="xs:string"
+                select="'^[a-z]{1,3}boxheading'"/>
+  
   <xsl:variable name="author-desc-style" as="xs:string"
                 select="'^[a-z]{1,3}authordescription'" />
   
