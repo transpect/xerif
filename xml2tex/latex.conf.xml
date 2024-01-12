@@ -2278,12 +2278,24 @@
   
   <template context="dbk:div[matches(@role, '^[a-z]{1,3}boxgrey')]">
     <rule name="kastengrau" type="env" break-after="0" break-before="0">
-      <text/>
+      <xsl:if test="dbk:para[matches(@role, $box-heading-style)]">
+        <option select="dbk:para[matches(@role, $box-heading-style)]"/>
+      </xsl:if>
+      <text select="node()[not(self::dbk:para[matches(@role, $box-heading-style)])]"/>
     </rule>
   </template>
   
   <template context="dbk:div[matches(@role, '^[a-z]{1,3}boxborder')]">
     <rule name="kastenlinie" type="env"  break-after="0" break-before="0">
+     <xsl:if test="dbk:para[matches(@role, $box-heading-style)]">
+        <option select="dbk:para[matches(@role, $box-heading-style)]"/>
+      </xsl:if>
+      <text select="node()[not(self::dbk:para[matches(@role, $box-heading-style)])]"/>
+    </rule>
+  </template>
+  
+    <template context="dbk:para[matches(@role, $box-heading-style)]">
+    <rule break-after="0">
       <text/>
     </rule>
   </template>
