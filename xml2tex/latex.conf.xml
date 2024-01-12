@@ -204,7 +204,6 @@
                                $pubtype-value, 
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
-                               ',autonumbering'[$numbering-depth ne '0'],
                                ',withcoltitles'[$running-header eq 'yes'],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
@@ -902,7 +901,7 @@
         * chapters and sections
         * 
 
-  \begin{heading}[numbered=false]{chapter}
+  \begin{heading}[nonumber]{chapter}
   \tpAuthor{John Doe und Max Mustermann}% Autor des Abschnitts
   \tpTitle{Einf?hrung\footnote{Foobar}}% Eigentliche ?S im Fliesstext
   \tpNumber{Kapitel 1}
@@ -1142,10 +1141,9 @@
                     |dbk:bibliodiv/dbk:info
                     |dbk:bibliolist/dbk:info">
     <rule name="heading" type="env" break-after="1" break-before="1">
-      <option select="concat('numbered=', 
-                             if(matches(dbk:title/@role,'nummerated') or dbk:title/dbk:phrase[@role='hub:identifier'])
-                             then 'true'
-                             else 'false')"/>
+      <option select="if(matches(dbk:title/@role,'nummerated') or dbk:title/dbk:phrase[@role='hub:identifier'])
+                             then 'nonumber'
+                             else ''"/>
       <param select="tr:heading-level(parent::*)"/>
       <xsl:apply-templates select="(dbk:author|dbk:authorgroup/dbk:author), 
                                    dbk:title/dbk:phrase[@role eq 'hub:identifier'],
