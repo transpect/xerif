@@ -177,7 +177,7 @@
   <xsl:variable name="info-meta-styles" as="xs:string"
                 select="concat('(',
                           string-join(
-                            ($info-keywords-role,
+                            ($hub:keywords-role-regex,
                              $info-author-role,
                              $info-author-bio-role,
                              $info-author-email-role,
@@ -193,9 +193,6 @@
     <!-- all meta style names that go into a bibloset, if they do not all begin with meta in your a9s, 
       concat the important ones (info-licence-style, info-doi, etc.)-->
   </xsl:variable>
-  
-  <xsl:variable name="info-keywords-role" as="xs:string"
-                select="'^[a-z]{1,3}keywords?$'"/>
   
   <xsl:variable name="info-author-role" as="xs:string"
                 select="'^[a-z]{1,3}(author)$'"/>
