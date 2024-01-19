@@ -2069,6 +2069,8 @@
     <xsl:value-of select="hub:gentle-normalize(.)"/>
   </xsl:template>
 
+  <!-- processing instructions -->
+
   <xsl:template match="para[not(@role)][not(matches(., '\S'))][@css:page-break-before]" mode="hub:split-at-tab">
     <xsl:text>&#xa;</xsl:text>
     <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak&#xa;'"/>
@@ -2082,6 +2084,19 @@
   
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]/text()" mode="hub:split-at-tab">
     <xsl:value-of select="replace(., $pi-mark, '\\')"/>
+  </xsl:template>
+  
+  <xsl:template match="phrase[matches(@role, $pi-style-regex, 'i')]/text()[matches(., concat($pi-mark, '[-+]\d+'))]" mode="hub:split-at-tab">
+    <xsl:analyze-string select="." regex="{concat($pi-mark, '([-+]\d+)')}">
+      <xsl:matching-substring>
+        <xsl:processing-instruction name="{$pi-xml-name}">
+          <xsl:value-of select="concat('\looseness=', regex-group(1))"/>
+        </xsl:processing-instruction>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
   </xsl:template>
   
   <xsl:template match="mediaobject[not(node())]" mode="hub:split-at-tab"/>
