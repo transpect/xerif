@@ -57,7 +57,7 @@
   \tpGroupHandler{tp#2}{%
     \tpIfComp{Biography}{}{\tpIfComp{Bio}{\tpBiography{\tpUseProperty{#1-biography-format}}}{}}%
   }%
-  \tpDeclareRoleBlock{#2}{BioBlock}{#1-bio-block-format}%
+  \tpDeclareRoleBlock[apply]{#2}{BioBlock}{#1-bio-block-format}%
 }
 \long\def\tpDeclareTitlepage#1{%
   \gdef\tp@titlepage{%
@@ -81,7 +81,6 @@
   \tpEvalType{Properties}%
   \tp@maketitle
   \tp@meta@role@eval{Author}%
-  \tpApplyCollection{tpAuthor}{\tp@meta@role@Author@BioBlock}{AuthorBioBlock}%
   \tpApplyCollection{tpAffil}{affil-block-item-format}{AffilBlock}%
   \tp@title@eds@eval{Editor}%
   \tp@title@eds@eval{SeriesEditor}%
@@ -178,7 +177,6 @@
 }}
 \def\tp@title@eds@eval#1{%
   \tp@meta@role@eval{#1}%
-  \tpApplyCollection{tp#1}{\csname tp@meta@role@#1@BioBlock\endcsname}{#1BioBlock}%
   \tp@create@editor@string{#1}}
 \def\tp@create@editor@string#1{%
   \expandafter\ifx\csname tp@\tp@cur@cont @#1NameList\endcsname\relax\else

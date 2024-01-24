@@ -88,27 +88,28 @@
   \tpDeclareRoleBlock{#2}{NameList}{#1-list-print-format}%
   \tpDeclareRoleBlock{#2}{CitationList}{#1-list-cite-format}%
   \tpDeclareRoleBlock{#2}{ShortCitationList}{#1-list-short-cite-format}%
-  \tpDeclareRoleBlock{#2}{PDFInfo}{#1-list-pdfinfo-format}%
+  \tpDeclareRoleBlock[apply]{#2}{PDFInfo}{#1-list-pdfinfo-format}%
   \tpDeclareRoleBlock{#2}{Correspondence}{#1-list-correspondence-format}%
 }
 \def\tpAddToRole#1#2{%
   \csgappto{@tp#1@hook}{#2}%
 }
-\def\tpDeclareRoleBlock#1#2#3{%
-  \tpDeclareComp{#1#2}{\expandafter\global}{}%
-  \csgdef{tp@meta@role@#1@#2}{#3}}
-\def\tp@meta@role@eval#1{%
-    \tp@meta@role@compose{#1}{NameList}%
-    \tp@meta@role@compose{#1}{CitationList}%
-    \tp@meta@role@compose{#1}{ShortCitationList}%
-    \tp@meta@role@compose{#1}{Correspondence}%
-    \tp@meta@role@apply{#1}{PDFInfo}%
-  }
+\def\tpDeclareRoleBlock{\@ifnextchar[\tp@declare@role@block{\tp@declare@role@block[compose]}}%]
+\def\tp@declare@role@block[#1]#2#3#4{%
+  \ifcsdef{tp@meta@role@#1}
+    {\tpDeclareComp{#2#3}{\expandafter\global}{}%
+     \csgdef{tp@meta@role@\tp@cur@cont @#2@#3}{#4}%
+     \csappto{@tp@meta@role@eval@\tp@cur@cont @#2}
+        {\csname tp@meta@role@#1\endcsname{#2}{#3}}}
+    {\tpPackageError{Meta}{Argument}
+      {Invalid optional argument in \string\tpDeclareRoleBlock!}
+      {Only `apply' or `compose' are allowed as values^^Jin the optional argument of \string\tpDeclareRoleBlock!}}}%
+\def\tp@meta@role@eval#1{\csname @tp@meta@role@eval@\tp@cur@cont @#1\endcsname}
 \def\@tp@meta@role@eval#1#2#3{%
   \tpIfComp{#2#3}{\cslet{tp@used@#2#3@override}\@empty}{%
     \ifcsdef{tp#2Cnt}
       {\expandafter\ifnum\csname tp#2Cnt\endcsname>\z@
-          #1{tp#2}{\csname tp@meta@role@#2@#3\endcsname}{#2#3}%
+          #1{tp#2}{\csname tp@meta@role@\tp@cur@cont @#2@#3\endcsname}{#2#3}%
         \fi
       }{}}}
 \def\tp@meta@role@apply#1#2{\@tp@meta@role@eval\tpApplyCollection{#1}{#2}}
