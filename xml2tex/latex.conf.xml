@@ -477,7 +477,7 @@
       </xsl:otherwise>  
     </xsl:choose>
     <xsl:value-of select="concat('&#xa;\tpPDFInfoName{', if (dbk:personname/dbk:firstname and dbk:personname/dbk:surname) 
-                                                         then concat(xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname, xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname))
+                                                         then concat(xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname))
                                                          else xml2tex:meta-remove-links-etc(.), '}')">
       <!-- https://redmine.le-tex.de/issues/16215-->
     </xsl:value-of>
