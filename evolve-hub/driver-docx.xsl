@@ -1182,7 +1182,7 @@
   <!-- markup links -->
   
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
-                select="'(https?://|www\.)[-a-z0-9\.:;#%_/\?=&amp;@&#x200b;-&#x200d;]+[-a-z0-9:;#%_/=&amp;&#x200b;-&#x200d;]'"/>
+                select="'(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;\(\)\[\]]+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;\(\)\[\]]'"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., '(https?://|www\.)')]" mode="hub:clean-hub">
     <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
