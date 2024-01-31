@@ -1182,15 +1182,19 @@
   <!-- markup links -->
   
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
-                select="'(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;]+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;]'"/>
+                select="concat('(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;',
+                               $tactical-break-character-for-urls,
+                               ']+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;',
+                               $tactical-break-character-for-urls,
+                               ']')"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., '(https?://|www\.)')]" mode="hub:clean-hub">
     <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
       <xsl:matching-substring>
         <link xlink:href="{if(starts-with(., 'www')) 
-                           then concat('https://', hub:remove-prohibited-characters-from-url(.)) 
-                           else hub:remove-prohibited-characters-from-url(.)}">
-          <xsl:value-of select="hub:remove-prohibited-characters-from-url(.)"/>
+                           then concat('https://', hub:remove-prohibited-characters-from-url(., false())) 
+                           else hub:remove-prohibited-characters-from-url(., false())}">
+          <xsl:value-of select="hub:remove-prohibited-characters-from-url(., true())"/>
         </link>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
@@ -1201,7 +1205,15 @@
   
   <xsl:function name="hub:remove-prohibited-characters-from-url" as="xs:string">
     <xsl:param name="url" as="xs:string"/>
-    <xsl:value-of select="replace($url, '[&#x200b;-&#x200d;]', '')"/>
+    <xsl:param name="text" as="xs:boolean"/>
+    <xsl:choose>
+      <xsl:when test="$text">
+        <xsl:value-of select="replace($url, '[&#x200b;-&#x200d;]', '')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="replace(replace($url, '[&#x200b;-&#x200d;]', ''), $tactical-break-character-for-urls, '')"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:function>
   
   <!-- blind table for tab-like structures -->

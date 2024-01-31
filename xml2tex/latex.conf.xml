@@ -705,8 +705,9 @@
     <!-- delete index terms to avoid TeX errors if no index is created but indexterms are contained in document.-->
   </xsl:template>
 
-  <template context="/*/*[self::dbk:part | self::dbk:chapter | self::dbk:section][empty(preceding-sibling::dbk:para)][1] | 
-                    /*/dbk:para[1][following-sibling::*[self::dbk:part | self::dbk:chapter | self::dbk:section]]" priority="3001">
+  <template context="/*/*[self::dbk:part|self::dbk:chapter|self::dbk:section]
+                         [empty(preceding-sibling::dbk:para)][1]
+                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
@@ -2682,12 +2683,7 @@
   </template>
   
   <!-- escape special characters in \url and \href inside footnotes
-       https://redmine.le-tex.de/issues/5376 -->
-  
-  <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
-  <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
-  <!-- character limit of url parts until tactical line breaks are inserted -->
-  <xsl:variable name="url-part-character-limit" as="xs:integer" select="40"/>
+       https://redmine.le-tex.de/issues/5376 -->  
 
   <xsl:function name="xml2tex:replace-recursive-linktext" as="node()*">
     <xsl:param name="nodes" as="node()*"/>

@@ -330,4 +330,10 @@
 
   <xsl:variable name="tei2html:no-toc-style-regex" as="xs:string" select="'notoc'"/>
 
+  <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
+  <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
+  
+  <!-- character limit of url parts until tactical line breaks are inserted -->
+  <xsl:variable name="url-part-character-limit" as="xs:integer" select="40"/>
+
 </xsl:stylesheet>
