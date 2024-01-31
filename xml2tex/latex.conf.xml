@@ -694,6 +694,15 @@
     </xsl:if>
   </template>
   
+  <template context="/dbk:*/dbk:acknowledgements">
+    <rule name="tpAcknowledgements" type="env" break-after="2" break-before="2">
+      <xsl:if test="dbk:title">
+        <option select="dbk:title" break-after="1"/>
+      </xsl:if>
+      <param select="* except dbk:title"/>
+    </rule>
+  </template>
+  
   <xsl:variable name="xerif" as="xs:boolean" select="true()">
   <!-- overrides some next-matches in docx2tex  -->
   </xsl:variable>

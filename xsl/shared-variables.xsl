@@ -17,6 +17,7 @@
                                 '|', replace($index-heading-regex, '^\^', ''),
                                 '|', replace($list-of-figures-regex, '^\^(.+)\$$', '$1'),
                                 '|', replace($list-of-tables-regex, '^\^(.+)\$$', '$1'),
+                                '|', replace($acknowledgements-role-regex, '^\^(.+)\$$', '$1'),
                                 ')(', $suffixes-regex, ')?$'
                                 ),
                          concat('^(berschrift3|[Hh]eading\s?3|[a-z]{1,3}heading2|[a-z]{1,3}headingenumerated2|[a-z]{1,3}(front|back)matter3)(', $suffixes-regex, ')?$'),
@@ -96,6 +97,9 @@
   
   <xsl:variable name="dedication-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}dedication$'"/>
+  
+  <xsl:variable name="acknowledgements-role-regex" as="xs:string"
+                select="'^[a-z]{1,3}acknowledgements$'"/>
   
   <xsl:variable name="literallayout-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}transliteration$'"/>

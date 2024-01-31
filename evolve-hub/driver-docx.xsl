@@ -940,6 +940,14 @@
     </dedication>
   </xsl:template>
   
+  <xsl:template match="chapter[title[matches(@role, $acknowledgements-role-regex)]]" mode="custom-1">
+    <acknowledgements>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </acknowledgements>
+  </xsl:template>
+  
+  <!-- acknowledgements -->
+  
   <!--  * 
         * programm listing 
         * -->
