@@ -173,6 +173,7 @@
                            para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
+                           biblioid,
                            bibliomisc,
                            abstract,
                            keywordset) (: must be placed below title :)"/>
