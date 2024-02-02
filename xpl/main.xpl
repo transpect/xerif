@@ -279,12 +279,12 @@
           <p:pipe port="result" step="normalize-filename"/>
         </p:with-option>
       </p:load>
+      
       <p:choose name="create-hub2">
         <p:when test="/*:TEI">
           <p:output port="result"  primary="true">
             <p:pipe port="result" step="tei2hub"/>
           </p:output>
-          
           <p:output port="report" primary="false">
             <p:pipe port="report" step="tei2hub"/>
           </p:output>
@@ -301,15 +301,14 @@
             <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
           </tei2hub:tei2hub>
         </p:when>
-        <p:otherwise>
+        <p:when test="/book or /article">
           <p:output port="result"  primary="true">
             <p:pipe port="result" step="bits2hub"/>
           </p:output>
-          
           <p:output port="report" primary="false">
             <p:pipe port="report" step="bits2hub"/>
           </p:output>
-          
+        
           <tr:bits2hub name="bits2hub">
             <p:input port="source">
               <p:pipe port="result" step="load-xml"/>
@@ -321,8 +320,18 @@
             <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
             <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
           </tr:bits2hub>
+        </p:when>
+        <p:otherwise>
+          <p:output port="result"  primary="true"/>
+          <p:output port="report" primary="false">
+            <p:empty/>
+          </p:output>
+          
+          <p:identity/>
+          
         </p:otherwise>
       </p:choose>
+      
     </p:otherwise>
   </p:choose>
   
