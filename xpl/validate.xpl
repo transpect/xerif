@@ -97,7 +97,7 @@
       </tr:validate-with-schematron>
   
     </p:when>
-    <p:when test="/*:hub or /*:book">
+    <p:when test="/book or /article">
       <p:xpath-context>
         <p:pipe port="source" step="validate"/>
       </p:xpath-context>
@@ -137,23 +137,24 @@
     <p:otherwise>
       <p:output port="result" primary="true" />
       <p:output port="reports" sequence="true">
-        <p:pipe port="report" step="validate-business-rules"/>
+        <p:pipe port="report" step="validate-docbook"/>
       </p:output>
       
-      <tr:validate-with-schematron name="validate-business-rules">
+      <tr:validate-with-schematron name="validate-docbook">
         <p:input port="parameters">
           <p:pipe port="paths" step="validate"/>
         </p:input>
         <p:input port="html-in">
           <p:empty/>
         </p:input>
-        <p:with-param name="family" select="'business-rules'"/>
-        <p:with-param name="step-name" select="'validate-business-rules'"/>
+        <p:with-param name="family" select="'dbk'"/>
+        <p:with-param name="step-name" select="'validate-dbk'"/>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
         <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
         <p:with-option name="schematron-rule-msg" select="'yes'"/>
       </tr:validate-with-schematron>
+      
     </p:otherwise>
   </p:choose>
   
