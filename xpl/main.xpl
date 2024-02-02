@@ -52,7 +52,7 @@
   </p:output>
   
   <p:output port="htmlreport" primary="false">
-    <p:pipe port="result" step="htmlreport"/>
+    <p:pipe port="result" step="validate-wrapper"/>
   </p:output>
   
   <p:output port="xmp" primary="false">
@@ -75,6 +75,10 @@
   
   <p:option name="output-xml" select="'tei'">
     <p:documentation>preferred XML Output. possible values: "bits" or "tei"</p:documentation>
+  </p:option>
+  
+  <p:option name="validate" select="'yes'">
+    <p:documentation>Whether to validate the XML and create a HTML report</p:documentation>
   </p:option>
   
   <p:option name="layout" select="'c'">
@@ -349,45 +353,68 @@
     <p:with-option name="output-xml" select="$output-xml"/>
   </tx:hub2epub>
   
-  <tx:validate name="validate" cx:depends-on="hub2epub">
-    <p:input port="source">
-      <p:pipe port="xml" step="hub2epub"/>
-    </p:input>
-    <p:input port="hub">
-      <p:pipe port="result" step="create-hub"/>
-    </p:input>
-    <p:input port="schema">
-      <p:pipe port="schema" step="main"/>
-    </p:input>
-    <p:input port="paths">
-      <p:pipe port="result" step="get-paths"/>
-    </p:input>
-    <p:input port="epub-file-uri">
-      <p:pipe port="epub-path" step="hub2epub"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-    <p:with-option name="interface-language" select="$interface-language"/>
-  </tx:validate>
+  <p:choose name="validate-wrapper">
+    <p:when test="$validate eq 'no'">
+      <p:output port="result"/>
+      
+      <p:identity>
+        <p:input port="source">
+          <p:inline>
+            <html>
+              <head><title>report</title></head>
+              <body><p>validate option was set to no</p></body>
+            </html>
+          </p:inline>
+        </p:input>
+      </p:identity>
+      
+    </p:when>
+    <p:otherwise>
+      <p:output port="result"/>
   
-  <p:sink/>
+      <tx:validate name="validate" cx:depends-on="hub2epub">
+        <p:input port="source">
+          <p:pipe port="xml" step="hub2epub"/>
+        </p:input>
+        <p:input port="hub">
+          <p:pipe port="result" step="create-hub"/>
+        </p:input>
+        <p:input port="schema">
+          <p:pipe port="schema" step="main"/>
+        </p:input>
+        <p:input port="paths">
+          <p:pipe port="result" step="get-paths"/>
+        </p:input>
+        <p:input port="epub-file-uri">
+          <p:pipe port="epub-path" step="hub2epub"/>
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+        <p:with-option name="interface-language" select="$interface-language"/>
+      </tx:validate>
   
-  <tx:htmlreport name="htmlreport" cx:depends-on="validate">
-    <p:input port="source">
-      <p:pipe port="result" step="hub2epub"/>
-    </p:input>
-    <p:input port="paths">
-      <p:pipe port="result" step="get-paths"/>
-    </p:input>
-    <p:input port="reports">
-      <p:pipe port="report" step="create-hub"/>
-      <p:pipe port="reports" step="validate"/>
-    </p:input>
-    <p:with-option name="debug" select="$debug"/>
-    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </tx:htmlreport>
+      <p:sink/>
+  
+      <tx:htmlreport name="htmlreport" cx:depends-on="validate">
+        <p:input port="source">
+          <p:pipe port="result" step="hub2epub"/>
+        </p:input>
+        <p:input port="paths">
+          <p:pipe port="result" step="get-paths"/>
+        </p:input>
+        <p:input port="reports">
+          <p:pipe port="report" step="create-hub"/>
+          <p:pipe port="reports" step="validate"/>
+        </p:input>
+        <p:with-option name="debug" select="$debug"/>
+        <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+        <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+      </tx:htmlreport>
+  
+    </p:otherwise>
+    
+  </p:choose>
   
   <p:sink/>
 
