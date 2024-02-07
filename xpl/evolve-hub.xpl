@@ -53,7 +53,7 @@
   </tr:dynamic-transformation-pipeline>
 
   <p:choose name="choose-parse-bibrefs">
-    <p:when test="/c:param-set/c:param[@name eq 'parse-bibliographic-references']/@value = 'yes'">
+    <p:when test="/c:param-set/c:param[@name eq 'parse-bib-refs']/@value = 'yes'">
       <p:xpath-context>
         <p:pipe port="params" step="tx-evolve-hub"/>
       </p:xpath-context>
