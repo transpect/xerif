@@ -234,7 +234,7 @@
   </tx:insert-meta>
 
   <tx:evolve-hub name="evolve-hub-dyn">
-    <p:input port="parameters">
+    <p:input port="params">
       <p:pipe port="result" step="get-paths"/> 
     </p:input>
     <p:with-option name="debug" select="$debug"/>

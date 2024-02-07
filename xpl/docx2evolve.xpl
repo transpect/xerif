@@ -103,7 +103,7 @@
   </tr:validate-with-schematron>
   
   <tx:evolve-hub name="evolve-hub-dyn">
-    <p:input port="parameters">
+    <p:input port="params">
       <p:pipe port="source" step="docx2evolve"/> 
     </p:input>
     <p:with-option name="debug" select="$debug"/>
