@@ -2,13 +2,17 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:dbk="http://docbook.org/ns/docbook"
+  xmlns:hub="http://transpect.io/hub"
   xmlns:c="http://www.w3.org/ns/xproc-step"
   xmlns="http://docbook.org/ns/docbook"
-  exclude-result-prefixes="c xs dbk"
+  exclude-result-prefixes="c dbk hub xs"
   version="2.0">
   
   <xsl:variable name="original-bibliography" as="document-node(element(dbk:bibliography))?" 
                 select="collection()[2]"/>
+  
+  <xsl:variable name="bibliography-index" as="xs:integer" 
+                select="1"/>
   
   <xsl:template match="c:result">
     <bibliography>
@@ -22,11 +26,60 @@
     <xsl:apply-templates/>
   </xsl:template>
   
+  <xsl:variable name="sequence-ids" as="xs:string*" 
+                      select="/c:result/dataset/sequence/generate-id()"/>
+  
   <xsl:template match="sequence">
-    <biblioentry>
-      <xsl:apply-templates/>
+    <xsl:variable name="ref-index" as="xs:integer"
+                  select="index-of($sequence-ids, generate-id())"/>
+    <xsl:variable name="ref-id" as="xs:string"
+                  select="concat($bibliography-index, '-', $ref-index)"/>
+    <xsl:variable name="rendered-ref" as="element(dbk:bibliomixed)?" 
+                  select="$original-bibliography/dbk:bibliography/dbk:bibliomixed[$ref-index]"/>
+    <biblioentry xml:id="ref-{$ref-id}">
+      <xsl:if test="$rendered-ref">
+        <abstract role="rendered">
+          <para>
+            <xsl:apply-templates select="$rendered-ref/node()"/>
+          </para>
+        </abstract>
+      </xsl:if>
+      <xsl:sequence select="hub:ref-wrapper(*)"/>
     </biblioentry>
   </xsl:template>
+  
+  <xsl:function name="hub:ref-wrapper">
+    <xsl:param name="ref-components" as="element()*"/>
+    <xsl:variable name="pub-type" as="xs:string" 
+                  select="('journal'[$ref-components[self::journal]], 
+                           'collection'[$ref-components[self::collection-title or self::container-title]], 
+                           'book'[$ref-components[self::author] and $ref-components[self::title]],
+                           'other')[1]"/>
+    <xsl:for-each-group select="$ref-components" group-by="hub:ref-type(., $pub-type)">
+      <biblioset relation="{current-grouping-key()}">
+        <xsl:apply-templates select="current-group()"/>
+      </biblioset>
+    </xsl:for-each-group>
+  </xsl:function>
+  
+  <xsl:function name="hub:ref-type">
+    <xsl:param name="ref-element" as="element()"/>
+    <xsl:param name="pub-type" as="xs:string"/>
+    <xsl:choose>
+      <xsl:when test="$pub-type = ('journal', 'collection') and $ref-element/local-name() = ('collection-title', 'container-title', 'journal', 'volume', 'editor', 'publisher', 'location')">
+        <xsl:sequence select="$pub-type"/>
+      </xsl:when>
+      <xsl:when test="$pub-type = ('journal', 'collection') and $ref-element/local-name() = ('author', 'title', 'pages', 'date', 'note')">
+        <xsl:sequence select="if($pub-type eq 'journal') then 'article' else 'chapter'"/>
+      </xsl:when>
+      <xsl:when test="$pub-type eq 'book'">
+        <xsl:sequence select="'book'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="'other'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
   
   <xsl:template match="author
                       |editor
@@ -45,16 +98,17 @@
     </xsl:element>
   </xsl:template>
   
-  <xsl:template match="title">
+  <xsl:template match="title
+                      |journal
+                      |collection-title
+                      |container-title">
     <title>
       <xsl:apply-templates/>
     </title>
   </xsl:template>
   
-  <xsl:template match="collection-title
-                      |container-title
-                      |edition">
-    <edition role="{local-name()}">
+  <xsl:template match="edition">
+    <edition>
       <xsl:apply-templates/>
     </edition>
   </xsl:template>
@@ -64,12 +118,6 @@
     <bibliomisc role="{local-name()}">
       <xsl:apply-templates/>
     </bibliomisc>
-  </xsl:template>
-  
-  <xsl:template match="journal">
-    <bibliosource role="journal">
-      <xsl:apply-templates/>
-    </bibliosource>
   </xsl:template>
   
   <xsl:template match="volume">
@@ -101,7 +149,6 @@
       <xsl:apply-templates/>
     </publishername>
   </xsl:template>
-  
   
   <xsl:template match="@* | *">
     <xsl:copy>

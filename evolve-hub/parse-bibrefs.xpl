@@ -50,9 +50,9 @@
     </p:input>
   </p:identity>
   
-  <p:viewport match="dbk:bibliography[dbk:bibliomixed]" name="bibliography-viewport">
-    <p:variable name="index" select="p:iteration-position()"/>
-    <p:variable name="ref-txt-path" select="concat($out-dir, $basename, '.ref-', $index, '.txt')"/>
+  <p:viewport match="dbk:bibliography[dbk:bibliomixed and not(dbk:biblioentry)]" name="bibliography-viewport">
+    <p:variable name="bib-index" select="p:iteration-position()"/>
+    <p:variable name="ref-txt-path" select="concat($out-dir, $basename, '.ref-', $bib-index, '.txt')"/>
     
     <p:xslt name="transform-xml-bibliography-to-plaintext">
       <p:input port="stylesheet">
@@ -74,7 +74,7 @@
     </p:xslt>
     
     <tr:store-debug name="debug-bib-txt">
-      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/04_plain-ref-', $index, '.txt')"/>
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/04_plain-ref-', $bib-index, '.txt')"/>
       <p:with-option name="active" select="'yes'"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
       <p:with-option name="indent" select="true()"/>
@@ -92,7 +92,7 @@
     </tr:bib-parser>
     
     <tr:store-debug name="debug-bib-xml">
-      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/08_xml-ref-', $index)"/>
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/08_xml-ref-', $bib-index)"/>
       <p:with-option name="active" select="'yes'"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
       <p:with-option name="indent" select="true()"/>
@@ -121,6 +121,7 @@
           <p:with-param name="original-bibliography" select="/dbk:bibliography">
             <p:pipe port="current" step="bibliography-viewport"/>
           </p:with-param>
+          <p:with-param name="bib-index" select="$bib-index"/>
         </p:xslt>
       </p:otherwise>
     </p:choose>
