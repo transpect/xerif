@@ -48,7 +48,7 @@
     </biblioentry>
   </xsl:template>
   
-  <xsl:function name="hub:ref-wrapper" as="element(dbk:biblioset)">
+  <xsl:function name="hub:ref-wrapper" as="element(dbk:biblioset)*">
     <xsl:param name="ref-components" as="element()*"/>
     <xsl:variable name="pub-type" as="xs:string" 
                   select="('journal'[$ref-components[self::journal]], 
