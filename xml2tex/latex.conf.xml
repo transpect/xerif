@@ -995,7 +995,8 @@
                                              dbk:author,
                                              dbk:epigraph,
                                              dbk:abstract, 
-                                             dbk:keywordset, 
+                                             dbk:keywordset,
+                                             dbk:biblioid,
                                              dbk:biblioset)" mode="#current"/>
     </xsl:if>
   </template>
