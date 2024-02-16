@@ -89,6 +89,9 @@
       <p:with-option name="parser-path" select="/c:param-set/c:param[@name eq 'bib-parser-path']/@value">
         <p:pipe port="result" step="expose-parameters"/>
       </p:with-option>
+      <p:with-option name="ruby-path" select="/c:param-set/c:param[@name eq 'bib-parser-ruby-path']/@value">
+        <p:pipe port="result" step="expose-parameters"/>
+      </p:with-option>
     </tr:bib-parser>
     
     <tr:store-debug name="debug-bib-xml">
