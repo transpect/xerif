@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.13}%
-\def\filedate{2023-10-05}%
+\def\fileversion{0.2.16}%
+\def\filedate{2024-02-16}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -215,6 +215,7 @@
 \newif\if@ht@break@table    \@ht@break@tablefalse
 \newif\if@ht@no@final@strut \@ht@no@final@strutfalse
 \newif\if@ht@no@init@strut  \@ht@no@init@strutfalse
+\newif\if@ht@hyph@first@word  \@ht@hyph@first@wordfalse
 \newif\if@ht@in@table       \@ht@in@tablefalse
 \gdef\ht@tempa{}
 \newcount\ht@tempcnta          \ht@tempcnta=\z@\relax
@@ -759,8 +760,8 @@
   \hbox{%
     #2\csname ht@border@style@#3\endcsname{#1}{\dimexpr\vsize\relax}}}}%
 \def\ht@halign{%
-    \GetCascCellProp{hAlign}{text-align}%
-    \GetCascCellProp{Hyphen}{hyphen}%
+  \GetCascCellProp{hAlign}{text-align}%
+  \GetCascCellProp{Hyphen}{hyphen}%
   \csname ht@halign@\hAlign @\Hyphen\endcsname}
 \def\ht@set@alignment{%
   \let\centering\ht@halign@center@none
@@ -1015,7 +1016,6 @@
     \global\ht@max@upper@dp\z@
     \global\ht@max@upper@ht\z@
     \global\ht@row@insert@ht\z@
-    %% 1. Durchlauf: nat. Höhen berechnen
     \ht@Iterate{\ht@curcol}{1}{\the\ht@maxcol}{{%
       \ht@eval@props{tr-\the\ht@currow}%
       \GetRowProp{ht@parent}{parent}%
@@ -1025,7 +1025,7 @@
       \GetCellPropDefault{AddCellHeight}{addheight}{\z@}%
       \ht@debugmsg{rowspan}{1st run, addheight: \AddCellHeight}%
       \IfCellPropEmpty{width}{\GetColProp{CurCellWidth}{max-width}}{\GetCellProp{CurCellWidth}{width}}%
-      \IfCellPropEmpty{virtual}{% ¬ virtuell
+      \IfCellPropEmpty{virtual}{% ¬ virtual
         \@ht@height@calctrue
         \ht@RenderCell
         \global\advance\ht@row@insert@ht\ht@cell@insert@ht
@@ -1033,14 +1033,14 @@
         \ifdim\ht@cur@upper@dp>\ht@max@upper@dp\relax\global\ht@max@upper@dp=\ht@cur@upper@dp\relax\fi
         \ifdim\ht@cur@upper@ht>\ht@max@upper@ht\relax\global\ht@max@upper@ht=\ht@cur@upper@ht\relax\fi
         \ht@debugmsg{calcheight}{Ht: \the\dimexpr\ht\htCellBox\relax, Dp: \the\dimexpr\dp\htCellBox\relax, Wd: \the\wd\htCellBox, Rem: \AddCellHeight}%
-        %% Zeilen-Höhe und -Tiefe updaten/setzen, Überschuss von oben berücksichtigen:
+        \ht@debugmsg{calcheight}{low-dp: \the\ht@cur@lower@dp, up-dp: \the\ht@cur@upper@dp, up-ht: \the\ht@cur@upper@ht}%
         \expandafter\ht@tempdima\dimexpr\ht\htCellBox-\AddCellHeight\relax
-        %% Hoehe der row setzen/updaten:
         \ifdim\ht@rowheight<\ht@tempdima\relax\global\ht@rowheight\ht@tempdima\relax\fi
         \@ht@height@calcfalse
-      }{% virtuell
-        \ifnum\ht@curcol=\ht@maxcol% wir sind in der letzten Spalte (=colspan bis zum Ende)
-        \else% Ansonsten schieben wir den verfügbaren Platz nach rechts, wenn nicht rowspan:
+      }{% virtual
+        \ifnum\ht@curcol=\ht@maxcol%
+            %TODO
+        \else%
           \GetCellProp{rowspan}{rowspan}%
           \ht@debugmsg{calcheight}{rowspan is: \rowspan}%
           \ifnum\rowspan<2\relax
@@ -1048,14 +1048,20 @@
             \ht@tempdima\dimexpr\NextCellWidth+\CurCellWidth\relax
             \SetNextCellProp{width}{\the\ht@tempdima}%
             \ht@debugmsg{colspan}{colspan; width of next cell: \NextCellWidth}%
-          \else% Zeile enthält vertikal überspannte Zellen:
+          \else
+            %TODO
           \fi%
-        \fi% /letzte Spalte
+        \fi% /maxcol
       }% /is@virtual
       \global\let\CurCellWidth\relax
     }}%/Iterate:cols:1
     \advance\ht@rowheight\ht@max@lower@dp\relax
     \ht@debugmsg{footnote}{Calculated Footins-height: \the\ht@row@insert@ht}%
+    \ifdim\ht@max@lower@dp=\z@\relax%% = all cells in row rotated
+      \advance\ht@rowheight\dp\strutbox\relax
+      \ht@max@upper@ht\ht\strutbox\relax
+      \ht@max@lower@dp\dp\strutbox\relax
+    \fi
     \SetRowProp{footins-height}{\the\ht@row@insert@ht}%
     \SetRowProp{height}{\the\ht@rowheight}%
     \SetRowProp{max-upper-height}{\the\ht@max@upper@ht}%
@@ -1075,6 +1081,7 @@
         \fi
       }%
     }}%/Iterate:cols:2
+  \ht@debugmsg{calcheight}{Calculated Row height: \the\ht@rowheight}%
 }%/Iterate:rows
 
 \def\HTProcessClass#1{%
@@ -1346,6 +1353,7 @@
 \HTRegisterCSSProperty{td}{vertical-align}{top}
 \HTRegisterCSSProperty{td}{font}{}
 \HTRegisterCSSProperty{td}{hyphen}{none}
+\HTRegisterCSSProperty{td}{hyphen-first}{true}
 \HTRegisterCSSProperty{td}{transform}{}
 \HTRegisterCSSProperty{}{class}{}
 \HTRegisterCSSProperty{}{virtual}{}
@@ -1384,7 +1392,8 @@
   \IfCellPropText{no-strut}{both}
     {\@ht@no@final@struttrue\@ht@no@init@struttrue}
     {\IfCellPropText{no-strut}{bottom}{\@ht@no@final@struttrue}{}%
-     \IfCellPropText{no-strut}{top}{\@ht@no@init@struttrue}{}}}
+     \IfCellPropText{no-strut}{top}{\@ht@no@init@struttrue}{}}%
+   \IfCellPropText{hyphen-first}{true}{\@ht@hyph@first@wordtrue}{\@ht@hyph@first@wordfalse}}
 \def\ht@RenderCell{{%
   \GetRowProp{ht@parent}{parent}%
   \HTEvalCellProps
@@ -1985,7 +1994,10 @@
   \SetCellProp{class}{\htTdClass}%
   \SetCellContent{%
     \if@ht@no@init@strut\strut\hrule \@height\z@\vskip-\baselineskip\vskip\z@skip\else\strut\fi
-    \ignorespaces#1%
+    \if@ht@hyph@first@word\kern\z@skip\fi
+    \ignorespaces
+    #1%
+    \if@ht@hyph@first@word\kern\z@\fi% to ensure hyphenation is applied when there is only a single word in the cell.
     \if@ht@no@final@strut\else\strut\fi}%
   \@tempswafalse
   \ifnum\htCellColspan>1\relax\@tempswatrue\fi
