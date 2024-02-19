@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.16}%
-\def\filedate{2024-02-16}%
+\def\fileversion{0.2.17}%
+\def\filedate{2024-02-19}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -1057,11 +1057,6 @@
     }}%/Iterate:cols:1
     \advance\ht@rowheight\ht@max@lower@dp\relax
     \ht@debugmsg{footnote}{Calculated Footins-height: \the\ht@row@insert@ht}%
-    \ifdim\ht@max@lower@dp=\z@\relax%% = all cells in row rotated
-      \advance\ht@rowheight\dp\strutbox\relax
-      \ht@max@upper@ht\ht\strutbox\relax
-      \ht@max@lower@dp\dp\strutbox\relax
-    \fi
     \SetRowProp{footins-height}{\the\ht@row@insert@ht}%
     \SetRowProp{height}{\the\ht@rowheight}%
     \SetRowProp{max-upper-height}{\the\ht@max@upper@ht}%
@@ -1596,8 +1591,10 @@
         \global\ht@cur@upper@ht=\z@\relax
         \linewidth\hsize
         \setbox\ht@tempboxa\vbox{\ht@transform@box{calc}{#6}}%
+        \IfCellPropEmpty{internal-rotate}{}{\dp\ht@tempboxa=\dp\strutbox}%
         \global\ht@cur@lower@dp=\dimexpr\the\dp\ht@tempboxa\relax
         \setbox\z@\vtop{\unvcopy\ht@tempboxa}%
+        \IfCellPropEmpty{internal-rotate}{}{\ht\z@=\ht\strutbox}%
         \global\ht@cur@upper@ht=\dimexpr\the\ht\z@\relax
         \global\ht@cur@upper@dp=\dimexpr\the\dp\z@\relax
       \fi
