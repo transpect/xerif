@@ -118,6 +118,13 @@
         <p:input port="source">
           <p:pipe port="source" step="hub2epub"/> 
         </p:input>
+        <p:input port="models">
+          <p:inline>
+            <c:models>
+              <c:model href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
+            </c:models>
+          </p:inline>
+        </p:input>
         <p:input port="paths">
           <p:pipe port="params" step="hub2epub"/> 
         </p:input>
