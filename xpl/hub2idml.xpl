@@ -38,6 +38,7 @@
   </p:output>
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
+  <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl" />
   <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl" />
   <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
   <p:import href="http://transpect.io/cascade/xpl/dynamic-transformation-pipeline.xpl"/>

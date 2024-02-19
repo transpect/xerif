@@ -62,6 +62,7 @@
   <p:import href="http://transpect.io/tei2html/xpl/tei2html.xpl"/>
   <p:import href="http://transpect.io/hub2bits/xpl/hub2bits.xpl"/>
   <p:import href="http://transpect.io/jats2html/xpl/jats2html.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/store-debug/xpl/store-debug.xpl"/>
   <p:import href="http://transpect.io/xproc-util/insert-srcpaths/xpl/insert-srcpaths.xpl"/>
   
   <p:import href="html2epub.xpl"/>

@@ -51,7 +51,8 @@
   <p:import href="http://transpect.io/evolve-hub/xpl/evolve-hub.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/check-styles.xpl"/>
   <p:import href="http://transpect.io/htmlreports/xpl/validate-with-schematron.xpl"/>
-  
+
+  <p:import href="insert-meta.xpl"/>
   <p:import href="evolve-hub.xpl"/>
   <p:import href="copy-images.xpl"/>
   
