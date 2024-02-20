@@ -82,7 +82,7 @@
     <p:input port="source">
       <p:pipe port="source" step="tx-insert-meta"/>
     </p:input>
-    <p:input port="insertion" select="/dbk:info/cx:documents/*">
+    <p:input port="insertion" select="/dbk:info/*">
       <p:pipe port="result" step="metadata2hub"/>
     </p:input>
   </p:insert>
