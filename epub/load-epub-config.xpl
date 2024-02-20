@@ -51,7 +51,7 @@
     <p:input port="source">
       <p:pipe port="result" step="load-epub-config-template"/>
       <p:pipe port="source" step="load-epub-config"/>
-      <p:pipe port="source" step="htmltemplates"/>
+      <p:pipe port="htmltemplates" step="load-epub-config"/>
     </p:input>
     <p:input port="stylesheet">
       <p:pipe port="stylesheet" step="load-epub-config"/>
