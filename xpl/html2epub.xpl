@@ -91,9 +91,9 @@
       <p:with-option name="different-basename" select="$basename"/>
     </html:templates>
     
-    <p:string-replace name="replace-base" match="/*/@xml:base">
+    <!--<p:string-replace name="replace-base" match="/*/@xml:base">
       <p:with-option name="replace" select="concat('''', $epub-path, '''')"/>
-    </p:string-replace>
+    </p:string-replace>-->
     
     <p:delete match="*:header[@class='chunk-meta-sec'] | *:p[matches(@class, 'tsmedia(caption|source|url)')]" name="delete-header"/>
      
