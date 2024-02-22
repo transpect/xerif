@@ -27,7 +27,7 @@
   
   <pattern id="email">
     <rule context="email">
-      <assert test="matches(@xlink:href, '^mailto:[a-z0-9\.\-_]+@[a-z0-9\-]+\.[a-z]+$', 'i')" role="error" id="email-invalid">
+      <assert test="matches(@xlink:href, '^mailto:[a-z0-9\.\-_]+@[a-z0-9\-]+(\.[a-z]+)+$', 'i')" role="error" id="email-invalid">
         The email link is not valid.
       </assert>
     </rule>
