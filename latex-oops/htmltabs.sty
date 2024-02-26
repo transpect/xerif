@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.17}%
-\def\filedate{2024-02-19}%
+\def\fileversion{0.2.18}%
+\def\filedate{2024-02-26}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -1622,6 +1622,7 @@
   \begingroup
     \ht@protect@fragile
     \def\htCellBreak{\noexpand\ht@cr}%
+    \def\tpBreak{\noexpand\ht@cr}%
     \protected@edef\@argi{#1}%
     \ht@tempdimc\z@%% width
     \long\def\ht@mesure@line ##1\ht@cr##2\@nil{%
