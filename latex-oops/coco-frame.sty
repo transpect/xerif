@@ -64,11 +64,12 @@
   }
   \expandafter\pdfpageattr\expandafter{\@tempa}
 \fi
-\ifx\tp@frame n\relax
+\@ifundefined{pdfpagewidth}{%
   \RequirePackage{luatex85}
   \pdfpagewidth\paperwidth
   \pdfpageheight\paperheight
-\else
+}{}
+\ifx\tp@frame n\relax\else
   \ifx\tp@frame p\relax
     \edef\stockwidth{\the\dimexpr\paperwidth+\tp@frame@offset+\tp@frame@offset\relax}
     \edef\stockheight{\the\dimexpr\paperheight+\tp@frame@offset+\tp@frame@offset\relax}
