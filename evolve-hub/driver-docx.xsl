@@ -532,7 +532,7 @@
                                 then 'figure' 
                                 else 'informalfigure'}">
               <xsl:if test="exists($float-pos)">
-                <xsl:attribute name="floatstyle" select="replace($float-pos, $pi-mark, '')"/>
+                <xsl:attribute name="floatstyle" select="substring-after($float-pos, $pi-mark)"/>
               </xsl:if>
               <xsl:if test="$is-grid-group">
                 <xsl:attribute name="css:display" select="'grid'"/>
@@ -649,6 +649,27 @@
     <xsl:if test="$is-grid-group">
       <xsl:attribute name="css:grid-column" select="replace(., $figure-image-role-regex, '$2', 'i')"/>
     </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="informaltable[preceding-sibling::*[1][self::para]
+                                                         [descendant-or-self::*[matches(@role, $pi-style-regex)]
+                                                                               [matches(., concat($pi-mark, $float-options-regex))]]]" mode="hub:split-at-tab">
+    <xsl:variable name="float-pos" as="xs:string?" 
+                  select="preceding-sibling::*[1][self::para]/descendant-or-self::*[matches(@role, $pi-style-regex)]
+                                                                                   [matches(., concat($pi-mark, $float-options-regex))]"/>
+    <xsl:copy>
+      <xsl:if test="exists($float-pos)">
+        <xsl:attribute name="floatstyle" select="substring-after($float-pos, $pi-mark)"/>
+      </xsl:if>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="para[descendant-or-self::*[matches(@role, $pi-style-regex)]
+                                                 [matches(., concat($pi-mark, $float-options-regex))]]
+                           [following-sibling::*[1][self::informaltable]]
+                           [not(normalize-space(replace(., concat($pi-mark, $float-options-regex), '')))]
+                           " mode="hub:split-at-tab">
   </xsl:template>
   
   <!-- dissolve informalfigures with no special role (we consider them as subsequent figures) -->

@@ -1162,7 +1162,9 @@
     <rule name="heading" type="env" break-after="1" break-before="1">
       <option select="if(matches(dbk:title/@role,'nummerated') or dbk:title/dbk:phrase[@role='hub:identifier'])
                              then 'nonumber'
-                             else ''"/>
+                             else  if (matches(parent::*/@renderas, 'hub:(no-toc|no-pdf-bookmarks)'))
+                                   then xml2tex:sect-renderas-to-option(parent::*/@renderas)
+                                   else ''"/>
       <param select="tr:heading-level(parent::*)"/>
       <xsl:apply-templates select="(dbk:author|dbk:authorgroup/dbk:author), 
                                    dbk:title/dbk:phrase[@role eq 'hub:identifier'],
@@ -1830,10 +1832,11 @@
     <xsl:param name="elt" as="element(*)"/>
      <xsl:choose>
        <xsl:when test="$elt[local-name() = ('table', 'informaltable')]
-                           [matches(@role, $rotated-table-style)
-                             or exists(.//dbk:entry[   matches(@css:transform, 'rotate\((90|270)deg\)')
-                                              or @css:writing-mode eq 'bt-lr']
-                             )]
+                           [   matches(@role, $rotated-table-style)
+                            or exists(.//dbk:entry[   matches(@css:transform, 'rotate\((90|270)deg\)')
+                                                   or @css:writing-mode eq 'bt-lr']
+                                      )
+                           ]
                         or
                         $elt[self::dbk:figure[dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')]]
                                              [not(parent::dbk:figure)]
@@ -1843,16 +1846,18 @@
          <xsl:sequence select="'orientation=landscape'"/>
        </xsl:when>
        <xsl:otherwise>
-        <xsl:sequence select="if ($elt[   dbk:title 
-                                            or dbk:info 
-                                            or dbk:caption 
-                                            or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
-                                            or ancestor::dbk:footnote]) 
-                                   then ('float-pos=t'[$elt/@floatstyle eq 'top'],
-                                         'float-pos=b'[$elt/@floatstyle eq 'bottom'],
-                                         'float-pos=h!'[$elt/@floatstyle eq 'fixed'],
-                                         'float-pos=h!')[1]
-                                   else ()"/>
+        <xsl:sequence select="if($elt[   dbk:title 
+                                      or dbk:info 
+                                      or dbk:caption
+                                      or self::dbk:informaltable
+                                      or self::*:table
+                                      or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
+                                      or ancestor::dbk:footnote]) 
+                              then ('float-pos=t'[$elt/@floatstyle eq 'top'],
+                                    'float-pos=b'[$elt/@floatstyle eq 'bottom'],
+                                    'float-pos=h!'[$elt/@floatstyle eq 'fixed'],
+                                    'float-pos=h!')[1]
+                              else ()"/>
       </xsl:otherwise>
     </xsl:choose>
     <!-- other options are: 

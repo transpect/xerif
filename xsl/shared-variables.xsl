@@ -71,6 +71,9 @@
   <xsl:variable name="float-options" as="xs:string+" 
                 select="'float', 'top', 'bottom', 'fixed'"/>
   
+  <xsl:variable name="float-options-regex" as="xs:string" 
+                select="concat('(', string-join($float-options, '|'), ')')"/>
+  
   <xsl:variable name="suffixes-regex" as="xs:string" 
                 select="concat($no-toc-suffix, '|', $no-pdf-bookmarks-suffix)"/>
   
