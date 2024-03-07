@@ -2744,7 +2744,6 @@
   
   <xsl:function name="xml2tex:add-tactical-breaks-by-string-length">
     <xsl:param name="url" as="xs:string"/>
-    
     <xsl:variable select="string-join(
                             tr:tokenize-strings-by-string-length(
                               tokenize($url, $tactical-break-character-for-urls),
@@ -2791,15 +2790,7 @@
     <!--if href contains non ascii characters for instance arabic characters it has to be encoded, https://redmine.le-tex.de/issues/14419-->
     <xsl:param name="uri" as="xs:string"/>
     <xsl:sequence select="if (matches($uri, '[^&#33;-&#127;]')) then escape-html-uri($uri) else $uri"/>
-  </xsl:function>  
-
-  <template context="dbk:footnote//dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):')]
-                    |dbk:footnote//dbk:ulink[matches(@url, '^(https?|ftp):')]" priority="15">
-     <xsl:if test="string-length(@xlink:href) gt 60">
-      <xsl:text>\break</xsl:text>
-    </xsl:if>
-    <xsl:next-match/>
-  </template>
+  </xsl:function>
   
   <!-- cross references -->
   
