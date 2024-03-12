@@ -1,0 +1,495 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]%% TODO check
+\ProvidesPackage{lttables}[\ltpdfapkgdate\space v\ltpdfaversion\space latex adaptions for table styles]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%             tables and friends                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% tabular(x) -> array.sty and friends
+%% colortbl overrides @tabarray, multicolumn, @preamble, hline etc.
+%% the following is for tabularx, longtable, multirow then color.sty 
+\newcount\ltpdfa@colcnt
+\def\@myTRStart{\vstructStart{TR}}
+\def\@myTREnd{\vstructEnd{TR}}
+\def\@myTDStart{\nextCol\structStart{TD}}
+\def\@myTDEnd{\structEnd{TD}}
+\def\@myVlineStart{\structStart{tabvrule}}
+\def\@myVlineEnd{\structEnd{tabvrule}}
+\def\@myHlineStart{\structStart{tabhrule}}
+\def\@myHlineEnd{\structEnd{tabhrule}}
+\def\whichCol{\showthe\ltpdfa@colcnt}
+\def\@nextCol{\global\advance\ltpdfa@colcnt by 1\relax}
+\def\@resetCol{\global\ltpdfa@colcnt=0}
+\def\@save@colnum{\edef\@ltpdfa@saved@colcnt{\the\ltpdfa@colcnt}}
+\def\@restore@colnum{\global\ltpdfa@colcnt=\@ltpdfa@saved@colcnt}
+\let\@ltpdfa@struct@name\@empty
+\newcommand*{\@startTHead}{%
+  \gdef\myTDStart{\nextCol\@lt@save@structStart{TH}}\gdef\myTDEnd{\@lt@save@structEnd{TH}}%
+  \vstructStart{THead}%
+}%
+\newcommand*{\@stopTHead}{%
+  \vstructEnd{THead}%
+  \global\let\myTDStart\@myTDStart%
+  \global\let\myTDEnd\@myTDEnd%
+}%
+\newcommand*{\@startTBody}{%
+  \vstructStart{TBody}%
+}%
+\newcommand*{\@stopTBody}{%
+  \vstructEnd{TBody}%
+}%
+
+\newcommand{\ltpdfa@protectForTable}{%
+  \let\myTRStart\relax
+  \let\myTREnd\relax
+  \let\myTDStart\relax
+  \let\myTDEnd\relax
+  \let\myVlineStart\relax
+  \let\myVlineEnd\relax
+  \let\myHlineStart\relax
+  \let\myHlineEnd\relax  
+  \let\nextCol\relax
+  \let\resetCol\relax
+  \let\@lt@startRowHook\relax
+  \let\@lt@endRowHook\relax
+  \let\startTHead\relax
+  \let\stopTHead\relax
+  \let\startTBody\relax
+  \let\stopTBody\relax
+}
+\newcommand{\ltpdfa@unprotectForTable}{%
+  \let\myTRStart\@myTRStart
+  \let\myTREnd\@myTREnd
+  \let\myTDStart\@myTDStart
+  \let\myTDEnd\@myTDEnd
+  \let\myVlineStart\@myVlineStart
+  \let\myVlineEnd\@myVlineEnd
+  \let\myHlineStart\@myHlineStart
+  \let\myHlineEnd\@myHlineEnd  
+  \let\nextCol\@nextCol
+  \let\resetCol\@resetCol
+  \let\startTHead\@startTHead
+  \let\stopTHead\@stopTHead
+  \let\startTBody\@startTBody
+  \let\stopTBody\@stopTBody
+}
+\let\@lt@save@@unprotectForTable\ltpdfa@unprotectForTable
+\let\@lt@save@@protectForTable\ltpdfa@protectForTable
+
+\newcommand*{\startArtifact}{%
+  \gdef\myTDStart{\@lt@save@structStart{ArtifactCell}}\gdef\myTDEnd{\@lt@save@structEnd{ArtifactCell}}
+  \gdef\myVlineStart{\@lt@save@structStart{tabvrule}}\gdef\myVlineEnd{\@lt@save@structEnd{tabhrule}}
+  \@disableLtpdfa\global\@inartifacttrue
+}
+\newcommand*{\stopArtifact}{%
+  \@restoreLtpdfa
+  \global\let\myTDStart\@myTDStart
+  \global\let\myTDEnd\@myTDEnd
+  \global\@inartifactfalse
+}
+
+\let\@lt@save@startArtifact\startArtifact
+\let\@lt@save@stopArtifact\stopArtifact
+
+\let\@ltpdfa@org@tabular\@tabular% or @tabarray???
+\def\@tabular{\@save@colnum\@ltpdfa@org@tabular}
+\let\@ltpdfa@org@endtabular\endtabular
+\def\endtabular{\@ltpdfa@org@endtabular\@restore@colnum}%$
+
+%% our macros
+%% @classz for array.sty
+\def\@ltpdfa@@array@classz{\@classx
+   \@tempcnta \count@
+   \prepnext@tok
+   \@addtopreamble{\myTDStart\ifcase \@chnum
+      \hfil
+      \d@llarbegin
+      \insert@column
+      \d@llarend \hfil \or
+      \hskip1sp\d@llarbegin \insert@column \d@llarend \hfil \or
+      \hfil\hskip1sp\d@llarbegin \insert@column \d@llarend \or
+   $\vcenter
+   \@startpbox{\@nextchar}\insert@column \@endpbox $\or
+   \vtop \@startpbox{\@nextchar}\insert@column \@endpbox \or
+   \vbox \@startpbox{\@nextchar}\insert@column \@endpbox
+  \fi\myTDEnd}\prepnext@tok}
+
+%% @classz for colortabl.sty
+\def\@ltpdfa@@ctbl@classz{\@classx
+  \@tempcnta \count@
+  \prepnext@tok
+  \expandafter\CT@extract\the\toks\@tempcnta\columncolor!\@nil
+  \@addtopreamble{%
+    \myTDStart\setbox\z@\hbox\bgroup\bgroup
+      \CT@everycr{}%
+      \ifcase \@chnum
+      \hskip\stretch{.5}\kern\z@
+      \d@llarbegin
+      \insert@column
+      \d@llarend\hskip\stretch{.5}\or
+      \d@llarbegin \insert@column \d@llarend \hfill \or
+      \hfill\kern\z@ \d@llarbegin \insert@column \d@llarend \or
+   $\vcenter
+   \@startpbox{\@nextchar}\insert@column \@endpbox $\or
+   \vtop \@startpbox{\@nextchar}\insert@column \@endpbox \or
+   \vbox \@startpbox{\@nextchar}\insert@column \@endpbox
+  \fi
+ \egroup\egroup
+\begingroup
+  \CT@setup
+  \CT@column@color
+  \CT@row@color
+  \CT@cell@color
+  \CT@do@color
+\endgroup
+        \@tempdima\ht\z@
+        \advance\@tempdima\minrowclearance
+        \vrule\@height\@tempdima\@width\z@
+        \unhbox\z@\myTDEnd}%
+      \advance\@tempcntb\@ne\prepnext@tok}
+
+\let\@ltpdfa@org@@classz\@classz
+
+%% longtable hline
+\def\@ltpdfa@LT@lt@hline{%
+  \ifx\@let@token\hline
+    \global\let\@gtempa\@gobble
+    \gdef\LT@sep{\penalty-\@medpenalty\vskip\doublerulesep}%
+  \else
+    \global\let\@gtempa\@empty
+    \gdef\LT@sep{\penalty-\@lowpenalty\vskip-\arrayrulewidth}%
+  \fi
+  \if@inartifact
+    \gdef\myHlineStart{\@lt@save@structStart{tabhrule}}%
+    \gdef\myHlineEnd{\@lt@save@structEnd{tabhrule}}%
+  \fi
+  \ifnum0=`{\fi}%
+  \multispan\LT@cols{\myHlineStart\unskip\leaders\hrule\@height\arrayrulewidth\hfill\myHlineEnd}\cr
+  \noalign{\LT@sep}%
+  \multispan\LT@cols{\myHlineStart\unskip\leaders\hrule\@height\arrayrulewidth\hfill\myHlineEnd}\cr
+  \noalign{\penalty\@M}%
+  \@gtempa}
+
+%% longtable + colortbl
+%% colortbl overrides def from longtable AtBeginDocument
+\def\@ltpdfa@LT@ctbl@hline{%
+  \ifx\LT@next\hline
+  \global\let\LT@next\@gobble
+  \ifx\CT@drsc@\relax
+  \gdef\CT@LT@sep{%
+    \noalign{\penalty-\@medpenalty\vskip\doublerulesep}}%
+  \else
+  \gdef\CT@LT@sep{%
+    \multispan\LT@cols{%
+      \CT@drsc@\leaders\hrule\@height\doublerulesep\hfill}\cr}%
+  \fi
+  \else
+  \global\let\LT@next\empty
+  \gdef\CT@LT@sep{%
+    \noalign{\penalty-\@lowpenalty\vskip-\arrayrulewidth}}%
+  \fi
+  \if@inartifact
+    \gdef\myHlineStart{\@lt@save@structStart{tabhrule}}%
+    \gdef\myHlineEnd{\@lt@save@structEnd{tabhrule}}%
+  \fi
+  \ifnum0=`{\fi}%
+  \multispan\LT@cols
+  {\myHlineStart\CT@arc@\leaders\hrule\@height\arrayrulewidth\hfill\myHlineEnd}\cr
+  \CT@LT@sep
+  \multispan\LT@cols
+  {\myHlineStart\CT@arc@\leaders\hrule\@height\arrayrulewidth\hfill\myHlineEnd}\cr
+  \noalign{\penalty\@M}%
+  \LT@next}
+
+% multicolumn (from colortbl) suppresses normal preamble by means of omit
+\long\def\ltpdfa@org@multicolumn#1#2#3{%
+   \multispan{#1}\begingroup\let\@classz\@ltpdfa@org@@classz
+   \def\@addamp{\if@firstamp \@firstampfalse \else
+                \@preamerr 5\fi}%
+   \@mkpream{#2}\@addtopreamble\@empty
+   \endgroup
+   \def\@sharp{#3}%
+   \let\CT@cell@color\relax
+   \let\CT@column@color\relax
+   \let\CT@do@color\relax
+   \@arstrut \@preamble
+   \null
+   \ignorespaces}
+
+\long\def\ltpdfa@multicolumn#1#2#3{%
+  \multispan{#1}%
+  %% ltpdfa@colcnt from end of previous line or beginning of table
+  %% save meaning of tdstart/tdend
+  \let\@mcolTDStart\myTDStart
+  \let\@mcolTDEnd\myTDEnd
+  \ifnum\ltpdfa@colcnt=\ltpdfa@numcols
+    \global\ltpdfa@colcnt=#1\@lt@startRowHook\myTRStart%\show\must
+  \else
+    \global\advance\ltpdfa@colcnt by #1
+  \fi%
+  \ltpdfa@protectForTable%
+  \begingroup
+  \def\@addamp{\if@firstamp\@firstampfalse \else
+    \@preamerr 5\fi}%
+  \@mkpream{#2}\@addtopreamble\@empty
+  \endgroup
+  \def\@sharp{\addColSpan{#1}\ignorespaces#3}%
+  %\def\@sharp{#3}%
+  \let\CT@cell@color\relax
+  \let\CT@column@color\relax
+  \let\CT@do@color\relax
+  %% #1 is LT@cols in multicolumn
+  %% mytdstart increases \ltpdfa@numcols, we expect one tdstart in multicol
+  \global\advance\ltpdfa@colcnt by \m@ne\relax
+  \ltpdfa@unprotectForTable%
+  \global\let\myTDStart\@mcolTDStart
+  \global\let\myTDEnd\@mcolTDEnd
+  \if@inartifact
+    \def\myTDStart{\@lt@save@structStart{ArtifactCell}}%
+    \def\myTDEnd{\@lt@save@structEnd{ArtifactCell}}%
+    \def\myVlineStart{\@lt@save@structStart{tabvrule}}%
+    \def\myVlineEnd{\@lt@save@structEnd{tabvrule}}%
+  \fi
+  %\show\@preamble%
+  \@arstrut \@preamble\ifnum\ltpdfa@numcols=\ltpdfa@colcnt\relax\myTREnd\fi%
+  \null
+  \ignorespaces}
+
+% multirow
+\@ifpackageloaded{multirow}{%
+  \let\@ltpdfa@org@multirow\multirow
+  \renewcommand\multirow[2][c]{\addRowSpan{#2}\@multirow[#1]{#2}}
+}{}
+
+\@ifpackageloaded{colortbl}{%
+  \let\@classz\@ltpdfa@@ctbl@classz
+  \let\@ltpdfa@LT@@hline\@ltpdfa@LT@ctbl@hline
+}{
+  \let\@classz\@ltpdfa@@array@classz
+  \let\@ltpdfa@LT@@hline\@ltpdfa@LT@lt@hline
+}
+% \@classz: MAKES COLUMNS
+% \@classi: MAKES RULES
+%% \ltpdfa@colcnt never 0 in table
+    
+\def\@array[#1]#2{%
+  \ltpdfa@protectForTable\@tempcntb=0%
+  \@tempdima \ht \strutbox
+  \advance \@tempdima by\extrarowheight
+  \setbox \@arstrutbox \hbox{\vrule
+    \@height \arraystretch \@tempdima
+    \@depth \arraystretch \dp \strutbox
+    \@width \z@}%
+  \begingroup
+    \@mkpream{#2}%
+    \xdef\ltpdfa@tmp@numcols{\the\@tempcntb}%TODO nested Tables ???
+    \xdef\@preamble{\noexpand \ialign \@halignto
+      \bgroup \@arstrut\@lt@startRowHook\resetCol\myTRStart\@preamble\myTREnd\@lt@endRowHook
+      \tabskip \z@ \cr}%
+  \endgroup
+  \edef\ltpdfa@numcols{\ltpdfa@tmp@numcols}%
+  \let\multicolumn\ltpdfa@multicolumn%
+  \@arrayleft
+  \if #1t\vtop \else \if#1b\vbox \else \vcenter \fi \fi
+  \bgroup
+  \let \@sharp ##\let \protect \relax
+  \lineskip \z@
+  \baselineskip \z@
+  \m@th
+  \let\\\@arraycr \let\tabularnewline\\\let\par\@empty
+  \global\ltpdfa@colcnt=\ltpdfa@numcols%start with last col
+  \ltpdfa@unprotectForTable%
+  % \show\@preamble%
+  % \show\@multispan
+  % \show\ltpdfa@numcols
+  \@preamble}
+
+% tabularx uses tabular*
+% TX@trial expands several times, \TX@endtabularx typesets
+\def\TX@endtabularx{%
+   \expandafter\expandafter\expandafter
+     \TX@find@endtabularxa\csname end\TX@\endcsname
+     \endtabularx\TX@\endtabularx\TX@find@endtabularxa
+  \expandafter\TX@newcol\expandafter{\tabularxcolumn{\TX@col@width}}%
+  \let\verb\TX@verb
+  \def\@elt##1{\global\value{##1}\the\value{##1}\relax}%
+  \edef\TX@ckpt{\cl@@ckpt}%
+  \let\@elt\relax
+  \TX@old@table\maxdimen
+  \TX@col@width\TX@target
+  \global\TX@cols\@ne
+  \TX@typeout@
+  {\@spaces Table Width\@spaces Column Width\@spaces X Columns}%
+  \let\ltpdfa@temp\ltpdfa@unprotectForTable
+  \let\ltpdfa@unprotectForTable\ltpdfa@protectForTable
+  \let\lt@ref\ref%
+  \let\ref\relax%% maybe into \ltpdfa@unprotectForTable ???
+  \TX@trial{\def\NC@rewrite@X{%
+          \global\advance\TX@cols\@ne\NC@find p{\TX@col@width}}}%
+  \loop
+    \TX@arith
+    \ifTX@
+    \TX@trial{}%
+  \repeat
+  \let\ltpdfa@unprotectForTable\ltpdfa@temp
+  \let\ref\lt@ref
+  {\let\@footnotetext\TX@ftntext\let\@xfootnotenext\TX@xftntext
+    \csname tabular*\expandafter\endcsname\expandafter\TX@target
+      \the\toks@
+    \csname endtabular*\endcsname}%
+  \global\TX@ftn\expandafter{\expandafter}\the\TX@ftn
+  \ifnum0=`{\fi}%
+   \expandafter\expandafter\expandafter
+   \TX@find@endtabularxbb
+    \expandafter\end\expandafter{\TX@}%
+    \endtabularx\TX@\endtabularx\TX@find@endtabularxb
+}
+
+
+\def\axelshow{\show\CT@cell@color}
+%% colortbl.sty
+%% ct@commands occurs after myTDStart and probably do not contain other structs???
+%% before each column => \begingroup \CT@setup \CT@row@color \CT@cell@color \CT@do@color \endgroup
+%% CT@setup defines CT@color -> \color
+%% this is used in \CT@row@color
+%% this is used in \CT@cell@color
+%% \CT@do@color ends color
+%% CT@color is possibly used more than once :-(
+%% \rowcolor makes global changes \gdef\CT@row@color{\CT@color ...}
+%% \cellcolor makes global changes \CT@cell@color{\CT@color ...}
+%% (columncolor in tablespec, rowcolor in row)
+\def\CT@setup{%
+  \@tempdimb\col@sep
+  \@tempdimc\col@sep
+  \def\CT@color{%
+    \global\let\CT@do@color\CT@@do@color
+    \vstructStart{ColorCell}\let\vstructStart\@lt@nop@vstructStart%oneshot vstructstart
+  \color}}
+\edef\@tempa{%
+  \catcode`\noexpand\^^A\the\catcode`\^^A\relax}
+\catcode`\^^A=\catcode`\% %=> 'Comment character'
+\def\CT@@do@color{%
+  \global\let\CT@do@color\relax
+  \@tempdima\wd\z@
+  \advance\@tempdima\@tempdimb
+  \advance\@tempdima\@tempdimc
+  \kern-\@tempdimb
+  \leaders\vrule
+  ^^A                     \@height\p@\@depth\p@
+  \hskip\@tempdima\@plus  1fill
+  \kern-\@tempdimc
+  \hskip-\wd\z@ \@plus -1fill\vstructEnd{ColorCell}}
+\@tempa
+
+\let\@@array\@array
+\let\@ltpdfa@org@vline\vline
+\renewcommand{\vline}{%
+  \myVlineStart\@ltpdfa@org@vline\myVlineEnd%
+}
+
+%% box\z@ gets the content and is set around the halign
+%% LT@start checks after \\ or \endlongtable
+%% called from \\ -> \LT@tabularcr -> \LT@t@bularcr(checks chunksize and -> \LT@xtabularcr)
+%% \LT@xtabularcr -> unvbox\z@
+% \let\@ltpdfa@org@LT@array\LT@array
+\def\LT@array[#1]#2{%
+  \refstepcounter{table}\stepcounter{LT@tables}%
+  \if l#1%
+     \LTleft\z@ \LTright\fill
+  \else\if r#1%
+    \LTleft\fill \LTright\z@
+  \else\if c#1%
+    \LTleft\fill \LTright\fill
+  \fi\fi\fi
+  \let\multicolumn\ltpdfa@multicolumn%
+  \let\LT@mcol\multicolumn
+  \let\LT@@tabarray\@tabarray
+  \let\LT@@hl\hline
+  \def\@tabarray{%
+    \let\hline\LT@@hl
+    \LT@@tabarray}%
+  \let\\\LT@tabularcr\let\tabularnewline\\%
+  \def\newpage{\noalign{\break}}%
+  \def\pagebreak{\noalign{\ifnum`}=0\fi\@testopt{\LT@no@pgbk-}4}%
+  \def\nopagebreak{\noalign{\ifnum`}=0\fi\@testopt\LT@no@pgbk4}%
+  \let\hline\LT@hline \let\kill\LT@kill\let\caption\LT@caption
+  \@tempdima\ht\strutbox
+  \let\@endpbox\LT@endpbox
+  \ifx\extrarowheight\@undefined
+    \let\@acol\@tabacol
+    \let\@classz\@tabclassz \let\@classiv\@tabclassiv
+    \def\@startpbox{\vtop\LT@startpbox}%
+    \let\@@startpbox\@startpbox
+    \let\@@endpbox\@endpbox
+    \let\LT@LL@FM@cr\@tabularcr
+  \else
+    \advance\@tempdima\extrarowheight
+    \col@sep\tabcolsep
+    \let\@startpbox\LT@startpbox\let\LT@LL@FM@cr\@arraycr
+  \fi
+  \setbox\@arstrutbox\hbox{\vrule
+    \@height \arraystretch \@tempdima
+    \@depth \arraystretch \dp \strutbox
+    \@width \z@}%
+  \let\@sharp##\let\protect\relax
+  \let\LT@@hline\@ltpdfa@LT@@hline
+  \ltpdfa@protectForTable
+  \@tempcntb=0%
+  \begingroup
+    \@mkpream{#2}%
+    \xdef\ltpdfa@tmp@numcols{\the\@tempcntb}%
+    \xdef\LT@bchunk{%'rename' \@preamble
+      \global\advance\c@LT@chunks\@ne
+      \global\LT@rows\z@\setbox\z@\vbox\bgroup
+      \LT@setprevdepth
+      \tabskip\LTleft \noexpand\halign to\hsize\bgroup
+      \tabskip\z@ \@arstrut \@lt@startRowHook\resetCol\myTRStart\@preamble\myTREnd\@lt@endRowHook \tabskip\LTright \cr}%
+  \endgroup
+  \edef\ltpdfa@numcols{\ltpdfa@tmp@numcols}%
+  % \show\LT@bchunk
+  % \show\LT@@hline
+  % find out how many columns -> set LT@cols
+  \expandafter\LT@nofcols\LT@bchunk&\LT@nofcols
+  \LT@make@row
+  \m@th\let\par\@empty
+  \everycr{}\lineskip\z@\baselineskip\z@
+  \global\ltpdfa@colcnt=\ltpdfa@numcols
+  \ltpdfa@unprotectForTable
+  \LT@bchunk}
+  
+% no table tags
+\def\LT@makecaption#1#2#3{%
+  \ltpdfa@org@multicolumn\LT@cols c{\hbox to\z@{\hss\parbox[t]\LTcapwidth{%
+        \structStart{caption}%
+        \sbox\@tempboxa{#1{#2: }#3}%
+        \ifdim\wd\@tempboxa>\hsize
+        #1{#2: }#3%
+        \else
+        \hbox to\hsize{\hfil\box\@tempboxa\hfil}%
+        \fi
+        \endgraf%
+        \structEnd{caption}\vskip\baselineskip}\hss}}}
+
+\let\@lt@save@@makecaption\@makecaption
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \structStart{caption}%
+  \sbox\@tempboxa{#1: #2}%
+  \ifdim \wd\@tempboxa >\hsize
+    #1: #2\par
+  \else
+    \global \@minipagefalse
+    \hb@xt@\hsize{\hfil\box\@tempboxa\hfil}%
+  \fi
+  \structEnd{caption}%
+  \vskip\belowcaptionskip}
+
+\addToConfig{artifact}{tabhrule={Type:Layout}}
+\addToConfig{artifact}{tabvrule={Type:Layout}}
+\addToConfig{artifact}{ColorCell={Type:Layout}}
+\addToConfig{artifact}{ArtifactCell={Type:Layout}}
+\addRolemap{tabularx}{Table}
+\addRolemap{longtable}{Table}
+\addRolemap{table}{Table}
+\addRolemap{caption}{Caption}
+
+\endinput

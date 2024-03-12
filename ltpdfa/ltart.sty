@@ -1,0 +1,44 @@
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]%% TODO check
+\ProvidesPackage{ltart}[\ltpdfapkgdate\space v\ltpdfaversion\space latex adaptions for book.cls]
+
+\let\@ltpdfa@org@@starttoc\@starttoc
+\renewcommand{\@starttoc}[1]{\structStart{TOC}\@ltpdfa@org@@starttoc{#1}\structEnd{TOC}}
+
+\renewcommand*{\l@part}[2]{%
+  \ifnum \c@tocdepth >-2\relax
+    \addpenalty{-\@highpenalty}%
+    \addvspace{2.25em \@plus\p@}%
+    \setlength\@tempdima{3em}%
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      {\leavevmode
+       \large \bfseries\structStart{TOCI} #1\hfil \hb@xt@\@pnumwidth{\hss #2}\structEnd{TOCI}}\par
+       \nobreak
+         \global\@nobreaktrue
+         \everypar{\global\@nobreakfalse\everypar{}}%
+    \endgroup
+\fi}
+
+\def\@dottedtocline#1#2#3#4#5{%
+  \ifnum #1>\c@tocdepth \else
+    \vskip \z@ \@plus.2\p@
+    {\leftskip #2\relax \rightskip \@tocrmarg \parfillskip -\rightskip
+     \parindent #2\relax\@afterindenttrue
+     \interlinepenalty\@M
+     \leavevmode
+     \@tempdima #3\relax
+     \advance\leftskip \@tempdima \null\nobreak\hskip -\leftskip
+     \structStart{TOCI}{#4}\nobreak
+     \structStart[document]{leaders}\leaders\hbox{$\m@th
+        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+        mu$}\hfill\structEnd{leaders}
+     \nobreak
+     \hb@xt@\@pnumwidth{\hfil\normalfont \normalcolor #5}\structEnd{TOCI}%
+     \par}%
+\fi}
+
+%\addRolemap{chapter}{Sect}
+%\addRolemap{chapterhead}{H}
+
+\endinput

@@ -1,0 +1,85 @@
+%%
+%% This is file `coco-accessibility.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `a11y-sty')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-accessibility.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% Accessibility features for \textit{xerif} projects.
+%%
+%% Maintainer: p.schulz@le-tex.de
+%%
+%% lualatex  -  texlive > 2018
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-accessibility}
+    [2024/01/29 0.4.0 CoCoTeX accessibility module]
+\def\tp@if@ally{\expandafter\@firstoftwo}
+\RequirePackage[pdftex,pdflang=De]{ltpdfa}%,nodetree,dospaces,doparas,,debug
+\hypersetup{linktoc=none}
+\RequirePackage{coco-title}%
+\directlua{ally = require('coco-accessibility')}
+\def\tp@title@insert@xmp{%
+  \edef\tp@xmp@file@name{\tpUseGComp{titlepage}{XmpFile}.xmp}%
+  \IfFileExists{\tp@xmp@file@name}
+    {\addToConfig{metadata}{xmpfile=\tp@xmp@file@name}%
+     \directlua{ally.meta.extract()}}
+    {\tpPackageWarning{A11y}{File}{%
+\tp@xmp@file@name\space not found.^^J
+Note that the ltpdfa package will create one^^J
+from the Components given in the tpMeta Container.}}}
+\tpAddToType{Components}{titlepage}{%
+  \tpDeclareGComp{IccProfileFile}
+  \tpDeclareGComp{IccComponents}
+  \tpDeclareGComp{IccIdentifier}}
+\tpAddToType{Properties}{titlepage}{%
+  \tpSetProperty{output-intent}{%
+    profile=\tpIfComp{IccProfileFile}{\tpUseComp{IccProfileFile}}{suppl/\tp@color@enc.icc};%
+    components=\tpIfComp{IccComponents}{\tpUseComp{IccComponents}}{\ifdefstring\tp@color@enc{cmyk}{4}{3}};%
+    identifier=\tpIfComp{IccIdentifier}{\tpUseComp{IccIdentifier}}{\ifdefstring\tp@color@enc{cmyk}{Coated FOGRA39}{sRGB IEC61966-2.1}}%
+  }}
+\tpAddToHook[titlepage]{document-meta-hook}{\edef\x{\noexpand\addToConfig{intent}{\tpUseProperty{output-intent}}}\x}
+\protected\def\pdfglyphtounicode{\pdfextension glyphtounicode}
+\input glyphtounicode
+\edef\pdfgentounicode{\pdfvariable gentounicode}
+\pdfgentounicode = 1
+\tpAddToType{Components}{titlepage}{%
+  \tpDeclareGComp[2]{PDFAID}%
+  \tpDeclareGComp[A]{PDFALevel}%
+  \tpDeclareGComp[1]{PDFUAID}}%
+\tpAddToHook[titlepage]{document-meta-hook}{%
+  \tpIfCompEmpty{PDFAID}{}{\tpIfCompEmpty{PDFALevel}{}{%
+      \edef\x{\noexpand\setDocInfo{conformance}{%
+          pdfaid=\tpUseComp{PDFAID};%
+          level=\tpUseComp{PDFALevel}%
+          \tpIfCompEmpty{PDFUAID}{}{;pdfuaid=\tpUseComp{PDFUAID}}}}%
+      \x}}}
+\AtBeginShipout{\directlua{ltpdfa.pageprocessor(tex.box["AtBeginShipoutBox"])}}%
+\tpIfAlly{%
+  \ltOmitEnv{tpMeta}
+  \ltOmitEnv{tpAuthor}
+  \ltOmitEnv{tpEditor}
+  \ltOmitEnv{tpSeriesEditor}
+  \ltOmitEnv{tpAffil}
+  \ltOmitEnv{tpFunding}
+  \ltOmitEnv{heading}
+}{}
+\endinput
+%%
+%% End of file `coco-accessibility.sty'.

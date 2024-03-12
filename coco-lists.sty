@@ -1,0 +1,304 @@
+%%
+%% This is file `coco-lists.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% cocotex.dtx  (with options: `lists')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from coco-lists.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file cocotex.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+%%
+%% module for CoCoTeX that handles lists.
+%%
+%% Maintainer: marcus.hottenroth@le-tex.de
+%%
+%% lualatex – texlive ≥ 2019
+%%
+\NeedsTeXFormat{LaTeX2e}[2018/12/01]
+\ProvidesPackage{coco-lists}
+    [2024/01/29 0.4.0 CoCoTeX lists module]
+\RequirePackage{coco-common}
+\usepackage{enumerate}
+\ifx\labelitemfont\@undefined\let\labelitemfont\relax\fi
+\renewcommand\labelitemi  {\labelitemfont \textendash}
+\setlength\leftmargini{\parindent}%
+\def\@listi{%
+  \leftmargin\leftmargini
+  \parsep \z@
+  \listparindent\parindent
+  \topsep .5\baselineskip % Hier Properties nutzen!
+  \itemsep\z@}
+\let\@listI\@listi
+\def\@listii {\leftmargin\leftmarginii
+              \labelwidth\leftmarginii
+              \advance\labelwidth-\labelsep
+              \topsep    \z@
+              \parsep    \z@
+              \itemsep   \parsep}
+
+\def\@listiii{\leftmargin\leftmarginiii
+              \labelwidth\leftmarginiii
+              \advance\labelwidth-\labelsep
+              \topsep    \z@
+              \parsep    \z@
+              \partopsep \z@
+              \itemsep   \topsep}
+
+\def\@@enum@[#1]{%
+  \@enLab{}\let\@enThe\@enQmark
+  \@enloop#1\@enum@
+  \ifx\@enThe\@enQmark\@warning{The counter will not be printed.%
+   ^^J\space\@spaces\@spaces\@spaces The label is: \the\@enLab}\fi
+  \expandafter\edef\csname label\@enumctr\endcsname{\the\@enLab}%
+  \expandafter\let\csname the\@enumctr\endcsname\@enThe
+  \csname c@\@enumctr\endcsname7
+  \@enum@}
+
+\def\@enum@{%
+  \list{\csname label\@enumctr\endcsname}%
+  {%
+    \usecounter{\@enumctr}%
+    \labelsep\z@
+    \labelwidth\leftmargin
+    \def\makelabel##1{\hb@xt@\leftmargin{##1\hss}}}}
+\def\itemize{%
+  \ifnum \@itemdepth >\thr@@\@toodeep\else
+    \advance\@itemdepth\@ne
+    \edef\@itemitem{labelitem\romannumeral\the\@itemdepth}%
+    \expandafter
+    \list
+      \csname\@itemitem\endcsname
+      {\labelsep\z@
+       \itemindent\z@
+       \labelwidth\leftmargin
+       \def\makelabel##1{\hb@xt@\leftmargin{##1\hss}}}%
+  \fi}
+\let\orig@doendpe\@doendpe
+\def\endenumerate{\endlist
+  \gdef\@doendpe{%
+    \@endpetrue
+    \everypar{{\setbox\z@\lastbox}\everypar{}\@endpefalse}%
+    \global\let\@doendpe\orig@doendpe}}
+\def\enditemize{\endlist
+  \gdef\@doendpe{%
+    \@endpetrue
+    \everypar{{\setbox\z@\lastbox}\everypar{}\@endpefalse}%
+    \global\let\@doendpe\orig@doendpe}}
+\newcount\tp@descriptionlist
+\global\newdimen\tp@maxLabelWidth%
+\def\tp@getMaxLabelWidth{%
+  \global\tp@maxLabelWidth=0pt%
+}
+\renewenvironment{description}[1][]{%
+  \small
+  % Read maximum label width for this list from the *.aux file and save as \tp@maxLabelWidth.
+  \tp@getMaxLabelWidth
+  \list{}%
+   {\labelwidth\tp@maxLabelWidth
+    \leftmargin\dimexpr\tp@maxLabelWidth+\labelsep\relax
+    \topsep .5\baselineskip
+    \itemsep\z@
+    \partopsep\z@
+    \parsep\z@
+    \itemindent\z@
+    \def\makelabel##1{%
+      \sbox\z@{##1}%
+      \ifdim\tp@maxLabelWidth<\wd\z@\relax
+        \global\tp@maxLabelWidth=\wd\z@\relax
+      \fi
+      \hb@xt@\labelwidth{\unhbox\z@\hss}%
+    }%
+   }%
+}{\endlist
+\immediate\write\@auxout{\string\g@addto@macro\string\tp@getMaxLabelWidth{\string\ifnum\string\the\tp@descriptionlist=\the\tp@descriptionlist\relax\string\global\string\tp@maxLabelWidth=\the\tp@maxLabelWidth\string\fi}}%
+\global\advance\tp@descriptionlist by \@ne
+\gdef\@doendpe{%
+    \@endpetrue
+    \everypar{{\setbox\z@\lastbox}\everypar{}\@endpefalse}%
+    \global\let\@doendpe\orig@doendpe}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\tp@ifstring#1#2{%
+  \edef\@tempa{#1}%
+  \edef\@tempb{#2}%
+  \ifx\@tempa\@tempb\relax%
+}
+\def\tp@numToLCLetter#1{%
+  \count255=\the\lccode`a%
+  \advance\count255 by -\@ne%
+  \advance\count255 by #1%
+  \char\count255%
+}
+\def\tp@numToUCLetter#1{%
+  \count255=\uccode`A%
+  \advance\count255 by -\@ne%
+  \advance\count255 by #1%
+  \char\count255%
+}
+\tpAddToDefault{list}{%
+  \tpSetProperty{after-skip}{\z@}% Vertical space after the list.
+  \tpSetProperty{before-skip}{\z@}% Vertical space before the list.
+  \tpSetProperty{item-indent}{0\p@}% Vertical difference from property left-margin.
+  \tpSetProperty{label-char}{} % Only applies with label-type »char« (or empty).
+  \tpSetProperty{label-prefix-delimiter}{} % The character/string between the prefix (inherited from list one level above) and the actual item’s label. Used for numbered lists.
+  \tpSetProperty{label-sep}{5mm}
+  \tpSetProperty{label-suffix}{}
+  \tpSetProperty{label-type}{char} % Label types: char (use label-char; default), number, Alpha, alpha, Roman, roman.
+  \tpSetProperty{label-width}{0\p@} % Label width is internally increased to width of label character.
+  \tpSetProperty{left-margin}{0\p@}
+}
+\long\def\tpDeclareList{\@ifnextchar[{\@tpDeclareList}{\@tpDeclareList[]}}%]
+\long\def\@tpDeclareList[#1]#2#3{%
+  \tpNamespace{list}%
+  \expandafter\def\csname tp@list@name\endcsname{#2}%
+  %
+  \if!#1!\else\expandafter\protect\expandafter\def\csname tp@list@#3@parent\endcsname{#1}\fi%
+  \expandafter\protect\expandafter\def\csname tp@list@#2@properties\endcsname{#3}%
+
+  % Define the macro for list with name/class #2.
+  \expandafter\def\csname tpUseList#2\endcsname{%
+    \if!#1!\else\edef\tp@list@parent{#1}\fi%
+    \tpNamespace{list}%
+    \tpCascadeProps{#2}{list} % Load the namespace defaults defined in \tpAddToDefault, the parent properties (if any), and the specific list properties.
+  }
+}
+\tpDeclareContainer{tpList}{%
+  \tpDeclareType{Properties}{\tp@list@default}%
+}
+\def\tpList{\@ifnextchar [{\tp@list}{\tp@list[]}}%]
+\def\endtpList{%
+  \endlist%
+  \global\advance\tp@currListDepth by -\@ne%
+  \expandafter\ifx\csname tpUseList\tp@list@name\endcsname\relax
+    \PackageError{coco-lists.sty}{List \tp@list@name\space unknown!}{A list with name \tp@list@name\space is unknown. Use the \string\tpDeclareList\space macro to declare list types.}%
+  \else
+    % If the parent list ends, gather the sublists and write their label widths to the aux file.
+    \ifnum\tp@currListDepth=-\@ne\relax%
+      \count255=\z@
+      \loop
+        \immediate\write\@auxout{\string\expandafter\string\gdef\string\csname\space\string tp@maxLabelWidth@\the\tp@listNumber @\the\count255\endcsname{\csname tp@maxLabelWidth@\the\tp@listNumber @\the\count255\endcsname}}
+        \advance\count255 by \@ne
+      \expandafter\ifx\csname tp@maxLabelWidth@\the\tp@listNumber @\the\count255\endcsname\relax\else\repeat
+    \fi
+    \csname tpUseList\tp@list@name\endcsname%
+    \vskip\tpUseProperty{after-skip}
+  \fi%
+  \gdef\@doendpe{%
+    \@endpetrue
+    \everypar{{\setbox\z@\lastbox}\everypar{}\@endpefalse}%
+    \global\let\@doendpe\orig@doendpe%
+  }
+}
+\global\newcount\tp@currListDepth \global\tp@currListDepth=-\@ne
+\expandafter\gdef\csname tp@inheritablePrefix\the\tp@currListDepth\endcsname{}
+\global\newcount\tp@listNumber \global\tp@listNumber=-\@ne
+\def\tp@list[#1]#2{%
+  % Increment the list depth and, in case the depth is zero, i.e. a completely new list and no sublist starts, the list number.
+  \global\advance\tp@currListDepth by \@ne%
+  \ifnum\tp@currListDepth = \z@
+    \global\advance\tp@listNumber by \@ne%
+  \fi
+
+  % Assign a new counter for the item numbers as well as an inheritable prefix for sublists, depending on the list depth.
+  \global\expandafter\newcount\csname tp@itemNumber\the\tp@currListDepth\endcsname%
+  \expandafter\gdef\csname tp@inheritablePrefix\the\tp@currListDepth\endcsname{}%
+  \gdef\tp@inheritedPrefixAbove{}%
+
+  \newbox\tp@labelbox%
+  \edef\tp@list@name{#2} % Needed for afterskips to apply.
+  \tpCascadeProps{#2}{list} % Load the properties.
+  % If the list has the keyword »inherit« and is enumerated, set its prefix according to the latest item label in the parent list.
+  \tp@ifstring{#1}{inherit}%
+    \tpIfPropVal{label-type}{char}{}{\gdef\tp@inheritedPrefixAbove{\csname tp@inheritablePrefix\the\numexpr\the\tp@currListDepth-1\relax \endcsname}}%
+  \fi
+
+  \vskip\tpUseProperty{before-skip}
+
+  \tpIfPropVal{label-type}{char}{%
+    \tpSetProperty{label-prefix-delimiter}{}%
+    \tpSetProperty{label-suffix}{}%
+  }{%
+    \tpSetProperty{label-char}{}%
+  }%
+  \tpIfPropVal{label-type}{number}{\edef\tp@convertNumber##1{##1}}{}%
+  \tpIfPropVal{label-type}{Alpha}{\edef\tp@convertNumber##1{\tp@numToUCLetter{##1}}}{}%
+  \tpIfPropVal{label-type}{alpha}{\edef\tp@convertNumber##1{\tp@numToLCLetter{##1}}}{}%
+  \tpIfPropVal{label-type}{Roman}{\def\tp@convertNumber##1{\uppercase\expandafter{\romannumeral##1}}}{}%
+  \tpIfPropVal{label-type}{roman}{\def\tp@convertNumber##1{\romannumeral##1}}{}%
+
+  % Use the label prefix delimiter only if there actually is a label prefix.
+  \ifx\empty\tp@inheritedPrefixAbove\empty
+    \tpSetProperty{label-prefix-delimiter}{}%
+  \fi
+  % Set the label width based on the potentially longest label string.
+  \setbox\tp@labelbox = \hbox{\tp@inheritedPrefixAbove\tpUseProperty{label-prefix-delimiter}\tpUseProperty{label-char}\tpUseProperty{label-suffix}}%
+  \ifdim\wd\tp@labelbox > \tpUseProperty{label-width}\relax%
+    \tpSetProperty{label-width}{\the\wd\tp@labelbox}%
+  \fi%
+
+  % If the macro already exists (loaded from the aux file), …
+  \expandafter\ifx\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname\relax%
+  \else%
+    % … set the »label-width« property accordingly.
+    \tpSetProperty{label-width}{\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname}%
+  \fi
+
+  \list{%
+    % Label. Uses [] in description items. Empty otherwise.%
+  }{%
+    \labelwidth\tpUseProperty{label-width}%
+    \labelsep\dimexpr\tpUseProperty{label-sep}+\tpUseProperty{item-indent}\relax%
+    \leftmargin\dimexpr\tpUseProperty{left-margin}+\tpUseProperty{label-width}+\tpUseProperty{label-sep}\relax%
+    \topsep0mm%
+    \partopsep0mm%
+    \itemindent\tpUseProperty{item-indent}%
+    \def\makelabel##1{%
+      % If the list is an enumerated one, increment the item counter and set the label accordingly.
+      \tpIfPropVal{label-type}{char}{}{%
+        \global\expandafter\advance\csname tp@itemNumber\the\tp@currListDepth\endcsname by \@ne%
+        \tpSetProperty{label-char}{\tp@convertNumber{\the\csname tp@itemNumber\the\tp@currListDepth\endcsname}}%
+      }
+      \ifx\empty##1\empty%
+        % Checking this condition is not necessary by all means, but prevents inheriting and accumulating characters if »inherit« option is set in the TeX document.
+        \tpIfPropVal{label-type}{char}{}{%
+          \global\expandafter\edef\csname tp@inheritablePrefix\the\tp@currListDepth\endcsname{\tp@inheritedPrefixAbove\tpUseProperty{label-prefix-delimiter}\tpUseProperty{label-char}}%
+        }
+        % Measure the actual full label width.
+        \hbox to \tpUseProperty{label-width}{\tp@inheritedPrefixAbove\tpUseProperty{label-prefix-delimiter}\tpUseProperty{label-char}\tpUseProperty{label-suffix}\hss}%
+        \setbox\tp@labelbox = \hbox{\tp@inheritedPrefixAbove\tpUseProperty{label-prefix-delimiter}\tpUseProperty{label-char}\tpUseProperty{label-suffix}}%
+      \else
+        \hbox to \tpUseProperty{label-width}{##1\hss}%
+        \setbox\tp@labelbox = \hbox{##1}%
+      \fi
+      % If the macro for the list and the according depth is not set yet, …
+      \expandafter\ifx\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname\relax%
+        % … define it based on the calculated full label width.
+        % (Needs \xdef! Fully expands the macro definition. Otherwise, the saved macro would change its value with \tp@labelbox’s content.)
+        \expandafter\xdef\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname{\the\wd\tp@labelbox}%
+      \else%
+        % If the currently defined macro holds a smaller label width than the actual label box, update the macro.
+        \expandafter\ifdim\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname < \the\wd\tp@labelbox\relax%
+          \expandafter\xdef\csname tp@maxLabelWidth@\the\tp@listNumber @\the\tp@currListDepth\endcsname{\the\wd\tp@labelbox}%
+        \fi
+      \fi
+    }%
+  }%
+}
+\tpDeclareList{default}{}
+\def\tp@list@load@props{\csname tp@list@\tp@list@name @properties\endcsname}
+\endinput
+%%
+%% End of file `coco-lists.sty'.

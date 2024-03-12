@@ -1,0 +1,109 @@
+%% lualatex test && dvips test && ps2pdf -dCompressPages=false test.ps
+\NeedsTeXFormat{LaTeX2e}[1994/06/01]%% TODO check
+\def\ltpdfapkgdate{2019/07/25}
+\def\ltpdfaversion{0.1}
+\ProvidesPackage{ltdraft}[\ltpdfapkgdate\space v\ltpdfaversion\space Structelem insertion draft]
+
+%% do nothing variants
+\newcommand*{\@lt@nop@addToConfig}[2]{\relax}%
+\newcommand*{\@lt@nop@structStart}[2][]{\relax}
+\newcommand*{\@lt@nop@structEnd}[1]{\relax}
+\newcommand*{\@lt@nop@vstructStart}[2][]{\relax}
+\newcommand*{\@lt@nop@vstructEnd}[1]{\relax}
+\newcommand*{\@lt@nop@pstructStart}[2][]{\relax}
+\newcommand*{\@lt@nop@pstructEnd}[1]{\relax}
+\newcommand*{\@lt@nop@addAltText}[1]{\relax}
+\newcommand*{\@lt@nop@addNumbering}[1]{\relax}
+\newcommand*{\@lt@nop@addLastLink}{\relax}
+\newcommand*{\@lt@nop@addSubLink}{\relax}
+\newcommand*{\@lt@nop@getStructParent}{\relax}
+\newcommand*{\@lt@nop@setNewParent}[1]{\relax}
+\newcommand*{\@lt@nop@addID}[1]{\relax}
+\newcommand*{\@lt@nop@addPlacement}[1]{\relax}
+\newcommand*{\@lt@nop@figureStart}[1]{\relax}
+\newcommand*{\@lt@nop@figureEnd}[1]{\relax}
+\newcommand*{\@lt@nop@figureSet}[3][bp]{\relax}
+\newcommand*{\@lt@nop@addFigure}[7]{\relax}
+\newcommand*{\@lt@nop@addColSpan}[1]{\relax}
+\newcommand*{\@lt@nop@addRowSpan}[1]{\relax}
+\newcommand*{\@lt@nop@addScope}[1]{\relax}
+\newcommand*{\@lt@nop@addKeep}{\relax}
+\newcommand*{\@lt@nop@toUnicode}[1]{\relax}
+\newcommand*{\@lt@nop@setDocInfo}[3][]{\relax}
+\newcommand*{\@lt@nop@addRolemap}[2]{\relax}
+\newcommand*{\@lt@nop@noAutoParas}{\relax}
+\newcommand*{\@lt@nop@doAutoParas}{\relax}
+\newcommand*{\@lt@nop@noAutoClose}{\relax}
+\newcommand*{\@lt@nop@doAutoClose}{\relax}
+\newcommand*{\@lt@nop@structRemove}{\relax}
+\newcommand*{\@lt@nop@getCurrentStruct}[1]{\relax}
+\newcommand*{\@lt@nop@addToStruct}[1]{\relax}
+\newcommand*{\@lt@nop@ignoreNext}[1]{\relax}
+\newcommand*{\@lt@nop@pushStruct}[1]{\relax}
+\newcommand*{\@lt@nop@setLang}[1]{\relax}
+
+\newcommand*{\@disableLtpdfa}{%
+  \global\let\addToConfig\@lt@nop@addToConfig
+  \global\let\structStart\@lt@nop@structStart
+  \global\let\structEnd\@lt@nop@structEnd
+  \global\let\vstructStart\@lt@nop@vstructStart
+  \global\let\vstructEnd\@lt@nop@vstructEnd
+  \global\let\pstructStart\@lt@nop@pstructStart
+  \global\let\pstructEnd\@lt@nop@pstructEnd
+  \global\let\addAltText\@lt@nop@addAltText
+  \global\let\addNumbering\@lt@nop@addNumbering
+  %% \global\let\addLastLink\@lt@nop@addLastLink need this in Artifacts
+  %% \global\let\getCurrentStruct\@lt@nop@getCurrentStruct
+  \global\let\getStructParent\@lt@nop@getStructParent
+  \global\let\setNewParent\@lt@nop@setNewParent
+  \global\let\addID\@lt@nop@addID
+  \global\let\addPlacement\@lt@nop@addPlacement
+  \global\let\figureStart\@lt@nop@figureStart
+  \global\let\figureEnd\@lt@nop@figureEnd
+  \global\let\figureSet\@lt@nop@figureSet
+  \global\let\addFigure\@lt@nop@addFigure
+  \global\let\addColSpan\@lt@nop@addColSpan
+  \global\let\addRowSpan\@lt@nop@addRowSpan
+  \global\let\addScope\@lt@nop@addScope
+  \global\let\addKeep\@lt@nop@addKeep
+  \global\let\toUnicode\@lt@nop@toUnicode
+  \global\let\setDocInfo\@lt@nop@setDocInfo
+  \global\let\addRolemap\@lt@nop@addRolemap
+  \global\let\noAutoParas\@lt@nop@noAutoParas
+  \global\let\doAutoParas\@lt@nop@doAutoParas
+  \global\let\noAutoClose\@lt@nop@noAutoClose
+  \global\let\doAutoClose\@lt@nop@doAutoClose
+  \global\let\structRemove\@lt@nop@structRemove
+  \global\let\addToStruct\@lt@nop@addToStruct
+  \global\let\ignoreNext\@lt@nop@ignoreNext
+  \global\let\pushStruct\@lt@nop@pushStruct
+  \global\let\setLang\@lt@nop@setLang
+  \ifltpdfa@final\NoHyper\fi
+}
+
+%%\ifltpdfa@disable sets final false
+\ifltpdfa@final\else
+  \let\Artifact\@empty
+  \let\startTHead\@empty
+  \let\stopTHead\@empty
+  \let\startArtifact\@empty
+  \let\stopArtifact\@empty
+%   \ifltpdfa@nohyperref\relax\else
+%     \RequirePackage[
+%     pdfa=true,
+%     unicode=true,
+%     bookmarks=true,
+%     bookmarksnumbered=true,
+%     colorlinks=true,
+%     linkcolor=blue,
+%     raiselinks=true,
+%     pdfinfo={},
+%     pdfpagelabels=true,
+%     pageanchor=true,
+%     hyperindex=true,
+%     hyperfootnotes=true,
+%     \ifltpdfa@debug{debug}\fi
+%     ]{hyperref}\fi
+\fi
+
+\endinput
