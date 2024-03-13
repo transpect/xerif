@@ -20,8 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that extends heading objects.
 %%
@@ -31,12 +29,12 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-headings}
-    [\filedate \fileversion CoCoTeX headings module]
+    [2024/01/29 0.4.0 CoCoTeX headings module]
 \RequirePackage{coco-meta}
-\RequirePackage{bookmark}
-\hypersetup{bookmarksdepth=-999}
-\tpDeclareContainer{tpHeading}{%
-  \tpInherit {Components,Properties} from Meta;
+\RequirePackage{bookmark}%
+\hypersetup{bookmarksdepth=-999}%
+\tpDeclareContainer{heading}{%
+  \tpInherit{Components,Properties}{CommonMeta}%
   \tpDeclareType{Components}{%
     \tp@heading@authors%
     \tp@provide@hd@macros{Title}%
@@ -46,8 +44,8 @@
     \tp@provide@hd@macros{LicenceName}%
     \tp@heading@quotes
   }%
-  \tpDeclareType{Properties}{\tp@heading@default}%
-  \tpDeclareEnv{\@heading}{\end@heading}%
+  \tpDeclareType{Properties}{}%
+  \tpDeclareEnv{\heading}{\endheading}%
 }
 \long\def\tpDeclareHeading{\tp@opt@empty\@tpDeclareHeading}
 \long\def\@tpDeclareHeading[#1]#2#3#4{%
@@ -83,9 +81,9 @@
       \edef\@argi{#1}%
       \tpDeclareType{Parent}{\tp@heading@create@parent{#1}{#3}}
       \ifx\@argi\@empty
-        \tpInherit {Components,Properties} from tpHeading;
+        \tpInherit{Components,Properties}{heading}%
       \else
-        \tpInherit {Components,Properties,Parent} from #1;
+        \tpInherit{Components,Properties,Parent}{#1}%
       \fi
       \tpDeclareType{Properties}{%
         #4%
@@ -118,7 +116,7 @@
     \tpEvalType[#2]{Properties}%
     \tp@meta@role@eval{Author}%
     \tpComposeCollection{tpAuthor}{author-contact-block-format}{AuthorContactBlock}%
-    \tpComposeCollection{tpAffil}{affil-block-format}{AffilBlock}%
+    \tpComposeCollection{tpAffil}{affil-block-item-format}{AffilBlock}%
     \tpComposeCollection{tpQuote}{quote-block-format}{QuoteBlock}%
     \def\Hy@toclevel{#1}%
     \tp@auto@number{#1}{#2}%
@@ -200,7 +198,7 @@
   \fi}
 \def\tp@heading@create@labels#1{%
   \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
-    \Hy@MakeCurrentHrefAuto{tp.#1}%
+    \Hy@MakeCurrentHrefAuto{tp:#1}%
     \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
   \fi
   \tpIfAttr{heading}{label}
@@ -216,23 +214,24 @@
     \expandafter\tpltx@label\expandafter{#1}%
   \fi
   \global\let\label\tpltx@label}
-\def\tp@check@author#1{%
-  \tpIfComp{#1AuthorNameList}{}{%
-    \tpIfComp{AuthorNameList}{%
+\def\cch@set@author@name@list#1{%
+  \tpUnlessComp{#1AuthorNameList}{%
+    \ifx\tp@used@AuthorNameList@override\@empty
       \expandafter\csname tp#1AuthorNameList\expandafter\endcsname\expandafter{\tp@heading@AuthorNameList}%
-    }{\ifnum\tpAuthorCnt>\z@
-        \tpCompDef\tp@tempa{tpAuthor}{author-list-format}%
-        \ifx\tp@tempa\relax
-        \else
-          \expandafter\csname tp#1AuthorNameList\expandafter\endcsname\expandafter{\tp@tempa}%
+    \else
+      \ifnum\tpAuthorCnt>\z@
+        \tpCompDef\cch@tempa{tpAuthor}{author-list-print-format}%
+        \ifx\cch@tempa\relax\else
+          \expandafter\csname tp#1AuthorNameList\expandafter\endcsname\expandafter{\cch@tempa}%
         \fi
       \fi
-    }}}%
+    \fi
+  }}%
 \def\tp@make@toc{%
   \tp@check@empty{heading}{Title}{Toc}%
   \tp@check@empty{heading}{Number}{Toc}%
   \tp@check@empty{heading}{Subtitle}{Toc}%
-  \tp@check@author{Toc}%
+  \cch@set@author@name@list{Toc}%
   \tpIfAttrIsset{heading}{notoc}
     {}
     {\protected@edef\tp@heading@toc@entry{%
@@ -270,8 +269,8 @@
 \def\tp@make@run{%
   \tp@check@empty{heading}{Title}{Run}%
   \tp@check@empty{heading}{Number}{Run}%
-  \tp@check@author{Run}%
   \tp@check@empty{heading}{Subtitle}{Run}%
+  \cch@set@author@name@list{Run}%
   \tpUseProperty{running-extra}%
   \tpIfProp{running-level}
     {\letcs\tp@mark@name{\tpUseProperty{running-level}mark}}
@@ -336,14 +335,14 @@
     \vskip \@tempskipa
     \@afterheading
     \ignorespaces}}
-\def\@heading{\@ifnextchar [{\@@heading}{\@@heading[]}}%]
-\def\@@heading[#1]#2{%
+\def\heading{\@ifnextchar [{\@heading}{\@heading[]}}%]
+\def\@heading[#1]#2{%
   \tp@heading@reserve
   \tpParseAttributes{heading}{#1}%
   \edef\tp@heading@name{#2}%
   \tpEvalType[#2]{Components}%
 }
-\def\end@heading{%
+\def\endheading{%
   \expandafter\ifx\csname tpUseHeading\tp@heading@name\endcsname\relax
     \PackageError{coco-headings.sty}{Heading level \tp@heading@name\space unknown!}{A Heading with level \tp@heading@name\space is unknown. Use the \string\tpDeclareHeading\space macro to declare heading levels.}%
   \else
@@ -351,8 +350,6 @@
   \fi
   \tp@heading@reset
 }
-\let\heading\tpHeading
-\let\endheading\endtpHeading
 \def\tp@heading@reserve{%
   \tpNamespace{heading}%
   \let\tpltx@dbl@backslash\\
@@ -525,13 +522,10 @@
   }%
   %% a single Author's contact infomration block
   \tpSetProperty{author-contact-format}{%Format of a single author's contact information
-    \tpUseComp{FullName}\tpIfComp{Affil}{\textsuperscript{\tpUseComp{Affil}}}{}%
+    \tpUseComp{FullName}\tpWhenComp{RefAffil}{\textsuperscript{\tpUseComp{AffilRef}}}%
     \tpUseProperty{orcid-link}%
-    %
   }%
-  \tpSetProperty{author-list-format}{% Format of the whole contact information block
-    \tpUseComp{FullName}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi
-  }%
+  \tpPropertyLet{author-list-format}{author-list-print-format}%
   \tpSetProperty{author-contact-block-format}{% Format of the whole contact information block
     \tpUseComp{AuthorContact}\ifnum\tpCurCount<\tpTotalCount\tpUseProperty{counted-name-sep}\fi
   }%

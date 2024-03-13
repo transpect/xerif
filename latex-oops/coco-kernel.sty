@@ -20,11 +20,9 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-kernel}
-    [\filedate \fileversion cocotex kernel]
+    [2024/01/29 0.4.0 cocotex kernel]
 \newif\if@tp@debug \@tp@debugfalse
 \DeclareOption{debug}{\global\@tp@debugtrue}%
 \ProcessOptions
@@ -62,7 +60,7 @@
     {\csdef{tp@container@#1}{}}%
   \csdef{tp@cur@cont}{#1}%
   \begingroup
-    \def\tpInherit ##1 from ##2;{\@tp@inherit{##1}{##2}{#1}}%
+    \def\tpInherit##1##2{\@tp@inherit{##1}{##2}{#1}}%
     \long\def\tpDeclareType##1##2{\csgappto{tp@type@##1@#1}{##2}}%
     \def\tpDeclareEnv{\@ifnextchar [{\tp@declare@env}{\tp@declare@env[#1]}}%]
     \def\tp@declare@env[##1]##2##3{%
@@ -124,7 +122,7 @@
     \tpPackageError{Kernel}{Type}{Type `#1' was not declared}{Type `#1' was not declared for Container `#2'.}%
   \else
     \edef\x{\noexpand\csgappto{tp@type@#1@#3}}%
-    \expandafter\expandafter\expandafter\x\expandafter\expandafter\expandafter{\csname tp@type@#1@#2\endcsname}%
+    \expandafter\x\expandafter{\csname tp@type@#1@#2\endcsname}%
     \tpKernelDebugMsg{value tp@type@#1@#3:^^J \expandafter\meaning\csname tp@type@#1@#3\endcsname}%
   \fi
 }
@@ -133,6 +131,11 @@
   \ltx@LocalExpandAfter\global\expandafter\let\csname tp@\tp@cur@cont @#1\endcsname\relax
   \expandafter\long\expandafter\def\csname tp#2\endcsname##1{%
     #3\expandafter\long\expandafter\def\csname tp@\tp@cur@cont @#1\endcsname{##1}\ignorespaces#4}%
+}
+\def\tpDeclareGComp{\tp@opt@empty\tp@declare@global@comp}%
+\def\tp@declare@global@comp[#1]#2{%
+  \tpDeclareComp{#2}{\expandafter\global}{}%
+  \if!#1!\else\csname tp#2\endcsname{#1}\fi%
 }
 \long\protected\def\tpComp#1#2{%
   \ifx\tp@is@counted\relax
@@ -182,7 +185,7 @@
     #2%
     \csname @#1@hook\endcsname
   }%
-  \csdef{end#1}{{\tpToggleCountedCond\csname tp@compose@group@#1\endcsname}}%
+  \csdef{end#1}{{\tpToggleCountedCond\csuse{tp@compose@group@#1}}}%
 }
 \def\tpGroupHandler#1#2{%
   \ifcsdef{@#1}
@@ -266,7 +269,8 @@
     }%
   \endgroup
 }
-\def\tp@comp@def[#1]#2#3#4{%
+\def\tp@comp@def{\tp@opt@empty\@tp@comp@def}
+\def\@tp@comp@def[#1]#2#3#4{%
   \tp@apply@collection{#3}{#4}%
   \ifx\tp@iterate@res\relax
     #1\let#2\relax%
@@ -275,7 +279,7 @@
     \tp@assign@res{@tempa}%
   \fi
 }
-\def\tpCompDef{\tp@comp@def[]}
+\def\tpCompDef{\tp@comp@def}
 \def\tpCompGDef{\tp@comp@def[\global]}
 \def\tpDeclareCountedComp#1{%
   \tp@def@counted@comp
@@ -300,10 +304,10 @@
 \long\def\tpToggleCountedCond{%
   \let\tp@is@counted\relax
   \long\def\tpIfComp##1##2##3{%
-    \expandafter\let\expandafter\@tempa\csname tp@\tp@cur@cont @##1\endcsname\relax
-    \expandafter\expandafter\expandafter\ifx\@tempa\relax##3\else##2\fi%
+    \expandafter\expandafter\expandafter\let\expandafter\csname tp@comp@name\expandafter\endcsname\csname tp@\tp@cur@cont @##1\endcsname%
+    \expandafter\expandafter\expandafter\ifx\tp@comp@name\relax##3\else##2\fi%
   }%
-  \long\protected\def\tpIfCompEmpty##1##2##3{%
+  \long\def\tpIfCompEmpty##1##2##3{%
     \expandafter\expandafter\expandafter\ifx\csname tp@\tp@cur@cont @##1\endcsname\long@empty ##2\else ##3\fi}}
 \def\tpDeclareHook{\tp@opt@curcont\tp@declare@hook}
 \def\tp@declare@hook[#1]#2{\expandafter\global\expandafter\let\csname tp@hook@#1@#2\endcsname\@empty}
@@ -321,7 +325,7 @@
 \long\def\tpPropertyLetX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{\csuse{tp@\tp@cur@cont @#2}}}
 \long\def\tpSetValProp#1#2{\def\@tempa{\tpSetProperty{#1}}\expandafter\@tempa\expandafter{#2}}
 \long\def\tpSetPropertyX#1#2{\long\csedef{tp@\tp@cur@cont @#1}{#2}}
-\long\def\tpAddToDefault#1#2{\csgappto{tp@#1@default}{#2}}
+\long\def\tpAddToDefault#1{\tpAddToType{Properties}{#1}}
 \def\tpUseProperty#1{\csuse{tp@\tp@cur@cont @#1}}
 \def\tpUsePropEnv#1{\cslet{tp@#1@active}{\relax}\csuse{tp@\tp@cur@cont @#1}\csundef{tp@#1@active}}
 \DeclareRobustCommand\tpPI[2]{\ifcsdef{tp@#1@active}{#2}{}}
@@ -358,7 +362,6 @@
     #5%
     \tp@iterate[#1]{#2}{\the#2}{#4}{#5}%
   \fi}%
-\def\csmean#1{\expandafter\meaning\csname#1\endcsname}%
 \begingroup
 \catcode`"=12
 \gdef\tpParseAttributes#1#2{%
@@ -408,7 +411,7 @@
     \expandafter\tpUseClass\expandafter{\csname tp@#2@class@#1@parent\endcsname}{#2}%
   \fi
   \csname tp@#2@class@#1\endcsname}
-\def\CoCoTeX{{\ttfamily CoCo\TeX}}
+\DeclareRobustCommand\CoCoTeX{\texorpdfstring{{C\kern-.1em o\kern-.033emC\kern-.1em o}\kern-.133em\TeX}{CoCoTeX}}
  \def\tpNamespace#1{\def\tp@cur@cont{#1}}
 \endinput
 %%

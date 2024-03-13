@@ -20,8 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX for maketitle.
 %%
@@ -31,10 +29,10 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-title}
-    [\filedate \fileversion CoCoTeX title module]
+    [2024/01/29 0.4.0 CoCoTeX title module]
 \RequirePackage{coco-meta}
 \tpDeclareContainer{titlepage}{%
-  \tpInherit {Components,Properties} from Meta;
+  \tpInherit {Components,Properties}{CommonMeta}%
   \tpDeclareType{Components}{%
     \tp@title@simple@comps
     \tp@meta@generic@comp
@@ -43,7 +41,7 @@
     \tp@titlepage@role{editor}{Editor}%
     \tp@titlepage@role{series-editor}{SeriesEditor}%
   }%
-  \tpDeclareType{Properties}{\tp@titlepage}%
+  \tpDeclareType{Properties}{}%
   \tpDeclareEnv[tpMeta]{\tp@Meta}{\tp@endMeta}%
 }
 \def\tp@titlepage@role#1#2{%
@@ -59,14 +57,7 @@
   }%
   \tpDeclareRoleBlock[apply]{#2}{BioBlock}{#1-bio-block-format}%
 }
-\long\def\tpDeclareTitlepage#1{%
-  \gdef\tp@titlepage{%
-    \tpNamespace{titlepage}%
-    \tp@titlepage@default
-    #1%
-  }%
-}
-\tpDeclareTitlepage{}
+\def\tpDeclareTitlepage{\tpAddToType{Properties}{titlepage}}
 \def\tp@Meta{%
   \tpEvalType{Components}%
 }
@@ -87,20 +78,33 @@
   \tp@meta@generic@eval
   \tp@title@fundings@eval
   \tp@title@add@eval
-  \tp@title@set@pdfmeta
+  \tp@if@preamble\tp@title@set@pdfmeta\relax
+  \tpUseHook{document-meta-hook}%
   \let\tp@cur@cont\@empty
 }
 \def\tp@title@set@pdfmeta{%
-  \def\tp@write@pdf@meta##1##2{\protected\def\@tempa{##2}\edef\x{\noexpand\hypersetup{##1={\expandonce{\@tempa}}}}\x}%
+  \def\tp@write@pdf@meta##1##2##3{%
+    \let\@tempa\@empty
+    \@ifpackageloaded{coco-accessibility}
+      {\edef\@tempa{\expandonce{\directlua{tex.print(cocotex.ally.meta.##2)}}}}{}%
+    \ifx\@tempa\@empty
+      \protected\def\@tempa{##3}%
+      \ifx\@tempa\@empty\else
+        \@ifpackageloaded{coco-accessibility}
+          {\pdfstringdef\x{##3}\setDocInfo{##2}{\x}}
+          {\edef\x{\noexpand\hypersetup{##1={\expandonce\@tempa}}}\x}%
+      \fi
+    \fi
+  }%
+  \tp@title@insert@xmp
   \tp@title@process@bkt
   \tp@title@process@bka
   \tp@title@process@bkc
-  \tpUseHook{document-meta-hook}%
 }
 \def\tp@title@process@bkt{%
   \let\tpBreak\space
   \protected@xdef\@title{\tpUseComp{Title}}%
-  \tp@write@pdf@meta{pdftitle}{\tpUseComp{Title}}%
+  \tp@write@pdf@meta{pdftitle}{Title}{\tpUseComp{Title}}%
   \protected@edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
   \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
@@ -122,18 +126,29 @@
     \fi
     \if@tempswa
       \expandafter\author\expandafter{\tpRunBookName}%
-      \tp@write@pdf@meta{pdfauthor}{\tpRunBookName}%
+      \tp@write@pdf@meta{pdfauthor}{Author}{\tpRunBookName}%
     \fi
   \endgroup
 }
 \def\tp@title@process@bkc{%
-  \tp@write@pdf@meta{pdfcreator}{\tpIfComp{PDFCreator}{\tpUseComp{PDFCreator}}{\tpUseComp{Publisher}\tpIfComp{PubPlace}{, \tpUseComp{PubPlace}}{}}}%
-  \tp@write@pdf@meta{pdfproducer}{\tpUseComp{PDFProducer}}%
+  \tp@write@pdf@meta{pdfcreator}{Creator}{\tpIfComp{PDFCreator}{\tpUseComp{PDFCreator}}{\tpUseComp{Publisher}\tpIfComp{PubPlace}{, \tpUseComp{PubPlace}}{}}}%
+  \tp@write@pdf@meta{pdfproducer}{Producer}{\tpUseComp{PDFProducer}}%
+  \tp@write@pdf@meta{pdfkeywords}{Keywords}{\tpUseComp{Keywords}}%
+}
+\def\tp@title@insert@xmp{%
+  \edef\include@xmp{\noexpand\@include@xmp{\tpUseComp{XmpFile}.xmp}}
+  \def\@include@xmp##1{\IfFileExists{##1}{\@@include@xmp{##1}}{}}
+  \def\@@include@xmp##1{%
+    \begingroup
+      \immediate\pdfobj stream attr {/Type /Metadata /Subtype /XML}
+      file{##1}
+      \pdfcatalog{/Metadata \the\pdflastobj\space 0 R}
+    \endgroup}%
+  \include@xmp
 }
 \tpDeclareHook[titlepage]{before-maketitle-hook}
 \tpDeclareHook[titlepage]{document-meta-hook}
 \def\tp@maketitle{%
-  %\csname tp@titlepage\endcsname
   \ifarticle
     \gdef\tpMaketitle{%
       \let\tp@cnt@grp\@empty
@@ -183,12 +198,9 @@
     \csgappto{tp@\tp@cur@cont @#1NameList}{{\letcs\tpTotalCount{tp#1Cnt}\tpUseProperty{editor-suffix}}}%
   \fi
 }%
-\def\tp@title@macro{\tp@opt@empty\@tp@title@macro}%
-\def\@tp@title@macro[#1]#2{%
-  \tpDeclareComp{#2}{\expandafter\global}{}%
-  \if!#1!\else\csname tp#2\endcsname{#1}\fi%
-}
+\let\tp@title@macro\tpDeclareGComp
 \def\tp@title@simple@comps{%
+  \tpDeclareGComp[\jobname]{XmpFile}             % File basename of the XMP file ('.xmp' is added automatically)
   %% Cover
   \tp@title@macro{Cover}                         % Path to Cover Image(!)
   %% Titles
@@ -284,7 +296,7 @@
   \tp@title@macro{AddNoteIII}                    % Additional information, title page III
   \tp@title@macro{AddNoteIV}                     % Additional information, title page IV
 }
-\def\tp@titlepage@default{%
+\tpAddToDefault{titlepage}{%
   \tpSetProperty{article-title}{}%
   % Title page hooks
   % Before \tpMaketitle and outside the group
@@ -566,7 +578,6 @@
        \else
          \tpIfComp{EditorNameList}
            {\tpUseComp{EditorNameList}}
-           %{\tpUseProperty{editor-string}}
            {no editor defined!}%
        \fi}%
   }%

@@ -20,8 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that provides handling of a document's meta data.
 %%
@@ -31,18 +29,16 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-meta}
-    [\filedate \fileversion CoCoTeX meta module]
+    [2024/01/29 0.4.0 CoCoTeX meta module]
 \RequirePackage{coco-common}
-\tpDeclareContainer{Meta}{%
+\tpDeclareContainer{CommonMeta}{%
   \tpDeclareType{Components}{%
     \tpDeclareRole[author]{Author}%
-    \tp@declare@meta@comp
-    \tp@extended@meta@macros
+    \tp@declare@common@meta@comp
+    \tp@extended@common@meta@macros
     \tp@declare@meta@affils
   }%
-  \tpDeclareType{Properties}{%
-    \tp@Meta@default
-  }%
+  \tpDeclareType{Properties}{}%
 }
 \def\tp@meta@generic@comp{%
   \tpDeclareComp{GenericMetaBlock}{\expandafter\global}{}%
@@ -131,11 +127,11 @@
       {\tpUseProperty{labeled-meta-\tpCurInfix-format}}
       {\tpUseProperty{labeled-meta-format}}%
   }{}}
-\def\tp@declare@meta@comp{%
+\def\tp@declare@common@meta@comp{%
     \tpDeclareComp{Copyright}{\expandafter\global}{}% Copyright text
     \tpDeclareComp{DOI}{\expandafter\global}{}%         DOI
 }%
-\def\tp@extended@meta@macros{%
+\def\tp@extended@common@meta@macros{%
   \tpDeclareLabeledComp[Abstract]{Abstract}{abstract}%
   \tpDeclareLabeledComp[Keywords]{Keywords}{keyword}%
   \tpDeclareLabeledComp{DOI}{doi}%
@@ -156,7 +152,7 @@
     \tpIfComp{Affiliation}{}{\tpAffiliation{\tpUseProperty{affiliation-format}}}%
   }%
 }
-\tpAddToDefault{Meta}{%
+\tpAddToDefault{CommonMeta}{%
   \tpSetProperty{initials-format}{%
     \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-FirstName-\the\tpCurCount\endcsname\long@empty\else
       \expandafter\ifx\csname tp@\tp@cur@cont @\tp@cnt@grp-FirstName-\the\tpCurCount\endcsname\relax\else
@@ -189,7 +185,7 @@
       \space\tpUseComp{Lineage}%
     \fi%
   }% How FullName for each name is built
-  \tpSetProperty{role-cite-name-format}{\tpUseComp{LastName},~\tpUseComp{Initial}}% How CiteName for each name is built
+  \tpSetProperty{role-cite-name-format}{\tpIfComp{LastName}{\tpUseComp{LastName},~\tpUseComp{Initial}}{\tpUseComp{FullName}}}% How CiteName for each name is built
   \tpSetProperty{role-short-cite-name-format}{\tpUseComp{LastName}}% how ShortCiteName for each name is built
   \tpPropertyLet{role-pdfinfo-name-format}{role-cite-name-format}% How PDFInfoName for each item is built
   \tpSetProperty{role-correspondence-as-format}{\tpUseComp{Email}}% How PDFInfoName for each item is built

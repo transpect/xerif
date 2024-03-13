@@ -20,8 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that provides some commonly used base macros.
 %%
@@ -31,11 +29,31 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-common}
-    [\filedate \fileversion CoCoTeX common module]
+    [2024/01/29 0.4.0 CoCoTeX common module]
 \RequirePackage{iftex}
+\DeclareOptionX{a11y}{\let\tp@do@ally\relax}
+\def\tp@color@enc{cmyk}
+\define@choicekey{coco-common.sty}{color-enc}[\@tp@color@enc\nr]{srgb,rgb,gray,cmy,cmyk,natural}[cmyk]{%
+  \let\tp@color@enc\@tp@color@enc
+  \ifcase\nr\relax% srgb
+    \def\tp@color@enc{rgb}%
+  \or% rgb
+  \or% gray
+  \or% cmy
+    \def\tp@color@enc{cmyk}%
+  \or% cmyk
+  \else% natural, i.e. no conversion of color spaces takes place
+  \fi
+}
+\ProcessOptionsX
+\PassOptionsToPackage{\tp@color@enc}{xcolor}%
+\def\tp@if@ally{\ifx\tp@do@ally\relax\expandafter\@firstoftwo\else\expandafter\@secondoftwo\fi}
+\let\tpIfAlly\tp@if@ally
+\def\tp@if@preamble{\ifx\@nodocument\relax\expandafter\@secondoftwo\else\expandafter\@firstoftwo\fi}
+\let\tpIfPreamble\tp@if@preamble
 \RequirePackage{coco-kernel}
-\usepackage{xcolor}
-\usepackage{graphicx}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
 \DeclareGraphicsRule{.EPS}{eps}{.EPS}{}
 \def\tp@str@default{default}
 \def\tp@str@table{table}
@@ -156,7 +174,9 @@
     \expandafter\ifnum \csname c@#2depth\endcsname<#3\relax
     \else
       \bgroup
-        \long\def\tpTocLink####1{\hyper@linkstart{link}{\Hy@tocdestname}{####1}\hyper@linkend}%
+        \tp@if@ally
+          {\long\def\tpTocLink####1{\hyper@linkstart[####1]{link}{\Hy@tocdestname}{####1}\hyper@linkend}}
+          {\long\def\tpTocLink####1{\hyper@linkstart{link}{\Hy@tocdestname}{####1}\hyper@linkend}}%
         \csname tp@#2@extract@data\endcsname{#3}{#4}{##1}{##2}%
         \csname tp@#2@print@entry\endcsname{#4}%
       \egroup

@@ -20,8 +20,6 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.3.0}%
-\def\filedate{2023-12-11}%
 %%
 %% module for CoCoTeX that extends floating objects.
 %%
@@ -31,7 +29,7 @@
 %%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{coco-floats}
-    [\filedate \fileversion CoCoTeX floats module]
+    [2024/01/29 0.4.0 CoCoTeX floats module]
 \DeclareOptionX{nofigs}{\global\let\tp@nofigs\relax}
 \ProcessOptionsX
 \RequirePackage{coco-common}
@@ -210,7 +208,7 @@
     \advance\tp@flt@marg@r\tp@flt@marg@i
   \fi
 }
-\tpDeclareContainer{tpFloat}{%
+\tpDeclareContainer{float}{%
   \tpDeclareType{Components}{%
     \tpMakeFltCompL{Caption}%
     \tpMakeFltCompL{Legend}%
@@ -219,7 +217,7 @@
     \tpMakeFltComp{RefLabel}%
     \tpMakeFltComp{AltText}% neu: 2023-06-08; TODO: muss noch implementiert werden
   }%
-  \tpDeclareType{Properties}{\tp@float@default}%
+  \tpDeclareType{Properties}{}%
 }
 \def\tpDeclareFloat{\tp@opt@empty\@tpDeclareFloat}
 \long\def\@tpDeclareFloat[#1]#2#3#4#5{%
@@ -242,9 +240,9 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \tpDeclareContainer{#2}{%
       \tpPackageInfo{Floats}{}{Declaring float `#2'}%
       \ifx\tp@float@parent\@empty
-        \tpInherit {Properties,Components} from tpFloat;
+        \tpInherit{Properties,Components}{float}
       \else
-        \tpInherit {Properties,Components} from \tp@float@parent;
+        \tpInherit{Properties,Components}{\tp@float@parent}
       \fi
       \tpDeclareType{FloatEnvInfo}{%
         \tpNamespace{#2}%
