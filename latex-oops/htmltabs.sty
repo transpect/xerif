@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.18}%
-\def\filedate{2024-02-26}%
+\def\fileversion{0.2.19}%
+\def\filedate{2024-03-14}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -780,8 +780,8 @@
   \parindent\z@
   \parfillskip\z@skip}
 \def\ht@halign@center@auto{%
-  \leftskip\z@\@plus\tw@ em\relax
-  \@rightskip\z@\@plus\tw@ em\relax
+  \leftskip\z@\@plus1fil\relax
+  \@rightskip\z@\@plus1fil\relax
   \rightskip\@rightskip
   \parfillskip\z@skip\relax
   }
@@ -799,7 +799,7 @@
   \relax}
 \def\ht@halign@left@auto{%
   \leftskip\z@skip\relax
-  \@rightskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@\@plus1fil\relax
   \rightskip\@rightskip
   \parfillskip\@flushglue\relax
 }
