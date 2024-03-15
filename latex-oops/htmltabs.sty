@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.19}%
-\def\filedate{2024-03-14}%
+\def\fileversion{0.2.20}%
+\def\filedate{2024-03-15}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -759,6 +759,28 @@
   \let\ht@is@left\relax
   \hbox{%
     #2\csname ht@border@style@#3\endcsname{#1}{\dimexpr\vsize\relax}}}}%
+\newif\if@ht@spaceskip
+\def\@ht@setspaceskip{%
+  \if@ht@spaceskip
+    \ifdim\fontdimen\thr@@\font=\z@\relax
+      \spaceskip\z@
+    \else
+      \spaceskip\fontdimen\tw@\font
+    \fi
+  \else
+    \spaceskip\z@
+  \fi}
+\let\@ht@savedcr\\
+\let\@ht@saved@gnewline\@gnewline
+\def\@ht@gnewline#1{%
+  \ifvmode\@nolnerr\else
+    \unskip
+    \ifmmode
+      \reserved@e {\reserved@f #1}\nobreak \hfil \break
+    \else
+      \reserved@e {\reserved@f #1}{\parskip\z@\par}%
+    \fi
+  \fi}
 \def\ht@halign{%
   \GetCascCellProp{hAlign}{text-align}%
   \GetCascCellProp{Hyphen}{hyphen}%
@@ -772,7 +794,6 @@
   \let\RaggedRight\ht@halign@left@auto
   \let\justified\ht@halign@justified@auto
 }
-
 \def\ht@halign@center@none{%
   \@rightskip\z@\@plus1fill\relax
   \rightskip\@rightskip
@@ -780,28 +801,29 @@
   \parindent\z@
   \parfillskip\z@skip}
 \def\ht@halign@center@auto{%
-  \leftskip\z@\@plus1fil\relax
-  \@rightskip\z@\@plus1fil\relax
+  \ifx\\\@ht@savedcr\let\\\@centercr\fi
+  \let\@gnewline\@ht@gnewline
+  \leftskip\z@\@plus\tw@ em\relax
+  \@rightskip\z@\@plus\tw@ em\relax
   \rightskip\@rightskip
   \parfillskip\z@skip\relax
+  \@ht@spaceskiptrue
+  \@ht@setspaceskip
   }
-\def\ht@halign@justified@auto{%
-  \leftskip\z@\relax
-  \@rightskip\z@\relax
-  \rightskip\@rightskip
-  \parfillskip\@flushglue
-}
-\let\ht@halign@justified@none\ht@halign@justified@auto
 \def\ht@halign@left@none{%
   \leftskip\z@\relax
   \@rightskip\@flushglue
   \rightskip\@rightskip
   \relax}
 \def\ht@halign@left@auto{%
+  \ifx\\\@ht@savedcr\let\\\@centercr\fi
+  \let\@gnewline\@ht@gnewline
   \leftskip\z@skip\relax
-  \@rightskip\z@\@plus1fil\relax
+  \@rightskip\z@\@plus\tw@ em\relax
   \rightskip\@rightskip
   \parfillskip\@flushglue\relax
+  \@ht@spaceskiptrue
+  \@ht@setspaceskip
 }
 \def\ht@halign@right@none{%
   \leftskip\@flushglue\relax
@@ -810,11 +832,26 @@
   \parfillskip\z@\relax
 }
 \def\ht@halign@right@auto{%
+  \ifx\\\@ht@savedcr\let\\\@centercr\fi
+  \let\@gnewline\@ht@gnewline
   \leftskip\z@\@plus\tw@ em\relax
   \@rightskip\z@skip\relax
   \rightskip\@rightskip
   \parfillskip\z@skip\relax
+  \@ht@spaceskiptrue
+  \@ht@setspaceskip
 }
+\def\ht@halign@justified@auto{%
+  \let\\\@raggedtwoe@savedcr
+  \let\@gnewline\@ht@saved@gnewline
+  \leftskip\z@\relax
+  \@rightskip\z@\relax
+  \rightskip\@rightskip
+  \parfillskip\@flushglue
+  \@ht@spaceskipfalse
+  \@ht@setspaceskip
+}
+\let\ht@halign@justified@none\ht@halign@justified@auto
 \def\ht@valign@box#1{%
   \GetCascCellProp{vAlign}{vertical-align}%
   \ht@debugmsg{align}{v-align for \ht@thecell: \vAlign}%
@@ -850,35 +887,36 @@
       }%
     \fi
   \fi}
+\def\htDeclareFontProperty#1#2#3{\expandafter\def\csname ht@#1@#2\endcsname{\ht@apply@prop{internal-#1}{#3}}}
 
-\expandafter\def\csname ht@font-family@sans-serif\endcsname{\ht@apply@prop{internal-font-family}{\sffamily}}
-\expandafter\def\csname ht@font-family@serif\endcsname{\ht@apply@prop{internal-font-family}{\rmfamily}}
-\expandafter\def\csname ht@font-family@monospace\endcsname{\ht@apply@prop{internal-font-family}{\ttfamily}}
-\expandafter\def\csname ht@font-family@inherit\endcsname{\ht@apply@prop{internal-font-family}{}}
+\htDeclareFontProperty{font-family}{sans-serif}{\sffamily}
+\htDeclareFontProperty{font-family}{serif}{\rmfamily}
+\htDeclareFontProperty{font-family}{monospace}{\ttfamily}
+\htDeclareFontProperty{font-family}{inherit}{}
 
-\expandafter\def\csname ht@font-weight@bold\endcsname{\ht@apply@prop{internal-font-weight}{\bfseries}}
-\expandafter\def\csname ht@font-weight@semi-bold\endcsname{\ht@apply@prop{internal-font-weight}{\sbseries}}
-\expandafter\def\csname ht@font-weight@extra-bold\endcsname{\ht@apply@prop{internal-font-weight}{\ebseries}}
-\expandafter\def\csname ht@font-weight@normal\endcsname{\ht@apply@prop{internal-font-weight}{\normalfont}}
-\expandafter\def\csname ht@font-weight@lighter\endcsname{\ht@apply@prop{internal-font-weight}{\lfseries}}
-\expandafter\def\csname ht@font-weight@inherit\endcsname{\ht@apply@prop{internal-font-weight}{}}
+\htDeclareFontProperty{font-weight}{bold}{\bfseries}
+\htDeclareFontProperty{font-weight}{semi-bold}{\sbseries}
+\htDeclareFontProperty{font-weight}{extra-bold}{\ebseries}
+\htDeclareFontProperty{font-weight}{normal}{\normalfont}
+\htDeclareFontProperty{font-weight}{lighter}{\lfseries}
+\htDeclareFontProperty{font-weight}{inherit}{}
 
-\expandafter\def\csname ht@font-style@normal\endcsname{\ht@apply@prop{internal-font-style}{\upshape}}
-\expandafter\def\csname ht@font-style@italic\endcsname{\ht@apply@prop{internal-font-style}{\itshape}}
-\expandafter\def\csname ht@font-style@inherit\endcsname{\ht@apply@prop{internal-font-style}{}}
+\htDeclareFontProperty{font-style}{normal}{\upshape}
+\htDeclareFontProperty{font-style}{italic}{\itshape}
+\htDeclareFontProperty{font-style}{inherit}{}
 
-\expandafter\def\csname ht@font-variant@normal\endcsname{\ht@apply@prop{internal-font-variant}{\upshape}}
-\expandafter\def\csname ht@font-variant@small-caps\endcsname{\ht@apply@prop{internal-font-variant}{\scshape}}
-\expandafter\def\csname ht@font-variant@inherit\endcsname{\ht@apply@prop{internal-font-variant}{}}
+\htDeclareFontProperty{font-variant}{normal}{\upshape}
+\htDeclareFontProperty{font-variant}{small-caps}{\scshape}
+\htDeclareFontProperty{font-variant}{inherit}{}
 
-\expandafter\def\csname ht@font-size@normal\endcsname{\ht@apply@prop{internal-font-size}{\normalsize}}
-\expandafter\def\csname ht@font-size@large\endcsname{\ht@apply@prop{internal-font-size}{\large}}
-\expandafter\def\csname ht@font-size@x-large\endcsname{\ht@apply@prop{internal-font-size}{\Large}}
-\expandafter\def\csname ht@font-size@xx-large\endcsname{\ht@apply@prop{internal-font-size}{\LARGE}}
-\expandafter\def\csname ht@font-size@small\endcsname{\ht@apply@prop{internal-font-size}{\small}}
-\expandafter\def\csname ht@font-size@x-small\endcsname{\ht@apply@prop{internal-font-size}{\footnotesize}}
-\expandafter\def\csname ht@font-size@xx-small\endcsname{\ht@apply@prop{internal-font-size}{\tiny}}
-\expandafter\def\csname ht@font-size@inherit\endcsname{\ht@apply@prop{internal-font-size}{}}
+\htDeclareFontProperty{font-size}{normal}{\normalsize}
+\htDeclareFontProperty{font-size}{large}{\large}
+\htDeclareFontProperty{font-size}{x-large}{\Large}
+\htDeclareFontProperty{font-size}{xx-large}{\LARGE}
+\htDeclareFontProperty{font-size}{small}{\small}
+\htDeclareFontProperty{font-size}{x-small}{\footnotesize}
+\htDeclareFontProperty{font-size}{xx-small}{\tiny}
+\htDeclareFontProperty{font-size}{inherit}{}
 
 \def\ht@CalculateColumnWidths{%
   \global\let\has@relative@cells\@undefined
@@ -1991,8 +2029,8 @@
   \ht@debugmsg{colspan}{Setting contents of cell \ht@thecell.}%
   \SetCellProp{class}{\htTdClass}%
   \SetCellContent{%
-    \if@ht@no@init@strut\strut\hrule \@height\z@\vskip-\baselineskip\vskip\z@skip\else\strut\fi
-    \if@ht@hyph@first@word\kern\z@skip\fi
+    \if@ht@no@init@strut\strut\vskip-\baselineskip\vskip\z@skip\else\strut\fi
+    \if@ht@hyph@first@word\ifhmode\hskip\z@\fi\fi
     \ignorespaces
     #1%
     \if@ht@hyph@first@word\kern\z@\fi% to ensure hyphenation is applied when there is only a single word in the cell.
