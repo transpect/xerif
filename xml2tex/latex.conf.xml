@@ -2025,10 +2025,6 @@
   
   <template context="dbk:variablelist[matches(@role, '^[a-z]{1,3}abbreviations$')]">
     <rule name="description" type="env" break-before="1">
-      <option select="xs:string((.//dbk:term[string-length(replace(., '\{\\slash\}', '/')) 
-                                             eq max(ancestor::dbk:variablelist[1]//dbk:term/string-length(replace(., '\{\\slash\}', '/')))
-                                            ])[1]
-                      )"/>
       <text/>
     </rule>
   </template>
