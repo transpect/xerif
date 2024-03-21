@@ -209,6 +209,7 @@
   \tp@title@macro{RunTitle}                      % Shortened main title override for headers
   \tp@title@macro{AltTitle}                      % Alternative main title (e.g. for bastard title page)
   \tp@title@macro{Subtitle}                      % Sub Title
+  \tp@title@macro{TitleNote}                     % Additional Title Information (contributor list)
   \tp@title@macro{RunNames}                      % Shortened list of names (authors and/or publishers)
   \tp@title@macro{AltNames}                      % Alternative list of names (e.g. for bastard title page)
   %% Series
@@ -429,9 +430,18 @@
       \tpUseProperty{title-face}%
       \tpUseComp{Title}\par
     \egroup
-    \tpIfComp{Subtitle}{\tpUseProperty{subtitle-format}}{}%
+    \tpWhenComp{Subtitle}{\tpUseProperty{subtitle-format}}%
+    \tpWhenComp{TitleNote}{\tpUseProperty{title-note-format}}%
     \tpGetComp{Statement}%
     \vskip\baselineskip
+  }%
+  \tpSetProperty{title-note-face}{\large\sffamily}%
+  \tpSetProperty{title-note-format}{%
+    \bgroup
+      \tpUseProperty{title-note-face}%
+      \tpUseComp{TitleNote}%
+    \egroup
+    \par
   }%
   \tpSetProperty{subtitle-face}{\Large\sffamily\bfseries}%
   \tpSetProperty{subtitle-format}{%
