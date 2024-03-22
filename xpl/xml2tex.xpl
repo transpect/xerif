@@ -55,7 +55,7 @@
   
   <p:sink/>
   
-  <tr:load-cascaded name="load-xml2tex-helpers-xslt" filename="xml2tex/10.helpers.xsl">
+  <tr:load-cascaded name="load-xml2tex-helpers-xslt" filename="xml2tex/helpers.xsl">
     <p:with-option name="debug" select="$debug" />
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri" />
     <p:input port="paths">
@@ -66,6 +66,9 @@
   <p:sink/>
   
   <tr:xslt-mode msg="yes" hub-version="1.1" prefix="xml2tex/12" mode="xml2tex:helpers">
+    <p:input port="source">
+      <p:pipe port="source" step="tx-xml2tex"/>
+    </p:input>
     <p:input port="stylesheet">
       <p:pipe step="load-xml2tex-helpers-xslt" port="result"/>
     </p:input>
@@ -75,7 +78,6 @@
     <p:input port="models"><p:empty/></p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
-    <p:with-option name="debug-indent" select="$debug-indent"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
   </tr:xslt-mode>
 
