@@ -6,6 +6,7 @@
   xmlns:dbk="http://docbook.org/ns/docbook" 
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:functx="http://www.functx.com"
+  xmlns:xml2tex="http://transpect.io/xml2tex"
   xmlns="http://docbook.org/ns/docbook" 
   xpath-default-namespace="http://docbook.org/ns/docbook"
   exclude-result-prefixes="xs hub dbk xlink functx" 
@@ -1213,9 +1214,9 @@
   
   <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
                 select="concat('(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;',
-                               $tactical-break-character-for-urls,
+                               $xml2tex:tactical-break-character-for-urls,
                                ']+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;',
-                               $tactical-break-character-for-urls,
+                               $xml2tex:tactical-break-character-for-urls,
                                ']')"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., '(https?://|www\.)')]" mode="hub:clean-hub">
@@ -1241,7 +1242,7 @@
         <xsl:value-of select="replace($url, '[&#x200b;-&#x200d;]', '')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="replace(replace($url, '[&#x200b;-&#x200d;]', ''), $tactical-break-character-for-urls, '')"/>
+        <xsl:value-of select="replace(replace($url, '[&#x200b;-&#x200d;]', ''), $xml2tex:tactical-break-character-for-urls, '')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>

@@ -8,6 +8,7 @@
   xmlns:schematron="http://purl.oclc.org/dsdl/schematron"
   xmlns:tei="http://www.tei-c.org/ns/1.0"
   xmlns:tei2html="http://transpect.io/tei2html"
+  xmlns:xml2tex="http://transpect.io/xml2tex"
   exclude-result-prefixes="xs tei"
   version="2.0">
   
@@ -338,9 +339,9 @@
   <xsl:variable name="tei2html:no-toc-style-regex" as="xs:string" select="'notoc'"/>
 
   <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
-  <xsl:variable name="tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
+  <xsl:variable name="xml2tex:tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
   
   <!-- character limit of url parts until tactical line breaks are inserted -->
-  <xsl:variable name="url-part-character-limit" as="xs:integer" select="40"/>
+  <xsl:variable name="xml2tex:url-part-character-limit" as="xs:integer" select="40"/>
 
 </xsl:stylesheet>

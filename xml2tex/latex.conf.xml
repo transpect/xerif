@@ -2742,10 +2742,10 @@
     <xsl:param name="url" as="xs:string"/>
     <xsl:variable select="string-join(
                             tr:tokenize-strings-by-string-length(
-                              tokenize($url, $tactical-break-character-for-urls),
-                              $url-part-character-limit
+                              tokenize($url, $xml2tex:tactical-break-character-for-urls),
+                              $xml2tex:url-part-character-limit
                             ),
-                            $tactical-break-character-for-urls
+                            $xml2tex:tactical-break-character-for-urls
                           )" name="broken-link" as="xs:string"/>
     <xsl:value-of select="replace(
                                   replace($broken-link, 
@@ -2764,13 +2764,13 @@
                               replace(
                                       $url,
                                       '([-%_./=?#])([^-%_./=?]{3})',
-                                      concat('$1',$tactical-break-character-for-urls, '$2')
+                                      concat('$1',$xml2tex:tactical-break-character-for-urls, '$2')
                                      ),
                               '\\?(&amp;)',
-                              concat($tactical-break-character-for-urls, '\\$1')
+                              concat($xml2tex:tactical-break-character-for-urls, '\\$1')
                              ),
                             '&#xad;',
-                            $tactical-break-character-for-urls
+                            $xml2tex:tactical-break-character-for-urls
                           )"/>
   </xsl:function>
   
