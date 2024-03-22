@@ -44,6 +44,9 @@
                           group-starting-with="dbk:row[dbk:entry//processing-instruction()[name() eq 'latex']
                                                       [matches(., functx:escape-for-regex($xml2tex:split-table-pi))]]">
         <xsl:element name="{$table/name()}">
+          <xsl:if test="not(position() eq 1) and $xml2tex:repeat-split-table-head">
+            <xsl:apply-templates select="$table/dbk:title" mode="#current"/>
+          </xsl:if>
           <tgroup>
             <xsl:apply-templates select="$table/dbk:tgroup/@*, 
                                          $table/dbk:tgroup/dbk:colspec, 
@@ -58,6 +61,9 @@
               <xsl:apply-templates select="$table/dbk:tgroup/dbk:tfoot" mode="#current"/>
             </xsl:if>
           </tgroup>
+          <xsl:if test="position() eq last()">
+            <xsl:apply-templates select="$table/dbk:caption" mode="#current"/>
+          </xsl:if>
         </xsl:element>
       </xsl:for-each-group>
     </xsl:variable>
