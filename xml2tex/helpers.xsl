@@ -43,6 +43,9 @@
                                   )/dbk:row" 
                           group-starting-with="dbk:row[dbk:entry//processing-instruction()[name() eq 'latex']
                                                       [matches(., functx:escape-for-regex($xml2tex:split-table-pi))]]">
+        <xsl:if test="not(position() eq 1)">
+          <xsl:processing-instruction name="latex" select="'\newpage%&#xa;'"/>
+        </xsl:if>
         <xsl:element name="{$table/name()}">
           <xsl:if test="not(position() eq 1) and $xml2tex:repeat-split-table-head">
             <xsl:apply-templates select="$table/dbk:title" mode="#current"/>
