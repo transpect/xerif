@@ -67,7 +67,7 @@
   
   <tr:xslt-mode msg="yes" hub-version="1.1" prefix="xml2tex/12" mode="xml2tex:helpers">
     <p:input port="stylesheet">
-      <p:pipe step="load-xml2tex-helpers-xslt" port="stylesheet"/>
+      <p:pipe step="load-xml2tex-helpers-xslt" port="result"/>
     </p:input>
     <p:input port="parameters">
       <p:pipe port="params" step="tx-xml2tex"/>
