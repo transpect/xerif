@@ -343,5 +343,13 @@
   
   <!-- character limit of url parts until tactical line breaks are inserted -->
   <xsl:variable name="xml2tex:url-part-character-limit" as="xs:integer" select="40"/>
-
+  
+  <xsl:variable name="xml2tex:split-table-pi" as="xs:string" select="'\doTableBreak'"/>
+  
+  <!-- As long as tables with PI orientation=landscape cannot be split automatically via the framework, they may be split via converter. 
+        how the splitting is done exactly, should in most cases be adapted in customer code to make sure that the position of titles, sources etc. is according to styles -->
+  <xsl:variable name="xml2tex:split-landscape-tables" select="false()" as="xs:boolean"/>
+  
+  <xsl:variable name="xml2tex:repeat-split-table-head" select="false()" as="xs:boolean"/>
+  
 </xsl:stylesheet>

@@ -37,11 +37,11 @@
   <xsl:variable name="hub:figure-copyright-statement-role-regex"  as="xs:string" select="'ts_dummy_source'">
     <!-- normally creates a legalnotice. but doesn't work here so dummy style. is needed though for schematron checks, do not delete -->
   </xsl:variable>
-  <xsl:variable name="split-landscape-table-with-dotablebreak-pi" select="false()" as="xs:boolean">
-    <!-- As long as tables with PI orientation=landscape cannot be split automatically via the framework, they may be split via converter. 
-        how the splitting is done exactly, should in most cases be adapted in customer code to make sure that the position of titles, sources etc. is according to styles -->
-  </xsl:variable>
-  <xsl:variable name="repeat-split-table-head" select="false()" as="xs:boolean"/>
+  <!--<xsl:variable name="split-landscape-table-with-dotablebreak-pi" select="false()" as="xs:boolean">
+    <!-\- As long as tables with PI orientation=landscape cannot be split automatically via the framework, they may be split via converter. 
+        how the splitting is done exactly, should in most cases be adapted in customer code to make sure that the position of titles, sources etc. is according to styles -\->
+  </xsl:variable>-->
+  <!--<xsl:variable name="repeat-split-table-head" select="false()" as="xs:boolean"/>-->
   
   <!--  *
         * create hierarchy
@@ -838,7 +838,7 @@
     <xsl:value-of select="replace(., '&#x9;', '&#x20;')"/>
   </xsl:template>
   
-  <xsl:template match="*[self::table|self::informaltable]
+  <!--<xsl:template match="*[self::table|self::informaltable]
                         [@role[contains(., 'tablerotated')] or preceding-sibling::node()[1]
                                                                                        [self::processing-instruction()]
                                                                                        [some $t in tokenize(., '\s+') satisfies $t = 'orientation=landscape']
@@ -848,22 +848,22 @@
     <xsl:call-template name="split-table">
       <xsl:with-param name="table" as="element()" select="."/>
     </xsl:call-template>
-    <!-- overwrite this in your adaptations to position titles/sources in first or last table fragment. 
-         be aware that it splits tables also if the hub is further processed to XML/HTML.-->
-  </xsl:template>
+    <!-\- overwrite this in your adaptations to position titles/sources in first or last table fragment. 
+         be aware that it splits tables also if the hub is further processed to XML/HTML.-\->
+  </xsl:template>-->
   
-  <xsl:template name="split-table" as="node()*">
+  <!--<xsl:template name="split-table" as="node()*">
     <xsl:param name="table" as="element()"/>
 
     <xsl:variable name="title" as="element(title)?" select="$table/title"/>
     <xsl:variable name="info" as="element(info)?" select="$table/info">
-        <!--  sources in info/legalnotice -->
+        <!-\-  sources in info/legalnotice -\->
     </xsl:variable>
     <xsl:variable name="caption" as="element(caption)?" select="$table/caption">
-      <!--additional descriptions/legends -->
+      <!-\-additional descriptions/legends -\->
     </xsl:variable>
     <xsl:variable name="table-head" as="element(thead)*" select="$table/tgroup/thead">
-      <!--additional descriptions/legends -->
+      <!-\-additional descriptions/legends -\->
     </xsl:variable>
 
     <xsl:variable name="splitted-tables">
@@ -871,7 +871,7 @@
                group-starting-with=".[.//processing-instruction()[some $t in tokenize(., '\s+') satisfies $t = '\doTableBreak']]">
     
           <xsl:if test="not(current-group()[1] is $table/tgroup[1]/descendant::row[1])">
-             <!-- insert PI between table fragments, but not before first to avoid duplication -->
+             <!-\- insert PI between table fragments, but not before first to avoid duplication -\->
             <xsl:apply-templates select="$table/preceding-sibling::node()[1][self::processing-instruction()]" mode="#current"/>
           </xsl:if>
           
@@ -891,7 +891,7 @@
             <xsl:if test="(current-group()[1] is $table/tgroup[1]/descendant::row[1](:first table:) and ($table-caption-pos = 'top'))
                            or
                           (current-group()[last()] is $table/tgroup[1]/descendant::row[last()](: last table:) and not($table-caption-pos = 'top'))">
-              <!-- insert title if its position is above or below table in PDF -->
+              <!-\- insert title if its position is above or below table in PDF -\->
               <xsl:apply-templates select="$title" mode="#current"/>
             </xsl:if>
             
@@ -907,7 +907,7 @@
                               and $repeat-split-table-head 
                               and not(current-grouping-key() = 'thead') 
                               and current-group()[1]//processing-instruction()[some $t in tokenize(., '\s+') satisfies $t = '\doTableBreak']">
-                  <!-- -repeat table heads if wanted, but only on split points -->
+                  <!-\- -repeat table heads if wanted, but only on split points -\->
                   <xsl:apply-templates select="$table-head" mode="#current"/>
                 </xsl:if>
                 <xsl:element name="{current-grouping-key()}">
@@ -923,7 +923,7 @@
                          (     current-group()[last()] is $table/tgroup[1]/descendant::row[last()]
                            and not($table-caption-pos = 'top')
                          ) ">
-            <!-- insert caption. default: bottom (last table) -->
+            <!-\- insert caption. default: bottom (last table) -\->
             <xsl:apply-templates select="$caption" mode="#current"/>
           </xsl:if>
           <xsl:if test="current-group()[last()] is $table/tgroup[1]/descendant::row[last()]">
@@ -935,7 +935,7 @@
 
      <xsl:choose>
         <xsl:when test="$splitted-tables/descendant::processing-instruction()[. = 'rowspans interrupted through table break']">
-          <!-- if rowspans hinder splitting: set PI to check and use original table-->
+          <!-\- if rowspans hinder splitting: set PI to check and use original table-\->
           <xsl:sequence select="$splitted-tables/descendant::processing-instruction()[. = 'rowspans interrupted through table break']"/>
            <xsl:element name="{$table/local-name()}">
              <xsl:apply-templates select="$table/@*, $table/node()" mode="#current"/>
@@ -945,7 +945,7 @@
          <xsl:sequence select="$splitted-tables"/>
        </xsl:otherwise>
       </xsl:choose>
-  </xsl:template>
+  </xsl:template>-->
   
   <!--  *
         * dedication

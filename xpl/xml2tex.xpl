@@ -31,6 +31,7 @@
   <p:import href="http://transpect.io/cascade/xpl/load-cascaded.xpl"/>
   <p:import href="http://transpect.io/xml2tex/xpl/xml2tex.xpl"/>
   <p:import href="http://transpect.io/xproc-util/simple-progress-msg/xpl/simple-progress-msg.xpl"/>
+  <p:import href="http://transpect.io/xproc-util/xslt-mode/xpl/xslt-mode.xpl"/>
 
   <tr:simple-progress-msg name="load-xml2tex-config-msg" file="load-xml2tex-config.txt">
     <p:input port="msgs">
@@ -53,6 +54,30 @@
   </tr:load-cascaded>
   
   <p:sink/>
+  
+  <tr:load-cascaded name="load-xml2tex-helpers-xslt" filename="xml2tex/10.helpers.xsl">
+    <p:with-option name="debug" select="$debug" />
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri" />
+    <p:input port="paths">
+      <p:pipe port="params" step="tx-xml2tex"/>
+    </p:input>
+  </tr:load-cascaded>
+  
+  <p:sink/>
+  
+  <tr:xslt-mode msg="yes" hub-version="1.1" prefix="xml2tex/12" mode="xml2tex:helpers">
+    <p:input port="stylesheet">
+      <p:pipe step="load-xml2tex-helpers-xslt" port="stylesheet"/>
+    </p:input>
+    <p:input port="parameters">
+      <p:pipe port="params" step="tx-xml2tex"/>
+    </p:input>
+    <p:input port="models"><p:empty/></p:input>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="debug-indent" select="$debug-indent"/>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </tr:xslt-mode>
 
   <tr:simple-progress-msg name="xml2tex-start-msg" file="xml2tex-start.txt">
     <p:input port="msgs">
@@ -68,9 +93,6 @@
   
   <xml2tex:convert name="hub2tex">
     <p:documentation>Converts the hub XML to TeX according to the xml2tex configuration file.</p:documentation>
-    <p:input port="source">
-      <p:pipe port="source" step="tx-xml2tex"/>
-    </p:input>
     <p:input port="conf">
       <p:pipe port="result" step="load-latex-conf"/>     
     </p:input>
