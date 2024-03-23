@@ -344,12 +344,22 @@
   <!-- character limit of url parts until tactical line breaks are inserted -->
   <xsl:variable name="xml2tex:url-part-character-limit" as="xs:integer" select="40"/>
   
+  <!-- processing instruction that provokes a table split -->
   <xsl:variable name="xml2tex:split-table-pi" as="xs:string" select="'\doTableBreak'"/>
   
-  <!-- As long as tables with PI orientation=landscape cannot be split automatically via the framework, they may be split via converter. 
-        how the splitting is done exactly, should in most cases be adapted in customer code to make sure that the position of titles, sources etc. is according to styles -->
+  <!-- As long as tables with PI orientation=landscape cannot be split automatically via 
+       the framework, they may be split via converter. how the splitting is done exactly, 
+       should in most cases be adapted in customer code to make sure that the position 
+       of titles, sources etc. is according to styles -->
   <xsl:variable name="xml2tex:split-landscape-tables" select="false()" as="xs:boolean"/>
   
+  <!-- Whether the title should be repeated in subsequent table parts -->
+  <xsl:variable name="xml2tex:repeat-split-table-title" select="false()" as="xs:boolean"/>
+  
+  <!-- Should the table head be repeated in subsequent table parts -->
   <xsl:variable name="xml2tex:repeat-split-table-head" select="false()" as="xs:boolean"/>
+  
+  <!-- Should the table caption always shown -->
+  <xsl:variable name="xml2tex:repeat-split-table-caption" select="false()" as="xs:boolean"/>
   
 </xsl:stylesheet>

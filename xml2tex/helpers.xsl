@@ -37,7 +37,7 @@
   
   <xsl:template name="xml2tex:split-table">
     <xsl:param name="table" as="element()"/>
-    <xsl:variable name="table-split" as="element()+">
+    <xsl:variable name="table-split" as="node()+">
       <xsl:for-each-group select="calstable:check-normalized(
                                     calstable:normalize(dbk:tgroup/dbk:tbody), 'no'
                                   )/dbk:row" 
@@ -47,16 +47,17 @@
           <xsl:processing-instruction name="latex" select="'\newpage%&#xa;'"/>
         </xsl:if>
         <xsl:element name="{$table/name()}">
-          <xsl:if test="not(position() eq 1) and $xml2tex:repeat-split-table-head">
-            <xsl:apply-templates select="$table/dbk:title" mode="#current"/>
-          </xsl:if>
+          <xsl:call-template name="xml2tex:split-table-title">
+            <xsl:with-param name="table" select="$table" as="element()"/>
+            <xsl:with-param name="pos" select="position()" as="xs:integer"/>
+          </xsl:call-template>
           <tgroup>
             <xsl:apply-templates select="$table/dbk:tgroup/@*, 
-                                         $table/dbk:tgroup/dbk:colspec, 
-                                         $table/dbk:tgroup/dbk:thead" mode="#current"/>
-            <xsl:if test="not(position() eq 1) and $xml2tex:repeat-split-table-head">
-              <xsl:apply-templates select="$table/dbk:tgroup/dbk:thead" mode="#current"/>
-            </xsl:if>
+                                         $table/dbk:tgroup/dbk:colspec" mode="#current"/>
+            <xsl:call-template name="xml2tex:split-table-head">
+              <xsl:with-param name="table" select="$table" as="element()"/>
+              <xsl:with-param name="pos" select="position()" as="xs:integer"/>
+            </xsl:call-template>
             <tbody>
               <xsl:apply-templates select="current-group()" mode="#current"/>
             </tbody>
@@ -64,16 +65,41 @@
               <xsl:apply-templates select="$table/dbk:tgroup/dbk:tfoot" mode="#current"/>
             </xsl:if>
           </tgroup>
-          <xsl:if test="position() eq last()">
-            <xsl:apply-templates select="$table/dbk:caption" mode="#current"/>
-          </xsl:if>
+          <xsl:call-template name="xml2tex:split-table-caption">
+            <xsl:with-param name="table" select="$table" as="element()"/>
+            <xsl:with-param name="pos" select="position()" as="xs:integer"/>
+          </xsl:call-template>
         </xsl:element>
       </xsl:for-each-group>
     </xsl:variable>
-    <xsl:variable name="table-restored" as="element()+">
+    <xsl:variable name="table-restored" as="node()+">
       <xsl:apply-templates select="$table-split" mode="xml2tex:table-split-restore"/>
     </xsl:variable>
-    <xsl:apply-templates select="$table-restored" mode="#current"/>
+    <xsl:sequence select="$table-restored"/>
+  </xsl:template>
+  
+  <xsl:template name="xml2tex:split-table-title">
+    <xsl:param name="table" as="element()"/>
+    <xsl:param name="pos" as="xs:integer"/>
+    <xsl:if test="$pos eq 1 or $xml2tex:repeat-split-table-title">
+      <xsl:apply-templates select="$table/dbk:title" mode="#current"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="xml2tex:split-table-head">
+    <xsl:param name="table" as="element()"/>
+    <xsl:param name="pos" as="xs:integer"/>
+    <xsl:if test="$pos eq 1 or $xml2tex:repeat-split-table-head">
+      <xsl:apply-templates select="$table/dbk:tgroup/dbk:thead" mode="#current"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template name="xml2tex:split-table-caption">
+    <xsl:param name="table" as="element()"/>
+    <xsl:param name="pos" as="xs:integer"/>
+    <xsl:if test="$pos eq last() or $xml2tex:repeat-split-table-caption">
+      <xsl:apply-templates select="$table/dbk:caption" mode="#current"/>
+    </xsl:if>
   </xsl:template>
   
   <xsl:template match="dbk:tbody/dbk:row/dbk:entry[@linkend][@morerows eq '0']" mode="xml2tex:table-split-restore">
