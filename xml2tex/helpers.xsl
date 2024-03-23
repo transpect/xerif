@@ -29,7 +29,7 @@
   <xsl:template match="*[local-name() = ('table', 'informaltable')]
                         [dbk:tgroup/dbk:tbody/dbk:row[dbk:entry//processing-instruction()[name() eq 'latex']
                                                      [matches(., functx:escape-for-regex($xml2tex:split-table-pi))]]]
-                        [not(@role eq 'tablerotated' and not($xml2tex:split-landscape-tables))]" mode="xml2tex:helpers">
+                        [not(@role eq 'tablerotated') or $xml2tex:split-landscape-tables]" mode="xml2tex:helpers">
     <xsl:call-template name="xml2tex:split-table">
       <xsl:with-param name="table" select="." as="element()"/>
     </xsl:call-template>
