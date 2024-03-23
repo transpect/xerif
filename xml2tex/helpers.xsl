@@ -18,7 +18,7 @@
   <xsl:import href="http://transpect.io/xslt-util/calstable/xsl/normalize.xsl"/>
   <xsl:import href="http://transpect.io/xslt-util/functx/Strings/Replacing/escape-for-regex.xsl"/>
   
-  <xsl:template match="@* | *" mode="xml2tex:helpers xml2tex:table-split-restore">
+  <xsl:template match="@* | node()" mode="xml2tex:helpers xml2tex:table-split-restore">
     <xsl:copy>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
