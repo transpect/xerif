@@ -252,19 +252,22 @@
   
   <p:sink/>
 
-
-  <tr:load-cascaded name="postprocess-hub-stylesheet" filename="evolve-hub/postprocess-hub-for-tex.xsl">
+  <!-- mk: commented, because tex-preprocessing is now 
+       done in xerif's common code base at xml2tex/helpers.xsl. 
+       transcript-specific preprocessing can be done in adaptions.
+    
+    <tr:load-cascaded name="postprocess-hub-stylesheet" filename="evolve-hub/postprocess-hub-for-tex.xsl">
     <p:input port="paths">
       <p:pipe port="result" step="get-paths"/>
     </p:input>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="required" select="'no'"/>
-  </tr:load-cascaded>
+  </tr:load-cascaded>-->
 
-  <p:sink/>
+  <!--<p:sink/>-->
 
-  <p:xslt name="postprocess-hub" initial-mode="postprocess-hub">
+  <!--<p:xslt name="postprocess-hub" initial-mode="postprocess-hub">
     <p:documentation>Splits tables etc. that is not wanted for XML/HTML</p:documentation>
     <p:input port="source">
       <p:pipe port="result" step="copy-images-and-patch-filerefs"/>
@@ -275,18 +278,21 @@
     <p:input port="parameters">
        <p:pipe port="result" step="get-paths"/> 
     </p:input>
-<!--    <p:with-param name="s9y1-path" select="/c:param-set/c:param[@name eq 's9y1-path']/@value">
+<!-\-    <p:with-param name="s9y1-path" select="/c:param-set/c:param[@name eq 's9y1-path']/@value">
       <p:pipe port="paths" step="export-chunks"/>
-    </p:with-param>-->
-  </p:xslt>
+    </p:with-param>-\->
+  </p:xslt>-->
 
-  <tr:store-debug name="store-postprocessed-hub" pipeline-step="evolve-hub/99.postprocessed">
+  <!--<tr:store-debug name="store-postprocessed-hub" pipeline-step="evolve-hub/99.postprocessed">
     <p:with-option name="active" select="$debug"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
-  </tr:store-debug>
+  </tr:store-debug>-->
 
   <tx:xml2tex name="hub2tex">
+    <p:input port="source">
+      <p:pipe port="result" step="copy-images-and-patch-filerefs"/>
+    </p:input>
     <p:input port="params">
       <p:pipe port="result" step="get-paths"/> 
     </p:input>

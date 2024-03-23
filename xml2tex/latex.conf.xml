@@ -741,9 +741,7 @@
     <xsl:next-match>
       <xsl:with-param name="suppress-select-lang" as="xs:boolean" select="$suppress-select-lang"/>
     </xsl:next-match>
-    <xsl:if test="(following-sibling::*[1][not(@xml:lang) 
-                                          or 
-                                          @xml:lang eq /*/@xml:lang]
+    <xsl:if test="(following-sibling::*[1][not(@xml:lang) or @xml:lang eq /*/@xml:lang]
                    or 
                    not(following-sibling::*))
                    and not($suppress-select-lang)">

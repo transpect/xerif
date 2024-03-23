@@ -874,7 +874,6 @@
              <!-\- insert PI between table fragments, but not before first to avoid duplication -\->
             <xsl:apply-templates select="$table/preceding-sibling::node()[1][self::processing-instruction()]" mode="#current"/>
           </xsl:if>
-          
           <xsl:element name="{$table/local-name()}">
             <xsl:apply-templates select="$table/@*[not(name() = 'xml:id')]" mode="#current"/>
             <xsl:if test="$table/@xml:id">
