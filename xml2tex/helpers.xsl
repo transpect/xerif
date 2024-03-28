@@ -35,6 +35,16 @@
     </xsl:call-template>
   </xsl:template>
   
+  <xsl:template match="dbk:entry//processing-instruction()[name() eq 'latex']
+                                                          [matches(., 
+                                                             functx:escape-for-regex($xml2tex:split-table-pi)
+                                                           )]" mode="xml2tex:helpers">
+    <xsl:param name="split" as="xs:boolean" select="false()" tunnel="yes"/>
+    <xsl:if test="not($split)">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template name="xml2tex:split-table">
     <xsl:param name="table" as="element()"/>
     <xsl:variable name="table-split" as="node()+">
@@ -63,7 +73,9 @@
               <xsl:with-param name="pos" select="position()" as="xs:integer"/>
             </xsl:call-template>
             <tbody>
-              <xsl:apply-templates select="current-group()" mode="#current"/>
+              <xsl:apply-templates select="current-group()" mode="#current">
+                <xsl:with-param name="split" select="true()" as="xs:boolean" tunnel="yes"/>
+              </xsl:apply-templates>
             </tbody>
             <xsl:if test="position() eq last()">
               <xsl:apply-templates select="$table/dbk:tgroup/dbk:tfoot" mode="#current"/>
