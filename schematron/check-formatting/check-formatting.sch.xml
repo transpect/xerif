@@ -31,7 +31,7 @@
   </pattern>
   
   <pattern id="figures">
-    <rule context="dbk:para[matches(@role, $figure-image-role-regex)]">
+    <rule context="dbk:para[matches(@role, $figure-image-role-regex, 'i')]">
       <assert test=".//dbk:mediaobject or normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))" role="error" id="figure-references">
         This paragraph has been formatted with the figure style but contains no embedded image or figure reference. If you use processing instructions, 
         please include them in the paragraph of the picture rather than inserting a new paragraph below.
@@ -42,7 +42,7 @@
         This paragraph has been formatted with the figure caption style but includes an image. Please verify whether the image belongs to the caption or to the figure. 
         For the latter, please ensure that the image is placed in a paragraph above the caption and formatted with the figure style (regex: <value-of select="$figure-image-role-regex"/>).
       </assert>
-      <assert test="not(preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex)])" role="error" id="isolated-figure-caption">
+      <assert test="preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')]" role="error" id="isolated-figure-caption">
         This paragraph has been formatted with the figure caption style but the paragraph above has the style: '<value-of select="preceding-sibling::*[1]/@role"/>'.
       </assert>
     </rule>
