@@ -47,6 +47,7 @@
           <xsl:processing-instruction name="latex" select="'\newpage%&#xa;'"/>
         </xsl:if>
         <xsl:element name="{$table/name()}">
+          <xsl:apply-templates select="$table/@*" mode="#current"/>
           <xsl:call-template name="xml2tex:split-table-title">
             <xsl:with-param name="table" select="$table" as="element()"/>
             <xsl:with-param name="pos" select="position()" as="xs:integer"/>
