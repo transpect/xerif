@@ -334,6 +334,13 @@
   </xsl:variable>
   <xsl:variable name="hub:container-styles" as="xs:string" select="'(tstable|tsfigure)$'"/>
 
+  <xsl:variable name="hub:regex-for-url-to-link-recognition" as="xs:string" 
+                select="concat('(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;',
+                               $xml2tex:tactical-break-character-for-urls,
+                               ']+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;',
+                               $xml2tex:tactical-break-character-for-urls,
+                               ']')"/>
+
   <xsl:variable name="tei:box-type-role" select="'box'" as="xs:string"/>
 
   <xsl:variable name="tei2html:no-toc-style-regex" as="xs:string" select="'notoc'"/>

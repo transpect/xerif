@@ -1210,16 +1210,9 @@
   </xsl:template>
   
   <!-- markup links -->
-  
-  <xsl:variable name="regex-for-url-to-link-recognition" as="xs:string" 
-                select="concat('(https?://|www\.)[-a-z0-9\.:;#~*%_/\?=&amp;@&#x200b;-&#x200d;',
-                               $xml2tex:tactical-break-character-for-urls,
-                               ']+[-a-z0-9:;#~\*%_/=&amp;&#x200b;-&#x200d;',
-                               $xml2tex:tactical-break-character-for-urls,
-                               ']')"/>
 
   <xsl:template match="text()[not(ancestor::link)][matches(., '(https?://|www\.)')]" mode="hub:clean-hub">
-    <xsl:analyze-string select="." regex="{$regex-for-url-to-link-recognition}" flags="i">
+    <xsl:analyze-string select="." regex="{$hub:regex-for-url-to-link-recognition}" flags="i">
       <xsl:matching-substring>
         <link xlink:href="{if(starts-with(., 'www')) 
                            then concat('https://', hub:remove-prohibited-characters-from-url(., false())) 
