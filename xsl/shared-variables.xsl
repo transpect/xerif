@@ -351,6 +351,10 @@
   <!-- character limit of url parts until tactical line breaks are inserted -->
   <xsl:variable name="xml2tex:url-part-character-limit" as="xs:integer" select="40"/>
   
+  <!-- if you want to override the variables below in your client-specific cascade,
+       please keep in mind that you must also add the configuration (xml2tex/helpers.xsl) 
+       to your cascade and import your client-specific shared variables there. -->
+  
   <!-- processing instruction that provokes a table split -->
   <xsl:variable name="xml2tex:split-table-pi" as="xs:string" select="'\doTableBreak'"/>
   
