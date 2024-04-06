@@ -9,7 +9,7 @@
   xmlns:xml2tex="http://transpect.io/xml2tex"
   xmlns="http://docbook.org/ns/docbook" 
   xpath-default-namespace="http://docbook.org/ns/docbook"
-  exclude-result-prefixes="xs hub dbk xlink functx" 
+  exclude-result-prefixes="xs hub dbk xlink functx xml2tex" 
   version="2.0">
   
   <xsl:output indent="yes"/>
@@ -1392,7 +1392,30 @@
           <xsl:apply-templates select="info/title, title" mode="#current"/>
         </info>
       </xsl:if>
-      <xsl:apply-templates select="* except (info, title)" mode="#current"/>
+      <!-- if existing, group static index entries -->
+      <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, $index-static-regex)">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key()">
+            <xsl:for-each-group select="current-group()" 
+                          group-starting-with="dbk:para[    matches(@role, $index-static-regex) 
+                                                        and (ends-with(@role, '1') or not(matches(@role, '\d$')))]">
+              <xsl:choose>
+                <xsl:when test="every $role in current-group()/@role satisfies matches($role, $index-static-regex)">
+                  <indexentry>
+                    <xsl:apply-templates select="current-group()" mode="#current"/>
+                  </indexentry>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each-group>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
     </index>
   </xsl:template>
   
@@ -1483,8 +1506,7 @@
   <xsl:template match="para[matches(@role, $index-static-regex)]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., $index-see-regex)"/>
-    <indexentry>
-      <primaryie>
+    <xsl:element name="{hub:index-entry-element-name(replace(@role, $index-static-regex, '$1'))}">
         <xsl:choose>
           <xsl:when test="$see-exists">
             <xsl:analyze-string select="." regex="{$index-see-regex}">
@@ -1501,8 +1523,7 @@
             <xsl:apply-templates mode="#current"/>
           </xsl:otherwise>
         </xsl:choose>
-      </primaryie>
-    </indexentry>
+      </xsl:element>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, $index-static-regex)]//text()" mode="custom-1">
@@ -1579,6 +1600,15 @@
   <xsl:function name="hub:normalize-index-type" as="xs:string">
     <xsl:param name="index-type" as="xs:string?"/>
     <xsl:value-of select="replace($index-type, '\p{P}', '')"/>
+  </xsl:function>
+  
+  <xsl:function name="hub:index-entry-element-name" as="xs:string">
+    <xsl:param name="level" as="xs:string?"/>
+    <xsl:variable name="primary-secondary-etc" as="xs:string+" 
+                  select="('primaryie', 'secondaryie', 'tertiaryie', 'quaternaryie', 'quinaryie', 'senaryie', 'septenaryie', 'octonaryie', 'nonaryie', 'denaryie')"/>
+    <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
+                          then $primary-secondary-etc[xs:integer($level)]
+                          else $primary-secondary-etc[1]"/>
   </xsl:function>
   
   <!-- remove empty index terms early -->

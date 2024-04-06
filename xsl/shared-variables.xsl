@@ -254,7 +254,7 @@
                 select="'^[a-z]{1,3}indexlist'"/>
   
   <xsl:variable name="index-static-regex" as="xs:string" 
-                select="'^[a-z]{1,3}indexstatic'"/>
+                select="'^[a-z]{1,3}indexstatic(\d*)'"/>
   
   <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
