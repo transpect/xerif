@@ -127,7 +127,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="dbk:tbody/dbk:row/dbk:entry[@linkend][not(@morerows) or @morerows ne '0']" 
+  <xsl:template match="dbk:tbody/dbk:row/dbk:entry[@linkend][not(@morerows) or @morerows ne '0'] | dbk:entry/@xml:id" 
                 mode="xml2tex:table-split-restore"/>
   
   <xsl:template match="dbk:row/dbk:entry[not(for $rowspan in @morerows 
