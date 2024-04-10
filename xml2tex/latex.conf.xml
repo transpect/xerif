@@ -510,11 +510,7 @@
         <xsl:text>\setcounter{page}{5}&#xa;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="    exists(/dbk:*/dbk:preface)
-		  and (some $front in /dbk:*/dbk:preface
-		       satisfies matches($front/dbk:info/dbk:title/@role, $frontmatter-heading-role-regex))">
-      <xsl:text>\frontmatter&#xa;</xsl:text>
-    </xsl:if>
+    <xsl:text>\frontmatter&#xa;</xsl:text>
     <xsl:apply-templates select="/dbk:*/dbk:colophon[@role = 'dedication']
                                 |/dbk:*/dbk:dedication" mode="#current">
       <xsl:with-param name="keep" select="true()" tunnel="yes"/>
@@ -1836,9 +1832,7 @@
                                       )
                            ]
                         or
-                        $elt[self::dbk:figure[dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')]]
-                                             [not(parent::dbk:figure)]
-                            ]
+                        $elt[self::dbk:figure[matches(@css:transform, 'rotate\((90|270)deg\)')]]
                         or 
                         $elt[self::dbk:mediaobject[matches(@css:transform, 'rotate\((90|270)deg\)')][not(parent::dbk:figure)]]">
          <xsl:sequence select="'orientation=landscape'"/>

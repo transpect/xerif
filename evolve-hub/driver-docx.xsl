@@ -526,6 +526,9 @@
                           select="if(not(current-group()//mediaobject))
                                   then current-group()[matches(@role, $figure-image-role-regex, 'i')][normalize-space()]
                                   else current-group()//mediaobject"/>
+            <xsl:variable name="orientation" as="xs:string?"
+                          select=".//phrase[matches(@role, $pi-style-regex, 'i')]
+                                           [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($orientation-options, '|') ,')$'))]"/>
             <xsl:variable name="float-pos" as="xs:string?" 
                           select=".//phrase[matches(@role, $pi-style-regex, 'i')]
                                            [matches(normalize-space(.), concat('^', $pi-mark, '(', string-join($float-options, '|') ,')$'))]"/>
@@ -534,6 +537,9 @@
                                 else 'informalfigure'}">
               <xsl:if test="exists($float-pos)">
                 <xsl:attribute name="floatstyle" select="substring-after($float-pos, $pi-mark)"/>
+              </xsl:if>
+              <xsl:if test="exists($orientation)">
+                <xsl:attribute name="css:transform" select="'rotate(90deg)'"/>
               </xsl:if>
               <xsl:if test="$is-grid-group">
                 <xsl:attribute name="css:display" select="'grid'"/>
@@ -675,7 +681,7 @@
   
   <!-- dissolve informalfigures with no special role (we consider them as subsequent figures) -->
   
-  <xsl:template match="informalfigure[@role eq 'figure']" mode="hub:dissolve-sidebars-without-purpose">
+  <xsl:template match="informalfigure[@role eq 'figure'][not(@css:display)]" mode="hub:dissolve-sidebars-without-purpose">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
@@ -2263,6 +2269,7 @@
   <xsl:function name="hub:renderas-from-xml-pi" as="attribute(renderas)?">
     <xsl:param name="renderas" as="xs:string?"/>
     <xsl:param name="pis" as="processing-instruction()*"/>
+    <xsl:message select="$renderas, $pis, matches(string-join($pis), $suffixes-regex, 'i')"></xsl:message>
     <xsl:if test="matches(string-join($pis), $suffixes-regex, 'i')">
       <xsl:attribute name="renderas" 
                     select="string-join(($renderas,

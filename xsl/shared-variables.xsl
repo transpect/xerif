@@ -75,6 +75,9 @@
   <xsl:variable name="float-options-regex" as="xs:string" 
                 select="concat('(', string-join($float-options, '|'), ')')"/>
   
+  <xsl:variable name="orientation-options" as="xs:string+" 
+                select="'landscape'"/>
+  
   <xsl:variable name="suffixes-regex" as="xs:string" 
                 select="concat($no-toc-suffix, '|', $no-pdf-bookmarks-suffix)"/>
   
