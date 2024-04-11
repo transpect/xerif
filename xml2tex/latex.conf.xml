@@ -1148,9 +1148,7 @@
     </xsl:if>
   </template>
   
-  <template context="dbk:preface/dbk:info
-                    |dbk:appendix/dbk:info
-                    |dbk:bibliogaphy/dbk:info
+  <template context="dbk:bibliogaphy/dbk:info
                     |dbk:bibliodiv/dbk:info
                     |dbk:bibliolist/dbk:info">
     <rule name="heading" type="env" break-after="1" break-before="1">
@@ -1266,7 +1264,7 @@
                        and not($bm-override eq true())
                        and not($run-override eq true()) 
                        and ancestor::*[local-name() = ('info', 'title')]
-                                      [parent::dbk:part | parent::dbk:chapter | parent::dbk:section]">
+                                      [parent::dbk:part | parent::dbk:chapter | parent::dbk:section | parent::dbk:appendix | parent::dbk:preface]">
          <xsl:text>\tpBreak&#xa;</xsl:text>
        </xsl:when>
       <xsl:when test="not($remove-newline eq true()) 
@@ -1595,6 +1593,8 @@
                     |dbk:chapter/dbk:title/dbk:tab
                     |dbk:chapter/dbk:info/dbk:title/dbk:tab
                     |dbk:section/dbk:info/dbk:title/dbk:tab
+                    |dbk:preface/dbk:info/dbk:title/dbk:tab
+                    |dbk:appendix/dbk:info/dbk:title/dbk:tab
                     |dbk:bibliography/dbk:info/dbk:title/dbk:tab
                     |dbk:bibliodiv/dbk:info/dbk:title/dbk:tab
                     |dbk:bibliolist/dbk:info/dbk:title/dbk:tab"/>
