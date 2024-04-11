@@ -390,7 +390,7 @@
   </xsl:template>
 
   <!-- Footnotes -->
-  <xsl:template match="*:div[@class = 'notes']">
+  <xsl:template match="*:div[@class = 'notes'] | *:section[@class='footnotes']">
     <xsl:param name="_work-lang" as="xs:string?" tunnel="yes"/>
     <xsl:element name="{concat('h', $footnote-heading-level)}">
       <xsl:attribute name="id" select="'footnotes'"/>
