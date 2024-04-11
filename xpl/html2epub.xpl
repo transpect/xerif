@@ -137,29 +137,10 @@
     </tr:dynamic-transformation-pipeline>
   
     <p:sink/>
-    
-    <p:identity cx:depends-on="load-epub-config" name="id-cover">
-      <p:input port="source">
-        <p:pipe port="result" step="delete-header"/>
-      </p:input>
-    </p:identity>
-  
-    <p:add-attribute attribute-name="src" match="/html:html/html:body/html:div[@id = 'epub-cover-image-container']/html:img" name="replace-cover-href">
-      <p:with-option name="attribute-value" select="/*:epub-config/*:cover/@href">
-        <p:pipe port="result" step="load-epub-config"/>
-      </p:with-option>
-    </p:add-attribute>
-
-    <tr:store-debug pipeline-step="htmltemplates/99_with_cover">
-      <p:with-option name="active" select="$debug"/>
-      <p:with-option name="base-uri" select="$debug-dir-uri"/>
-    </tr:store-debug>
-
-    <p:sink/>
 
     <epub:convert name="epub-convert">
       <p:input port="source">
-        <p:pipe port="result" step="replace-cover-href"/>
+        <p:pipe port="result" step="delete-header"/>
       </p:input>
       <p:input port="meta">
         <p:pipe port="result" step="load-epub-config"/>
