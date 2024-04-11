@@ -415,6 +415,7 @@
         <p:input port="reports">
           <p:pipe port="report" step="create-hub"/>
           <p:pipe port="reports" step="validate"/>
+          <p:pipe port="report" step="hub2epub"/>
         </p:input>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>

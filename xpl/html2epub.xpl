@@ -34,10 +34,15 @@
     <p:documentation>
       The EPUB file URI
     </p:documentation>
+    <p:pipe port="result" step="create-epub"/>
   </p:output>
   
   <p:output port="html" primary="false">
     <p:pipe port="html" step="create-epub"/>
+  </p:output>
+  
+  <p:output port="report" primary="false" sequence="true">
+    <p:pipe port="report" step="create-epub"/>
   </p:output>
   
   <p:option name="out-dir-uri" select="'out'"/>
@@ -68,8 +73,14 @@
   <p:sink/>
 
   <p:group name="create-epub" cx:depends-on="load-epub-config">
+    <p:output port="result">
+      <p:pipe port="result" step="epub-convert"/>
+    </p:output>
     <p:output port="html">
       <p:pipe port="result" step="htmltemplates"/>
+    </p:output>
+    <p:output port="report" sequence="true">
+      <p:pipe port="report" step="epub-convert"/>
     </p:output>
     <p:variable name="basename" select="/c:param-set/c:param[@name='basename']/@value">
       <p:pipe port="params" step="tx-html2epub"/>

@@ -43,6 +43,10 @@
     <p:pipe port="result" step="choose-output-xml"/>
   </p:output>
   
+  <p:output port="report" primary="false" sequence="true">
+    <p:pipe port="report" step="create-epub"/>
+  </p:output>
+  
   <p:output port="epub-path" primary="false">
     <p:pipe port="result" step="create-epub"/>
   </p:output>
@@ -187,6 +191,9 @@
       <p:output port="result">
         <p:pipe port="result" step="html2epub"/>
       </p:output>
+      <p:output port="report" sequence="true">
+        <p:pipe port="report" step="html2epub"/>
+      </p:output>
       <p:output port="html">
         <p:pipe port="html" step="html2epub"/>
       </p:output>
@@ -213,6 +220,9 @@
         <p:inline><c:result os-path="bogo"/></p:inline>
       </p:output>
       <p:output port="html">
+        <p:pipe port="result" step="identity-html"/>
+      </p:output>
+      <p:output port="report">
         <p:pipe port="result" step="identity-html"/>
       </p:output>
       
