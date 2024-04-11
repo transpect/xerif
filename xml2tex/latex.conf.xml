@@ -1686,10 +1686,12 @@
       <xsl:if test="matches($option, '\p{L}')"><option select="$option"></option></xsl:if>
       <xsl:apply-templates select="dbk:title, 
                                    dbk:caption,
-                                   dbk:info/dbk:legalnotice, 
+                                   dbk:info/dbk:legalnotice,
+                                   dbk:textobject,
                                    node() except (dbk:title, 
                                                   dbk:caption,
-                                                  dbk:info)" mode="#current"/>
+                                                  dbk:info,
+                                                  dbk:textobject)" mode="#current"/>
     </rule>
     <xsl:sequence select="xml2tex:generate-clear-after-p(.)"/>
   </template>
@@ -1915,7 +1917,8 @@
    <template context="dbk:figure/dbk:note
                      |dbk:figure/dbk:para[matches(@role, $fig-legend-para-style-regex)][1]
                      |*:table/dbk:caption
-                     |dbk:informaltable/dbk:caption">
+                     |dbk:informaltable/dbk:caption
+                     |*:table/dbk:textobject">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
        <param/>
      </rule>
