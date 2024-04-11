@@ -42,18 +42,18 @@
 }%
 \ProcessOptionsX\relax
 \ifx\tp@frame p\relax
-  \newdimen\bleed \bleed4mm\relax
-  \newdimen\tp@frame@offset \tp@frame@offset4em\relax%
+  \ifx\bleed\@undefined \newdimen\bleed \bleed4mm\relax\fi
+  \ifx\tp@frame@offset\@undefined \newdimen\tp@frame@offset \tp@frame@offset4em\relax\fi
   \voffset\dimexpr\tp@frame@offset-1in\relax
   \hoffset\dimexpr\tp@frame@offset-1in\relax
   \edef\l@offset{\strip@pt\dimexpr\tp@frame@offset*7200/7227\relax}
   \edef\r@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperwidth)*7200/7227\relax}
-  \edef\u@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset-\paperheight)*7200/7227\relax}
-  \edef\o@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset)*7200/7227\relax}
+  \edef\u@offset{\strip@pt\dimexpr(\tp@frame@offset)*7200/7227\relax}
+  \edef\o@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperheight)*7200/7227\relax}
   \edef\b@l@offset{\strip@pt\dimexpr(\tp@frame@offset-\bleed)*7200/7227\relax}
   \edef\b@r@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperwidth+\bleed)*7200/7227\relax}
-  \edef\b@u@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset-\paperheight-\bleed)*7200/7227\relax}
-  \edef\b@o@offset{\strip@pt\dimexpr(842bp-\tp@frame@offset+\bleed)*7200/7227\relax}
+  \edef\b@u@offset{\strip@pt\dimexpr(\tp@frame@offset-\bleed)*7200/7227\relax}
+  \edef\b@o@offset{\strip@pt\dimexpr(\tp@frame@offset+\paperheight+\bleed)*7200/7227\relax}
   \edef\@tempa{%
     /TrimBox [\l@offset\space\u@offset\space\r@offset\space\o@offset]
     /BleedBox[\b@l@offset\space\b@u@offset\space\b@r@offset\space\b@o@offset]
@@ -99,15 +99,15 @@
           \kern-0.3\p@
           \vrule\@width0.3\p@\@height1.7mm\@depth1.7mm\relax}}}
     \def\cammcrossleft{%
-      \llap{\camcross\vrule\@width6mm\@height0.15\p@\@depth0.15\p@\kern4mm}}
+      \llap{\camcross\vrule\@width\dimexpr\bleed+2mm\relax\@height0.15\p@\@depth0.15\p@\kern\bleed}}
     \def\cammcrossright{%
-      \rlap{\kern4mm\vrule\@width6mm\@height0.15\p@\@depth0.15\p@\camcross}}
+      \rlap{\kern\bleed\vrule\@width\dimexpr\bleed+2mm\relax\@height0.15\p@\@depth0.15\p@\camcross}}
     \def\cammcrossup{%
-      \rlap{\smash{\raise10mm\hbox{\camcross}%
-          \kern-0.15\p@\vrule\@width0.3\p@\@height10mm\@depth-4mm}}}%
+      \rlap{\smash{\raise\dimexpr\tp@frame@offset-2mm\relax\hbox{\camcross}%
+          \kern-0.15\p@\vrule\@width0.3\p@\@height\dimexpr\tp@frame@offset-2mm\relax\@depth-\bleed}}}
     \def\cammcrossdown{%
-      \rlap{\smash{\lower10mm\hbox{\camcross}%
-          \kern-0.15\p@\vrule\@width0.3\p@\@height-4mm\@depth10mm}}}%
+      \rlap{\smash{\lower\dimexpr\tp@frame@offset-2mm\relax\hbox{\camcross}%
+          \kern-0.15\p@\vrule\@width0.3\p@\@height-\bleed\@depth\dimexpr\tp@frame@offset-2mm\relax}}}
     \def\CROP@@ulc{\cammcrossup\cammcrossleft}
     \def\CROP@@urc{\cammcrossup\cammcrossright}
     \def\CROP@@llc{\cammcrossdown\cammcrossleft}
