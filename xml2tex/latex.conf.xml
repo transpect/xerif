@@ -938,6 +938,8 @@
                     |dbk:chapter/dbk:info 
                     |dbk:section/dbk:info
                     |dbk:bibliography/dbk:info
+                    |dbk:bibliodiv/dbk:info
+                    |dbk:bibliolist/dbk:info
                     |dbk:appendix/dbk:info
                     |dbk:index/dbk:info">
     <xsl:param name="discard-info" select="false()" tunnel="yes" as="xs:boolean?"/>
@@ -1147,7 +1149,7 @@
       </rule>
     </xsl:if>
   </template>
-  
+<!--  
   <template context="dbk:bibliogaphy/dbk:info
                     |dbk:bibliodiv/dbk:info
                     |dbk:bibliolist/dbk:info">
@@ -1166,7 +1168,7 @@
       <xsl:apply-templates select="dbk:subtitle, dbk:blockquote" mode="#current"/>
     </rule>
     <xsl:apply-templates select=".//dbk:anchor" mode="#current"/>
-  </template>
+  </template>-->
 
   <xsl:variable name="general-heading-style" select="'^[a-z]{1,3}heading(enumerated)?'" as="xs:string"/>
   
