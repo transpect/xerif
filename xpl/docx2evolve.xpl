@@ -64,6 +64,7 @@
     <p:with-option name="mathtype2mml" select="'yes'"/>
     <p:with-option name="remove-biblioentry-paragraphs" select="'no'"/>
     <p:with-option name="table-headers-and-footers-from-tblLook" select="'yes'"/>
+    <p:with-option name="create-svg" select="'false'"/>
   </docx2hub:convert>
   
   <tx:insert-meta name="insert-meta">
