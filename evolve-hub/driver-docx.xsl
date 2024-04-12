@@ -1436,7 +1436,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="indexterm[empty(*)]" priority="3" mode="custom-2"/>
+  <xsl:template match="indexterm[empty(*)][not(@startref)]" priority="3" mode="custom-2"/>
 
   <!-- (2) create index entries from phrases with specific character style -->
   
