@@ -112,17 +112,17 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[not(self::blockquote)][para[matches(@role, $hub:blockquote-role-regex)]]" 
+  <xsl:template match="*[not(self::blockquote)][para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]" 
                 name="build-blockquotes" 
                 mode="hub:blockquotes" xmlns="http://docbook.org/ns/docbook">
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*|processing-instruction()" group-adjacent="self::para[matches(@role, $hub:blockquote-role-regex)] 
+      <xsl:for-each-group select="*|processing-instruction()" group-adjacent="self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))] 
                                                                               or
-                                                                              self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, $hub:blockquote-role-regex)]] 
+                                                                              self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]] 
                                                                                                                     and
-                                                                                                                    following-sibling::*[1][self::para[matches(@role, $hub:blockquote-role-regex)]]]">
+                                                                                                                    following-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]]">
         <xsl:variable name="blockquote-source" as="element(dbk:para)*" 
                       select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
         <!-- all blockquote paras -->
