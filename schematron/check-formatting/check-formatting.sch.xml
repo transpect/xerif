@@ -21,7 +21,7 @@
     <rule context="dbk:para[some $regex in $hub:hierarchy-role-regexes-x 
                             satisfies matches(@role, $regex)]">
       <let name="style-name" value="@role"/>
-      <assert test="not(preceding-sibling::*[1][self::dbk:para[@role = $style-name]])" id="heading-level" role="error">
+      <assert test="not(preceding-sibling::*[1][self::dbk:para[@role = $style-name]])" id="heading-level" role="error" diagnostics="heading-level_de">
         <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Heading Level</span>
         The previous paragraph is a heading and uses the same style as this paragraph. If you want this paragraph to be part 
         of the previous heading, please separate the heading parts with a soft return. Headings need to be followed by a 
@@ -32,22 +32,22 @@
   
   <pattern id="figures">
     <rule context="dbk:para[matches(@role, $figure-image-role-regex, 'i')]">
-      <assert test=".//dbk:mediaobject or normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))" role="error" id="figure-references">
+      <assert test=".//dbk:mediaobject or normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))" role="error" id="figure-references" diagnostics="figure-references_de">
         This paragraph has been formatted with the figure style but contains no embedded image or figure reference. If you use processing instructions, 
         please include them in the paragraph of the picture rather than inserting a new paragraph below.
       </assert>
     </rule>
     <rule context="dbk:para[matches(@role, $figure-caption-role-regex)]">
-      <assert test="not(.//dbk:mediaobject)" role="warning" id="image-in-caption">
+      <assert test="not(.//dbk:mediaobject)" role="warning" id="image-in-caption" diagnostics="image-in-caption_de">
         This paragraph has been formatted with the figure caption style but includes an image. Please verify whether the image belongs to the caption or to the figure. 
         For the latter, please ensure that the image is placed in a paragraph above the caption and formatted with the figure style (regex: <value-of select="$figure-image-role-regex"/>).
       </assert>
-      <assert test="preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')]" role="error" id="isolated-figure-caption">
+      <assert test="preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')]" role="error" id="isolated-figure-caption" diagnostics="isolated-figure-caption_de">
         This paragraph has been formatted with the figure caption style but the paragraph above has the style: '<value-of select="preceding-sibling::*[1]/@role"/>'.
       </assert>
     </rule>
     <rule context="dbk:para[matches(@role, $figure-source-role-regex)]">
-      <assert test="not(preceding-sibling::*[position() = (1,2)][self::dbk:para][matches(@role, $figure-source-role-regex)])" role="error" id="isolated-figure-source">
+      <assert test="not(preceding-sibling::*[position() = (1,2)][self::dbk:para][matches(@role, $figure-source-role-regex)])" role="error" id="isolated-figure-source" diagnostics="isolated-figure-source_de">
         This paragraph has been formatted with the figure source style but it's not placed under an image or its caption.
       </assert>
     </rule>
@@ -55,17 +55,17 @@
   
   <pattern id="tables">
     <rule context="dbk:para[matches(@role, $hub:table-rotated-role-regex)]">
-      <assert test="not(following-sibling::*[position() = (1,2)][self::dbk:informaltable])" id="table-rotated-regex">
+      <assert test="not(following-sibling::*[position() = (1,2)][self::dbk:informaltable])" id="table-rotated-regex" diagnostics="table-rotated-regex_de">
         This paragraph formatted has been formatted with the style '<value-of select="$hub:table-rotated-role-regex"/>' but the paragraph is not placed over the table.
       </assert>
     </rule>
     <rule context="dbk:para[matches(@role, $table-caption-role-regex)]">
-      <assert test="not(following-sibling::*[1][self::dbk:informaltable])" role="error" id="isolated-table-caption">
+      <assert test="not(following-sibling::*[1][self::dbk:informaltable])" role="error" id="isolated-table-caption" diagnostics="isolated-table-caption_de">
         This paragraph has been formatted with the table caption style but it is not placed above the table.
       </assert>
     </rule>
     <rule context="dbk:para[matches(@role, $table-source-role-regex)]">
-      <assert test="not(preceding-sibling::*[1][self::dbk:informaltable])" role="error" id="isolated-table-source">
+      <assert test="not(preceding-sibling::*[1][self::dbk:informaltable])" role="error" id="isolated-table-source" diagnostics="isolated-table-source_de">
         This paragraph has been formatted with the table source style but it is not placed below the table.
       </assert>
     </rule>
@@ -79,12 +79,40 @@
     </rule>
   </pattern>
   
+  
   <diagnostics>
-    <diagnostic id="hidden-text_de">
+    <diagnostic id="figure-references_de" xml:lang="de">
+      Dieser Absatz ist mit einem Absatzformat für Bilder ausgzeichnet, aber es gibt weder ein eingebettetes Bild noch eine Bildreferenz.
+      Falls eine Processing-Instruction verwendet werden soll, sollte diese im Absatz des Bildes bzw. der Bildreferenz stehen, statt in einem folgenden Absatz
+    </diagnostic>
+    <diagnostic id="image-in-caption_de" xml:lang="de">
+      Dieser Absatz ist mit dem Absatzformat für Bild-Titel bzw. -Legende ausgezeichnet, enthält aber ein Bild. Bitte prüfen Sie, ob das Bild in die Legende gehört oder 
+      besser mit einem passenden Bild-Absatzformat (regex: <value-of select="$figure-image-role-regex"/>) im Absatz über der Legende auszuzeichnen ist.
+    </diagnostic>
+    <diagnostic id="isolated-figure-caption_de" xml:lang="de">
+      Dieser Absatz ist als Bild-Legende ausgezeichnet, aber der Absatz darüber ist mit dem das Absatzformat '<value-of select="preceding-sibling::*[1]/@role"/>' ausgezeichnet.
+      Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Bild, Legende und Quelle.
+    </diagnostic>
+    <diagnostic id="isolated-figure-source_de" xml:lang="de">
+      Dieser Absatz ist als Bild-Quelle ausgezeichnet, aber ist nicht unterhalb eines Bilder bzw. einer Bild-Legende platziert.
+      Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Bild, Legende und Quelle.
+    </diagnostic>
+    <diagnostic id="table-rotated-regex_de" xml:lang="de">
+      Dieser Absatz ist mit dem Absatzformat für eine gedrehte Tabelle ausgezeichnet, ist aber nicht über eine Tabelle platziert. 
+    </diagnostic>
+    <diagnostic id="isolated-table-caption_de" xml:lang="de">
+      Dieser Absatz ist als Tabellen-Legende ausgezeichnet, aber der Absatz darüber ist mit dem das Absatzformat '<value-of select="preceding-sibling::*[1]/@role"/>' ausgezeichnet.
+      Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Tabelle, Legende und Quelle.
+    </diagnostic>
+    <diagnostic id="isolated-table-source_de" xml:lang="de">
+      Dieser Absatz ist als Tabelle-Quelle ausgezeichnet, aber ist nicht unterhalb eines Bilder bzw. einer Bild-Legende platziert.
+      Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Tabelle, Legende und Quelle.
+    </diagnostic>
+    <diagnostic id="hidden-text_de" xml:lang="de">
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Versteckter Text</span>
       Dieser Text wurde als versteckt ausgezeichnet und wird höchstwahrscheinlich nicht in der Ausgabe erscheinen: "<value-of select="."/>"
     </diagnostic>
-    <diagnostic id="heading-level_de">
+    <diagnostic id="heading-level_de" xml:lang="de">
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Überschriften-Hierarchie</span>
       Der vorherige Absatz ist eine Überschrift und verwendet dieselbe Formatvorlage wie dieser Absatz. Wenn dieser Absatz Teil 
       der vorherigen Überschrift ist, trennen Sie bitte Teile mit einem Zeilenumbruch statt einem Absatzwechsel. Überschriften 
