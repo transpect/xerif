@@ -35,6 +35,8 @@
   <xsl:param name="running-header" as="xs:string"/>
   <xsl:variable name="aff-as-ref" as="xs:boolean" select="true()"/>
   
+  <xsl:variable name="remove-textcolor-for-runningtitles" select="false()"/>
+  
   <xsl:param name="run-local" as="xs:string"/>
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
   
@@ -1038,27 +1040,30 @@
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
       </xsl:when>
-      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
+      <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm | self::dbk:phrase[@css:color]]]">
         <rule name="tpRunTitle" type="cmd" break-before="1">
           <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
       </xsl:when>
     </xsl:choose>
     <!-- optional: include running title authors  -->
-   <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
+   <xsl:if test="$runtitle-para or dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm | self::dbk:phrase[@css:color]]]">
      <xsl:if test="dbk:author">
       <rule name="tpRunAuthorNameList" type="cmd" break-before="1">
          <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+           <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
     </xsl:if>
@@ -1067,6 +1072,7 @@
         <param select="dbk:subtitle/node()">
           <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
           <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+          <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1074,10 +1080,11 @@
       <rule name="tpRunNumber" type="cmd" break-before="1">
         <param select="if(exists($runtitle-para)) 
                        then $runtitle-para//(dbk:phrase[@role = ('identifier', 'hub:identifier')], dbk:tab[1]/preceding-sibling::node())[1] (:if no identifier, suppress number:)
-                       else dbk:title//dbk:phrase[@role = ('identifier', 'hub:identifier')]">
+                       else dbk:title//dbk:phrase[@role = ('identifier', 'hub:identifier')]/node()">
            <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
            <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+           <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1101,15 +1108,17 @@
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
           </param>
         </rule>
         <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
           <rule name="tpTocNumber" type="cmd" break-after="0" break-bfore="1">
-            <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/text()">
+            <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/node()">
               <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
               <with-param name="remove-newline" select="true()" as="xs:boolean" tunnel="yes"/>
               <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
               <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
             </param>
           </rule>
         </xsl:if>
@@ -1122,13 +1131,15 @@
       <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
         <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
         <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+        <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
       </param>
     </rule>
     <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
       <rule name="tpTocNumber" type="cmd" break-after="0" break-before="1">
-        <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/text()">
+        <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/node()">
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1137,6 +1148,7 @@
         <param select="dbk:subtitle/node()">
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+          <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
@@ -1174,6 +1186,7 @@
   
   <template context="dbk:title[matches(@role, $general-heading-style)]/dbk:phrase[@role eq 'hub:identifier']">
     <xsl:param name="remove-footnote" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="remove-textcolor" as="xs:boolean?" tunnel="yes"/>
     <rule name="tpNumber" type="cmd" break-before="1">
       <param/>
     </rule>
@@ -1309,6 +1322,7 @@
      <xsl:text>&#xa;</xsl:text>
     </xsl:if>
   </template>
+  
   
   <template context="dbk:title//dbk:footnote
                     |dbk:subtitle//dbk:footnote
@@ -1909,9 +1923,14 @@
   
   <template name="create-caption">
     <xsl:param name="context-nodes" as="node()*"/>
-    <xsl:if test="$context-nodes[self::dbk:phrase]">
+    <xsl:if test="$context-nodes[self::dbk:phrase and not(descendant::dbk:phrase[@css:color])]">
       <rule name="tpNumber" type="cmd" break-before="1">
         <param select="replace(string-join($context-nodes, ''),'\.$','')"/>
+      </rule>
+    </xsl:if>
+    <xsl:if test="$context-nodes[self::dbk:phrase and descendant::dbk:phrase[@css:color]]">
+      <rule name="tpNumber" type="cmd" break-before="1">
+        <param select="$context-nodes"/>
       </rule>
     </xsl:if>
   </template>  
@@ -2963,6 +2982,23 @@
       <param select="'\newpage'"/>
     </rule>
   </template>
+  
+  <xsl:template match="*[self::dbk:title|self::dbk:subtitle]//dbk:phrase[@css:color]"
+                mode="xml2tex"
+                priority="100000">
+    <xsl:param name="remove-textcolor" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="$remove-textcolor eq true() or $toc-override eq 'true' or $bm-override eq 'true'">
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:next-match/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
   <xsl:template match="*[self::dbk:title|self::dbk:subtitle]//text()[matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+')]" mode="xml2tex" priority="100000">
     <xsl:param name="toc-override" as="xs:boolean?" tunnel="yes"/>
