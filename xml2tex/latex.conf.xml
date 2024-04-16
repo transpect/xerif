@@ -268,7 +268,7 @@
           <xsl:choose>
             <xsl:when test="position() eq last()">
               <xsl:variable name="custom-hyphenations-path" as="xs:string" 
-                            select="concat(., $basename, '.hyph.txt')"/>
+                            select="concat(., 'tex/', $basename, '.hyph.txt')"/>
               <xsl:if test="unparsed-text-available($custom-hyphenations-path)">
                 <xsl:value-of select="concat('% ', $custom-hyphenations-path, '&#xa;')"/>
                 <xsl:value-of select="unparsed-text($custom-hyphenations-path)"/>
