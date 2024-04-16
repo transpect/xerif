@@ -101,7 +101,9 @@
   <xsl:template name="xml2tex:split-table-title">
     <xsl:param name="table" as="element()"/>
     <xsl:param name="pos" as="xs:integer"/>
-    <xsl:if test="$pos eq 1 or $xml2tex:repeat-split-table-title">
+    <xsl:if test="(   $pos eq 1 and not($xml2tex:table-caption-pos = 'bottom'))
+                   or $xml2tex:repeat-split-table-title
+                   or ($pos eq last() and $xml2tex:table-caption-pos = 'bottom')">
       <xsl:apply-templates select="$table/dbk:title" mode="#current"/>
     </xsl:if>
   </xsl:template>

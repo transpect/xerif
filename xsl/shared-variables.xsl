@@ -376,4 +376,10 @@
   <!-- Should the table caption always shown -->
   <xsl:variable name="xml2tex:repeat-split-table-caption" select="false()" as="xs:boolean"/>
   
+  <!-- always render table copyright -->
+  <xsl:variable name="xml2tex:repeat-split-table-info" select="false()" as="xs:boolean"/>
+  
+  <!-- handle table caption position. 'top' or 'bottom'-->
+  <xsl:variable name="xml2tex:table-caption-pos" as="xs:string?" select="'top'"/>
+  
 </xsl:stylesheet>
