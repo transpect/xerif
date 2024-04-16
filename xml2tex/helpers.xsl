@@ -65,6 +65,10 @@
             <xsl:with-param name="table" select="$table" as="element()"/>
             <xsl:with-param name="pos" select="position()" as="xs:integer"/>
           </xsl:call-template>
+          <xsl:call-template name="xml2tex:split-table-info">
+            <xsl:with-param name="table" select="$table" as="element()"/>
+            <xsl:with-param name="pos" select="position()" as="xs:integer"/>
+          </xsl:call-template>
           <tgroup>
             <xsl:apply-templates select="$table/dbk:tgroup/@*, 
                                          $table/dbk:tgroup/dbk:colspec" mode="#current"/>
@@ -107,6 +111,14 @@
     <xsl:param name="pos" as="xs:integer"/>
     <xsl:if test="$pos eq 1 or $xml2tex:repeat-split-table-head">
       <xsl:apply-templates select="$table/dbk:tgroup/dbk:thead" mode="#current"/>
+    </xsl:if>
+  </xsl:template>
+ 
+  <xsl:template name="xml2tex:split-table-info">
+    <xsl:param name="table" as="element()"/>
+    <xsl:param name="pos" as="xs:integer"/>
+    <xsl:if test="$pos eq last() or $xml2tex:repeat-split-table-info">
+      <xsl:apply-templates select="$table/dbk:info(:copyright info:)" mode="#current"/>
     </xsl:if>
   </xsl:template>
   
