@@ -2118,7 +2118,7 @@
   <template context="dbk:info/dbk:epigraph">
     <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/%C3%9Cberschriften#%C3%9Cberschriften-im-transpect-tex-Common-Framework-transpect-headingsdtx-->
     <!--   alle Zitat-Absätze in ein \quote-Makro, ggf. mit \tpBreak abgegrenzt, wenn mehrere Zitat-Absätze, analog Zitat-Quelle → \quotesource-->
-
+    <xsl:variable name="context" select="."/>
     <xsl:for-each-group select="node()" 
                         group-adjacent="boolean(.[self::dbk:para[matches(@role, concat($motto-style, 
                                                                                        '|', 
@@ -2151,10 +2151,11 @@
               </xsl:otherwise>
             </xsl:choose>
           </xsl:for-each-group>
+          <xsl:apply-templates select="$context/dbk:attribution" mode="#current"/>
           <xsl:text>&#xa;\end{tpQuote}</xsl:text>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates select="current-group()" mode="#current"/>
+          <xsl:apply-templates select="current-group() except self::dbk:attribution" mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each-group>
