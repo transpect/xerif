@@ -2109,6 +2109,12 @@
     </xsl:if>
   </template>
   
+  <template context="dbk:info/dbk:epigraph/dbk:attribution">
+    <rule name="tpQuoteSource" type="cmd" break-before="1">
+        <param/>
+      </rule>
+  </template>
+  
   <template context="dbk:info/dbk:epigraph">
     <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/%C3%9Cberschriften#%C3%9Cberschriften-im-transpect-tex-Common-Framework-transpect-headingsdtx-->
     <!--   alle Zitat-Absätze in ein \quote-Makro, ggf. mit \tpBreak abgegrenzt, wenn mehrere Zitat-Absätze, analog Zitat-Quelle → \quotesource-->
