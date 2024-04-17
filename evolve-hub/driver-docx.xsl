@@ -98,6 +98,17 @@
     </para>
   </xsl:template>
   
+  <!-- https://redmine.le-tex.de/issues/16658 -->
+  
+  <xsl:template match="table/textobject[.//processing-instruction()[name() eq $pi-xml-name]]" mode="hub:clean-hub"/>
+  
+  <xsl:template match="table[textobject[.//processing-instruction()[name() eq $pi-xml-name]]]" mode="hub:clean-hub">
+    <xsl:apply-templates select="textobject/node()" mode="#current"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="blockquote[matches(@role, $verse-heading-style)]
                                  [following-sibling::*[1][self::blockquote[matches(@role, $verse-style)]]]" mode="custom-1"/>
   
