@@ -75,7 +75,8 @@
     </preface>
   </xsl:template>
   
-  <xsl:template match="hub/*[matches(@role, $backmatter-heading-role-regex)]" 
+  <xsl:template match="hub/*[matches(@role, $backmatter-heading-role-regex)]
+                      |hub/*[not(matches(@role, $backmatter-heading-role-regex))]/*[matches(@role, $backmatter-heading-role-regex)]" 
                 mode="hub:postprocess-hierarchy" priority="5">
     <appendix role="backmatter">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
