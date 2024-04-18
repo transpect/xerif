@@ -83,6 +83,14 @@
     </appendix>
   </xsl:template>
   
+  <xsl:template match="hub/part[*[title[matches(@role, $backmatter-heading-role-regex)]]]" 
+                mode="hub:clean-hub">
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node() except *[title[matches(@role, $backmatter-heading-role-regex)]]" mode="#current"/>
+    </xsl:copy>
+    <xsl:apply-templates select="*[title[matches(@role, $backmatter-heading-role-regex)]]" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="informaltable//chapter
                       |informaltable//section
                       |table//chapter
