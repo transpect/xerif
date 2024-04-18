@@ -553,7 +553,7 @@
   <preamble>%
     <xsl:message select="'&#xa;&#xa;Layout: ', $layout, '&#xa;Publikationstyp: ', $pubtype, '&#xa;Format: ', $format, '&#xa;Notentyp: ', $notes-type, '&#xa;Kapitelweise Endnoten: ', 
                           $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
-    <xsl:sequence select="string-join($preamble, '')"/>
+    <xsl:sequence select="$preamble"/>
   </preamble>
   
   <!--  *
