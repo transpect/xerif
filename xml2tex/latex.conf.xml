@@ -3060,7 +3060,7 @@
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
-      <xsl:when test="$remove-textcolor eq true() or $toc-override eq 'true' or $bm-override eq 'true'">
+      <xsl:when test="$remove-textcolor eq true() or $toc-override eq true() or $bm-override eq true()">
         <xsl:apply-templates select="node()" mode="#current"/>
       </xsl:when>
       <xsl:otherwise>
