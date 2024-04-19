@@ -66,6 +66,12 @@
     </chapter>
   </xsl:template>
   
+  <xsl:template match="section[matches(@role, $appendix-heading-role-regex)]" mode="hub:postprocess-hierarchy">
+    <appendix>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </appendix>
+  </xsl:template>
+  
   <!-- special sections to wrap frontmatter and backmatter sections -->
   
   <xsl:template match="hub/*[matches(@role, $frontmatter-heading-role-regex)]"

@@ -15,6 +15,7 @@
   <xsl:variable name="hub:hierarchy-role-regexes-x" as="xs:string+" 
                 select="('^(berschrift1|[Hh]eading\s?1|[a-z]{1,3}headingpart)|[a-z]{1,3}(front|back)matter1$',
                          concat('^(berschrift2|[Hh]eading\s?2|[a-z]{1,3}heading1|[a-z]{1,3}(front|back)matter2|[a-z]{1,3}(journalreviewheading|heading1review)|[a-z]{1,3}headingenumerated1|toctitle',
+                                '|', replace($appendix-heading-role-regex, '^\^', ''),
                                 '|', replace($index-heading-regex, '^\^', ''),
                                 '|', replace($list-of-figures-regex, '^\^(.+)\$$', '$1'),
                                 '|', replace($list-of-tables-regex, '^\^(.+)\$$', '$1'),
@@ -95,6 +96,9 @@
   
   <xsl:variable name="part-heading-role-regex" as="xs:string" 
                 select=" '^[a-z]{1,3}headingpart$'"/>
+  
+  <xsl:variable name="appendix-heading-role-regex" as="xs:string" 
+                select=" '^[a-z]{1,3}appendix$'"/>
   
   <xsl:variable name="frontmatter-heading-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}frontmatter\d$'"/>
