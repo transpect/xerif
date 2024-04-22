@@ -66,7 +66,7 @@
     </chapter>
   </xsl:template>
   
-  <xsl:template match="section[matches(@role, $appendix-heading-role-regex)]" mode="hub:postprocess-hierarchy">
+  <xsl:template match="section[matches(@role, $appendix-heading-role-regex)]" mode="hub:postprocess-hierarchy" priority="5">
     <appendix>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </appendix>
