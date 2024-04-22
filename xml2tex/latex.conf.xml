@@ -1695,7 +1695,7 @@
   <xsl:function name="xml2tex:is-float-object" as="xs:boolean">
     <xsl:param name="context" as="element()"/>
     <xsl:sequence select="exists($context[self::*:figure | self::*:informalfigure | self::*:table | self::*:informaltable]
-                                         [matches(tr:determine-float-pos(.), 'float-pos=[tphb]')])"/>
+                                         [matches(tr:determine-float-pos(.), 'float-pos=[tphb]($|\s+)')])"/>
   </xsl:function>
 
 
@@ -1726,7 +1726,7 @@
     </xsl:variable>
     
     <xsl:variable select="exists(
-                            $context[matches(tr:determine-float-pos(.), 'float-pos=[tphb]')
+                            $context[matches(tr:determine-float-pos(.), 'float-pos=[tphb]($|\s+)')
                                      and preceding-sibling::*[1][xml2tex:is-float-object(.)]
                                      and preceding-sibling::*[2][xml2tex:is-float-object(.)]
                                      and not($next-is-float)]
