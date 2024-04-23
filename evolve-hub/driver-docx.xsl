@@ -1642,7 +1642,7 @@
   </xsl:function>
   
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
-    <xsl:param name="level" as="xs:string?"/>
+    <xsl:param name="level" />
     <xsl:variable name="primary-secondary-etc" as="xs:string+" 
                   select="('primaryie', 'secondaryie', 'tertiaryie', 'quaternaryie', 'quinaryie', 'senaryie', 'septenaryie', 'octonaryie', 'nonaryie', 'denaryie')"/>
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
