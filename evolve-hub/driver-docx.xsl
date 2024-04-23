@@ -1430,14 +1430,15 @@
         </info>
       </xsl:if>
       <!-- if existing, group static index entries -->
-      <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, $index-static-regex)">
+      <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
+        
         <xsl:choose>
-          <xsl:when test="current-grouping-key()">
+          <xsl:when test="current-grouping-key()">>
             <xsl:for-each-group select="current-group()" 
                           group-starting-with="dbk:para[    matches(@role, $index-static-regex) 
-                                                        and (ends-with(@role, '1') or not(matches(@role, '\d$')))]">
+                                                        and ( matches(@role,concat($index-static-regex,'$')) or not(matches(@role, $index-static-level-regex)))]">
               <xsl:choose>
-                <xsl:when test="every $role in current-group()/@role satisfies matches($role, $index-static-regex)">
+                <xsl:when test="every $role in current-group()/@role satisfies matches($role, concat($index-static-regex,$index-static-level-regex))">
                   <indexentry>
                     <xsl:apply-templates select="current-group()" mode="#current"/>
                   </indexentry>
@@ -1540,10 +1541,11 @@
   
   <!-- (4) static index -->
   
-  <xsl:template match="para[matches(@role, $index-static-regex)]" mode="custom-1">
+  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., $index-see-regex)"/>
-    <xsl:element name="{hub:index-entry-element-name(replace(@role, $index-static-regex, '$1'))}">
+    <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
+    <xsl:element name="{hub:index-entry-element-name($index-level)}">
         <xsl:choose>
           <xsl:when test="$see-exists">
             <xsl:analyze-string select="." regex="{$index-see-regex}">
@@ -1563,7 +1565,7 @@
       </xsl:element>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $index-static-regex)]//text()" mode="custom-1">
+  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()" mode="custom-1">
     <xsl:analyze-string select="." regex="(,?\s)([\d]+)+">
       <xsl:matching-substring>
         <xsl:value-of select="regex-group(1)"/>

@@ -261,7 +261,13 @@
                 select="'^[a-z]{1,3}indexlist'"/>
   
   <xsl:variable name="index-static-regex" as="xs:string" 
-                select="'^[a-z]{1,3}indexstatic(\d*)'"/>
+                select="'^[a-z]{1,3}indexstatic'"/>
+  
+  <xsl:variable name="index-static-level" as="xs:string+" 
+                select="'1', '2', '3', '4'"/>
+  
+  <xsl:variable name="index-static-level-regex" as="xs:string" 
+                select="concat('(', string-join($index-static-level, '|'), ')')"/>
   
   <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
