@@ -264,7 +264,7 @@
                 select="'^[a-z]{1,3}indexstatic'"/>
   
   <xsl:variable name="index-static-level" as="xs:string+" 
-                select="'1', '2', '3', '4'"/>
+                select="'', '1', '2', '3', '4'"/>
   
   <xsl:variable name="index-static-level-regex" as="xs:string" 
                 select="concat('(', string-join($index-static-level, '|'), ')')"/>
