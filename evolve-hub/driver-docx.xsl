@@ -1433,7 +1433,7 @@
       <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
         
         <xsl:choose>
-          <xsl:when test="current-grouping-key()">>
+          <xsl:when test="current-grouping-key()">
             <xsl:for-each-group select="current-group()" 
                           group-starting-with="dbk:para[    matches(@role, $index-static-regex) 
                                                         and ( matches(@role,concat($index-static-regex,'$')) or not(matches(@role, $index-static-level-regex)))]">
