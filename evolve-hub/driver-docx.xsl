@@ -1435,7 +1435,7 @@
         <xsl:choose>
           <xsl:when test="current-grouping-key()">
             <xsl:for-each-group select="current-group()" 
-                          group-starting-with="dbk:para[    matches(@role, $index-static-regex) 
+                          group-starting-with="dbk:para[  matches(@role, $index-static-regex) 
                                                         and ( matches(@role,concat($index-static-regex,'$')) or not(matches(@role, $index-static-level-regex)))]">
               <xsl:choose>
                 <xsl:when test="every $role in current-group()/@role satisfies matches($role, concat($index-static-regex,$index-static-level-regex))">
@@ -1661,7 +1661,7 @@
         <xsl:with-param name="indexterm" select="$indexterm"/>
       </xsl:call-template>
     </xsl:variable>
-    <xsl:sequence select="upper-case(substring((normalize-space($indexterm), $sortas)[1], 1, 1))"/>
+    <xsl:sequence select="upper-case(substring((normalize-space($indexterm), $sortas)[last()], 1, 1))"/>
   </xsl:function>
   
   <!-- repair structure -->
