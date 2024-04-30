@@ -1361,7 +1361,7 @@
       </xsl:when>
       <xsl:when test="   ancestor::dbk:dedication 
                       or ancestor::*[self::dbk:colophon[@role = 'dedication']]
-                      or ancestor::dbk:blockquote[matches(@role, $verse-style)]">
+                      or ancestor::dbk:blockquote[matches(@role, $verse-style) or contains(@role, 'quotation')]">
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
