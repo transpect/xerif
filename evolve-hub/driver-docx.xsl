@@ -754,7 +754,8 @@
   
   <xsl:variable name="refs" select="for $ref in //link/(@linkend, @linkends) return tokenize($ref, '\s')" as="xs:string*"/>
   
-  <xsl:template match="anchor[@role = ('start', 'end')][not(@xml:id = $refs)]" mode="hub:dissolve-sidebars-without-purpose"/>
+  <xsl:template match="anchor[@role = 'start'][not(@xml:id = $refs)]
+                      |anchor[@role = 'end'][not(concat(@xml:id, '_end') = $refs)]" mode="hub:dissolve-sidebars-without-purpose"/>
   
   <!-- move anchors inside of footnote -->
   
