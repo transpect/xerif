@@ -1855,7 +1855,7 @@
     </xsl:choose>
   </xsl:template>
   
-  <template context="dbk:mediaobject">
+  <template context="dbk:mediaobject[not(ancestor::*:th or ancestor::*:td)]">
     <xsl:param name="not-create-tpFig" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
       <xsl:when test="$not-create-tpFig">
