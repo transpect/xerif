@@ -670,6 +670,18 @@
     </xsl:copy>
   </xsl:template>
   
+  <!-- explicitely markup inline images so that they don't get accidentally 
+       removed or rendered as display image later -->
+  
+  <xsl:template match="mediaobject[not(parent::figure)]
+                                  [not(ancestor::para[matches(@role, $figure-image-role-regex, 'i')])]
+                                  [not(ancestor::para[.//processing-instruction()[name() eq $pi-xml-name]])]
+                                  [ancestor::para[normalize-space(.)]]" mode="hub:split-at-tab">
+    <inlinemediaobject>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </inlinemediaobject>
+  </xsl:template>
+  
   <!-- figure role index letter represents cert -->
   
   <xsl:template match="@role" mode="figure-role-type">
