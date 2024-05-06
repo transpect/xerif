@@ -448,10 +448,7 @@
     </xsl:if>
     <!-- licensing meta -->
     <xsl:if test="normalize-space($copyright-note)">
-      <xsl:value-of select="concat('&#xa;\tpCopyrightDisclaimer{', $copyright-note, '}&#xa;')"/>
-      <xsl:text>&#xa;\tpCopyrightDisclaimer{</xsl:text>
-      <xsl:apply-templates select="$copyright-note" mode="xml2tex"/>
-      <xsl:text>}&#xa;</xsl:text>
+      <xsl:text>&#xa;\tpCopyrightDisclaimer{</xsl:text><xsl:apply-templates select="$copyright-note" mode="xml2tex"/><xsl:text>}&#xa;</xsl:text>
     </xsl:if>
     <xsl:if test="normalize-space($copyright-holder)">
       <xsl:text>&#xa;\tpCopyright{</xsl:text>
