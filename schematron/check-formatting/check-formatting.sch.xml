@@ -69,6 +69,11 @@
         This paragraph has been formatted with the table source style but it is not placed below the table.
       </assert>
     </rule>
+    <rule context="dbk:para[matches(@role, $table-header-style-regex)]">
+      <assert test="not(parent::*[1][self::dbk:entry])" role="error" id="table-header-outside-table" diagnostics="table-header-outside-table_de">
+        This paragraph has been formatted with the table header style but it is not placed inside a table entry. Use this style for header cells.
+      </assert>
+    </rule>
   </pattern>
   
   <pattern id="unusual">
@@ -107,6 +112,10 @@
     <diagnostic id="isolated-table-source_de" xml:lang="de">
       Dieser Absatz ist als Tabelle-Quelle ausgezeichnet, aber ist nicht unterhalb eines Bilder bzw. einer Bild-Legende platziert.
       Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Tabelle, Legende und Quelle.
+    </diagnostic>
+    <diagnostic id="table-header-outside-table_de" xml:lang="de">
+      Dieser Absatz ist als Tabellen-Kopf ausgezeichnet, aber ist nicht in einer Zelle platziert.
+      Bitte verwenden Sie dieses Format für die Auszeichnung des Tabellenkopfes, nicht als Tabellentitel über der Tabelle.
     </diagnostic>
     <diagnostic id="hidden-text_de" xml:lang="de">
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Versteckter Text</span>
