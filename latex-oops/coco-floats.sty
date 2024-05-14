@@ -373,17 +373,23 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
 \def\tp@make@anchor#1{%
   \bgroup
     \tpSubFloatCnt#1\relax
-    \tpIfComp{RefLabel}
-      {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname}
-      {\edef\@currentlabel{tp-\tp@cur@cont-number-\the\tp@int@flt@cnt}}%
+    \global\let\Hy@tempa\Hy@float@caption
     \expandafter\H@refstepcounter\expandafter{\tp@captype}%
     \expandafter\hyper@makecurrent\expandafter{\tp@captype}%
-    \global\let\Hy@tempa\Hy@float@caption
-    \expandafter\hyper@@anchor\expandafter{\@currentHref}{\relax}%
-    \tpIfComp{RefLabel}
-      {\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname
+    \tpIfComp{Number}
+      {\protected@edef\@currentlabel{\tpUseComp{Number}}}
+      {\letcs\@currentlabel{tp@\tp@cur@cont @number-\the\tpSubFloatCnt}}%
+    \ifx\@currentlabel\@undefined\else
+      \ifx\Hy@MakeCurrentHrefAuto\@undefined\else
+        \Hy@MakeCurrentHrefAuto{\tp@captype}%
+        \Hy@raisedlink{\hyper@anchorstart{\@currentHref}\hyper@anchorend}%
+      \fi
+      \expandafter\hyper@@anchor\expandafter{\@currentHref}{\relax}%
+      \tpIfComp{RefLabel}
+      {%\expandafter\let\expandafter\@currentlabel\csname tp@\tp@cur@cont @number-\the\tpSubFloatCnt\endcsname
        \edef\@tempa{\tpUseComp{RefLabel}}%
        \expandafter\tpltx@label\expandafter{\@tempa}}{\relax}%
+    \fi
   \egroup}
 \def\tp@float{\tp@opt@empty\@tp@float}
 \def\@tp@float[#1]{%
@@ -401,6 +407,7 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
     \tpUseProperty{before-float}%
     \tp@set@flt@env
     \ifx\tp@fps\@empty\else\savenotes\fi
+    \let\label\tpRefLabel
 }
 \def\endtp@float{%
     \tp@b@float
@@ -472,8 +479,8 @@ Use \string\tpAddToType{<Type>}{#2}{<code>}\space to alter the #2 container!}
   \bgroup
     \hsize\tp@total@flt@width
     \tp@flt@process
-    \tp@make@anchors%
     \csname tp@make@listof@\tp@captype\endcsname{\tp@captype}% single float
+    \tp@make@anchors%
     \par
   \egroup}
 \def\tp@test@caption#1#2#3{%
