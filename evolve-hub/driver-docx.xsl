@@ -1871,17 +1871,33 @@
   <xsl:template match="section[@role = ('abstract', 'keywords', 'alternative-title')]
                               [not(title)]/para[matches(@role, $hub:keyword-abstract-transtitle-combined)][1]/node()[1][self::phrase]" mode="hub:process-meta-sidebar" priority="2">
     <xsl:param name="phrase-to-title" as="xs:boolean?" tunnel="yes"/>
-    <xsl:if test="$phrase-to-title" >
-      <title>
-        <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:value-of select="normalize-space(replace(., ':\p{Zs}?$', ''))"/>
-      </title>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="$phrase-to-title" >
+        <title>
+          <xsl:apply-templates select="@*" mode="#current"/>
+          <xsl:value-of select="normalize-space(replace(., ':\p{Zs}?$', ''))"/>
+        </title>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:apply-templates select="@*, node()" mode="#current"/>
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="section[@role = ('abstract', 'keywords', 'alternative-title')]
                               [not(title)]/para[matches(@role, $hub:keyword-abstract-transtitle-combined)][1][node()[1][self::phrase]]/node()[2][self::text()]" mode="hub:process-meta-sidebar" priority="2">
-    <xsl:value-of select="replace(., '^[\p{Zs}]+', '')"/>
+    <xsl:param name="phrase-to-title" as="xs:boolean?" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="$phrase-to-title">
+        <xsl:value-of select="replace(., '^[\p{Zs}]+', '')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="."/>
+      </xsl:otherwise>
+    </xsl:choose>
+    
   </xsl:template>
 
   <xsl:template match="para[@role[matches(., $info-year)]]" mode="hub:process-meta-sidebar">
