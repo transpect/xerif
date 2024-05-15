@@ -719,7 +719,9 @@
                                                  [matches(., concat($pi-mark, $float-options-regex))]]
                            [following-sibling::*[1][self::informaltable]]
                            [not(normalize-space(replace(., concat($pi-mark, $float-options-regex), '')))]
-                           " mode="hub:split-at-tab">
+                     | para[descendant-or-self::*[matches(@role, $pi-style-regex)]
+                                                 [matches(., concat($pi-mark, $float-options-regex))]]
+                           [following-sibling::*[1][self::informaltable]]/phrase[matches(@role, $pi-style-regex)]" mode="hub:split-at-tab" priority="3">
   </xsl:template>
   
   <!-- dissolve informalfigures with no special role (we consider them as subsequent figures) -->
