@@ -103,10 +103,10 @@
       Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Bild, Legende und Quelle.
     </diagnostic>
     <diagnostic id="table-rotated-regex_de" xml:lang="de">
-      Dieser Absatz ist mit dem Absatzformat für eine gedrehte Tabelle ausgezeichnet, ist aber nicht über eine Tabelle platziert. 
+      Dieser Absatz ist mit dem Absatzformat für eine gedrehte Tabelle ausgezeichnet, ist aber nicht über einer Tabelle platziert. 
     </diagnostic>
     <diagnostic id="isolated-table-caption_de" xml:lang="de">
-      Dieser Absatz ist als Tabellen-Legende ausgezeichnet, aber der Absatz darüber ist mit dem das Absatzformat '<value-of select="preceding-sibling::*[1]/@role"/>' ausgezeichnet.
+      Dieser Absatz ist als Tabellen-Legende ausgezeichnet, aber der Absatz darüber ist nicht über einer Tabelle platziert.
       Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Tabelle, Legende und Quelle.
     </diagnostic>
     <diagnostic id="isolated-table-source_de" xml:lang="de">
