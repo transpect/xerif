@@ -205,9 +205,9 @@
   <xsl:variable name="main-lang" select="/dbk:*/@xml:lang" as="attribute(xml:lang)"/>
   <xsl:variable name="all-langs" select="distinct-values(//@xml:lang)" as="xs:string*"/>
   <xsl:variable name="babel-langs" select="for $i in $all-langs
-                                           return replace(xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian'))],
+                                           return replace(xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian', $xml2tex:lang-for-additional-fonts))],
                                                          '(spanish)', 
-                                                         '$1,es-noindentfirst,es-noshorthands')" as="xs:string*">
+                                                         '$1,es-noindentfirst,es-noshorthands')[normalize-space()]" as="xs:string*">
     <!--   spanish special handling: #13453, #15054-->
   </xsl:variable>
   <!-- pub type metadata -->
@@ -217,6 +217,7 @@
   <xsl:variable name="layout-value"  as="xs:string?" select="if ($layout = ('a', 'b', 'c', 'd', 'e')) then concat('layout=', $layout) else ()"/>
   <xsl:variable name="pubtype-value" as="xs:string?" select="if ($pubtype = ('article','collection', 'mono')) then concat(',pubtype=', $pubtype) else ()"/>
   <xsl:variable name="format-value"  as="xs:string?" select="if ($format) then concat('format=', $format)  else ()"/>
+  <!-- depending on whether some langugages need their own fonts, this has to be adapted-->
   <xsl:variable name="greek" as="xs:string?" 
                   select="if (some $l in xml2tex:determine-other-langs(root()) satisfies $l = 'greek' 
                                        and 
@@ -627,10 +628,10 @@
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
     <xsl:param name="root" as="document-node(element())"/>
     <!-- adds usescripts for lanugages defined in variable scripts. If a usescript is set, a fallback font for this language will be applied.
-         For greek this is overridden because most fonts contain greek characters already. If not, overwrite this function and deleted the 
-         condition for greek as well as the variable $greek in the documentclass definitiOn -->
+         For greek this is overridden because most fonts contain greek characters already. If not, overwrite this function and delete the 
+         condition for greek as well as the variable $greek in the documentclass definition -->
 
-    <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root)"/>
+    <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root), $xml2tex:lang-for-additional-fonts"/>
     
     <xsl:sequence select="if(exists($other-scripts-in-doc[not(. = 'greek')]))
                           then concat(',usescript={',

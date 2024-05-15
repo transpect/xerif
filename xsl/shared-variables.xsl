@@ -392,4 +392,7 @@
   <!-- handle table caption position. 'top' or 'bottom'-->
   <xsl:variable name="xml2tex:table-caption-pos" as="xs:string?" select="'top'"/>
   
+  <!-- add babel languages here that require their own font in customer styles -->
+  <xsl:variable name="xml2tex:lang-for-additional-fonts" select="'amharic'" as="xs:string*"/>
+  
 </xsl:stylesheet>
