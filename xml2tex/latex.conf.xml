@@ -204,8 +204,10 @@
   <!-- langs -->
   <xsl:variable name="main-lang" select="/dbk:*/@xml:lang" as="attribute(xml:lang)"/>
   <xsl:variable name="all-langs" select="distinct-values(//@xml:lang)" as="xs:string*"/>
-  <xsl:variable name="babel-langs" select="for $i in $all-langs
-                                           return replace(xml2tex:lang-to-babel-lang($i)[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian', $xml2tex:lang-for-additional-fonts))],
+  <xsl:variable name="all-babel-langs" select="for $i in $all-langs
+                                           return xml2tex:lang-to-babel-lang($i)" as="xs:string*"/>
+  <xsl:variable name="babel-langs" select="for $i in $all-babel-langs
+                                           return replace($i[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian', $xml2tex:lang-for-additional-fonts))],
                                                          '(spanish)', 
                                                          '$1,es-noindentfirst,es-noshorthands')[normalize-space()]" as="xs:string*">
     <!--   spanish special handling: #13453, #15054-->
@@ -631,7 +633,7 @@
          For greek this is overridden because most fonts contain greek characters already. If not, overwrite this function and delete the 
          condition for greek as well as the variable $greek in the documentclass definition -->
 
-    <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root), $xml2tex:lang-for-additional-fonts"/>
+    <xsl:variable name="other-scripts-in-doc" as="xs:string*" select="xml2tex:determine-other-langs($root), for $af in $xml2tex:lang-for-additional-fonts return $af[. = $all-babel-langs]"/>
     
     <xsl:sequence select="if(exists($other-scripts-in-doc[not(. = 'greek')]))
                           then concat(',usescript={',
