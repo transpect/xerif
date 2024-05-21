@@ -2015,6 +2015,16 @@
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
       <param/>
     </rule>
+    <xsl:if test="descendant::*[dbk:link|dbk:footnote]">
+    <!-- https://redmine.le-tex.de/issues/16801#note-6-->
+      <rule name="tpListofSource" break-before="1" break-after="0" type="cmd" >
+        <param>
+           <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="dissolve-hyperlink" select="true()" as="xs:boolean" tunnel="yes"/>
+        </param>
+      </rule>
+    </xsl:if>
   </template>
 
   <!--<template context="dbk:inlinemediaobject/dbk:imagedata[@fileref]">
@@ -2919,6 +2929,7 @@
   </template>
   
   <template context="dbk:link[@linkend]">
+    <xsl:param name="dissolve-hyperlink" as="xs:boolean?" tunnel="yes"/>
     <xsl:variable name="linkend" select="@linkend" as="attribute(linkend)"/>
     <xsl:variable name="footnote-anchor" as="element(dbk:anchor)?" 
                   select="//dbk:anchor[@xml:id eq $linkend]
@@ -2926,7 +2937,7 @@
     <xsl:variable name="index" as="xs:integer?"
                   select="index-of($anchor-ids, @linkend)"/>
     <xsl:choose>
-      <xsl:when test="exists($index)">
+      <xsl:when test="exists($index) and not($dissolve-hyperlink)">
         <xsl:variable name="leading-zeros" as="xs:string*"
                       select="string-join(for $i in (string-length(xs:string($index)) to $anchor-digits) 
                                           return '0', '')"/>
@@ -3064,9 +3075,19 @@
   
   <!-- SPECIAL PAGE BREAK THAT FILLS THE LINE -->
   <template context="processing-instruction()[name() eq $pi-xml-name][matches(., '&#x21a1;')]">
-    <rule name="vadjust" type="cmd" break-after="1">
-      <param select="'\newpage'"/>
-    </rule>
+    <xsl:choose>
+      <xsl:when test="..[not(normalize-space())]">
+        <!-- if PI is included as only node in para; no vadjust is allowed, https://redmine.le-tex.de/issues/16801#note-6-->
+        <rule name="newpage" type="cmd" break-after="0">
+        <text/>
+      </rule>  
+      </xsl:when>
+      <xsl:otherwise>
+        <rule name="vadjust" type="cmd" break-after="1">
+          <param select="'\newpage'"/>
+        </rule>
+      </xsl:otherwise>
+    </xsl:choose>
   </template>
   
   <xsl:template match="*[self::dbk:title|self::dbk:subtitle]//dbk:phrase[@css:color]"
