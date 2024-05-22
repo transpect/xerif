@@ -1973,11 +1973,13 @@
         <param select="$caption-nodes-without-num"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
-                                                                      [@xml:id = $link-refs]">
+                                                                      [@xml:id = $link-refs]
+                                             or descendant::dbk:link[@linkend]">
         <rule name="tpListofCaption" type="cmd" break-before="0" break-after="1">
           <param select="$caption-nodes-without-num">
             <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
             <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="dissolve-hyperlink" select="true()" as="xs:boolean" tunnel="yes"/>
           </param>
         </rule>
       </xsl:if>
@@ -2015,13 +2017,13 @@
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
       <param/>
     </rule>
-    <xsl:if test="descendant::*[dbk:link|dbk:footnote]">
+    <xsl:if test="descendant::*[dbk:link[@linkend]|dbk:footnote]">
     <!-- https://redmine.le-tex.de/issues/16801#note-6-->
       <rule name="tpListofSource" break-before="1" break-after="0" type="cmd" >
         <param>
            <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
-            <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
-            <with-param name="dissolve-hyperlink" select="true()" as="xs:boolean" tunnel="yes"/>
+           <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
+           <with-param name="dissolve-hyperlink" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>
       </rule>
     </xsl:if>
