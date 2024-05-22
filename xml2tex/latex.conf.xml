@@ -3080,9 +3080,7 @@
     <xsl:choose>
       <xsl:when test="..[not(normalize-space())]">
         <!-- if PI is included as only node in para; no vadjust is allowed, https://redmine.le-tex.de/issues/16801#note-6-->
-        <rule name="newpage" type="cmd" break-after="0">
-        <text/>
-      </rule>  
+        <rule name="newpage" type="cmd" break-after="1"/>
       </xsl:when>
       <xsl:otherwise>
         <rule name="vadjust" type="cmd" break-after="1">
