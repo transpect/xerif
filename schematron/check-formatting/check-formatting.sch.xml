@@ -16,6 +16,7 @@
   <ns prefix="tr" uri="http://transpect.io"/>
   
   <xsl:import href="http://customer.le-tex.de/adaptions/xsl/shared-variables.xsl"/>
+  <xsl:import href="http://transpect.io/xslt-util/num/xsl/num.xsl"/>
   
   <pattern id="headings">
     <rule context="dbk:para[some $regex in $hub:hierarchy-role-regexes-x 
@@ -84,6 +85,34 @@
     </rule>
   </pattern>
   
+  <pattern id="nbsp-limit" is-a="char-limit_abstract-pattern">
+    <param name="context" value="dbk:para"/>                           <!-- XSL matching pattern -->
+    <param name="char-limit" value="10"/>                              <!-- xs:integer -->
+    <param name="char-list" value="&#xa0; &#x2007; &#x202f; &#xfeff;"/><!-- whitespace-separated list -->
+    <param name="class" value="non-breaking whitespace"/>              <!-- xs:string -->
+  </pattern>
+  
+  <pattern abstract="true" id="char-limit_abstract-pattern">
+    <rule context="$context">
+      <let name="this" value="."/>
+      <assert test="count(
+                      (
+                       for $char in string-to-codepoints(.) 
+                       return codepoints-to-string($char)
+                      )[. = tokenize('$char-list')]
+                    ) &lt;= $char-limit" id="special-character" role="warning">
+        There are more than <value-of select="concat($char-limit, ' ', tokenize('$class')[1])"/> characters of 
+        a specific type (U+<value-of select="string-join(
+                                               for $dec in 
+                                                 for $char in string-to-codepoints('$char-list')[. != 32]
+                                                 return $char[. = string-to-codepoints($this)]
+                                               return tr:dec-to-hex($dec),
+                                               ', U+' 
+                                             )"/>) 
+        which could cause rendering issues in this context (<value-of select="name()"/>). 
+      </assert>
+    </rule>
+  </pattern>
   
   <diagnostics>
     <diagnostic id="figure-references_de" xml:lang="de">
