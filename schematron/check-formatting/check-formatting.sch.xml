@@ -31,6 +31,16 @@
     </rule>
   </pattern>
   
+  <pattern id="acknowledgments">
+    <rule context="dbk:para[matches(., '^Acknowledgments|Danksagung(en)?|Remerciements|Dankbetuigingen$', 'i')]">
+      <assert test="matches(@role, $acknowledgements-role-regex)" id="acknowledgements" role="warning" diagnostics="acknowledgements-style_de">
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Missing Acknowledgements Style</span>
+        Found a paragraph with the text '<value-of select="."/>' but without an acknowledgement wrapper. Perhaps you forgot 
+        to apply the acknowledgement style (Regex: '<value-of select="$acknowledgements-role-regex"/>')? 
+      </assert>
+    </rule>
+  </pattern>
+  
   <pattern id="figures">
     <rule context="dbk:para[matches(@role, $figure-image-role-regex, 'i')]">
       <assert test=".//dbk:mediaobject or normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))" role="error" id="figure-references" diagnostics="figure-references_de">
@@ -155,6 +165,10 @@
       Der vorherige Absatz ist eine Überschrift und verwendet dieselbe Formatvorlage wie dieser Absatz. Wenn dieser Absatz Teil 
       der vorherigen Überschrift ist, trennen Sie bitte Teile mit einem Zeilenumbruch statt einem Absatzwechsel. Überschriften 
       darf nur eine Überschrift mit einer niedrigeren Hierarchieebene oder regulärer Inhalt folgen.
+    </diagnostic>
+    <diagnostic id="acknowledgements-style_de" xml:lang="de">
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Danksagung ohne Formatvorlage</span>
+      Es wurde ein Absatz mit dem Text „<value-of select="."/>“ gefunden, jedoch wurde keine Formatvorlage für Danksagungen zugewiesen. 
     </diagnostic>
   </diagnostics>
 

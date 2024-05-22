@@ -1014,7 +1014,9 @@
     </dedication>
   </xsl:template>
   
-  <xsl:template match="chapter[title[matches(@role, $acknowledgements-role-regex)]]" mode="custom-1">
+  <xsl:template match="chapter[title[matches(@role, $acknowledgements-role-regex)]]
+                      |preface[info/title[matches(@role, $acknowledgements-role-regex)]]" mode="custom-1">
+    <xsl:message select="'------'"></xsl:message>
     <acknowledgements>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </acknowledgements>
@@ -2333,7 +2335,6 @@
   <xsl:function name="hub:renderas-from-xml-pi" as="attribute(renderas)?">
     <xsl:param name="renderas" as="xs:string?"/>
     <xsl:param name="pis" as="processing-instruction()*"/>
-    <xsl:message select="$renderas, $pis, matches(string-join($pis), $suffixes-regex, 'i')"></xsl:message>
     <xsl:if test="matches(string-join($pis), $suffixes-regex, 'i')">
       <xsl:attribute name="renderas" 
                     select="string-join(($renderas,
