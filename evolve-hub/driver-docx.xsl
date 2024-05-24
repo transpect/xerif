@@ -376,7 +376,7 @@
                                       or para[matches(@role, $info-blockquote-source-roles)])]
                                  [not(count(*) eq 1)]" mode="hub:clean-hub">
     <xsl:variable name="role" select="@role" as="attribute(role)?"/>
-    <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex))
+    <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex) or not(@role))
                                                    then (preceding-sibling::*[1], following-sibling::*[1])[1]/@role
                                                    else @role">
       <blockquote>
