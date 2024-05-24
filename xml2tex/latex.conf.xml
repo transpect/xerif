@@ -2862,13 +2862,18 @@
                             $xml2tex:tactical-break-character-for-urls
                           )" name="broken-link" as="xs:string"/>
     <xsl:value-of select="replace(
-                                  replace($broken-link, 
-                                          '\\?_', 
-                                           '\\_'
-                                          ),
-                                  '\s+', 
-                                  '{\\space}'
-                                  )"/>
+                            replace(
+                              replace(
+                                $broken-link, 
+                                '\\?_', 
+                                '\\_'
+                              ),
+                              '\s+', 
+                              '{\\space}'
+                            ),
+                            concat('\\', $xml2tex:tactical-break-character-for-urls),
+                            concat($xml2tex:tactical-break-character-for-urls, '\\')
+                          )"/>
   </xsl:function>
   
   <xsl:function name="xml2tex:add-tactical-break-chars-in-linktext">
