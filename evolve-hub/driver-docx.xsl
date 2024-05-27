@@ -66,6 +66,12 @@
     </chapter>
   </xsl:template>
   
+  <xsl:template match="section[matches(@role, $acknowledgements-role-regex)]" mode="hub:postprocess-hierarchy" priority="5">
+    <acknowledgements>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </acknowledgements>
+  </xsl:template>
+  
   <xsl:template match="section[matches(@role, $appendix-heading-role-regex)]" mode="hub:postprocess-hierarchy" priority="5">
     <appendix>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
@@ -1013,16 +1019,6 @@
       <xsl:next-match/>
     </dedication>
   </xsl:template>
-  
-  <xsl:template match="chapter[title[matches(@role, $acknowledgements-role-regex)]]
-                      |preface[info/title[matches(@role, $acknowledgements-role-regex)]]" mode="custom-1">
-    <xsl:message select="'------'"></xsl:message>
-    <acknowledgements>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </acknowledgements>
-  </xsl:template>
-  
-  <!-- acknowledgements -->
   
   <!--  * 
         * programm listing 
