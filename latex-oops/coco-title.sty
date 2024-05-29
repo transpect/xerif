@@ -103,8 +103,8 @@
 }
 \def\tp@title@process@bkt{%
   \let\tpBreak\space
-  \protected@xdef\@title{\tpUseComp{Title}}%
-  \tp@write@pdf@meta{pdftitle}{Title}{\tpUseComp{Title}}%
+  \protected@xdef\@title{\tpUseProperty{doc-book-title}}%
+  \tp@write@pdf@meta{pdftitle}{Title}{\@title}%
   \protected@edef\tp@run@book@title{\tpUseProperty{run-book-title}}%
   \expandafter\gdef\expandafter\tpRunBookTitle\expandafter{\tp@run@book@title}%
 }
@@ -206,6 +206,7 @@
   %% Titles
   \tp@title@macro{Title}                         % Main Title
   \tp@title@macro{ShortTitle}                    % Shortened main title
+  \tp@title@macro{DocTitle}                      % Shortened main title override for pdf meta data
   \tp@title@macro{RunTitle}                      % Shortened main title override for headers
   \tp@title@macro{AltTitle}                      % Alternative main title (e.g. for bastard title page)
   \tp@title@macro{Subtitle}                      % Sub Title
@@ -576,7 +577,9 @@
       {\tpUseComp{RunTitle}}
       {\tpIfComp{ShortTitle}
         {\tpUseComp{ShortTitle}}
-        {\tpIfComp{Title}{\tpUseComp{Title}}{No title given!}}}%
+        {\tpIfComp{DocTitle}
+          {\tpUseComp{DocTitle}}
+          {\tpIfComp{Title}{\tpUseComp{Title}}{No title given!}}}}%
   }%
   \tpSetProperty{run-book-name}{%
     \tpIfComp{RunNames}
@@ -590,6 +593,13 @@
            {\tpUseComp{EditorNameList}}
            {no editor defined!}%
        \fi}%
+  }%
+  \tpSetProperty{doc-book-title}{%
+    \tpIfComp{DocTitle}
+      {\tpUseComp{DocTitle}}
+      {\tpIfComp{ShortTitle}
+        {\tpUseComp{ShortTitle}}
+        {\tpUseComp{Title}}}%
   }%
 }
 \endinput
