@@ -1424,6 +1424,7 @@
   
   <xsl:template match="*[self::part
                         |self::chapter
+                        |self::index(:might be already mapped:)
                         |self::section
                         |self::appendix]
                         [info/title[matches(@role, $index-heading-regex)]
