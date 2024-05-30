@@ -1430,7 +1430,7 @@
                         [info/title[matches(@role, $index-heading-regex)]
                         |title[matches(@role, $index-heading-regex)]]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
-                  select="(replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
+                  select="(@type[..[self::index]], replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
     <index>
       <!-- check if there are static index entries present (static index) or if the type 
            matches any real indexterm elements (dynamic index with index headline). sometimes
