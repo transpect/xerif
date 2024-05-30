@@ -340,7 +340,7 @@
           <xsl:variable name="first-lang" as="xs:string?" select="(descendant::*[@xml:lang])[1]/@xml:lang"/>
           <xsl:variable name="sec-is-completeley-in-other-lang" select="hub:sec-is-completeley-in-other-lang(., $first-lang)" as="xs:boolean"/>
           <xsl:if test="$sec-is-completeley-in-other-lang"><xsl:attribute name="xml:lang" select="$first-lang"/></xsl:if>
-          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, .//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title/@role))[1]"/>
+          <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, title//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title/@role))[1]"/>
           <xsl:if test="$sec-info">
             <info>
               <xsl:apply-templates select="$sec-info" mode="#current">
