@@ -248,6 +248,9 @@
   <xsl:variable name="variable-list-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}abbreviations$'"/>
   
+  <xsl:variable name="create-index-at-general-headings" 
+                select="false()"/>
+  
   <xsl:variable name="index-heading-regex" as="xs:string" 
                 select="'^[a-z]{1,3}index\s?heading'"/>
   
