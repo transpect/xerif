@@ -1425,11 +1425,18 @@
   
   <xsl:template match="*[self::part
                         |self::chapter
-                        |self::index(:might be already mapped:)
                         |self::section
                         |self::appendix]
                         [info/title[matches(@role, $index-heading-regex)]
-                        |title[matches(@role, $index-heading-regex)]]" mode="custom-1" priority="3">
+                          |title[matches(@role, $index-heading-regex)]]
+                     | *[self::index]     
+                     | *[self::part
+                        |self::chapter
+                        |self::section
+                        |self::appendix]
+                        [title[matches(@role, $hub:general-heading-main-name-regex)]]
+                        [para][every $p in para satisfies $p[not(@role) or matches(@role,$index-static-regex)]]
+                        [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
     <index>
