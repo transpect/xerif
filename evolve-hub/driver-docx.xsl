@@ -1435,7 +1435,7 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, $hub:general-heading-main-name-regex)]]
-                        [para][every $p in para satisfies $p[not(@role) or matches(@role,$index-static-regex)]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
@@ -1603,12 +1603,13 @@
   <xsl:variable name="static-index-sections" as="element(index)*"
                 select="//index[indexentry]"/>
   
-  <xsl:template match="index[indexentry]" mode="custom-2">
+  <xsl:template match="index[indexentry]" mode="custom-2" priority="6">
     <xsl:variable name="index-type" select="@type" as="attribute(type)?"/>
     <xsl:variable name="index-title" as="element(info)?" 
                   select="info"/>
     <xsl:variable name="pre-text" as="element(para)*" 
                   select="para[not(preceding-sibling::indexterm)]"/>
+    <xsl:message select="'ddddd',$static-index-sections, index-of($static-index-sections, .)"></xsl:message>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
     <xsl:for-each-group select="* except info" group-adjacent="local-name() ='indexentry'">
       <xsl:choose>
@@ -1652,7 +1653,7 @@
   <xsl:template match="index[not(indexentry)]" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string" 
                   select="hub:normalize-index-type((@type, $index-type-default-name)[1])"/>
-    <!--<xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
+<!--    <xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
     <xsl:copy>
