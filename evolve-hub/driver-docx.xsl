@@ -7,6 +7,7 @@
   xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:functx="http://www.functx.com"
   xmlns:xml2tex="http://transpect.io/xml2tex"
+  xmlns:tr="http://transpect.io"
   xmlns="http://docbook.org/ns/docbook" 
   xpath-default-namespace="http://docbook.org/ns/docbook"
   exclude-result-prefixes="xs hub dbk xlink functx xml2tex" 
@@ -1598,7 +1599,7 @@
   <xsl:template match="index[indexentry]" mode="custom-2">
     <xsl:variable name="index-type" select="@type" as="attribute(type)?"/>
     <xsl:variable name="index-title" as="element(info)?" 
-                  select="info[title[matches(@role, $index-heading-regex, 'i')]]"/>
+                  select="info"/>
     <xsl:variable name="pre-text" as="element(para)*" 
                   select="para[not(preceding-sibling::indexterm)]"/>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
@@ -1612,19 +1613,26 @@
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="hub:sortkey(primaryie)">
               <indexdiv>
-                <title><xsl:value-of select="current-grouping-key()"/></title>
+                <xsl:if test="tr:create-indexdiv-title(.)">
+                  <title><xsl:value-of select="current-grouping-key()"/></title>
+                </xsl:if>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
               </indexdiv>
             </xsl:for-each-group>
           </index>
         </xsl:when>
         <xsl:otherwise>
-         <xsl:apply-templates select="current-group()[not(matches(@role, $index-heading-regex, 'i'))][not(. is $pre-text)]" 
+         <xsl:apply-templates select="current-group()[not(matches(@role, $index-heading-regex, 'i'))][not(. union $pre-text)]" 
                                mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each-group>
   </xsl:template>
+  
+  <xsl:function name="tr:create-indexdiv-title">
+    <xsl:param name="index"/>
+    <xsl:sequence select="true()"/>
+  </xsl:function>
   
   <xsl:template match="index/@type" mode="custom-2">
     <xsl:copy>
