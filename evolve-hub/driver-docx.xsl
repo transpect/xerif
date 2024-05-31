@@ -1438,6 +1438,7 @@
       <xsl:if test="para or ($index-type = $index-types)">
         <xsl:attribute name="type" select="$index-type"/>
       </xsl:if>
+      <xsl:apply-templates select="@xml:id|@role" mode="#current"/>
       <xsl:if test="info/title or title">
         <info>
           <xsl:apply-templates select="info/title, title" mode="#current"/>
