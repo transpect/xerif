@@ -1435,7 +1435,7 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, $hub:general-heading-main-name-regex)]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::title]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
@@ -1609,7 +1609,6 @@
                   select="info"/>
     <xsl:variable name="pre-text" as="element(para)*" 
                   select="para[not(preceding-sibling::indexterm)]"/>
-    <xsl:message select="'ddddd',$static-index-sections, index-of($static-index-sections, .)"></xsl:message>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
     <xsl:for-each-group select="* except info" group-adjacent="local-name() ='indexentry'">
       <xsl:choose>
