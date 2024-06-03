@@ -209,6 +209,7 @@
                   select="(author,
                            title,
                            titleabbrev,
+                           abbrev,
                            para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
@@ -320,6 +321,7 @@
                            blockquote[para[matches(@role, '^[a-z]{1,3}motto$')]],
                            title,
                            titleabbrev,
+                           abbrev,
                            para[matches(@role, $info-subtitle-role)],
                            epigraph,
                            biblioset,
@@ -2055,13 +2057,13 @@
           <xsl:value-of select="normalize-space(current())"/>
         </xsl:copy>
       </xsl:for-each>
-      <xsl:apply-templates select="../abstract" mode="#current">
+      <xsl:apply-templates select="../abstract | ../epigraph" mode="#current">
         <xsl:with-param name="moved-to-info" select="true()" as="xs:boolean" tunnel="yes"/>
       </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="hub/abstract" mode="custom-2">
+  <xsl:template match="hub/abstract | hub/epigraph" mode="custom-2">
     <xsl:param name="moved-to-info" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$moved-to-info">
       <xsl:next-match/>
