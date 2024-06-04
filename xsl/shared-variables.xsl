@@ -401,4 +401,7 @@
   <!-- add babel languages here that require their own font in customer styles -->
   <xsl:variable name="xml2tex:lang-for-additional-fonts" select="'amharic'" as="xs:string*"/>
   
+  <!-- add pagecounter if not title pages are included. -->
+  <xsl:variable name="xml2tex:set-pagecounter-without-titlepage" select="'\setcounter{page}{5}&#xa;'"/>
+  
 </xsl:stylesheet>

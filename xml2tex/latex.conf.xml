@@ -556,7 +556,7 @@
                           $notes-per-chapter, '&#xa;Anmerkungen mit K.-Überschriften: ', $endnotes-with-chapter, '&#xa;Titelseiten generieren', $title-pages"/>
     <xsl:sequence select="$preamble"/>
   </preamble>
-  
+
   <!--  *
         * this stuff comes immediately after \begin{document}
         * -->
@@ -572,11 +572,12 @@
         <xsl:text>\tpMaketitle&#xa;</xsl:text>  
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>\setcounter{page}{5}&#xa;</xsl:text>
+        <xsl:value-of select="$xml2tex:set-pagecounter-without-titlepage"/>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:text>\frontmatter&#xa;</xsl:text>
     <xsl:apply-templates select="/dbk:*/dbk:colophon[@role = 'dedication']
+                                |/dbk:*/dbk:preface[@role = 'epigraph']
                                 |/dbk:*/dbk:dedication" mode="#current">
       <xsl:with-param name="keep" select="true()" tunnel="yes"/>
     </xsl:apply-templates>
@@ -1335,7 +1336,7 @@
                        and not($bm-override eq true())
                        and not($run-override eq true())
                        and (   ancestor::*[self::dbk:epigraph|self::dbk:blockquote][..[self::dbk:info]] 
-                            or ancestor::*[self::dbk:colophon[@role = 'motto']]
+                            or ancestor::*[self::dbk:colophon|self::dbk:preface[@role = 'epigraph']]
                             or ancestor::dbk:keyword)">
        <xsl:text>\\&#xa;</xsl:text>
        </xsl:when>
@@ -2180,9 +2181,12 @@
     </xsl:if>
   </xsl:template>
   
-  <template context="dbk:blockquote[not(..[self::dbk:info])]">
+  <template context=" dbk:blockquote[not(..[self::dbk:info])] 
+                     |dbk:preface[@role = 'epigraph']/dbk:epigraph">
     <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
-    <xsl:if test="@xml:lang and not($suppress-select-lang)">
+    <xsl:param name="keep" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="(self::dbk:epigraph and $keep) or self::dbk:blockquote">
+     <xsl:if test="@xml:lang and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
     </xsl:if>
     <rule name="quote" type="env" break-before="1">
@@ -2196,6 +2200,7 @@
     <xsl:if test="@xml:lang and not(following-sibling::*[1][not(self::dbk:div)][@xml:lang]) and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
     </xsl:if>
+   </xsl:if>
   </template>
   
   <template context="dbk:info/dbk:epigraph/dbk:attribution">
