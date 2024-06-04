@@ -1630,6 +1630,7 @@
     <xsl:variable name="pre-text" as="element(para)*" 
                   select="para[not(preceding-sibling::indexterm)]"/>
     <xsl:variable name="index-index" select="index-of($static-index-sections, .)" as="xs:integer"/>
+    <xsl:variable name="context" select="."/>
     <xsl:for-each-group select="* except info" group-adjacent="local-name() ='indexentry'">
       <xsl:choose>
         <xsl:when test="current-group()[1][self::indexentry]">
@@ -1639,12 +1640,18 @@
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="hub:sortkey(primaryie)">
-              <indexdiv>
-                <xsl:if test="tr:create-indexdiv-title(.)">
-                  <title><xsl:value-of select="current-grouping-key()"/></title>
-                </xsl:if>
+              <xsl:choose>
+                <xsl:when test="tr:create-indexdiv($context)">
+                  <indexdiv>
+                    <title><xsl:value-of select="current-grouping-key()"/></title>
+                    <xsl:apply-templates select="current-group()" mode="#current"/>
+                  </indexdiv>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
+                </xsl:otherwise>
+              </xsl:choose>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
-              </indexdiv>
             </xsl:for-each-group>
           </index>
         </xsl:when>
@@ -1656,7 +1663,7 @@
     </xsl:for-each-group>
   </xsl:template>
   
-  <xsl:function name="tr:create-indexdiv-title">
+  <xsl:function name="tr:create-indexdiv">
     <xsl:param name="index"/>
     <xsl:sequence select="true()"/>
   </xsl:function>
