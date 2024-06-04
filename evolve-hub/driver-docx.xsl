@@ -1640,18 +1640,12 @@
             <!-- indexdiv headline with starting letter -->
             <xsl:for-each-group select="current-group()" 
                                 group-adjacent="hub:sortkey(primaryie)">
-              <xsl:choose>
-                <xsl:when test="tr:create-indexdiv($context)">
-                  <indexdiv>
-                    <title><xsl:value-of select="current-grouping-key()"/></title>
-                    <xsl:apply-templates select="current-group()" mode="#current"/>
-                  </indexdiv>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="current-group()" mode="#current"/>
-                </xsl:otherwise>
-              </xsl:choose>
+              <indexdiv>
+                <xsl:if test="tr:create-indexdiv-title($context)">
+                  <title><xsl:value-of select="current-grouping-key()"/></title>
+                </xsl:if>
                 <xsl:apply-templates select="current-group()" mode="#current"/>
+              </indexdiv>
             </xsl:for-each-group>
           </index>
         </xsl:when>
@@ -1663,7 +1657,7 @@
     </xsl:for-each-group>
   </xsl:template>
   
-  <xsl:function name="tr:create-indexdiv">
+  <xsl:function name="tr:create-indexdiv-title">
     <xsl:param name="index"/>
     <xsl:sequence select="true()"/>
   </xsl:function>
