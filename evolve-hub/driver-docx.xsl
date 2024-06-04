@@ -58,14 +58,26 @@
     </part>
   </xsl:template>
   
-  <xsl:template match="hub/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1(notoc|nobm|review)?|journalreviewheading)$')]
-                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, '^[a-z]{1,3}(heading(enumerated)?1(notoc|nobm|review)?|journalreviewheading)$')]
+  <xsl:template match="hub/section[matches(@role, concat('^[a-z]{1,3}(heading(enumerated)?1(review)?|journalreviewheading)(', $suffixes-regex, ')?$'))]
+                      |hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, concat('^[a-z]{1,3}(heading(enumerated)?1(review)?|journalreviewheading)(', $suffixes-regex, ')?$'))]
                       |hub/section[not(matches(@role, $part-heading-role-regex))]" 
                 mode="hub:postprocess-hierarchy">
     <chapter>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </chapter>
   </xsl:template>
+  
+<!--  <xsl:template match="hub/section[matches(@role,$part-heading-role-regex)]/section[matches(@role, concat('^[a-z]{1,3}(',
+                                                                                                                 replace($list-of-figures-regex, '^\^(.+)\$$', '$1'),
+                                                                                                            '|', replace($list-of-tables-regex, '^\^(.+)\$$', '$1'),
+                                                                                                            ')(', $suffixes-regex, ')?$'))]" mode="hub:postprocess-hierarchy">
+    <xsl:element name="{if (some $sibling in (preceding-sibling::*|following-sibling::*) 
+                            satisfies $sibling/@role[matches(., concat($appendix-heading-role-regex, '|', $index-heading-regex))]) 
+                        then 'appendix' 
+                        else 'chapter'}">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:element>
+  </xsl:template>--><!-- might be commented in if needed. -->
   
   <xsl:template match="section[matches(@role, $acknowledgements-role-regex)]" mode="hub:postprocess-hierarchy" priority="5">
     <acknowledgements>
@@ -85,6 +97,12 @@
                 mode="hub:postprocess-hierarchy" priority="5">
     <preface role="frontmatter">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </preface>
+  </xsl:template>
+  
+  <xsl:template match="hub/blockquote" mode="hub:clean-hub" priority="5">
+    <preface role="epigraph">
+      <xsl:next-match/>
     </preface>
   </xsl:template>
   
@@ -211,7 +229,7 @@
                            titleabbrev,
                            abbrev,
                            para[matches(@role, $info-subtitle-role)],
-                           epigraph,
+                           epigraph[not(..[@role = 'epigraph'])],
                            biblioset,
                            biblioid,
                            bibliomisc,
@@ -1426,6 +1444,7 @@
   </xsl:template>
   
   <xsl:template match="*[self::part
+                        |self::index
                         |self::chapter
                         |self::section
                         |self::appendix]
@@ -2057,13 +2076,13 @@
           <xsl:value-of select="normalize-space(current())"/>
         </xsl:copy>
       </xsl:for-each>
-      <xsl:apply-templates select="../abstract | ../epigraph" mode="#current">
+      <xsl:apply-templates select="../abstract" mode="#current">
         <xsl:with-param name="moved-to-info" select="true()" as="xs:boolean" tunnel="yes"/>
       </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="hub/abstract | hub/epigraph" mode="custom-2">
+  <xsl:template match="hub/abstract" mode="custom-2">
     <xsl:param name="moved-to-info" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$moved-to-info">
       <xsl:next-match/>
