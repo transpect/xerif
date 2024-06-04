@@ -1444,7 +1444,6 @@
   </xsl:template>
   
   <xsl:template match="*[self::part
-                        |self::index
                         |self::chapter
                         |self::section
                         |self::appendix]
