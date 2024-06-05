@@ -748,7 +748,8 @@
   </xsl:template>
   
   <template context="/dbk:*/dbk:colophon[@role = 'dedication']
-                    |/dbk:*/dbk:dedication">
+                    |/dbk:*/dbk:dedication
+                    |/dbk:*/dbk:preface/dbk:dedication">
     <xsl:param name="keep" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="$keep">
       <rule name="tpDedication" type="env" break-after="2" break-before="2">
