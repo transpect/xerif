@@ -1679,7 +1679,11 @@
                     |dbk:appendix/dbk:info/dbk:title/dbk:tab
                     |dbk:bibliography/dbk:info/dbk:title/dbk:tab
                     |dbk:bibliodiv/dbk:info/dbk:title/dbk:tab
-                    |dbk:bibliolist/dbk:info/dbk:title/dbk:tab"/>
+                    |dbk:bibliolist/dbk:info/dbk:title/dbk:tab">
+    <xsl:if test="not(preceding-sibling::dbk:phrase[@role eq 'hub:identifier']) and normalize-space(preceding-sibling::node()[1])">
+      <xsl:text>&#x20;</xsl:text>
+    </xsl:if>
+  </template>
   
   <!-- tables, https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Tabellen -->
 
