@@ -277,7 +277,7 @@
   
   <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
-                select="'^(.+?)\s(see|siehe)\s(.+?)$'"/>
+                select="'(see|siehe)'"/>
   
   <xsl:variable name="bibliography-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}literature$'"/>

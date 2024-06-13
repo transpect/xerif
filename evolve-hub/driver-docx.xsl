@@ -1589,22 +1589,40 @@
                   select="matches(., $index-see-regex)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
     <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
-    <xsl:variable name="see-atts" as="attribute()*" 
-                  select="node()[matches(., $index-see-regex)]/@*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
       <xsl:apply-templates select="$para-atts" mode="#current"/>
         <xsl:choose>
           <xsl:when test="$see-exists">
-            <xsl:analyze-string select="." regex="{$index-see-regex}">
-              <xsl:matching-substring>
-                <xsl:value-of select="regex-group(1)"/>
-                <xsl:text>&#x20;</xsl:text>
-                <seeie xreflabel="{regex-group(2)}">
-                  <xsl:apply-templates select="$see-atts" mode="#current"/>
-                  <xsl:value-of select="regex-group(3)"/>
-                </seeie>
-              </xsl:matching-substring>
-            </xsl:analyze-string>
+            <xsl:for-each-group select="node()" group-starting-with="node()[matches(., $index-see-regex)]">
+              <xsl:choose>
+                <xsl:when test="matches(string-join(current-group()), $index-see-regex)">
+                  <seeie xreflabel="see">
+                    <xsl:for-each select="current-group()">
+                      <xsl:choose>
+                        <xsl:when test="matches(., $index-see-regex)">
+                          <xsl:copy>
+                            <xsl:apply-templates select="@*" mode="#current"/>
+                            <xsl:analyze-string select="." regex="{$index-see-regex}">
+                              <xsl:non-matching-substring>
+                                <xsl:value-of select="."/>
+                              </xsl:non-matching-substring>
+                            </xsl:analyze-string>
+                          </xsl:copy>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:copy>
+                            <xsl:apply-templates select="@*, node()" mode="#current"/>
+                          </xsl:copy>
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:for-each>
+                  </seeie>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each-group>
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates mode="#current"/>
