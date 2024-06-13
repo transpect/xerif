@@ -1595,8 +1595,9 @@
           <xsl:when test="$see-exists">
             <xsl:for-each-group select="node()" group-starting-with="node()[matches(., $index-see-regex)]">
               <xsl:choose>
-                <xsl:when test="matches(string-join(current-group()), $index-see-regex)">
-                  <seeie xreflabel="see">
+                <xsl:when test="matches(string-join(current-group(), ''), $index-see-regex)">
+                  <xsl:element name="{if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'seealsoie' else 'seeie'}">
+                    <xsl:attribute name="xreflabel" select="concat('see', if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'also' else ())"/>
                     <xsl:for-each select="current-group()">
                       <xsl:choose>
                         <xsl:when test="matches(., $index-see-regex)">
@@ -1616,7 +1617,7 @@
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:for-each>
-                  </seeie>
+                  </xsl:element>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -1638,7 +1639,7 @@
         <xref xlink:href="page-{regex-group(2)}"/>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
-        <xsl:value-of select="replace(., $index-see-regex, '$1')"/>
+        <xsl:value-of select="."/>
       </xsl:non-matching-substring>
     </xsl:analyze-string>
   </xsl:template>
