@@ -1603,7 +1603,7 @@
                         <xsl:when test="matches(., $index-see-regex)">
                           <xsl:copy>
                             <xsl:apply-templates select="@*" mode="#current"/>
-                            <xsl:analyze-string select="." regex="{$index-see-regex}">
+                            <xsl:analyze-string select="." regex="{concat($index-see-also-regex, '?')}">
                               <xsl:non-matching-substring>
                                 <xsl:value-of select="."/>
                               </xsl:non-matching-substring>
