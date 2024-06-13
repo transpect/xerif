@@ -1588,7 +1588,11 @@
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., $index-see-regex)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
+    <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
+    <xsl:variable name="see-atts" as="attribute()*" 
+                  select="node()[matches(., $index-see-regex)]/@*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
+      <xsl:apply-templates select="$para-atts" mode="#current"/>
         <xsl:choose>
           <xsl:when test="$see-exists">
             <xsl:analyze-string select="." regex="{$index-see-regex}">
@@ -1596,6 +1600,7 @@
                 <xsl:value-of select="regex-group(1)"/>
                 <xsl:text>&#x20;</xsl:text>
                 <seeie xreflabel="{regex-group(2)}">
+                  <xsl:apply-templates select="$see-atts" mode="#current"/>
                   <xsl:value-of select="regex-group(3)"/>
                 </seeie>
               </xsl:matching-substring>
