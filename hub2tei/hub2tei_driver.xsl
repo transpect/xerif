@@ -117,6 +117,7 @@
   </xsl:template>
 
   <xsl:template match="/*/info" mode="hub2tei:dbk2tei">
+    <xsl:variable name="tei:frontmatter-parts" select="('dedication', 'preface', 'colophon', 'toc')" as="xs:string+"/>
     <front>
       <titlePage>
         <docTitle>
@@ -137,7 +138,7 @@
           </head> 
         </divGen>
       </xsl:if>
-      <xsl:apply-templates select="//*[local-name() = ('dedication', 'preface', 'colophon', 'toc')]" mode="#current">
+      <xsl:apply-templates select="//*[local-name() = $tei:frontmatter-parts][not(..[local-name() = $tei:frontmatter-parts])]" mode="#current">
         <xsl:with-param name="move-front-matter-parts" select="true()" tunnel="yes"/>
       </xsl:apply-templates>
     </front>
