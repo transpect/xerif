@@ -100,7 +100,7 @@
     </preface>
   </xsl:template>
   
-  <xsl:template match="hub/blockquote" mode="hub:clean-hub" priority="5">
+  <xsl:template match="hub/blockquote[not(@role[matches(., $dedication-role-regex)])]" mode="hub:clean-hub" priority="5">
     <preface role="epigraph">
       <xsl:next-match/>
     </preface>
