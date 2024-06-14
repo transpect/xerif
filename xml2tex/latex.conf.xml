@@ -1027,7 +1027,7 @@
           </xsl:for-each>
           <xsl:text>}]</xsl:text>
         </xsl:if>
-        <xsl:if test="parent::*/@renderas and not(matches(parent::*/@renderas, '^sect\d+$'))">
+        <xsl:if test="tr:create-sect-option-from-renderas(parent::*/@renderas)">
           <option select="xml2tex:sect-renderas-to-option(parent::*/@renderas)"/>
         </xsl:if>
         <param select="tr:heading-level(parent::*)"/>
@@ -1065,6 +1065,11 @@
                                              dbk:biblioset)" mode="#current"/>
     </xsl:if>
   </template>
+  
+  <xsl:function name="tr:create-sect-option-from-renderas">
+    <xsl:param name="renderas"/>
+    <xsl:sequence select="matches($renderas, 'hub:(no-toc|no-pdf-bookmarks)')"/>
+  </xsl:function>
   
   <template context="dbk:index[empty(.//dbk:indexentry)]">
     <xsl:variable name="introduction-paras" as="xs:boolean" select="count(dbk:para) le 3"/>
