@@ -821,10 +821,6 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="phrase[matches(., '^\s$')]" mode="hub:clean-hub">
-    <xsl:apply-templates mode="#current"/>
-  </xsl:template>
-  
   <xsl:template match="para[matches(@role, $figure-caption-role-regex)]
                            [preceding-sibling::*[1][self::figure]]" mode="hub:figure-captions"/>
   
