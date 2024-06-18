@@ -627,6 +627,7 @@
     <script name="japanese" unicode-range="&#x3040;-&#x309f;&#x30a0;-&#x30ff;&#12352;-&#12543;"/>
     <script name="korean"   unicode-range="&#xac00;-&#xd7ae;&#x1100;-&#x11ff;&#x3130;-&#x318f;&#xa960;-&#xa97f;&#xd7b0;-&#xd7ff;"/>
     <script name="greek"    unicode-range="&#x370;-&#x3ff;&#7936;-&#8191;"/>
+    <script name="georgian" unicode-range="&#x10a0;-&#x10ff;"/>
   </xsl:variable>
   
   <xsl:function name="xml2tex:foreign-scripts" as="xs:string?">
@@ -2683,6 +2684,9 @@
           </xsl:when>
           <xsl:when test="regex-group(15) and not($context-lang = 'el')">
             <xsl:value-of select="concat('{'[$double-parenthesis],$protect,'\foreignlanguage{greek}{', ., '}', '}'[$double-parenthesis])"/>  
+          </xsl:when>
+          <xsl:when test="regex-group(17) and not($context-lang = 'ka')">
+            <xsl:value-of select="concat('{'[$double-parenthesis],'\foreignlanguage{georgian}{', ., '}', '}'[$double-parenthesis])"/>  
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select="."/>
