@@ -2245,7 +2245,7 @@
                   <xsl:text>{</xsl:text>
                     <xsl:for-each select="current-group()">
                       <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
-                        <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
+                        <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}')"/>
                       </xsl:if>
                       <xsl:apply-templates select="./node()" mode="#current"/>
                       <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
