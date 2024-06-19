@@ -2225,6 +2225,8 @@
   </template>
   
   <template context="dbk:info/dbk:epigraph">
+    <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
+    <xsl:param name="keep" as="xs:boolean?" tunnel="yes"/>
     <!--  https://redmine.le-tex.de/projects/transpect-typesetter/wiki/%C3%9Cberschriften#%C3%9Cberschriften-im-transpect-tex-Common-Framework-transpect-headingsdtx-->
     <!--   alle Zitat-Absätze in ein \quote-Makro, ggf. mit \tpBreak abgegrenzt, wenn mehrere Zitat-Absätze, analog Zitat-Quelle → \quotesource-->
     <xsl:variable name="context" select="."/>
@@ -2242,7 +2244,13 @@
                 <rule name="tpQuoteText" type="cmd" break-before="1">
                   <xsl:text>{</xsl:text>
                     <xsl:for-each select="current-group()">
+                      <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
+                        <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
+                      </xsl:if>
                       <xsl:apply-templates select="./node()" mode="#current"/>
+                      <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
+                        <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
+                      </xsl:if>
                       <xsl:if test="not(. is $cg[position() = last()])"><xsl:value-of select="$motto-linebreak-content"/></xsl:if>
                     </xsl:for-each>
                   <xsl:text>}</xsl:text>
