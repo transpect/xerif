@@ -314,6 +314,11 @@
     </xsl:copy>
   </xsl:template>
   
+    <xsl:template match="phrase[matches(@role, '^tsemph')]/@*[starts-with(name(), 'css:')] | 
+                       css:rule[matches(@name, '^tsemph')]/@*[starts-with(name(), 'css:')]" mode="hub:postprocess-lists" priority="13">
+    <!-- https://redmine.le-tex.de/issues/15620 -->
+  </xsl:template>
+  
   <xsl:template match="@xml:lang[. = ../../@xml:lang]" mode="hub:preprocess-hierarchy"/>
 
   <xsl:template match="para[@xml:lang ne $doc-lang][not(normalize-space())]
@@ -818,6 +823,11 @@
   <xsl:template match="superscript[mediaobject]
                       |subscript[mediaobject]
                       |phrase[mediaobject]" mode="hub:clean-hub">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="phrase[matches(., '^\p{Zs}+$')]
+                             [every $a in @* satisfies $a[name() = $hub:dissolve-empty-phrase-att-name]]" mode="hub:clean-hub">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   

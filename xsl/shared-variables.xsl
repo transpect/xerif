@@ -61,6 +61,8 @@
   <xsl:variable name="hub:caption-sep-regex" as="xs:string" 
                 select="'[&#x20;&#x2002;&#xa0;&#x202F; \p{Zs}]+'"/>
   
+  <xsl:variable name="hub:dissolve-empty-phrase-att-name" as="xs:string+" select="('srcpath', 'css:letter-spacing')"/>
+  
   <xsl:variable name="pi-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}pi$'"/>
   
