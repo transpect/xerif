@@ -25,6 +25,7 @@
   <xsl:param name="s9y5-path"/>
   
   <xsl:param name="table-caption-pos" as="xs:string?"/>
+  <xsl:param name="notes-per-chapter" as="xs:string?"/>
   
   <!-- generate sortas attributes for indexterms. can be overriden with the same-titled template -->
   <xsl:param name="generate-sortas" select="'yes'"/>
@@ -1464,7 +1465,10 @@
                         [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
-                  select="(@type[..[self::index]], replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), $index-type-default-name)[. ne ''][1]"/>
+                  select="(@type[..[self::index]], 
+                           replace((info/title/@role, title/@role)[1], $index-heading-regex, ''), 
+                           $index-type-default-name
+                           )[. ne ''][1]"/>
     <index>
       <!-- check if there are static index entries present (static index) or if the type 
            matches any real indexterm elements (dynamic index with index headline). sometimes
