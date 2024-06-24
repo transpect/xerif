@@ -208,7 +208,7 @@
   <xsl:variable name="all-babel-langs" select="for $i in $all-langs
                                            return xml2tex:lang-to-babel-lang($i)" as="xs:string*"/>
   <xsl:variable name="babel-langs" select="for $i in $all-babel-langs
-                                           return replace($i[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian', $xml2tex:lang-for-additional-fonts))],
+                                           return replace($i[not(. = ('hebrew', 'arabic', 'chinese', 'japanese', 'syriac', 'armenian', 'georgian', $xml2tex:lang-for-additional-fonts))],
                                                          '(spanish)', 
                                                          '$1,es-noindentfirst,es-noshorthands')[normalize-space()]" as="xs:string*">
     <!--   spanish special handling: #13453, #15054-->
