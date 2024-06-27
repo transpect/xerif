@@ -365,7 +365,7 @@
     <xsl:param name="_content" as="node()*"/>
     <xsl:param name="_work-lang" as="xs:string?" tunnel="yes"/>
     <xsl:if test="$restructured-body-parts[@epub:type = ('toc')]">
-      <div class="toc" id="toc" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc">
+      <nav class="toc" id="toc" xmlns:epub="http://www.idpf.org/2007/ops" epub:type="toc">
     <xsl:choose>
        <xsl:when test="matches($_content, '\S') and not($restructured-body-parts[@epub:type = ('toc')]/*[local-name() = ('h1', 'h2')])">
           <xsl:call-template name="_heading">
@@ -385,7 +385,7 @@
         <xsl:if test="$htmlinput[1]//*[@epub:type = ('footnote', 'rearnote')]">
           <p class="toc1-nolabel"><a href="#footnotes"><xsl:value-of select="if ($_work-lang = 'eng') then $footnote-heading-title_en else $footnote-heading-title_de"/></a></p>
         </xsl:if>
-      </div>
+      </nav>
     </xsl:if>
   </xsl:template>
 
