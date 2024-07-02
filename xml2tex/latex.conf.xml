@@ -3138,7 +3138,13 @@
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
       <xsl:when test="$remove-textcolor eq true() or $toc-override eq true() or $bm-override eq true()">
-        <xsl:apply-templates select="node()" mode="#current"/>
+        <!-- before: phrases were dissolved, other attributes lost. So handle phrase further without color, https://redmine.le-tex.de/issues/17106 -->
+        <xsl:variable name="phrase-without-color" as="element(dbk:phrase)">
+          <xsl:copy copy-namespaces="no">
+            <xsl:copy-of select="@* except @css:color, node()"/>
+          </xsl:copy>
+        </xsl:variable>
+        <xsl:apply-templates select="$phrase-without-color" mode="#current"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:next-match/>
