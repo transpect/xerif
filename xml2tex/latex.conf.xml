@@ -2510,45 +2510,29 @@
   <!-- main bibliographies -->
   
   <template context="  dbk:bibliography[not(@role = ('Citavi', 'Citavi-formatted', 'CSL', 'CSL-formatted'))][not(parent::dbk:bibliography)] 
-                     | dbk:bibliodiv">
+                     | dbk:bibliodiv
+                     | dbk:bibliolist">
     <xsl:apply-templates select="dbk:info" mode="#current"/>
     <xsl:choose>
-      <xsl:when test="(./dbk:bibliodiv or ./dbk:bibliolist) and (dbk:bibliomixed|dbk:biblioentry[dbk:abstract[@role eq 'rendered']])">
+      <xsl:when test="./dbk:bibliodiv or (./dbk:bibliolist and not(dbk:bibliomixed or dbk:biblioentry[dbk:abstract[@role eq 'rendered']]))">
         <!-- if the bibliography contains subsections with bibliomixed and further subsections -->
-        <rule name="thebibliography" type="env" break-after="2" break-before="1">
-          <param>0</param>
-          <text select="dbk:bibliomixed
-                       |dbk:biblioentry[dbk:abstract[@role eq 'rendered']]"/>
-        </rule>
-        <xsl:apply-templates select="node() except (dbk:info, (dbk:bibliomixed
-                                                              |dbk:biblioentry[dbk:abstract[@role eq 'rendered']]))" mode="#current"/>
-      </xsl:when>
-      <xsl:when test="./dbk:bibliodiv or ./dbk:bibliolist">
-        <xsl:apply-templates select="node() except dbk:info" mode="#current"/>
+        <xsl:apply-templates select="node() except dbk:info"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="dbk:para[   following-sibling::dbk:bibliomixed
-                               or following-sibling::dbk:biblioentry[dbk:abstract[@role eq 'rendered']]]">
-          <xsl:apply-templates select="dbk:para" mode="#current"/>
-        </xsl:if>
         <rule name="thebibliography" type="env" break-after="2" break-before="1">
           <param>0</param>
-          <text select="dbk:bibliomixed
-                       |dbk:biblioentry[dbk:abstract[@role eq 'rendered']]"/>
+            <text select="node() except dbk:info"/>
         </rule>
-        <xsl:apply-templates select="node() except (dbk:info, dbk:bibliomixed, 
-                                                    dbk:biblioentry[dbk:abstract[@role eq 'rendered']], 
-                                                    dbk:para)" mode="#current"/>
         <!-- https://redmine.le-tex.de/issues/12455 -->
       </xsl:otherwise>
     </xsl:choose>
   </template>
   
-  <template context="dbk:bibliolist">
+<!--  <template context="dbk:bibliolist">
     <xsl:apply-templates select="dbk:info" mode="#current"/>
     <xsl:choose>
       <xsl:when test="./dbk:bibliolist and (dbk:bibliomixed or dbk:biblioentry[dbk:abstract[@role eq 'rendered']])">
-        <!-- if the bibliography contains subsections with bibliomixed and further subsections -->
+        <!-\- if the bibliography contains subsections with bibliomixed and further subsections -\->
         <rule name="thebibliography" type="env" break-after="2" break-before="1">
           <param>0</param>
           <text select="dbk:bibliomixed
@@ -2567,7 +2551,7 @@
         </rule>
       </xsl:otherwise>
     </xsl:choose>
-  </template>
+  </template>-->
 
   <!-- sub bibliographies -->
   
@@ -2576,7 +2560,7 @@
     <xsl:value-of select="node() except (dbk:bibliomixed|dbk:biblioentry[dbk:abstract[@role eq 'rendered']])"/>
     <rule name="thebibliography" type="env" break-after="2" break-before="1">
       <param>0</param>
-      <text select="(dbk:bibliomixed|dbk:biblioentry[dbk:abstract[@role eq 'rendered']])"/>
+      <text select="node() except dbk:info"/>
     </rule>
   </template>
 
