@@ -193,6 +193,9 @@
 
   <xsl:variable name="running-header-regex" as="xs:string" 
                 select="'^[a-z]{1,3}(headingshort|headline(right|left|author|short)?)$'"/>
+  
+  <xsl:variable name="toc-header-regex" as="xs:string" 
+                select="'^[a-z]{1,3}headlinetoc$'"/>
 
   <xsl:variable name="info-meta-styles" as="xs:string"
                 select="concat('(',

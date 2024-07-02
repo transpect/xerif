@@ -499,18 +499,18 @@
   
   <!-- abbrev for running headers -->
   
-  <xsl:template match="title[following-sibling::para[matches(@role, $running-header-regex)]]" mode="hub:clean-hub">
+  <xsl:template match="title[following-sibling::para[matches(@role, concat($running-header-regex, '|', $toc-header-regex))]]" mode="hub:clean-hub">
     <xsl:next-match/>
-    <xsl:apply-templates select="following-sibling::para[matches(@role, $running-header-regex)]" mode="running-header"/>
+    <xsl:apply-templates select="following-sibling::para[matches(@role,concat($running-header-regex, '|', $toc-header-regex))]" mode="running-header"/>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $running-header-regex)]" mode="running-header">
+  <xsl:template match="para[matches(@role, concat($running-header-regex, '|', $toc-header-regex))]" mode="running-header">
     <titleabbrev role="{@role}">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </titleabbrev>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $running-header-regex)]" mode="hub:clean-hub"/>
+  <xsl:template match="para[matches(@role, concat($running-header-regex, '|', $toc-header-regex))]" mode="hub:clean-hub"/>
   
   <!--  *
         * special markup

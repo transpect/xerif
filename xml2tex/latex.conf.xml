@@ -1099,7 +1099,8 @@
   <template name="col-titles">
     <!-- use col-style para for runtitle. if it doesn't exist and heading contains footnotes or linebreaks:
          discard those and use as column title. otherwise do not create an element-->
-    <xsl:variable name="runtitle-para" as="element()*" select="(dbk:titleabbrev, dbk:abbrev[matches(@role, concat($col-head-short-style, 
+    <xsl:variable name="runtitle-para" as="element()*" select="(dbk:titleabbrev[not(matches(@role,$toc-header-regex))], 
+                                                                dbk:abbrev[matches(@role, concat($col-head-short-style, 
                                                                             '|', 
                                                                             $col-head-left-style, 
                                                                             '|', 
@@ -1169,6 +1170,7 @@
   <template name="toc-titles">
      <!-- here the content of the heading in the ToC is determined. If the 
           heading contains footnotes or linebreaks: discard those for ToC. 
+          or use titleabbrevs with toc-title override
           Otherwise do nothing.-->
     <xsl:choose>
       <xsl:when test="$create-customer-toctitles">
@@ -1200,7 +1202,23 @@
   </template>
 
   <template name="customer-toctitles">
-    <rule name="tpTocTitle" type="cmd" break-after="0" break-before="1">
+    <xsl:variable name="toctitle-para" as="element()*" select="dbk:titleabbrev[matches(@role,$toc-header-regex)]"/>
+    <xsl:choose>
+       <xsl:when test="exists($toctitle-para)">
+        <rule name="tpTocTitle" type="cmd" break-before="1">
+          <param select="$toctitle-para/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]
+                                              [not(following-sibling::dbk:tab)]
+                                              [not(self::dbk:tab)]">
+            <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
+          </param>
+        </rule>
+      </xsl:when>
+      <xsl:otherwise>
+        <rule name="tpTocTitle" type="cmd" break-after="0" break-before="1">
       <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
         <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
         <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
@@ -1233,6 +1251,8 @@
         </param>
       </rule>
     </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </template>
 <!--  
   <template context="dbk:bibliogaphy/dbk:info
