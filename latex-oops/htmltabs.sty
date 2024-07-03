@@ -20,8 +20,8 @@
 %% original source files, as listed above, are part of the
 %% same distribution. (The sources need not necessarily be
 %% in the same archive or directory.)
-\def\fileversion{0.2.21}%
-\def\filedate{2024-03-18}%
+\def\fileversion{0.3.2}%
+\def\filedate{2024-07-03}%
 \NeedsTeXFormat{LaTeX2e}[2018/12/01]
 \ProvidesPackage{htmltabs}
     [\filedate\space\fileversion\space htmltabs]
@@ -33,7 +33,34 @@
 \DeclareOptionX{loglvl}[info]{\DebugLevel{#1}}%
 \DeclareOptionX{silent}{\@ht@silenttrue\message{^^J[htmltabs info] Silent mode. No more messages from me.^^J}}%
 \DeclareOptionX{cssfile}{\gdef\ht@cssfile{#1}}%
-\ProcessOptionsX\relax
+\newif\if@ht@ally   \@ht@allyfalse
+\DeclareOptionX{a11y}{\global\@ht@allytrue}%
+\ProcessOptionsX*\relax
+\@ifpackageloaded{coco-accessibility}{}
+  {\if@ht@ally
+      \PackageWarning{htmltabs.sty}
+      {Accessibility features need coco-accessibility.sty loaded^^J
+        before htmltabs.sty. All Tagging features will be disabled!}
+   \fi
+   \global\@ht@allyfalse
+   \newif\if@cc@is@final\@cc@is@finaltrue
+   \newcommand\ccaStructStart[2][]{}%
+   \newcommand\ccaStructEnd[1]{}%
+   \newcommand\ccaVstructStart[2][]{}%
+   \newcommand\ccaVstructEnd[1]{}%
+   \newcommand\ccaAddPlacement[1]{}%
+   \newcommand\ccaAddScope[1]{}%
+   \newcommand\ccaAddRolemap[2]{}%
+   \newcommand\ccaAddToStruct[1]{}%
+   \newcommand\ccaGetCurStruct[1]{}%
+   \newcommand\ccaAddColSpan[1]{}%
+   \newcommand\ccaAddRowSpan[1]{}%
+   \newcommand\ccaReplaceStruct[1]{}%
+   \newcommand\ccaAddToConfig[2]{}%
+   \newcommand\ccaMoveStruct[1]{}%
+   \let\ccaEnable\relax
+   \let\ccaDisable\relax
+ }%
 \if@ht@silent
   \@ht@debugfalse
   \global\let\DebugLevel\@undefined
@@ -42,10 +69,10 @@
     \ExecuteOptionsX{loglvl=info}%
   \fi
 \fi
-\gdef\ht@no@config@warning{\ht@debugmsg{warning}{Keine Klassen-Definitionsdatei (cssfile-Option) angegeben!}}
+\gdef\ht@no@config@warning{\ht@debugmsg{warning}{No class definition file given!}}
 \ifx\ht@cssfile\@undefined\else
   \IfFileExists{\ht@cssfile}{%
-    \gdef\ht@no@config@warning{\ht@infomsg{Nutze Klassen-Definitionsdatei \ht@cssfile}}%
+    \gdef\ht@no@config@warning{\ht@infomsg{Using class definition file \ht@cssfile}}%
     \ifx\xmltexversion\@undefined
       \AtBeginDocument{\input \ht@cssfile}%
     \else
@@ -55,7 +82,7 @@
 \fi
 \AtBeginDocument{\ht@no@config@warning}
 
-\def\convertMPtoPDF#1#2#3{}%verhindert, dass supp-pdf.mkii geladen wird, dass zusammen mit xmltex Probleme  bereiten kann (vgl. pdftex.def); thx to giovanni.
+\def\convertMPtoPDF#1#2#3{}% prevents loading of supp-pdf.mkii, which causes problems with xmltex; thx to giovanni.
 \RequirePackage{xcolor}
 \RequirePackage{etoolbox}
 \RequirePackage{expl3}
@@ -266,6 +293,9 @@
   \global\setbox\htTfootBox\box\voidb@x
   \global\setbox\htCaptionBox\box\voidb@x
   \global\setbox\htTableBox\box\voidb@x
+  \global\let\ht@structID@THead\@undefined
+  \global\let\ht@structID@TBody\@undefined
+  \global\let\ht@structID@TFoot\@undefined
   \global\let\ht@prev@parent\@undefined
   \global\let\htCaptionContent\relax
   \global\@ht@break@tablefalse
@@ -288,6 +318,12 @@
 \def\ht@str@bottom{bottom}
 \def\ht@str@auto{auto}
 \def\ht@str@none{none}
+\AtBeginDocument{%
+  \@ifpackageloaded{hyperref}
+    {\def\ht@hy@safe@footnote{%
+       \let\ht@ltx@footnote\footnote
+       \def\footnote{\advance\c@Hfootnote\m@ne\relax\ht@ltx@footnote}}}
+    {\let\ht@hy@safe@footnote\relax}}
 
 \def\HTRegisterCSSProperty#1#2#3{{%
   \edef\ht@prop{#2}%
@@ -1127,7 +1163,7 @@
           \ifx\ht@cur@element\ht@str@tfoot\def\ht@proplistname{tfoot-props}\else
             \ifx\ht@cur@element\ht@str@tr\def\ht@proplistname{tr-\the\ht@currow-props}\else
               \ifx\ht@cur@element\ht@str@col\def\ht@proplistname{col-\the\ht@curcol-props}\else
-                \ifx\ht@cur@element\ht@str@td\def\ht@proplistname{td-\the\ht@currow-\the\ht@curcol-props}
+                \ifx\ht@cur@element\ht@str@td\def\ht@proplistname{td-\the\ht@currow-\the\ht@curcol-props}%
                 \fi\fi\fi\fi\fi\fi\fi
     \expandafter\ifx\csname #1-property-list\endcsname\relax\else
       \expandafter\ht@append@to@props\expandafter{\csname #1-property-list\endcsname}{\ht@proplistname}%
@@ -1420,7 +1456,8 @@
   \ht@eval@props{\ht@parent}%
   \ht@eval@props{tr-\the\ht@currow}%
   \ht@eval@props{col-\the\ht@curcol}%
-  \ht@eval@props{td-\ht@thecell}}
+  \ht@eval@props{td-\ht@thecell}%
+}
 \def\ht@eval@no@strut{%
   \IfCellPropText{no-strut}{both}
     {\@ht@no@final@struttrue\@ht@no@init@struttrue}
@@ -1432,6 +1469,8 @@
   \HTEvalCellProps
   \GetCellContent{CellContent}%
   \GetCellPropDefault{colspan}{colspan}{1}%
+  \GetCellPropDefault{int@colspan}{spanns-over-cols}{1}%
+  \GetCellPropDefault{int@rowspan}{spanns-over-rows}{1}%
   \GetFont{CellFont}%
   \ht@eval@no@strut
   \ifx\CellFont\relax\else\ht@debugmsg{font}{Using font \meaning\CellFont}\fi%
@@ -1472,7 +1511,12 @@
           \expandafter\hsize\dimexpr\CurColWidth\relax
           \ht@build@cell{\leavevmode}%
         }%
-        \global\setbox\htCellBox\vbox{}%
+        \global\setbox\htCellBox\vbox{%
+          \ccaStructStart{TD}%
+          \ccaAddToStruct{\ht@structID@TR}%
+          \csxdef{dummy-\ht@therow-\ht@thecol}{\ccaGetCurStruct{idx}}%
+          \ccaStructEnd{TD}%
+        }%
         \global\wd\htCellBox=\wd\ht@tempboxa\relax
         \global\ht\htCellBox=\ht\ht@tempboxa\relax
         \ht@debugmsg{render}{Height of virtual \ht@thecell: \the\ht\htCellBox}%
@@ -1529,13 +1573,43 @@
          \csname internal-#1-padding-top\endcsname
         +\csname internal-#1-padding-bottom\endcsname
       \relax
-      \vskip\csname internal-#1-padding-top\endcsname
-      {\ifx\ht@scope\ht@str@td
-        \linewidth\hsize
-        \hbox{\ht@transform@box{build}{#2}}%
-      \else
-        \IfCellPropEmpty{virtual}{#2}{}%
-      \fi}%
+      \vskip\csname internal-#1-padding-top\endcsname%
+      \bgroup
+        \ifx\ht@scope\ht@str@td
+          \linewidth\hsize
+          \if@ht@ally
+            \GetCellProp{ht@is@th}{is-head}%
+            \GetRowProp{cur@parent}{parent}%
+            \ifx\ht@is@th\ht@str@true
+              \def\ht@cell@struct{TH}%
+            \else
+              \def\ht@cell@struct{TD}%
+            \fi
+            \ccaStructStart{\ht@cell@struct}%
+            \ifnum\int@colspan>\@ne\relax
+              \ccaAddColSpan{\int@colspan}%
+            \fi
+            \ifnum\int@rowspan>\@ne\relax
+              \ccaAddRowSpan{\int@rowspan}%
+            \fi
+            \ifx\ht@is@th\ht@str@true\ccaAddScope{Row}\fi
+            \ifx\cur@parent\ht@str@thead\ccaAddScope{Column}\fi
+          \fi%
+          \hbox{\ht@transform@box{build}{#2}}%
+          \if@ht@ally
+            \ifnum\int@rowspan>\@ne\relax
+              \edef\@target{\csname dummy-\the\numexpr\ht@therow-\int@rowspan+\@ne\relax-\the\numexpr\ht@thecol-\int@colspan+\@ne\relax\endcsname}%
+              \ccaAddKeep{}%
+              \expandafter\ccaReplaceStruct\expandafter{\@target}%
+            \else
+              \ccaAddToStruct{\ht@structID@TR}%
+            \fi
+            \ccaStructEnd{\ht@cell@struct}%
+          \fi
+        \else
+          \IfCellPropEmpty{virtual}{#2}{}%
+        \fi
+      \egroup%
       \vskip\csname internal-#1-padding-bottom\endcsname
     }%
     \hskip\csname internal-#1-padding-right\endcsname
@@ -1564,15 +1638,19 @@
     \else
       \smash{\rlap{\csname internal-background-color\endcsname
           \hskip\csname internal-#1-border-width-left\endcsname
+          \if@ht@final@render\ccaVstructStart{TBackgroundColorBox}\fi
           \vrule
             \@width\dimexpr\wd\ht@tempboxa-\csname internal-#1-border-width-left\endcsname\relax
             \@height\dimexpr\ht\ht@tempboxa-\csname internal-#1-border-width-top\endcsname\relax
-            \@depth\dp\ht@tempboxa}}%
+            \@depth\dp\ht@tempboxa
+          \if@ht@final@render\ccaVstructEnd{TBackgroundColorBox}\fi
+        }}%
     \fi
     \begingroup\box\ht@tempboxa\endgroup
     \ht@render@border{#1}{right}%
     \ht@render@border{#1}{bottom}%
   \endgroup}
+\ccaAddToConfig{artifact}{TBackgroundColorBox={Type:Layout}}
 \def\ht@render@border#1#2{%
   \ifdim\csname internal-#1-border-width-#2\endcsname>\z@\relax
     \ifx\ht@scope\ht@str@td
@@ -1580,9 +1658,11 @@
     \else
       \GetScopedProp{internal-#1-border-color}{#1}{border-#2-color}%
     \fi
-    %\ht@parse@color{internal-#1-color}%
+    \if@ht@final@render\ccaVstructStart{TRule}\fi
     \csname ht@border@#2\endcsname{\csname internal-#1-border-width-#2\endcsname}{\csname internal-#1-border-color\endcsname}{\csname internal-#1-border-style-#2\endcsname}%
+    \if@ht@final@render\ccaVstructEnd{TRule}\fi
   \fi}
+\ccaAddToConfig{artifact}{TRule={Type:Layout}}
 \def\ht@build@margin@box#1#2{%
   \vskip\csname internal-#1-margin-top\endcsname
   \hskip\csname internal-#1-margin-left\endcsname
@@ -1618,7 +1698,16 @@
   \if@ht@nat@calc
     \hskip\ht@framewidth
     \IfCellPropEmpty{internal-rotate}
-      {\hbox{#6\ifhmode\strut\fi}}%
+      {\ifx\ht@scope\ht@str@td
+         \setbox\z@\vtop{\hsize\maxdimen#6}%
+         \ifdim\dp\z@<\baselineskip\relax
+           \hbox{#6\ifhmode\strut\fi}%
+         \else
+           \hbox to \dimexpr\textwidth/\ht@maxcol\relax{\null}%
+         \fi
+       \else
+         \hbox{#6\ifhmode\strut\fi}%
+       \fi}
       {\ht@transform@box{calc}{#6}\hskip-\z@}%
   \else
     \if@ht@height@calc
@@ -1683,6 +1772,7 @@
 }
 \def\ht@align@box#1{%
   \if@ht@final@render
+    \ht@hy@safe@footnote
     \ht@valign@box{\ht@halign#1}%
   \else
     \if@ht@nat@calc
@@ -1734,6 +1824,7 @@
     \ifdim\htRotate\p@>\z@\relax\hskip.25\dp\strutbox\else\hskip-.25\dp\strutbox\fi
     \leavevmode
     \ht@valign@box{%
+      \ht@hy@safe@footnote
       \ht@halign
       \leavevmode
       \ignorespaces
@@ -1807,6 +1898,7 @@
   \egroup
   \let\ht@parent\ht@str@tbody
   \let\ht@initial@run\relax
+  \ccaDisable
 }
 \def\HTEndTable{%
   \let\ht@initial@run\@undefined
@@ -2041,7 +2133,8 @@
   \ifnum\htCellRowspan>1\relax\@tempswatrue\fi
   \ht@debugmsg{rowspan}{Cell \ht@thecell: rowspan=\htCellRowspan, colspan=\htCellColspan\if@tempswa; setting is-spanner\fi}%
   \if@tempswa\SetCellProp{is-spanner}{true}%
-    \SetCellProp{spanns-over}{\htCellColspan}%
+    \SetCellProp{spanns-over-cols}{\htCellColspan}%
+    \SetCellProp{spanns-over-rows}{\htCellRowspan}%
     \ifnum\htCellColspan>1
       \advance\ht@curcol\numexpr-\htCellColspan+1\relax
       \HTInheritColProps
@@ -2056,6 +2149,7 @@
     \SetCellProp{is-leftmost}{true}%
   \fi
   \ifx\IsUpper\ht@str@true\SetCellProp{is-upper}{true}\fi
+  \SetCellProp{is-head}{\ifx\is@head@cell\relax true\else false\fi}%
   \global\advance\ht@currow\numexpr-\htCellRowspan+1\relax
   \let\is@leftmost\@undefined}
 \def\ht@ExpandContents{%
@@ -2142,17 +2236,26 @@
   \fi}
 \def\ht@build@rowbox{%
   \global\setbox\htRowBox\hb@xt@\dimexpr\htTableWidth+\ht@h@offset{%
+    \if@ht@ally
+      \ccaStructStart{TR}%
+      \xdef\ht@structID@TR{\ccaGetCurStruct{idx}}%
+    \fi
     \hskip\ht@h@offset
     \ht@Iterate{\ht@curcol}{1}{\the\ht@maxcol}{%
-      \@ht@final@rendertrue
-      \ht@savenotes
-      \ht@RenderCell%
-      \box\htCellBox
-      \@ht@final@renderfalse
+      \begingroup
+        \@ht@final@rendertrue
+        \ht@savenotes
+        \ht@RenderCell%
+        \box\htCellBox
+        \@ht@final@renderfalse
+      \endgroup
     }%% /Iterate::cols
+    \if@ht@ally
+      \ccaStructEnd{TR}%
+    \fi
   }% /rowbox
 }
-\def\ht@build@macro@box#1#2#3{%
+\def\ht@build@macro@box#1#2#3#4{%
   \expandafter\ifnum\numexpr #3-#2+1\relax>0\relax
     \ht@Iterate{\ht@currow}{#2}{#3}{{%
         \ht@eval@props{tr-\the\ht@currow}%
@@ -2160,10 +2263,18 @@
         \GetRowProp{insertHt}{footins-height}%
         \expandafter\global\expandafter\advance\csname ht@#1@fins@ht\endcsname\insertHt\relax
         \expandafter\global\expandafter\setbox\csname #1\endcsname\vbox{%
+          \if@ht@ally\ifnum\ht@currow=#2\relax
+              \ccaVstructStart{#4}%
+              \csxdef{ht@structID@#4}{\ccaGetCurStruct{idx}}%
+            \fi\fi
           \expandafter\unvbox\csname #1\endcsname%
           \nointerlineskip%
           \box\htRowBox
+          \ccaMoveStruct{\ht@structID@TR}%
           \nopagebreak%
+          \if@ht@ally\ifnum\ht@currow=#3\relax
+              \ccaVstructEnd{#4}%
+            \fi\fi
         }% /rowboxname
     }}%
   \else
@@ -2173,22 +2284,32 @@
   \if@ht@break@table
     \ht@determine@break@points
   \fi
+  \edef\ht@start@tbody@row{\the\numexpr\ht@theadrows+\ht@tfootrows+1\relax}%
   \ht@Iterate{\ht@currow}%
-    {\the\numexpr\ht@theadrows+\ht@tfootrows+1\relax}%
+    {\ht@start@tbody@row}%
     {\ht@maxrow}{{%
       \ht@eval@props{tr-\the\ht@currow}%
       \ht@build@rowbox
       \global\setbox\htTbodyBox\vbox{%
+        \if@ht@ally\ifnum\ht@currow=\ht@start@tbody@row\relax
+            \ccaVstructStart{TBody}%
+            \xdef\ht@structID@TBody{\ccaGetCurStruct{idx}}%
+          \fi\fi
         \unvbox\htTbodyBox%
         \nointerlineskip%
         \IfPropText{tr}{do-break}{true}{%
           \ht@insert@page@breakers
         }{}%
         \box\htRowBox%
+        \ccaMoveStruct{\ht@structID@TR}%
         \ht@spewnotes
         \nopagebreak
+        \if@ht@ally\ifnum\ht@currow=\ht@maxrow\relax
+            \ccaVstructEnd{TBody}%
+          \fi\fi
       }% /htTbodyBox
-    }}}
+    }}%
+}
 \def\ht@insert@page@breakers{%
   \IfTablePropText{repeat-foot}{true}{\nopagebreak\nointerlineskip%
     \unvcopy\htTfootBox}{}%
@@ -2204,15 +2325,17 @@
 \def\htBuildTableBox{%
   \global\setbox\htTableBox\vbox{%
     \ifdim\TabMarginTop=\z@\else\addvspace{\TabMarginTop}\fi%
-    \htOutputCaption{top}%
-    \unvcopy\htTheadBox\nobreak\nointerlineskip
+    \@cc@is@finaltrue
+    \unvcopy\htTheadBox
+    \nobreak\nointerlineskip%
     \ht@spewnotes
-    \unvbox\htTbodyBox\nobreak\nointerlineskip
-    \unvcopy\htTfootBox
+    \unvbox\htTbodyBox
+    \nobreak\nointerlineskip%
+    \unvbox\htTfootBox%
     \ht@spewnotes
     \htOutputCaption{bottom}%
     \ifdim\TabMarginBot=\z@\else\addvspace{\TabMarginBot}\fi%
-  }}
+  }}%
 \def\ht@RenderCaption{%
   \GetScopedProp{CaptionWidth}{caption}{width}%
   \ifx\CaptionWidth\ht@str@auto
@@ -2243,14 +2366,15 @@
     \GetScopedProp{TabMarginBot}{table}{margin-bottom}%
     \GetScopedProp{TabMarginLeft}{table}{margin-left}%
     \GetScopedProp{TabMarginRight}{table}{margin-right}%
+    \ccaEnable
     \ifx\htCaptionContent\relax\else
       \bgroup
         \ht@eval@props{caption}%
         \ht@RenderCaption
       \egroup
     \fi
-    \ht@build@macro@box{htTheadBox}{1}{\the\ht@theadrows}%
-    \ht@build@macro@box{htTfootBox}{\numexpr\the\ht@theadrows+\@ne\relax}{\numexpr\the\ht@theadrows+\the\ht@tfootrows\relax}%
+    \ht@build@macro@box{htTheadBox}{1}{\the\ht@theadrows}{THead}%
+    \ht@build@macro@box{htTfootBox}{\numexpr\the\ht@theadrows+\@ne\relax}{\numexpr\the\ht@theadrows+\the\ht@tfootrows\relax}{TFoot}%
     \ht@build@tbody@box%
     \htBuildTableBox
 }
@@ -2418,7 +2542,13 @@
   % \IfTablePropText{is-float}{true}%
   % {\htOutputFloatTable}%
   %{
+  \if@ht@ally\ccaStructStart{Table}%
+    \ifx\ht@structID@THead\@undefined\else\ccaMoveStruct{\ht@structID@THead}\fi%
+    \ifx\ht@structID@TBody\@undefined\else\ccaMoveStruct{\ht@structID@TBody}\fi%
+    \ifx\ht@structID@TFoot\@undefined\else\ccaMoveStruct{\ht@structID@TFoot}\fi%
+  \fi%
   \unvbox\htTableBox
+  \if@ht@ally\ccaStructEnd{Table}\fi%
   %}%
 }
 
@@ -2511,8 +2641,9 @@
   \ht@register@macro{HTcol}%
   \ht@register@macro{HTtr}%
   \ht@register@macro{HTtd}%
+  \ht@register@macro{HTth}%
   \ht@register@macro{HTcaption}%
-  \let\HTth\HTtd
+  %\let\HTth\HTtd
 }
 \def\htmltab{\@ifnextchar [{\ht@htmltab}{\ht@htmltab[]}}%]
 \def\ht@parse@width#1#2{%
@@ -2619,16 +2750,24 @@
   \endgroup
   \ignorespaces}
 \long\def\ht@HTtd[#1]#2{%
+  \@ht@HTtd{}[#1]{#2}%
+}
+\long\def\ht@HTth[#1]#2{%
+  \@ht@HTtd{\let\is@head@cell\relax}[#1]{#2}%
+}
+\long\def\@ht@HTtd#1[#2]#3{%
   \begingroup
     \def\ht@ltx@cur@env{Td}%
-    \ht@parse@attributes #1,,\@nil
+    \ht@parse@attributes #2,,\@nil
     \ht@ltx@reg@style@and@class%
     \expandafter\let\expandafter\htCellRowspan\csname ht@Td@attr@rowspan\endcsname
     \ifx\htCellRowspan\relax\def\htCellRowspan{1}\fi%
     \expandafter\let\expandafter\htCellColspan\csname ht@Td@attr@colspan\endcsname
     \ifx\htCellColspan\relax\def\htCellColspan{1}\fi%
-    \HTTableCell{\ignorespaces#2}%
-  \endgroup}
+    #1%
+    \HTTableCell{\ignorespaces#3}%
+  \endgroup
+}
 \long\def\ht@HTcaption[#1]#2{%
   \begingroup
     \def\ht@ltx@cur@env{Caption}%
@@ -2636,7 +2775,7 @@
     \ht@ltx@reg@style@and@class%
     \HTTableCaption{%
       \ignorespaces
-      #2
+      #2%
       \ifhmode\unskip\fi}%
   \endgroup}
 
