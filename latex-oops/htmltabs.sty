@@ -845,6 +845,7 @@
   \parfillskip\z@skip\relax
   \@ht@spaceskiptrue
   \@ht@setspaceskip
+  \apptocmd\selectfont{\@ht@setspaceskip}{}{}%
   }
 \def\ht@halign@left@none{%
   \leftskip\z@\relax
@@ -860,6 +861,7 @@
   \parfillskip\@flushglue\relax
   \@ht@spaceskiptrue
   \@ht@setspaceskip
+  \apptocmd\selectfont{\@ht@setspaceskip}{}{}%
 }
 \def\ht@halign@right@none{%
   \leftskip\@flushglue\relax
@@ -876,6 +878,7 @@
   \parfillskip\z@skip\relax
   \@ht@spaceskiptrue
   \@ht@setspaceskip
+  \apptocmd\selectfont{\@ht@setspaceskip}{}{}%
 }
 \def\ht@halign@justified@auto{%
   \let\\\@raggedtwoe@savedcr
@@ -886,6 +889,7 @@
   \parfillskip\@flushglue
   \@ht@spaceskipfalse
   \@ht@setspaceskip
+  \apptocmd\selectfont{\@ht@setspaceskip}{}{}%
 }
 \let\ht@halign@justified@none\ht@halign@justified@auto
 \def\ht@valign@box#1{%
