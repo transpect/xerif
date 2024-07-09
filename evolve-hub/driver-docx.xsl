@@ -2291,6 +2291,8 @@
     <xsl:value-of select="replace(., $pi-mark, '\\')"/>
   </xsl:template>
   
+  <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]/anchor" mode="hub:split-at-tab"/>
+  
   <xsl:template match="phrase[matches(@role, $pi-style-regex, 'i')]/text()[matches(., concat($pi-mark, '[-+]\d+'))]" mode="hub:split-at-tab" priority="5">
     <xsl:analyze-string select="." regex="{concat($pi-mark, '([-+]\d+)')}">
       <xsl:matching-substring>
