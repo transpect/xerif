@@ -2773,8 +2773,9 @@
   
   <!-- spaced -->
   
-  <template context="dbk:phrase[matches(@role, '^[a-z]{1,3}spaced$')]">
-    <rule name="so" type="cmd">
+  <template context="dbk:phrase[matches(@role, '^[a-z]{1,3}spaced$')][not(@css:letter-spacing[matches(., '^0\p{Ll}')])]">
+     <!-- https://mattermost.le-tex.de/letexml/pl/xmbts7gyrfgy8czhf1h3w1nyzh -->
+    <rule name="textls" type="cmd">
       <param/>
     </rule>
   </template>
