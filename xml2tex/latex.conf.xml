@@ -3161,6 +3161,15 @@
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:choose>
+      <xsl:when test="every $c in node()[normalize-space()] satisfies $c[self::dbk:footnote]">
+        <!-- it gets very comlicated with footnotes here. if a footnote is in a variable, several templates won't match anymore-->
+        <xsl:apply-templates select="node()" mode="#current">
+          <xsl:with-param name="remove-textcolor" as="xs:boolean?" select="$remove-textcolor" tunnel="yes"/>
+          <xsl:with-param name="toc-override" as="xs:boolean?" select="$toc-override" tunnel="yes"/>
+          <xsl:with-param name="bm-override" as="xs:boolean?" select="$bm-override" tunnel="yes"/>
+          <xsl:with-param name="run-override" as="xs:boolean?" select="$run-override" tunnel="yes"/>
+        </xsl:apply-templates>
+      </xsl:when>
       <xsl:when test="$remove-textcolor eq true() or $toc-override eq true() or $bm-override eq true()">
         <!-- before: phrases were dissolved, other attributes lost. So handle phrase further without color, https://redmine.le-tex.de/issues/17106 -->
         <xsl:variable name="phrase-without-color" as="element(dbk:phrase)">
@@ -3168,7 +3177,12 @@
             <xsl:copy-of select="@* except @css:color, node()"/>
           </xsl:copy>
         </xsl:variable>
-        <xsl:apply-templates select="$phrase-without-color" mode="#current"/>
+        <xsl:apply-templates select="$phrase-without-color" mode="#current">
+          <xsl:with-param name="remove-textcolor" as="xs:boolean?" select="$remove-textcolor" tunnel="yes"/>
+          <xsl:with-param name="toc-override" as="xs:boolean?" select="$toc-override" tunnel="yes"/>
+          <xsl:with-param name="bm-override" as="xs:boolean?" select="$bm-override" tunnel="yes"/>
+          <xsl:with-param name="run-override" as="xs:boolean?" select="$run-override" tunnel="yes"/>
+        </xsl:apply-templates>
       </xsl:when>
       <xsl:otherwise>
         <xsl:next-match/>
