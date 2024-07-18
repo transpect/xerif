@@ -73,7 +73,7 @@
   <xsl:variable name="client-options" as="xs:string*"/>
   <xsl:variable name="secnumdepth" as="xs:string" 
                 select="xs:string(xs:integer($numbering-depth) - 1)"/>
-  <xsl:variable name="letter-spacing-def" select="'soul'" as="xs:string?"/>
+  <xsl:variable name="letter-spacing-def" select="''" as="xs:string?"/>
   <xsl:variable name="create-TocAuthorNames-by-style" select="false()"/>
 
   <!-- see the wiki link below for details
