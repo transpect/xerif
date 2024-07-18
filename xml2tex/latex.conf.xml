@@ -1210,7 +1210,7 @@
                                               [not(following-sibling::dbk:tab)]
                                               [not(self::dbk:tab)]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
-            <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
+            <with-param name="remove-newline" select="false()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
             <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
