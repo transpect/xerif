@@ -122,8 +122,6 @@
         <p:with-option name="schematron-rule-msg" select="'yes'"/>
       </tr:validate-with-schematron>
       
-      <p:delete match="@css:* | css:rules | @srcpath | @c:*"/>
-      
       <tr:validate-with-rng-svrl name="validate-bits-schema">
         <p:input port="schema">
           <p:document href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng"/>

@@ -40,7 +40,7 @@
   </p:output>
   
   <p:output port="xml" primary="false">
-    <p:pipe port="result" step="choose-output-xml"/>
+    <p:pipe port="result" step="clean-output-xml"/>
   </p:output>
   
   <p:output port="report" primary="false" sequence="true">
@@ -182,6 +182,8 @@
       
     </p:otherwise>
   </p:choose>
+  
+  <p:delete name="clean-output-xml" match="@css:* | css:rules | @srcpath | @c:*"/>
   
   <p:sink/>
   
