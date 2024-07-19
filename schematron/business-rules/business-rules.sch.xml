@@ -67,7 +67,7 @@
     <rule context="tei:figure">
       <let name="srcpath" value="(.//@srcpath[1], preceding-sibling::*[exists(.//@srcpath)][1]//@srcpath[1])[1]"/>
      
-      <report test="empty(tei:graphic)" role="error" id="Bildabsatz-ohne-Bild2">
+      <report test="empty(tei:graphic|tei:formula)" role="error" id="Bildabsatz-ohne-Bild2">
         <span class="srcpath"><xsl:value-of select="$srcpath"/></span>
         <span class="category">Abbildungen</span>
         Ein Absatz wurde mit dem Format <html:code>ts_figure</html:code> ausgezeichnet, 
