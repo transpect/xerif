@@ -60,6 +60,10 @@
  WordSpace = 1.25]
 \DeclareTextFontCommand\textfallback{\fallbackfont}
 \DeclareTextFontCommand\textsffallback{\sffallbackfont}
+\newfontfamily\emojifont{NotoEmoji-Regular.ttf}%
+[BoldFont = NotoEmoji-Bold.ttf,%
+ Path = ./fonts/Noto/Emoji/]
+\DeclareTextFontCommand\textemoji{\emojifont}
 \def\tpDeclareBabelFont{\@ifnextchar[\tp@declare@babel@font{\tp@declare@babel@font[]}}%]
 \def\tp@declare@babel@font[#1]#2#3#4{%
   \expandafter\ifx\csname use@script@#2\endcsname\@empty
