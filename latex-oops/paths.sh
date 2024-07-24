@@ -15,6 +15,8 @@ elif [ "$THISHOST" = "transcript-prod" ]; then
     XINDY=/usr/local/texlive/2019early/bin/x86_64-linux/xindy
 elif [ "$THISHOST" = "transpect" ]; then
     XINDY=/usr/local/texlive/2019/bin/x86_64-linux/xindy
+elif [ "$THISHOST" = "merlin" ]; then
+    XINDY=/usr/local/texlive/2019/bin/x86_64-linux/xindy
 else
     XINDY=$(which xindy)
 fi
