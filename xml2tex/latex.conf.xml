@@ -2753,6 +2753,8 @@
          U+2600-U+26FF Miscellaneous Symbols
          U+2700-U+27BF Dingbats
          U+2B00-U+2BFF Miscellaneous Symbols and Arrows
+                U+3297 CIRCLED IDEOGRAPH CONGRATULATION
+                U+3299 CIRCLED IDEOGRAPH SECRET
        U+1F600-U+1F64F Emoticons
        U+1F100-U+1F1FF Enclosed Alphanumeric Supplement
        U+1F200-U+1F2FF Enclosed Ideographic Supplement
@@ -2762,7 +2764,7 @@
        U+E0000-U+E007F Tags
   -->
   
-  <regex regex="([&#x203c;&#x2049;&#x2139;&#x2194;-&#x2199;&#x231a;&#x231b;&#x2328;&#x23cf;&#x23e9;-&#x23ef;&#x23f0;-&#x23f3;&#x23f8;-&#x23fa;&#x24c2;&#x25aa;&#x25ab;&#x25b6;&#x25c0;&#x25fb;-&#x25fe;&#x2600;-&#x26ff;&#x2700;-&#x27bf;&#x2b00;-&#x2bff;&#x1f600;-&#x1f64f;&#x1f100;-&#x1f1ff;&#x1f200;-&#x1f2ff;&#x1f300;-&#x1f5ff;&#x1fa70;-&#x1faff;&#xe0000;-&#xe007f;]&#x200d;?)+">
+  <regex regex="([&#x203c;&#x2049;&#x2139;&#x2194;-&#x2199;&#x231a;&#x231b;&#x2328;&#x23cf;&#x23e9;-&#x23ef;&#x23f0;-&#x23f3;&#x23f8;-&#x23fa;&#x24c2;&#x25aa;&#x25ab;&#x25b6;&#x25c0;&#x25fb;-&#x25fe;&#x2600;-&#x26ff;&#x2700;-&#x27bf;&#x2b00;-&#x2bff;&#x3297;&#x3299;&#x1f600;-&#x1f64f;&#x1f100;-&#x1f1ff;&#x1f200;-&#x1f2ff;&#x1f300;-&#x1f5ff;&#x1fa70;-&#x1faff;&#xe0000;-&#xe007f;]&#x200d;?)+">
     <rule name="textemoji" type="cmd">
       <param/>
     </rule>
@@ -3066,10 +3068,10 @@
             </xsl:variable>
             <xsl:value-of select="concat('{\hyperlink{', $ref, '}{', replace(replace(string-join($content-with-formatting, ''), '(\\[a-z])', '{$1'), '\}', '}}'), '}}')"/>
           </xsl:otherwise>
-        </xsl:choose>  
+        </xsl:choose>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:next-match/>    
+        <xsl:next-match/>
       </xsl:otherwise>
     </xsl:choose>
   </template>
