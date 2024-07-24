@@ -10,9 +10,18 @@
   xpath-default-namespace="http://www.w3.org/1999/xhtml"
   retain-tagging="false">
   
-  <import href="http://transpect.io/htmltables/xsl/html-tables.xsl" />
+  <import href="http://transpect.io/htmltables/xsl/html-tables.xsl"/>
+  <import href="http://transpect.io/hub2html/xsl/hub2html.xsl"/>
   
   <inline>
+    
+   <!-- remove xhtml namespace (after hub2htm-cals2html) ­ -->
+    <xsl:template match="xhtml:*" mode="xml2idml:Stories">
+      <xsl:element name="{local-name()}" namespace="http://docbook.org/ns/docbook">
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </xsl:element>      
+    </xsl:template>
+    
     <xsl:template match="link/@href[matches(., '^#')]" mode="xml2idml:Discard">
       <xsl:attribute name="href" select="replace(., '^#', '')"/>
     </xsl:template>
@@ -33,8 +42,11 @@
     
   </inline>
   
+  
   <xslt-pipeline>
-    <step mode="htmltable:tables-add-atts" before="xml2idml:CellStyles"/>
+    <!-- convert cals tables to html (table input format for xml2idml)-->
+    <step mode="hub2htm-cals2html" before="xml2idml:Discard"/>
+    <step mode="htmltable:tables-add-atts"/>
   </xslt-pipeline>
   
   <Pages>
@@ -98,6 +110,12 @@
   </TableStyles>
   
   <CellStyles>
+    
+    <mapping-instruction>
+      <path >*:td | *:th</path>
+       <xpath>@class</xpath>
+    </mapping-instruction>
+    
     <mapping-instruction>
       <path>*:entry</path>
       <xpath>@role</xpath>
