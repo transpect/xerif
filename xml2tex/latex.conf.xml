@@ -2764,7 +2764,7 @@
   
   <regex regex="([&#x203c;&#x2049;&#x2139;&#x2194;-&#x2199;&#x231a;&#x231b;&#x2328;&#x23cf;&#x23e9;-&#x23ef;&#x23f0;-&#x23f3;&#x23f8;-&#x23fa;&#x24c2;&#x25aa;&#x25ab;&#x25b6;&#x25c0;&#x25fb;-&#x25fe;&#x2600;-&#x26ff;&#x2700;-&#x27bf;&#x2b00;-&#x2bff;&#x1f600;-&#x1f64f;&#x1f100;-&#x1f1ff;&#x1f200;-&#x1f2ff;&#x1f300;-&#x1f5ff;&#x1fa70;-&#x1faff;&#xe0000;-&#xe007f;]&#x200d;?)+">
     <rule name="textemoji" type="cmd">
-      <param regex-group="1"/>
+      <param/>
     </rule>
   </regex>
 
