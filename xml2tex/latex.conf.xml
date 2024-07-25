@@ -1944,11 +1944,7 @@
     <xsl:param name="elt" as="element(*)"/>
      <xsl:choose>
        <xsl:when test="$elt[local-name() = ('table', 'informaltable')]
-                           [   matches(@role, $rotated-table-style)
-                            or exists(descendant-or-self::*[matches(@css:transform, 'rotate\((90|270)deg\)')
-                                                            or @css:writing-mode eq 'bt-lr']
-                                      )
-                           ]
+                           [matches(@role, $rotated-table-style)]
                         or
                         $elt[self::dbk:figure[matches(@css:transform, 'rotate\((90|270)deg\)')]]
                         or 
