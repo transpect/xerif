@@ -897,7 +897,9 @@
   <!-- assign thead. currently very basic stuff, needs to be refinded 
        when more test data is available.-->
   
-  <xsl:template match="tbody" mode="custom-1">
+  <xsl:variable name="hub:thead-pstyle-regex" select="$table-header-style-regex"/>
+  
+  <!--<xsl:template match="tbody" mode="custom-1">
     <xsl:for-each-group select="row" group-adjacent="exists(.//para[matches(@role, $table-header-style-regex)])">
       <xsl:choose>
         <xsl:when test="current-grouping-key() eq true()">
@@ -912,7 +914,7 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:for-each-group>
-  </xsl:template>
+  </xsl:template>-->
   
   <xsl:template match="para[matches(@role, $table-source-role-regex)][preceding-sibling::*[1][self::table]]
                       |para[matches(@role, $figure-source-role-regex)][preceding-sibling::*[1][self::figure]]" mode="custom-1"/>
@@ -1643,10 +1645,20 @@
   </xsl:template>
   
   <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()" mode="custom-1">
-    <xsl:analyze-string select="." regex="(,?\s)([\d]+)+">
+    <xsl:analyze-string select="." regex="(,?\s)(([\d]+)(–([\d]+))?)+">
       <xsl:matching-substring>
-        <xsl:value-of select="regex-group(1)"/>
-        <xref xlink:href="page-{regex-group(2)}"/>
+        <xsl:choose>
+          <!-- range-->
+          <xsl:when test="regex-group(4)">
+            <xsl:value-of select="regex-group(1)"/>
+            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>-
+            <xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
+          </xsl:when>
+          <xsl:otherwise>
+              <xsl:value-of select="regex-group(1)"/>
+              <xref xlink:href="page-{regex-group(2)}"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
         <xsl:value-of select="."/>
