@@ -1068,7 +1068,7 @@
     </xsl:if>
   </template>
   
-  <xsl:template name="contribtion-meta">
+  <xsl:template name="contribution-meta">
     <!-- to be uncommented when all xerif standard macros have been eventually mapped
       <xsl:apply-templates select="dbk:epigraph,
                                 |dbk:abstract 
