@@ -207,6 +207,8 @@
                              $info-author-affiliation-role,
                              $info-doi,
                              $info-orcid-style,
+                             $info-copyright-holder-role,
+                             $info-copyright-year-role,
                              $info-licence-style,
                              $info-year
                             ), 
@@ -222,6 +224,12 @@
   
   <xsl:variable name="info-author-bio-role" as="xs:string"
                 select="'^[a-z]{1,3}author-bio'" />
+
+  <xsl:variable name="info-copyright-holder-role" as="xs:string"
+                select="'^[a-z]{1,3}copyright-holder'" />
+  
+  <xsl:variable name="info-copyright-year-role" as="xs:string"
+                select="'^[a-z]{1,3}copyright-year'" />
 
   <xsl:variable name="info-licence-style" as="xs:string"
                 select="'^[a-z]{2,3}metacontributionlicence'" />

@@ -1897,6 +1897,20 @@
     </personname>
   </xsl:template>
 
+  <xsl:template match="para[matches(@role, $info-copyright-holder-role)]" mode="hub:process-meta-sidebar">
+    <copyright>
+      <year>
+        <xsl:apply-templates select="../para[matches(@role, $info-copyright-year-role)]/@*" mode="#current"/>
+        <xsl:value-of select="(../para[matches(@role, $info-copyright-year-role)], format-date(current-date(), '[Y]'))[1]"/>
+      </year>
+      <holder>
+        <xsl:apply-templates select="@*, node()" mode="#current"/>
+      </holder>
+    </copyright>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $info-copyright-year-role)]" mode="hub:process-meta-sidebar"/>
+
   <xsl:template match="para[matches(@role, $info-licence-style)]" mode="hub:process-meta-sidebar">
     <legalnotice otherclass="{if(matches(., '&#xa9;')) then 'copyright' else 'license'}">
       <xsl:apply-templates select="@*" mode="#current"/>

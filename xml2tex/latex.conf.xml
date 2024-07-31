@@ -1034,7 +1034,8 @@
         <param select="tr:heading-level(parent::*)"/>
         <xsl:apply-templates select="(dbk:authorgroup | dbk:author), dbk:title" mode="#current"/>
         <xsl:call-template name="toc-titles" />
-        <xsl:call-template name="col-titles" /> 
+        <xsl:call-template name="col-titles" />
+        <xsl:call-template name="contribution-meta"/>
         <xsl:apply-templates select="dbk:subtitle,
                                      dbk:epigraph,
                                      dbk:abstract,
@@ -1058,14 +1059,24 @@
                                              dbk:titleabbrev,
                                              dbk:subtitle,
                                              dbk:abbrev,
-                                             dbk:author,
                                              dbk:epigraph,
                                              dbk:abstract, 
                                              dbk:keywordset,
+                                             dbk:copyright,
                                              dbk:biblioid,
                                              dbk:biblioset)" mode="#current"/>
     </xsl:if>
   </template>
+  
+  <xsl:template name="contribtion-meta">
+    <!-- to be uncommented when all xerif standard macros have been eventually mapped
+      <xsl:apply-templates select="dbk:epigraph,
+                                |dbk:abstract 
+                                |dbk:keywordset
+                                |dbk:copyright
+                                |dbk:biblioid
+                                |dbk:biblioset" mode="xml2tex"/>-->
+  </xsl:template>
   
   <xsl:function name="tr:create-sect-option-from-renderas">
     <xsl:param name="renderas"/>
