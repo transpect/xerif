@@ -1875,8 +1875,10 @@
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
                     dbk:note,
-                    dbk:para[matches(@role, $fig-legend-para-style-regex)],
-                    dbk:mediaobject/dbk:alt"/>
+                    dbk:para[matches(@role, $fig-legend-para-style-regex)]"/>
+      <text select="dbk:mediaobject[count(../dbk:mediaobject) = 1]/dbk:alt">
+         <with-param name="render-alt-text" select="true()" as="xs:boolean" tunnel="yes"/>
+      </text>
       <xsl:call-template name="handle-mediaobjects"/>
       <text select="dbk:figure"/>
       
@@ -1894,7 +1896,7 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:when test="exists(dbk:mediaobject)">
-        <!-- several images in one figure without subfloats must be handled as several \includegraphics-->
+        <!-- several images in one figure without subfloats must be handled as several \includegraphics. als normal figures handled here-->
          <xsl:text>&#xa;\tpFig{</xsl:text>
          <xsl:apply-templates select="dbk:mediaobject" mode="xml2tex">
            <xsl:with-param name="not-create-tpFig" select="true()" as="xs:boolean" tunnel="yes"/>
@@ -1912,19 +1914,25 @@
         <xsl:apply-templates select="node()" mode="xml2tex"/>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:apply-templates select="dbk:alt" mode="xml2tex">
+          <xsl:with-param name="render-alt-text" select="true()" as="xs:boolean" tunnel="yes"/>
+        </xsl:apply-templates>
         <rule name="tpFig" type="cmd" break-before="1" break-after="0">
-          <param select="node()"/>
+          <param select="node() except dbk:alt"/>
         </rule>
       </xsl:otherwise>
     </xsl:choose>
   </template>
   
-<!--  <template context="dbk:mediaobject/dbk:alt">
-    <rule name="tpAltText" type="cmd" break-before="1" break-after="0">
-      <param/>
-    </rule>
-  <!-\- https://redmine.le-tex.de/issues/14731 -\->
-  </template>-->
+  <template context="dbk:mediaobject/dbk:alt">
+    <xsl:param name="render-alt-text" select="false()" as="xs:boolean" tunnel="yes"/>
+    <xsl:if test="$render-alt-text">   
+      <rule name="tpAltText" type="cmd" break-before="1" break-after="0">
+        <param/>
+      </rule>
+    </xsl:if>
+    <!-- https://redmine.le-tex.de/issues/14731 -->
+  </template>
 
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
     <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
@@ -1933,7 +1941,13 @@
                     dbk:info[dbk:legalnotice],
                     dbk:note,
                     dbk:para[matches(@role, $fig-legend-para-style-regex)],
+                    dbk:mediaobject/dbk:alt,
                     dbk:mediaobject,
+                    dbk:figure"/>
+      <text select="dbk:mediaobject/dbk:alt">
+         <with-param name="render-alt-text" select="true()" as="xs:boolean" tunnel="yes"/>
+      </text>
+      <text select="dbk:mediaobject,
                     dbk:figure"/>
     </rule>
   </template>
@@ -2093,7 +2107,7 @@
   <template context="*[self::*:td | *:th | *:entry]//dbk:mediaobject/dbk:imageobject/dbk:imagedata[@fileref]" priority="500">
      <!-- Bilder in Tabellen -->
     <rule name="includegraphics" type="cmd" break-before="1">
-      <option/>
+      <option select="xml2tex:image-option(.)"/>
       <param select="xml2tex:get-image-url(., $image-dir)"/>
     </rule>
   </template>
@@ -2132,7 +2146,11 @@
 
   <xsl:function name="xml2tex:image-option" as="xs:string?">
     <xsl:param name="image" as="element(dbk:imagedata)"/>
-    <xsl:sequence select="()"/>
+    <xsl:sequence select="if ($image[../..[self::dbk:inlinemediaobject | self::dbk:mediaobject[not(..[self::dbk:figure])]]
+                                          [dbk:alt[normalize-space()]]
+                                    ]) 
+                          then concat('alt={', $image/../../dbk:alt, '}') 
+                          else ()"/>
     <!-- overwrite this in your customer specific styles. E.g. for adjusting the width.-->
   </xsl:function>
   
