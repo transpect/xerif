@@ -554,6 +554,11 @@
                    select="concat($s9y1-path, 'images/', .)"/>
   </xsl:template>
   
+  <!-- delete linebreaks in alt texts for now, maybe handle in future? -->
+  <xsl:template match="alt[ancestor::inlinemediaobject or ancestor::mediaobject][matches(.,'&#xa;')]/text()" mode="hub:clean-hub">
+    <xsl:sequence select="replace(.,'&#xa;',' ')"/>
+  </xsl:template>
+  
   <!-- group multiple adjacent images in one figure environment -->
   
   <xsl:variable name="figure-roles-regex" as="xs:string"
