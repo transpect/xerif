@@ -1598,7 +1598,7 @@
   
   <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
-                  select="matches(., $index-see-regex)"/>
+                  select="matches(., concat('(^|[\P{L}])', $index-see-regex))(:avoid matching of Tennessee:)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
     <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
