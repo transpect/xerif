@@ -1940,10 +1940,7 @@
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
                     dbk:note,
-                    dbk:para[matches(@role, $fig-legend-para-style-regex)],
-                    dbk:mediaobject/dbk:alt,
-                    dbk:mediaobject,
-                    dbk:figure"/>
+                    dbk:para[matches(@role, $fig-legend-para-style-regex)]"/>
       <text select="dbk:mediaobject/dbk:alt">
          <with-param name="render-alt-text" select="true()" as="xs:boolean" tunnel="yes"/>
       </text>
