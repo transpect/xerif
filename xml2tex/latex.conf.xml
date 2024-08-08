@@ -793,7 +793,7 @@
     <xsl:text>&#xa;\backmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
-    
+
   <template context="*[not(self::dbk:book|self::dbk:hub|self::dbk:figure)]
                       [not(@role = ('alternative-title', 'keywords'))]
                       [dbk:info]
@@ -2698,7 +2698,7 @@
 
     <xsl:variable name="regex" as="xs:string"
                 select="string-join((for $l in $scripts return concat('(', 
-                                                                      if ($l/@name=('arabic', 'hebrew', 'syriac')) then '[\p{P}]?' else (), (:include punctuation for right-to-left languages:)
+                                                                      if ($l/@name=('arabic', 'hebrew', 'syriac')) then '[\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?' else (), (:include punctuation for right-to-left languages:)
                                                                       '[', 
                                                                       $l/@unicode-range, 
                                                                       ']+([\p{Zs}\p{P}]+[', (:summarize several words:)
