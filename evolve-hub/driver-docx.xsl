@@ -1649,8 +1649,8 @@
       </xsl:element>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()" mode="custom-1">
-    <xsl:analyze-string select="." regex="(,?\s)(([\d]+)(–([\d]+))?)+">
+  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()[not(following-sibling::tab)]" mode="custom-1">
+    <xsl:analyze-string select="." regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
       <xsl:matching-substring>
         <xsl:choose>
           <!-- range-->
