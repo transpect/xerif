@@ -1572,7 +1572,7 @@
   
   <xsl:template match="*[local-name() = ('para', 'title')]//text()[$index-list-search-terms-available]
                         [not(ancestor::*[matches(@role, $index-list-regex)])]
-                        [not(ancestor::*/local-name() = ('indexterm', 'link', 'caption', 'bibliomixed'))]
+                        [not(ancestor::*/local-name() = ('indexterm', 'link', 'caption', 'bibliomixed', 'keyword'))]
                         [matches(., $index-list-search-terms-as-regex, 'i')]" mode="custom-1">
     <xsl:analyze-string select="." regex="{$index-list-search-terms-as-regex}" flags="i">
       <xsl:matching-substring>
