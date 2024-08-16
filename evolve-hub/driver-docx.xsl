@@ -1613,11 +1613,11 @@
             <xsl:for-each-group select="node()" group-starting-with="node()[matches(., $index-see-regex)]">
               <xsl:choose>
                 <xsl:when test="matches(string-join(current-group(), ''), $index-see-regex)">
-                  <xsl:element name="{if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'seealsoie' else 'seeie'}">
-                    <xsl:attribute name="xreflabel" select="concat('see', if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'also' else ())"/>
-                    <xsl:for-each select="current-group()">
-                      <xsl:choose>
-                        <xsl:when test="matches(., $index-see-regex)">
+                  <xsl:for-each select="current-group()">
+                    <xsl:choose>
+                      <xsl:when test="matches(., $index-see-regex)">
+                        <xsl:element name="{if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'seealsoie' else 'seeie'}">
+                          <xsl:attribute name="xreflabel" select="concat('see', if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'also' else ())"/>
                           <xsl:copy>
                             <xsl:apply-templates select="@*" mode="#current"/>
                             <xsl:analyze-string select="." regex="{concat($index-see-also-regex, '?')}">
@@ -1626,15 +1626,22 @@
                               </xsl:non-matching-substring>
                             </xsl:analyze-string>
                           </xsl:copy>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:copy>
-                            <xsl:apply-templates select="@*, node()" mode="#current"/>
-                          </xsl:copy>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:for-each>
-                  </xsl:element>
+                        </xsl:element>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:choose>
+                          <xsl:when test="matches(current(),'(,?\s)(([\d]+)(–([\d]+))?)+')">
+                            <xsl:sequence select="tr:pagenums-to-xref(.)"/>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:copy>
+                              <xsl:apply-templates select="@*, node()" mode="#current"/>
+                            </xsl:copy>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -1649,8 +1656,9 @@
       </xsl:element>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()[not(following-sibling::tab)]" mode="custom-1">
-    <xsl:analyze-string select="." regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
+  <xsl:function name="tr:pagenums-to-xref">
+    <xsl:param name="str" as="xs:string"/>
+    <xsl:analyze-string select="$str" regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
       <xsl:matching-substring>
         <xsl:choose>
           <!-- range-->
@@ -1669,6 +1677,17 @@
         <xsl:value-of select="."/>
       </xsl:non-matching-substring>
     </xsl:analyze-string>
+  </xsl:function>
+  
+  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()[not(following-sibling::tab)]" mode="custom-1">
+    <xsl:choose>
+      <xsl:when test="parent::para/tab or matches(.,'(,?\s)(([\d]+)(–([\d]+))?)+')">
+        <xsl:sequence select="tr:pagenums-to-xref(.)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <xsl:variable name="static-index-sections" as="element(index)*"
