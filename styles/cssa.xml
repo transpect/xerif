@@ -51,6 +51,7 @@
   <css:rule layout-type="para" native-name="ts_footnote" name="tsfootnote" regex="^[a-z]{1,3}footnote$"/>
   <css:rule layout-type="para" native-name="ts_ded" name="tsded" regex="^[a-z]{1,3}ded$"/>
   <css:rule layout-type="para" native-name="ts_dedication" name="tsdedication" regex="^[a-z]{1,3}dedication$"/>
+  <css:rule layout-type="para" native-name="ts_transcription" name="tsdedication" regex="^[a-z]{1,3}transcription$"/>
   
 
   <css:rule layout-type="para" native-name="ts_meta_keywords" name="tsmetakeywords" regex="^[a-z]{1,3}metakeywords$"/>
