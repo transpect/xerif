@@ -2248,11 +2248,40 @@
     </toc>
   </xsl:template>
 
+  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]" mode="hub:repair-hierarchy">
+    <!-- move line number to para to allow def-list creation from speakers-->
+   <xsl:variable name="line-num-separator" select="tab[preceding-sibling::node()[1][matches(., '\d')]]" as="element(tab)?"/>
+   <xsl:copy>
+     <xsl:apply-templates select="@*" mode="#current"/>
+     <xsl:if test="exists($line-num-separator)"><xsl:attribute name="annotations" select="node()[. &lt;&lt; $line-num-separator]">
+       <!-- line number-->
+     </xsl:attribute>
+     </xsl:if>
+     <xsl:apply-templates select="if (exists($line-num-separator)) then node()[. &gt;&gt; $line-num-separator] else node()" mode="#current"/>
+   </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[matches(@role, $hub:transcription-role-regex-x)]" mode="hub:clean-hub">
+    <xsl:variable name="context" select="."/>
+    <xsl:for-each-group select="node()" group-starting-with="para[not(normalize-space())][processing-instruction()[contains(., 'tpNewPar')]](:empty para with PI to split transcriptions:)">
+      <div role="transcription">
+        <xsl:apply-templates select="$context/@* except $context/@role, current-group()[not(self::para[not(normalize-space())][processing-instruction()[contains(., 'tpNewPar')]])]" mode="#current"/>
+      </div>
+    </xsl:for-each-group>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/tab " mode="hub:clean-hub">
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/node()[1][contains(., ':')][following-sibling::node()[1][self::tab]]" mode="hub:clean-hub">
+    <phrase role="speaker"><xsl:sequence select="."/></phrase>
+  </xsl:template>
+  
   <!-- optional mode preprocesses whitespaces. based on mode docx2tex-preprocess in docx2tex/xsl/docx2tex-preprocess.xsl -->
-
+  
   <xsl:template match="div[@role = ('transcription', 'transcript')]" mode="preprocess-whitespaces">
     <xsl:copy-of select="."/>
-    <!-- do not tocuh whitespaces in transcripts -->
+    <!-- do not touch whitespaces in transcripts -->
   </xsl:template>
 
   <xsl:template match="text()[parent::phrase]
