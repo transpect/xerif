@@ -1664,8 +1664,7 @@
           <!-- range-->
           <xsl:when test="regex-group(4)">
             <xsl:value-of select="regex-group(1)"/>
-            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>-
-            <xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
+            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>-<xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
           </xsl:when>
           <xsl:otherwise>
               <xsl:value-of select="regex-group(1)"/>
@@ -1681,7 +1680,7 @@
   
   <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()[not(following-sibling::tab)]" mode="custom-1">
     <xsl:choose>
-      <xsl:when test="parent::para/tab or matches(.,'(,?\s)(([\d]+)(–([\d]+))?)+')">
+      <xsl:when test="ancestor::para/tab or matches(.,'(,?\s)(([\d]+)(–([\d]+))?)+')">
         <xsl:sequence select="tr:pagenums-to-xref(.)"/>
       </xsl:when>
       <xsl:otherwise>
