@@ -1403,6 +1403,7 @@
       </xsl:when>
       <xsl:when test="   ancestor::dbk:dedication 
                       or ancestor::*[self::dbk:colophon[@role = 'dedication']]
+                      or ancestor::*[self::dbk:div[@role = 'transcription']]
                       or ancestor::dbk:blockquote[matches(@role, $verse-style) or contains(@role, 'quotation')]">
         <xsl:text>\tpBreak&#xa;</xsl:text>
       </xsl:when>
@@ -2357,12 +2358,33 @@
 
   <!-- transcripts -->
 
+  <!--  https://redmine.le-tex.de/issues/16281 -->
   <template context="dbk:div[@role = 'transcription']">
     <rule name="transcript" type="env" break-after="1"  break-before="1">
+      <xsl:if test="descendant::dbk:para[1][@annotations]">
+        <option select="descendant::dbk:para[1]/@annotations"/>
+      </xsl:if>
       <text/>
     </rule>
   </template>
-
+  
+  <template context="dbk:div[@role = 'transcription'][dbk:para[dbk:phrase[@role = 'speaker']]]/dbk:para" priority="400">
+    <!-- https://redmine.le-tex.de/issues/16281 -->
+    <xsl:variable name="previous-line-number" select="preceding-sibling::*[self::dbk:para][1]/@annotations"/>
+    <xsl:variable name="line-number" select="@annotations"/>
+    <xsl:if test="$line-number[normalize-space()] and 
+                  not(($line-number[. castable as xs:integer], 0)[1] - ($previous-line-number[. castable as xs:integer], 0)[1] = 1)
+                  and exists(preceding-sibling::dbk:para)">
+      <rule name="lineNumber" type="cmd" break-before="1">
+        <param select="@annotations"/>
+      </rule>
+    </xsl:if>
+    <rule name="item" type="cmd" break-before="1">
+      <xsl:if test="dbk:phrase[@role = 'speaker']"><option select="dbk:phrase[@role = 'speaker']"/></xsl:if>
+      <text select="' ', node() except dbk:phrase[@role = 'speaker']"/>
+    </rule>
+  </template>
+  
   <!-- letters -->
     
   <template context="dbk:div[@role = ('letter', 'poem')] | dbk:sidebar[@role = ('letter', 'poem')]">
