@@ -19,9 +19,9 @@
   <xsl:output indent="yes"/>
   
   <xsl:import href="http://transpect.io/hub2tei/xsl/hub2tei.xsl"/>
+  <xsl:import href="../xsl/shared-variables.xsl"/>
   
   <xsl:template match="@docx2hub:*" mode="hub2tei:dbk2tei"/>
-  <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^[a-z]{1,3}box(grey|border)$'"/>
   
   <xsl:template match="html:table[tei:p]" mode="hub2tei:tidy">
     <figure>
@@ -281,5 +281,27 @@
       <xsl:apply-templates select="@* except @type, node()" mode="#current"/>  
     </argument>
   </xsl:template>
+  
+  <xsl:template match="div[@role = 'transcription']//para/@annotations" mode="hub2tei:dbk2tei">
+    <!-- line numbers -->
+    <xsl:attribute name="n" select="."/>
+  </xsl:template>
+  
+  <xsl:template match="tei:floatingText[@rend = 'transcription'][.//tei:p[tei:seg[@rend = 'speaker']]]/tei:body/tei:div1" mode="hub2tei:tidy">
+    <!-- group to list (for TEI/HMTML)-->
+    <xsl:copy>
+      <xsl:element name="list">
+        <xsl:attribute name="type" select="'gloss'"/>
+        <xsl:for-each-group select="node()" group-starting-with="self::tei:p[tei:seg[@rend = 'speaker']]">
+          <xsl:element name="label"><xsl:sequence select="current-group()[1]/tei:seg[@rend = 'speaker']"/></xsl:element>
+          <xsl:element name="item">
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:element>
+        </xsl:for-each-group>
+      </xsl:element>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="tei:floatingText[@rend = 'transcription']//tei:p/tei:seg[@rend = 'speaker']" mode="hub2tei:tidy"/>
 
 </xsl:stylesheet>
