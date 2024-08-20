@@ -787,10 +787,18 @@
     <xsl:next-match/>
   </template>
   
-  <template context="/*/*[self::dbk:appendix|self::dbk:index|self::dbk:bibliography]
+  <template context="/*/*[self::dbk:appendix
+                         |self::dbk:index
+                         |self::dbk:bibliography]
                          [matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]
                          [not(//processing-instruction()[contains(., '\backmatter')])]" priority="302">
-    <xsl:text>&#xa;\backmatter&#xa;</xsl:text>
+    <xsl:if test="not(preceding::*[self::dbk:appendix
+                                  |self::dbk:index
+                                  |self::dbk:bibliography]
+                                  [matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]
+                                  [not(//processing-instruction()[contains(., '\backmatter')])])">
+      <xsl:text>&#xa;\backmatter&#xa;</xsl:text>
+    </xsl:if>
     <xsl:next-match/>
   </template>
 
