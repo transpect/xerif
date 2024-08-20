@@ -2380,8 +2380,8 @@
       </rule>
     </xsl:if>
     <rule name="item" type="cmd" break-before="1">
-      <xsl:if test="dbk:phrase[@role = 'speaker']"><option select="dbk:phrase[@role = 'speaker']"/></xsl:if>
-      <text select="' ', node() except dbk:phrase[@role = 'speaker']"/>
+      <option select="dbk:phrase[@role = 'speaker']"/>
+      <text select="node() except dbk:phrase[@role = 'speaker']"/>
     </rule>
   </template>
   
