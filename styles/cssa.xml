@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <css:rules xmlns:css="http://www.w3.org/1996/css">
   <css:rule layout-type="para" native-name="ts_abstracts" name="abstracts" regex="^[a-z]{1,3}abstracts$"/>
-  <css:rule layout-type="para" native-name="ts_author" name="tsauthor"  regex="^[a-z]{1,3}author$"/>
+  <css:rule layout-type="para" native-name="ts_author" name="tsauthor"  regex="^[a-z]{1,3}author(notoc)?$"/>
   <css:rule layout-type="para" native-name="ts_author_name" name="tsauthorname" regex="^[a-z]{1,3}authorname$"/>
   <css:rule layout-type="para" native-name="ts_author_description" name="tsauthordescription" regex="^[a-z]{1,3}authordescription$"/>
   <css:rule layout-type="para" native-name="ts_heading_short" name="tsheadingshort" regex="^[a-z]{1,3}headingshort$"/>

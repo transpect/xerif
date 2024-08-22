@@ -341,7 +341,7 @@
   <xsl:template match="section | sect1 | sect2 | sect3 | sect4 | sect5" mode="custom-1">
     <xsl:param name="remove-wrapper" as="xs:boolean" select="false()"/>
     <xsl:variable name="sec-info" as="element()*" 
-                  select="((author, para[matches(@role, '^[a-z]{1,3}author$')])[1],
+                  select="((author, para[matches(@role, '^[a-z]{1,3}author(notoc)?$')])[1],
                            blockquote[para[matches(@role, '^[a-z]{1,3}motto$')]],
                            title,
                            titleabbrev,

@@ -1264,7 +1264,9 @@
     </xsl:if>
     <xsl:if test="(dbk:author or dbk:authorgroup/dbk:author) and not($create-TocAuthorNames-by-style)">
       <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
-        <param select="(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
+        <param select="if ((dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername[@role[contains(., 'notoc')]]) 
+                       then '' 
+                       else (dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
         </param>

@@ -225,7 +225,7 @@
   </xsl:variable>
   
   <xsl:variable name="info-author-role" as="xs:string"
-                select="'^[a-z]{1,3}(author)$'"/>
+                select="'^[a-z]{1,3}(author)(notoc)?$'"/>
   
   <xsl:variable name="info-author-bio-role" as="xs:string"
                 select="'^[a-z]{1,3}author-bio'" />
