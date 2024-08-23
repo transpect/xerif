@@ -16,7 +16,7 @@
                 select="('^(berschrift1|[Hh]eading\s?1|[a-z]{1,3}headingpart)|[a-z]{1,3}(front|back)matter1$',
                          concat('^(berschrift2|[Hh]eading\s?2|[a-z]{1,3}heading1|[a-z]{1,3}(front|back)matter2|[a-z]{1,3}(journalreviewheading|heading1review)|[a-z]{1,3}headingenumerated1|toctitle',
                                 '|', replace($appendix-heading-role-regex, '^\^', ''),
-                                '|', replace($index-heading-regex, '^\^', ''),
+                                '|', concat(replace($index-heading-regex, '^\^', ''), '(\p{L}+)?'(:allow different index types declared in heading:)),
                                 '|', replace($list-of-figures-regex, '^\^(.+)\$$', '$1'),
                                 '|', replace($list-of-tables-regex, '^\^(.+)\$$', '$1'),
                                 '|', replace($acknowledgements-role-regex, '^\^(.+)\$$', '$1'),
