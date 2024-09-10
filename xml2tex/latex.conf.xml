@@ -1515,6 +1515,9 @@
         <!-- if author contains only name → tpAuthorNamelist. If name is structured though 
              or if other metadata is present generate environment -->
         <rule name="tpAuthor" type="env" break-after="0" break-before="1">
+          <xsl:if test="@annotations='deceased'">
+            <xsl:text>\tpDeceased{}&#xa;</xsl:text>
+          </xsl:if>
           <text select="node()">
             <with-param name="in-author" tunnel="yes" as="xs:boolean" select="true()"/>
           </text>
