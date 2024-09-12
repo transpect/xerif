@@ -2269,8 +2269,8 @@
     </xsl:for-each-group>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/tab " mode="hub:clean-hub">
-  </xsl:template>
+  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/tab " mode="hub:clean-hub"/>
+  
   
   <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/node()[1][contains(., ':')][following-sibling::node()[1][self::tab]]" mode="hub:clean-hub">
     <phrase role="speaker"><xsl:sequence select="."/></phrase>
@@ -2282,7 +2282,11 @@
     <xsl:copy-of select="."/>
     <!-- do not touch whitespaces in transcripts -->
   </xsl:template>
-
+  
+  <!-- https://redmine.le-tex.de/issues/17480 -->
+  
+  <xsl:template match="annotation" mode="hub:clean-hub"/>
+  
   <xsl:template match="text()[parent::phrase]
                              [(matches(., '^(\s+).+') and ../node()[1][not(self::anchor | self::index-term)][self::text()]) or (matches(., '.+(\s+)$') and ../node()[not(self::anchor | self::index-term)][last()][self::text()])] (: leading or trailing whitespace :)
                              [string-length(normalize-space(.)) gt 0]
