@@ -671,7 +671,7 @@
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
       <imageobject>
-        <imagedata role="archive" fileref="{normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))}"/>
+        <imagedata role="archive" fileref="{encode-for-uri(normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i')))}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>
