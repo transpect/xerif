@@ -105,12 +105,25 @@
   <pattern abstract="true" id="char-limit_abstract-pattern">
     <rule context="$context">
       <let name="this" value="."/>
+      <let name="char-count" value="count(
+                      (
+                       for $char in string-to-codepoints(.) 
+                       return codepoints-to-string($char)
+                      )[. = tokenize('$char-list')]
+                    )"/>
+      <let name="special-chars-found" value="string-join(
+                                               for $dec in 
+                                                 for $char in string-to-codepoints('$char-list')[. != 32]
+                                                 return $char[. = string-to-codepoints($this)]
+                                               return tr:dec-to-hex($dec),
+                                               ', U+' 
+                                             )"></let>
       <assert test="count(
                       (
                        for $char in string-to-codepoints(.) 
                        return codepoints-to-string($char)
                       )[. = tokenize('$char-list')]
-                    ) &lt;= $char-limit" id="special-character" role="warning">
+                    ) &lt;= $char-limit" id="special-character" role="warning" diagnostics="special-character_de">
         There are more than <value-of select="concat($char-limit, ' ', tokenize('$class')[1])"/> characters of 
         a specific type (U+<value-of select="string-join(
                                                for $dec in 
@@ -159,6 +172,11 @@
     <diagnostic id="hidden-text_de" xml:lang="de">
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Versteckter Text</span>
       Dieser Text wurde als versteckt ausgezeichnet und wird höchstwahrscheinlich nicht in der Ausgabe erscheinen: "<value-of select="."/>"
+    </diagnostic>
+    <diagnostic id="special-character_de" xml:lang="de">
+      In diesem Abschnitt sind <value-of select="$char-count"/> Zeichen des
+      Typs (U+<value-of select="$special-chars-found"/>) verwendet worden.
+        Das könnte zu Problemen im Rendering führen. 
     </diagnostic>
     <diagnostic id="heading-level_de" xml:lang="de">
       <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Überschriften-Hierarchie</span>
