@@ -1685,6 +1685,8 @@
   </template>
   
   <template context="dbk:section[@role = 'keywords'] | dbk:section[@role = 'alternative-title']"/>
+  
+  <xsl:variable name="keyword-joiner" select="';'"/>
 
   <template context="dbk:info/dbk:keywordset">
     <xsl:if test="@role">
@@ -1693,7 +1695,7 @@
       </rule>
     </xsl:if>
     <rule name="tpKeywords" type="cmd" break-before="1" break-after="0">
-      <param select="string-join(dbk:keyword, '; ')"/>
+      <param select="string-join(dbk:keyword, concat($keyword-joiner,' '))"/>
     </rule>
   </template>
 
