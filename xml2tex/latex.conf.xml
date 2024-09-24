@@ -53,6 +53,7 @@
   
   <xsl:param name="run-local" as="xs:string"/>
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
+  <xsl:param name="a11y" as="xs:boolean" select="true()"/>
   
   <!-- keys -->
   
@@ -236,6 +237,7 @@
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
                                ',withcoltitles'[$running-header eq 'yes'],
+                               'a11y'[$a11y],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
                                '}&#xa;')"/>
