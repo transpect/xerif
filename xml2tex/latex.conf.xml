@@ -1088,7 +1088,7 @@
   
   <xsl:function name="tr:create-sect-option-from-renderas">
     <xsl:param name="renderas"/>
-    <xsl:sequence select="matches($renderas, 'hub:(no-toc|no-pdf-bookmarks)')"/>
+    <xsl:sequence select="matches($renderas, 'hub:(no-toc|no-pdf-bm)')"/>
   </xsl:function>
   
   <template context="dbk:index[empty(.//dbk:indexentry)]">
