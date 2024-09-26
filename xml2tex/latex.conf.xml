@@ -2832,13 +2832,13 @@
     </rule>
   </regex>
 
-  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)">
+  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(self::*:phrase[@xml:lang='el'])">
     <rule type="cmd" name="foreignlanguage{greek}">
       <param regex-group="1"/>
     </rule>
   </regex>
   
-  <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" >
+  <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
     <rule type="cmd" name="foreignlanguage{hebrew}">
       <param regex-group="1"/>
     </rule>
@@ -2862,7 +2862,7 @@
     </rule>
   </regex>
   
-  <regex regex="([&#x700;-&#x74f;]+)">
+  <regex regex="([&#x700;-&#x74f;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x700;-&#x74f;]+)*[…:;,\.]?)" context="not(self::*:phrase[@xml:lang='syr'])">
     <rule type="cmd" name="foreignlanguage{syriac}">
       <param regex-group="1"/>
     </rule>
@@ -2874,21 +2874,11 @@
     </rule>
   </regex>
   
-  <regex regex="([&#x700;-&#x74f;]+)">
-    <rule type="cmd" name="foreignlanguage{syriac}">
-      <param regex-group="1"/>
-    </rule>
-  </regex>
-  
   <regex regex="([&#x10a0;-&#x10ff;]+)">
     <rule type="cmd" name="foreignlanguage{georgian}">
       <param regex-group="1"/>
     </rule>
   </regex>
-  
-  <template context="dbk:phrase[@xml:lang=('he','el','hy','syr')]">
-    <xsl:apply-templates mode="#current"/>
-  </template>
   
   <!-- unichar for font change in sans-serif non-latin text #7115 -->
  
