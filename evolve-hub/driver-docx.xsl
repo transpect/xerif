@@ -2360,12 +2360,14 @@
 
   <xsl:template match="para[not(@role)][not(matches(., '\S'))][@css:page-break-before]" mode="hub:split-at-tab">
     <xsl:text>&#xa;</xsl:text>
-    <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak&#xa;'"/>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'{\pagebreak}&#xa;'"/>
   </xsl:template>
   
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
     <xsl:processing-instruction name="{$pi-xml-name}">
+      <xsl:text>{</xsl:text>
       <xsl:apply-templates mode="#current"/>
+      <xsl:text>}</xsl:text>
     </xsl:processing-instruction>
   </xsl:template>
   
@@ -2379,7 +2381,7 @@
     <xsl:analyze-string select="." regex="{concat($pi-mark, '([-+]\d+)')}">
       <xsl:matching-substring>
         <xsl:processing-instruction name="{$pi-xml-name}">
-          <xsl:value-of select="concat('\looseness=', regex-group(1))"/>
+          <xsl:value-of select="concat('{\looseness=', regex-group(1), '}')"/>
         </xsl:processing-instruction>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
