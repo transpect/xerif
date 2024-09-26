@@ -2723,7 +2723,10 @@
     </rule>
   </template>
 
-  <xsl:template match="text()[matches(., concat('[', string-join($scripts/@unicode-range), ']'))]"
+  <!--    <xsl:variable name="regex" as="xs:string" select="concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')"/>
+    moved functionality to regex templates 
+    need for double-parenthesis and protect 
+    <xsl:template match="text()[matches(., concat('[', string-join($scripts/@unicode-range), ']'))]"
                 mode="xml2tex" priority="300">
     <xsl:param name="protect-lang" as="xs:boolean?" tunnel="yes" select="false()"/>
     <xsl:variable name="protect" select="'\protect'[$protect-lang]" as="xs:string?"/>
@@ -2731,7 +2734,7 @@
     <xsl:variable name="double-parenthesis" select="empty(../name()) or ..[self::*:link]" as="xs:boolean"/>
     <xsl:variable name="context-lang" as="attribute(xml:lang)?"
                   select="ancestor::*[@xml:lang][1]/@xml:lang"/>
-<!--    <xsl:variable name="regex" as="xs:string" select="concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')"/>-->
+<!-\-    <xsl:variable name="regex" as="xs:string" select="concat('([', string-join($scripts/@unicode-range, ']+)|(['), '])')"/>-\->
 
     <xsl:variable name="regex" as="xs:string"
                 select="string-join((for $l in $scripts return concat('(', 
@@ -2749,7 +2752,7 @@
                                     '|')"/>
     <xsl:analyze-string select="." regex="{$regex}">
       <xsl:matching-substring>
-        <!-- order of languages must match the order in $script var -->
+        <!-\- order of languages must match the order in $script var -\->
         <xsl:choose>
           <xsl:when test="regex-group(1) and not($context-lang = 'ar')">
             <xsl:value-of select="concat('{'[$double-parenthesis],$protect,'\foreignlanguage{arabic}{', ., '}', '}'[$double-parenthesis])"/>      
@@ -2791,7 +2794,7 @@
       </xsl:non-matching-substring>
     </xsl:analyze-string>
     
-  </xsl:template>
+  </xsl:template>-->
   
   <!-- Map Unicode Emojis to \textemoji{} (https://redmine.le-tex.de/issues/17212)
        Source: https://www.fileformat.info/info/unicode/font/noto_emoji_regular/list.htm
@@ -2820,7 +2823,73 @@
       <param regex-group="1"/>
     </rule>
   </regex>-->
+  
+  <!--  regexes for script languages -->
+  
+  <regex regex="([&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+([\p{Zs}\p{P}]+[&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+)*[…:;,\.]?)">
+    <rule type="cmd" name="foreignlanguage{chinese}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
 
+  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)">
+    <rule type="cmd" name="foreignlanguage{greek}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" >
+    <rule type="cmd" name="foreignlanguage{hebrew}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)">
+    <rule name="foreignlanguage{armenian}" type="cmd">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="(((\s*[…&#x300;-&#x36F;,\|‘’:]*\s*[&#x600;-&#x6ff;&#x750;-&#x77f;]+\s*[…&#x300;-&#x36F;,\|‘’:]*))+)">
+    <rule name="foreignlanguage{arabic}" type="cmd">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#x3040;-&#x309f;&#x30a0;-&#x30ff;&#12352;-&#12543;]+)">
+    <rule type="cmd" name="foreignlanguage{japanese}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#x700;-&#x74f;]+)">
+    <rule type="cmd" name="foreignlanguage{syriac}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#xac00;-&#xd7ae;&#x1100;-&#x11ff;&#x3130;-&#x318f;&#xa960;-&#xa97f;&#xd7b0;-&#xd7ff;]+)">
+    <rule type="cmd" name="foreignlanguage{korean}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#x700;-&#x74f;]+)">
+    <rule type="cmd" name="foreignlanguage{syriac}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <regex regex="([&#x10a0;-&#x10ff;]+)">
+    <rule type="cmd" name="foreignlanguage{georgian}">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
+  <template context="dbk:phrase[@xml:lang=('he','el','hy','syr')]">
+    <xsl:apply-templates mode="#current"/>
+  </template>
+  
   <!-- unichar for font change in sans-serif non-latin text #7115 -->
  
   <xsl:variable name="non-latin-style" select="'^[a-z]{1,3}nonlatin$'" as="xs:string"/>
