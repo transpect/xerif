@@ -3289,7 +3289,7 @@
         <xsl:text>\newpage%&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>\vadjust{\newpage}%&#xa;</xsl:text>
+        <xsl:text>&#x20;\vadjust{\newpage}%&#xa;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </template>
