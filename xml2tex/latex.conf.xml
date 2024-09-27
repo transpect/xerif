@@ -2844,7 +2844,7 @@
     </rule>
   </regex>
   
-  <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)">
+  <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)" context="not(self::*:phrase[@xml:lang='hy'])">
     <rule name="foreignlanguage{armenian}" type="cmd">
       <param regex-group="1"/>
     </rule>
