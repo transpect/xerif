@@ -2826,7 +2826,7 @@
   
   <!--  regexes for script languages -->
   
-  <regex regex="([&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+([\p{Zs}\p{P}]+[&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+)*[…:;,\.]?)">
+  <regex regex="([&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+([\p{Zs}\p{P}]+[&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+)*[…]?)">
     <rule type="cmd" name="foreignlanguage{chinese}">
       <param regex-group="1"/>
     </rule>
