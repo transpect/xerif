@@ -2366,6 +2366,7 @@
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
     <xsl:processing-instruction name="{$pi-xml-name}">
       <xsl:apply-templates mode="#current"/>
+      <xsl:text>&#x20;</xsl:text>
     </xsl:processing-instruction>
   </xsl:template>
   
