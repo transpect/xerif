@@ -3392,8 +3392,6 @@
     <char character="&#xdf;" string="ß"/>
     <!-- SINGLE LOW-9 QUOTATION MARK -->
     <char character="&#x201a;" string=","/>
-    <!-- FULLWIDTH COMMA -->
-    <char character="&#xff0c;" string=","/>
     <!-- *
          * remove bidirectional Unicode characters, Babel handles text direction
          * -->
