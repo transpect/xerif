@@ -3400,8 +3400,6 @@
     <char character="&#x202c;" string=""/>
     <char character="&#x202d;" string=""/>
     <char character="&#x202e;" string=""/>
-    <!-- FULLWIDTH COMMA -->
-    <char character="&#xff0c;" string=","/>
     <!-- * 
          * special processing instructions for common 
          * -->
