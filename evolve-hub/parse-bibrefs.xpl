@@ -54,6 +54,13 @@
     <p:variable name="bib-index" select="p:iteration-position()"/>
     <p:variable name="ref-txt-path" select="concat($out-dir, $basename, '.ref-', $bib-index, '.txt')"/>
     
+    <tr:store-debug name="debug-bib-xml">
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/bib-', $bib-index, '/02_original-bib')"/>
+      <p:with-option name="active" select="'yes'"/>
+      <p:with-option name="base-uri" select="$debug-dir-uri"/>
+      <p:with-option name="indent" select="true()"/>
+    </tr:store-debug>
+    
     <p:xslt name="transform-xml-bibliography-to-plaintext">
       <p:input port="stylesheet">
         <p:inline>
@@ -73,8 +80,8 @@
       </p:input>
     </p:xslt>
     
-    <tr:store-debug name="debug-bib-txt">
-      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/04_plain-ref-', $bib-index, '.txt')"/>
+    <tr:store-debug name="debug-plaintxt-bib" extension="txt">
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/bib-', $bib-index, '/04_plaintext-bib')"/>
       <p:with-option name="active" select="'yes'"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
       <p:with-option name="indent" select="true()"/>
@@ -94,8 +101,8 @@
       </p:with-option>
     </tr:bib-parser>
     
-    <tr:store-debug name="debug-bib-xml">
-      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/08_xml-ref-', $bib-index)"/>
+    <tr:store-debug name="debug-parsed-bib">
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/bib-', $bib-index, '/06_parsed-bib')"/>
       <p:with-option name="active" select="'yes'"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
       <p:with-option name="indent" select="true()"/>
@@ -129,9 +136,16 @@
       </p:otherwise>
     </p:choose>
     
+    <tr:store-debug name="debug-hub-bib">
+      <p:with-option name="pipeline-step" select="concat('parse-bibrefs/bib-', $bib-index, '/08_hub-bib')"/>
+      <p:with-option name="active" select="'yes'"/>
+      <p:with-option name="base-uri" select="$debug-dir-uri"/>
+      <p:with-option name="indent" select="true()"/>
+    </tr:store-debug>
+    
   </p:viewport>
   
-  <tr:store-debug name="debug-hub" pipeline-step="parse-bibrefs/12_hub-doc">
+  <tr:store-debug name="debug-hub-doc" pipeline-step="parse-bibrefs/10_hub-doc">
     <p:with-option name="active" select="'yes'"/>
     <p:with-option name="base-uri" select="$debug-dir-uri"/>
     <p:with-option name="indent" select="true()"/>
