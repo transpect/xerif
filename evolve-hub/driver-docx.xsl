@@ -1604,19 +1604,31 @@
   
   <!--    move see indicator from phrase, like
   <phrase>136, 156, 208; s. a.</phrase> Anton, Herzog-->
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]/phrase[matches(.,concat($index-see-also-regex,'?'))]" mode="hub:clean-hub">
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(.,
+                                     concat(
+                                       $index-see-also-regex, 
+                                       '?'
+                                     )
+                                   )]" mode="hub:clean-hub">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:sequence select="replace(.,concat($index-see-also-regex,'?'),'')"/>
+      <xsl:sequence select="replace(., concat($index-see-also-regex, '?'), '')"/>
     </xsl:copy>
-    <xsl:sequence select="replace(.,concat('.*',$index-see-also-regex,'?(\p{Zs})?.*'),'$1$2$4')"/>
+    <xsl:sequence select="replace(., 
+                            concat('.*', $index-see-also-regex, '?(\p{Zs})?.*' ), 
+                            '$1$2$4'
+                          )"/>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]/phrase[matches(.,concat('^\p{Zs}*',$index-see-also-regex,'?\p{Zs}*$'))]" mode="hub:clean-hub" priority="2">
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(.,
+                                     concat('^\p{Zs}*', $index-see-also-regex, '?\p{Zs}*$')
+                                   )]" mode="hub:clean-hub" priority="2">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]" mode="custom-1">
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., concat('(^|[\P{L}])', $index-see-regex))(:avoid matching of Tennessee:)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
@@ -1633,17 +1645,22 @@
       <xsl:apply-templates select="$para" mode="custom-1-index"/>
     </xsl:variable>
     <xsl:variable name="para-with-see" as="item()*">
-      <xsl:for-each-group select="$para-with-see-pi/node()" group-starting-with="processing-instruction()">
+      <xsl:for-each-group select="$para-with-see-pi/node()" 
+                          group-starting-with="processing-instruction()">
         
         <xsl:choose>
-          <xsl:when test="current-group()[self::processing-instruction()[matches(name(),'seealso')]]">
+          <xsl:when test="current-group()[self::processing-instruction()[matches(name(), $index-see-also-pi-name)]]">
             <seealsoie>
-              <xsl:apply-templates select="current-group() except self::processing-instruction()[matches(name(),'see')]" mode="custom-1-index"/>
+              <xsl:apply-templates select="current-group() 
+                                             except self::processing-instruction()[matches(name(), $index-see-pi-name)]" 
+                                   mode="custom-1-index"/>
             </seealsoie>
           </xsl:when>
-          <xsl:when test="current-group()[self::processing-instruction()[matches(name(),'see')]]">
+          <xsl:when test="current-group()[self::processing-instruction()[matches(name(),$index-see-pi-name)]]">
             <seeie>
-              <xsl:apply-templates select="current-group() except self::processing-instruction()[matches(name(),'see')]" mode="custom-1-index"/>
+              <xsl:apply-templates select="current-group() 
+                                             except self::processing-instruction()[matches(name(), $index-see-pi-name)]" 
+                                   mode="custom-1-index"/>
             </seeie>
           </xsl:when>
           <xsl:otherwise>
@@ -1712,10 +1729,20 @@
     </xsl:analyze-string>
   </xsl:function>
   
-  <xsl:template match="*[self::*[local-name()=('primaryie', 'secondaryie', 'tertiaryie')]][*:seealsoie or *:seeie]"  mode="custom-2" priority="4">
-    <xsl:copy>
-      <xsl:apply-templates select="node() except (*:seeie,*:seealsoie)" mode="#current"/>
-    </xsl:copy>
+  <xsl:template match="*[self::*[local-name() = $primary-secondary-etc]]
+                        [*:seealsoie or *:seeie]"  
+                mode="custom-2" priority="4">
+    <xsl:variable name="nodes-without-see" as="node()*" 
+                  select="node() except (*:seeie, *:seealsoie)"/>
+    <xsl:if test="not(
+                    matches(
+                      string-join($nodes-without-see, ''), 
+                    '^\p{Zs}+$')
+                  )">
+      <xsl:copy>
+        <xsl:apply-templates select="$nodes-without-see" mode="#current"/>
+      </xsl:copy>
+    </xsl:if>
     <xsl:apply-templates select="*:seeie, *:seealsoie" mode="#current"/>
   </xsl:template>
   
@@ -1795,10 +1822,20 @@
     <xsl:value-of select="replace($index-type, '\p{P}', '')"/>
   </xsl:function>
   
+  <xsl:variable name="primary-secondary-etc" as="xs:string+" 
+                select="('primaryie', 
+                         'secondaryie', 
+                         'tertiaryie', 
+                         'quaternaryie', 
+                         'quinaryie', 
+                         'senaryie', 
+                         'septenaryie', 
+                         'octonaryie', 
+                         'nonaryie', 
+                         'denaryie')"/>
+  
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
-    <xsl:param name="level" />
-    <xsl:variable name="primary-secondary-etc" as="xs:string+" 
-                  select="('primaryie', 'secondaryie', 'tertiaryie', 'quaternaryie', 'quinaryie', 'senaryie', 'septenaryie', 'octonaryie', 'nonaryie', 'denaryie')"/>
+    <xsl:param name="level"/>
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
                           then $primary-secondary-etc[xs:integer($level)]
                           else $primary-secondary-etc[1]"/>
