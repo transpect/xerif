@@ -2834,55 +2834,55 @@
   <!--  regexes for script languages -->
   
   <regex regex="([&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+([\p{Zs}\p{P}]+[&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+)*[…]?)">
-    <rule type="cmd" name="foreignlanguage{chinese}">
+    <rule type="cmd" name="foreignlanguage{chinese}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
 
   <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(self::*:phrase[@xml:lang='el'])">
-    <rule type="cmd" name="foreignlanguage{greek}">
+    <rule type="cmd" name="foreignlanguage{greek}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
-    <rule type="cmd" name="foreignlanguage{hebrew}">
+    <rule type="cmd" name="foreignlanguage{hebrew}"  protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([&#x530;-&#x58f;&#xfb13;-&#xfb17;]+)" context="not(self::*:phrase[@xml:lang='hy'])">
-    <rule name="foreignlanguage{armenian}" type="cmd">
+    <rule name="foreignlanguage{armenian}" type="cmd" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="(((\s*[…&#x300;-&#x36F;,\|‘’:]*\s*[&#x600;-&#x6ff;&#x750;-&#x77f;]+\s*[…&#x300;-&#x36F;,\|‘’:]*))+)">
-    <rule name="foreignlanguage{arabic}" type="cmd">
+    <rule name="foreignlanguage{arabic}" type="cmd" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([&#x3040;-&#x309f;&#x30a0;-&#x30ff;&#12352;-&#12543;]+)">
-    <rule type="cmd" name="foreignlanguage{japanese}">
+    <rule type="cmd" name="foreignlanguage{japanese}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([&#x700;-&#x74f;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x700;-&#x74f;]+)*[…:;,\.]?)" context="not(self::*:phrase[@xml:lang='syr'])">
-    <rule type="cmd" name="foreignlanguage{syriac}">
+    <rule type="cmd" name="foreignlanguage{syriac}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([&#xac00;-&#xd7ae;&#x1100;-&#x11ff;&#x3130;-&#x318f;&#xa960;-&#xa97f;&#xd7b0;-&#xd7ff;]+)">
-    <rule type="cmd" name="foreignlanguage{korean}">
+    <rule type="cmd" name="foreignlanguage{korean}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
   
   <regex regex="([&#x10a0;-&#x10ff;]+)">
-    <rule type="cmd" name="foreignlanguage{georgian}">
+    <rule type="cmd" name="foreignlanguage{georgian}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
