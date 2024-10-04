@@ -1670,7 +1670,7 @@
     <xsl:sequence select="$para-with-see"/>
   </xsl:function>
   
-  <xsl:template match="text()[matches(.,concat($index-see-also-regex,'?'))]" mode="custom-1-index">
+  <xsl:template match="text()[matches(.,concat('(^|[\P{L}])',$index-see-also-regex,'?'))]" mode="custom-1-index">
     <xsl:analyze-string select="." regex="{$index-see-also-regex}">
       <xsl:matching-substring>
         <xsl:processing-instruction name="seealso"/>
