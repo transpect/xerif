@@ -2690,15 +2690,14 @@
        escape ! in indexterms (makeindex has no issues with escaped 
        exclamation mark "! but xindy does ) -->
   
-  <template context="dbk:see//text()
-                    |dbk:seealso//text()">
+  <template context="dbk:see|dbk:seealso">
     <rule>
       <text select="concat(
                       '|',
                       replace(
                         replace(
                           string-join(
-                            xml2tex:utf2tex(.., ., $charmap, (), $texregex), ''
+                            xml2tex:utf2tex(., ., $charmap, (), $texregex), ''
                           ), '!', '{&quot;!}'
                         ), '^((see|voir|véase|vedi|ver|siehe|请参阅|ראה|انظر|참조)\s+)?(.+)$', 'see{$3}', 'i'
                       )
