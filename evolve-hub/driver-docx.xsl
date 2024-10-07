@@ -1601,63 +1601,115 @@
   
   <!-- (4) static index -->
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]" mode="custom-1">
+  <!-- but first: cleaning of indexparas and see/seealso phrases -->
+  
+  <!--    move see indicator from phrase, like
+  <phrase>136, 156, 208; s. a.</phrase> Anton, Herzog-->
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(.,
+                                     concat(
+                                       $index-see-also-regex, 
+                                       '?'
+                                     )
+                                   )]" mode="hub:clean-hub">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:sequence select="replace(., concat($index-see-also-regex, '?'), '')"/>
+    </xsl:copy>
+    <xsl:sequence select="replace(., 
+                            concat('.*', $index-see-also-regex, '?(\p{Zs})?.*' ), 
+                            '$1$2$4'
+                          )"/>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(.,
+                                     concat('^\p{Zs}*', $index-see-also-regex, '?\p{Zs}*$')
+                                   )]" mode="hub:clean-hub" priority="2">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., concat('(^|[\P{L}])', $index-see-regex))(:avoid matching of Tennessee:)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
     <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
       <xsl:apply-templates select="$para-atts" mode="#current"/>
-        <xsl:choose>
-          <xsl:when test="$see-exists">
-            <xsl:for-each-group select="node()" group-starting-with="node()[matches(., $index-see-regex)]">
-              <xsl:choose>
-                <xsl:when test="matches(string-join(current-group(), ''), $index-see-regex)">
-                  <xsl:for-each select="current-group()">
-                    <xsl:choose>
-                      <xsl:when test="matches(., $index-see-regex)">
-                        <xsl:element name="{if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'seealsoie' else 'seeie'}">
-                          <xsl:attribute name="xreflabel" select="concat('see', if (matches(string-join(current-group(), ''), $index-see-also-regex)) then 'also' else ())"/>
-                          <xsl:copy>
-                            <xsl:apply-templates select="@*" mode="#current"/>
-                            <xsl:analyze-string select="." regex="{concat($index-see-also-regex, '?')}">
-                              <xsl:non-matching-substring>
-                                <xsl:value-of select="."/>
-                              </xsl:non-matching-substring>
-                            </xsl:analyze-string>
-                          </xsl:copy>
-                        </xsl:element>
-                      </xsl:when>
-                      <xsl:otherwise>
-                        <xsl:choose>
-                          <xsl:when test="matches(current(),'(,?\s)(([\d]+)(–([\d]+))?)+')">
-                            <xsl:sequence select="tr:pagenums-to-xref(.)"/>
-                          </xsl:when>
-                          <xsl:otherwise>
-                            <xsl:copy>
-                              <xsl:apply-templates select="@*, node()" mode="#current"/>
-                            </xsl:copy>
-                          </xsl:otherwise>
-                        </xsl:choose>
-                      </xsl:otherwise>
-                    </xsl:choose>
-                  </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:apply-templates select="current-group()" mode="#current"/>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each-group>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:apply-templates mode="#current"/>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:sequence select="tr:create-static-index(.)"/>
       </xsl:element>
   </xsl:template>
   
+  <xsl:function name="tr:create-static-index">
+    <xsl:param name="para" as="element()*"/>
+    <xsl:variable name="para-with-see-pi" as="element()*">
+      <xsl:apply-templates select="$para" mode="custom-1-index"/>
+      </xsl:variable>
+  <xsl:variable name="para-with-see" as="item()*">
+      <xsl:for-each-group select="$para-with-see-pi/node()" 
+                          group-starting-with="processing-instruction()">
+        
+        <xsl:choose>
+          <xsl:when test="current-group()[self::processing-instruction()[matches(name(), $index-see-also-pi-name)]]">
+            <seealsoie>
+              <xsl:apply-templates select="current-group() 
+                                             except self::processing-instruction()[matches(name(), $index-see-pi-name)]" 
+                                   mode="custom-1-index"/>
+            </seealsoie>
+          </xsl:when>
+          <xsl:when test="current-group()[self::processing-instruction()[matches(name(),$index-see-pi-name)]]">
+            <seeie>
+              <xsl:apply-templates select="current-group() 
+                                             except self::processing-instruction()[matches(name(), $index-see-pi-name)]" 
+                                   mode="custom-1-index"/>
+            </seeie>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:for-each select="current-group()" >
+              <xsl:choose>
+                <xsl:when test="matches(string-join(current(),''),'(^|,?\s)(([\d]+)(–([\d]+))?)+') and current()[self::*]">
+                  <xsl:copy>
+                    <xsl:apply-templates select="@*"/>
+                    <xsl:sequence select="tr:pagenums-to-xref(string-join(current(),''))" />
+                  </xsl:copy>
+                </xsl:when>
+                <xsl:when test="matches(string-join(current(),''),'(^|,?\s)(([\d]+)(–([\d]+))?)+')">
+                  <xsl:sequence select="tr:pagenums-to-xref(string-join(current(),''))" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current()"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:variable>
+    <xsl:sequence select="$para-with-see"/>
+  </xsl:function>
+  
+  <xsl:template match="text()[matches(.,concat('(^|[\P{L}])',$index-see-also-regex,'?'))]" mode="custom-1-index">
+    <xsl:analyze-string select="." regex="{$index-see-also-regex}">
+      <xsl:matching-substring>
+        <xsl:processing-instruction name="seealso"/>
+      <xsl:value-of select="replace(.,$index-see-also-regex,'')"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:analyze-string select="." regex="{$index-see-regex}">
+          <xsl:matching-substring>
+            <xsl:processing-instruction name="see"/>
+            <xsl:value-of select="replace(.,$index-see-regex,'')"/>
+          </xsl:matching-substring>
+          <xsl:non-matching-substring>
+            <xsl:value-of select="."/>
+          </xsl:non-matching-substring>
+        </xsl:analyze-string>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
+  
   <xsl:function name="tr:pagenums-to-xref">
-    <xsl:param name="str" as="xs:string"/>
+    <xsl:param name="str" as="xs:string*"/>
     <xsl:analyze-string select="$str" regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
       <xsl:matching-substring>
         <xsl:choose>
@@ -1678,15 +1730,25 @@
     </xsl:analyze-string>
   </xsl:function>
   
-  <xsl:template match="para[matches(@role, concat($index-static-regex,$index-static-level-regex))]//text()[not(following-sibling::tab)]" mode="custom-1">
-    <xsl:choose>
-      <xsl:when test="ancestor::para/tab or matches(.,'(,?\s)(([\d]+)(–([\d]+))?)+')">
-        <xsl:sequence select="tr:pagenums-to-xref(.)"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:copy/>
-      </xsl:otherwise>
-    </xsl:choose>
+  <xsl:template match="*[self::*[local-name() = $primary-secondary-etc]]
+                        [*:seealsoie or *:seeie]"  
+                mode="custom-2" priority="4">
+    <xsl:variable name="nodes-without-see" as="node()*" 
+                  select="node() except (*:seeie, *:seealsoie)"/>
+    <xsl:if test="not(
+                    matches(
+                      string-join($nodes-without-see, ''), 
+                    '^\p{Zs}+$')
+                  )">
+      <xsl:copy>
+        <xsl:apply-templates select="$nodes-without-see" mode="#current"/>
+      </xsl:copy>
+    </xsl:if>
+    <xsl:apply-templates select="*:seeie, *:seealsoie" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="*[self::*:seealsoie or self::*:seeie]/text()[1][matches(.,'^\p{Zs}+')]"  mode="custom-2" priority="4">
+    <xsl:sequence select="replace(.,'^\p{Zs}+','')"/>
   </xsl:template>
   
   <xsl:variable name="static-index-sections" as="element(index)*"
@@ -1761,10 +1823,20 @@
     <xsl:value-of select="replace($index-type, '\p{P}', '')"/>
   </xsl:function>
   
+  <xsl:variable name="primary-secondary-etc" as="xs:string+" 
+                select="('primaryie', 
+                         'secondaryie', 
+                         'tertiaryie', 
+                         'quaternaryie', 
+                         'quinaryie', 
+                         'senaryie', 
+                         'septenaryie', 
+                         'octonaryie', 
+                         'nonaryie', 
+                         'denaryie')"/>
+  
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
     <xsl:param name="level" />
-    <xsl:variable name="primary-secondary-etc" as="xs:string+" 
-                  select="('primaryie', 'secondaryie', 'tertiaryie', 'quaternaryie', 'quinaryie', 'senaryie', 'septenaryie', 'octonaryie', 'nonaryie', 'denaryie')"/>
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
                           then $primary-secondary-etc[xs:integer($level)]
                           else $primary-secondary-etc[1]"/>
@@ -2360,12 +2432,13 @@
 
   <xsl:template match="para[not(@role)][not(matches(., '\S'))][@css:page-break-before]" mode="hub:split-at-tab">
     <xsl:text>&#xa;</xsl:text>
-    <xsl:processing-instruction name="{$pi-xml-name}" select="'\pagebreak&#xa;'"/>
+    <xsl:processing-instruction name="{$pi-xml-name}" select="'{\pagebreak}&#xa;'"/>
   </xsl:template>
   
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
     <xsl:processing-instruction name="{$pi-xml-name}">
       <xsl:apply-templates mode="#current"/>
+    <xsl:text>&#x20;</xsl:text>
     </xsl:processing-instruction>
   </xsl:template>
   
