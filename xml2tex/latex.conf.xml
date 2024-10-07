@@ -790,7 +790,7 @@
   </template>
   
   <template context="dbk:para" priority="900">
-     <!--\ccaStructStart{P}-->
+    <!--\ccaStructStart{P}-->
     <rule name="ccaStructStart" type="cmd" break-after="0" break-before="0">
       <param select="'P'"/>
     </rule>
@@ -798,7 +798,7 @@
     <xsl:next-match>
       <xsl:with-param name="already-tagged" select="true()" tunnel="yes" as="xs:boolean"/>
     </xsl:next-match>
-        <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
+    <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
       <param select="'P'"/>
     </rule>
   </template>
