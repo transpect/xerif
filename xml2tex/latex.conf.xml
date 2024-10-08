@@ -237,7 +237,7 @@
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
                                ',withcoltitles'[$running-header eq 'yes'],
-                               'a11y'[$a11y],
+                               ',a11y'[$a11y],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
                                '}&#xa;')"/>
