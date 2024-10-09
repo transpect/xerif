@@ -2437,7 +2437,10 @@
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
     <xsl:processing-instruction name="{$pi-xml-name}">
       <xsl:apply-templates mode="#current"/>
-      <xsl:text>&#x20;</xsl:text>
+      <xsl:if test="    not(matches(string-join(., ''), '[\p{Zs}\p{P}%]$')) 
+                    and not(matches(following-sibling::node()[1], '^[\p{Zs}\p{P}%]'))">
+        <xsl:text>&#x20;</xsl:text>
+      </xsl:if>
     </xsl:processing-instruction>
   </xsl:template>
   
