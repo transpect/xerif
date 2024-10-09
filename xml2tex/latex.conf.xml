@@ -790,14 +790,12 @@
   </template>
   
   <template context="dbk:para" priority="975">
-    <xsl:param name="suppress-cca" select="exists(parent::*[self::legalnotice])" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    
     <!--\ccaStructStart{P}-->
     <xsl:if test="not($suppress-cca)">
       <rule name="ccaStructStart" type="cmd" break-after="0" break-before="0">
         <param select="'P'"/>
-        <text>
-           <with-param name="suppress-cca" select="true()" tunnel="yes" as="xs:boolean"/>
-        </text>
       </rule>
     </xsl:if>
     <!--\ccaStructEnd{P}-->
