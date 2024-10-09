@@ -77,6 +77,10 @@
   <xsl:variable name="letter-spacing-def" select="''" as="xs:string?"/>
   <xsl:variable name="create-TocAuthorNames-by-style" select="false()"/>
 
+  <xsl:variable name="cca-start" select="'\ccaStructStart{P}'" as="xs:string"/>
+  <xsl:variable name="cca-end" select="'\ccaStructEnd{P}'" as="xs:string"/>
+
+
   <!-- see the wiki link below for details
        https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Titelei -->
   <xsl:variable name="metadata" as="element(dbk:keywordset)?" 
@@ -803,7 +807,7 @@
       <xsl:with-param name="suppress-cca" select="true()" tunnel="yes" as="xs:boolean"/>
     </xsl:next-match>
     <xsl:if test="not($suppress-cca)">  
-      <rule name="ccaStructEnd" type="cmd" break-after="2" break-before="0">
+      <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
         <param select="'P'"/>
       </rule>
     </xsl:if>
