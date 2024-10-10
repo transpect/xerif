@@ -77,8 +77,8 @@
   <xsl:variable name="letter-spacing-def" select="''" as="xs:string?"/>
   <xsl:variable name="create-TocAuthorNames-by-style" select="false()"/>
 
-  <xsl:variable name="cca-start" select="'\ccaStructStart{P}'" as="xs:string"/>
-  <xsl:variable name="cca-end" select="'\ccaStructEnd{P}'" as="xs:string"/>
+  <xsl:variable name="cca-start" select="if ($a11y) then '\ccaStructStart{P}' else ()" as="xs:string?"/>
+  <xsl:variable name="cca-end" select="if ($a11y) then '\ccaStructEnd{P}' else ()" as="xs:string"/>
 
 
   <!-- see the wiki link below for details
