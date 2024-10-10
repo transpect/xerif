@@ -795,18 +795,18 @@
   
   <template context="dbk:para" priority="975">
     <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
-    
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <!--\ccaStructStart{P}-->
-    <xsl:if test="not($suppress-cca)">
-      <rule name="ccaStructStart" type="cmd" break-after="0" break-before="0">
+    <xsl:if test="not($suppress-cca) and not($already-structured)">
+      <rule name="ccaStructStart" type="cmd" break-after="0" break-before="1">
         <param select="'P'"/>
       </rule>
     </xsl:if>
     <!--\ccaStructEnd{P}-->
     <xsl:next-match>
-      <xsl:with-param name="suppress-cca" select="true()" tunnel="yes" as="xs:boolean"/>
+      <xsl:with-param name="already-structured" select="true()" tunnel="yes" as="xs:boolean"/>
     </xsl:next-match>
-    <xsl:if test="not($suppress-cca)">  
+    <xsl:if test="not($suppress-cca) and not($already-structured)">  
       <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
         <param select="'P'"/>
       </rule>
