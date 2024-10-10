@@ -1881,6 +1881,7 @@
       <text> \tpBreak </text>
     </rule>
     <!--https://redmine.le-tex.de/issues/15354#note-14-->
+    <!-- change to A11Y -->
   </template>
 
  
@@ -2105,6 +2106,7 @@
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
        <param/>
      </rule>
+     <!-- A11Y? -->
    </template>
   
   <template context="dbk:figure/dbk:caption 
@@ -2387,13 +2389,13 @@
         <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
         <xsl:text>\par&#xa;</xsl:text>
       </xsl:if>
-      <text select="*[not(self::dbk:title or self::dbk:attribution)]"/>
+      <text select="$cca-start, *[not(self::dbk:title or self::dbk:attribution)], $cca-end"/>
     </rule>
   </template>
   
   <template context="dbk:blockquote[matches(@role, $verse-centered-style)]">
     <rule name="versecentered" type="env" break-after="1" break-before="1">
-      <text/>
+      <text select="$cca-start, *[not(self::dbk:title or self::dbk:attribution)], $cca-end"/>
     </rule>
   </template>
 
@@ -2422,8 +2424,9 @@
     </xsl:if>
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:phrase[@role = 'speaker']"/>
-      <text select="node() except dbk:phrase[@role = 'speaker']"/>
+      <text select="$cca-start, node() except dbk:phrase[@role = 'speaker'], $cca-end "/>
     </rule>
+    <!-- A11Y? -->
   </template>
   
   <!-- letters -->
@@ -2442,6 +2445,7 @@
         <text>&#xa;</text>
       </xsl:if>
     </rule>
+    <!-- A11Y? -->
   </template>
 
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]
@@ -2453,6 +2457,7 @@
       <text/>
       <text>&#xa;</text>
     </rule>
+    <!-- A11Y? -->
   </template>
 
  <!-- example:
@@ -2487,12 +2492,14 @@
       <text/>
       <text>\tpBreak</text>
     </rule>
+    <!-- A11Y? -->
   </template>
 
   <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
     <rule break-after="1">
       <text/>
     </rule>
+    <!-- A11Y? -->
   </template>
   
   <template context=" dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para[position() eq last()] 
@@ -2500,6 +2507,7 @@
     <rule>
       <text/>
     </rule>
+    <!-- A11Y? -->
   </template>
   
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]]">
@@ -2510,6 +2518,7 @@
       </xsl:if>
     </rule>
     <!-- do not create item because margin is generated via letter-environment. handle as normal letter para -->
+    <!-- A11Y? -->
   </template>
 
   <template context="dbk:para[matches(@role, $letter-para-style)]
@@ -2517,6 +2526,7 @@
     <rule break-after="1">
       <text/>
     </rule>
+    <!-- A11Y? -->
   </template>
   
   <!--  *
@@ -2532,7 +2542,7 @@
   <template context="dbk:para[dbk:personname[@role eq 'speaker']]">
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:personname[@role eq 'speaker']/normalize-space(string-join(node(), ''))"/>
-      <text select="node() except dbk:personname[@role eq 'speaker']"/>
+      <text select="$cca-start, node() except dbk:personname[@role eq 'speaker'], $cca-end"/>
     </rule>
   </template>
   
@@ -2558,10 +2568,11 @@
     </rule>
   </template>
   
-    <template context="dbk:para[matches(@role, $box-heading-style)]">
+  <template context="dbk:para[matches(@role, $box-heading-style)]">
     <rule break-after="0">
       <text/>
     </rule>
+    <!-- A11Y -->
   </template>
   
   <!--  *
@@ -2572,6 +2583,7 @@
     <rule name="authorbio" break-after="1" break-before="1" type="env">
       <text/>
     </rule>
+    <!-- A11Y -->
   </template>
   
   <!--  *
@@ -3393,6 +3405,12 @@
     <xsl:value-of select="$remove-whitespace-before-pagebreaks"/>
   </xsl:template>
 
+  <xsl:function name="tr:suppress-structure" as="xs:boolean">
+    <xsl:param name="elt" as="element()"/>
+    <!-- add conditions to not generate structure. if outcome is true: no structure will be added.  -->
+    <xsl:sequence select="if ($a11y) then exists($elt[parent::*[self::*:legalnotice|self::*:blockquote[matches(@role,'verse')]]]) else true()"/>
+  </xsl:function>
+  
   <charmap ignore-imported-charmaps="true">
     <!--SOFT HYPHEN -->
     <char character="&#xad;" string="\-"/>
