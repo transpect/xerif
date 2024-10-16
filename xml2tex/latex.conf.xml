@@ -77,8 +77,6 @@
   <xsl:variable name="letter-spacing-def" select="''" as="xs:string?"/>
   <xsl:variable name="create-TocAuthorNames-by-style" select="false()"/>
 
-  <xsl:variable name="cca-start" select="if ($a11y) then '\ccaStructStart{P}' else ()" as="xs:string?"/>
-  <xsl:variable name="cca-end" select="if ($a11y) then '\ccaStructEnd{P}' else ()" as="xs:string?"/>
 
 
   <!-- see the wiki link below for details
@@ -793,16 +791,24 @@
     <xsl:next-match/>
   </template>
   
-  <template context="dbk:para" priority="975">
+  <template context="dbk:para" priority="2">
     <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
     <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="avoid-space-before-para" as="xs:boolean?" tunnel="yes">
+        <!-- if a select language was made: avoid breaks before (esp. with cca tagging) -->
+      </xsl:param>
     <!--\ccaStructStart{P}-->
-    <xsl:if test="not($suppress-cca) and not($already-structured)">
-      <rule name="ccaStructStart" type="cmd" break-after="0" break-before="1">
+      <rule break-before="0" break-after="0">
+        <text select="$cca-start[not($suppress-cca) and not($already-structured)], node(), $cca-end[not($suppress-cca) and not($already-structured)]"/>
+      </rule>
+  
+    <!--<xsl:if test="not($suppress-cca) and not($already-structured)">
+     <!-\- <xsl:if test="not($avoid-space-before-para)"><xsl:text>###&#xa;</xsl:text></xsl:if>-\->
+      <rule name="ccaStructStart" type="cmd" break-after="0" break-before="0">
         <param select="'P'"/>
       </rule>
     </xsl:if>
-    <!--\ccaStructEnd{P}-->
+    <!-\-\ccaStructEnd{P}-\->
     <xsl:next-match>
       <xsl:with-param name="already-structured" select="if ($a11y) then true() else false()" tunnel="yes" as="xs:boolean"/>
     </xsl:next-match>
@@ -810,7 +816,8 @@
       <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
         <param select="'P'"/>
       </rule>
-    </xsl:if>
+    </xsl:if>-->
+<!--     <xsl:if test="not($avoid-space-before-para)"><xsl:text>&#xa;</xsl:text></xsl:if>-->
   </template>
   
   <template context="/*/*[self::dbk:appendix
@@ -1978,7 +1985,7 @@
   </template>
 
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
-    <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
+    <rule name="tpSubFloat" type="env" break-after="0" break-before="1">
       <text select="dbk:title,
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
@@ -2068,7 +2075,7 @@
                                                                                                                                             'caption-number', 'caption-numtext-separator')]])]" 
                       as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
-        <param select="$caption-nodes-without-num"/>
+        <param select="$cca-start, $caption-nodes-without-num, $cca-end"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
                                                                       [@xml:id = $link-refs]
