@@ -797,27 +797,9 @@
     <xsl:param name="avoid-space-before-para" as="xs:boolean?" tunnel="yes">
         <!-- if a select language was made: avoid breaks before (esp. with cca tagging) -->
       </xsl:param>
-    <!--\ccaStructStart{P}-->
       <rule break-before="0" break-after="0">
         <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)], node(), tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       </rule>
-  
-    <!--<xsl:if test="not($suppress-cca) and not($already-structured)">
-     <!-\- <xsl:if test="not($avoid-space-before-para)"><xsl:text>###&#xa;</xsl:text></xsl:if>-\->
-      <rule name="ccaStructStart" type="cmd" break-after="0" break-before="0">
-        <param select="'P'"/>
-      </rule>
-    </xsl:if>
-    <!-\-\ccaStructEnd{P}-\->
-    <xsl:next-match>
-      <xsl:with-param name="already-structured" select="if ($a11y) then true() else false()" tunnel="yes" as="xs:boolean"/>
-    </xsl:next-match>
-    <xsl:if test="not($suppress-cca) and not($already-structured)">  
-      <rule name="ccaStructEnd" type="cmd" break-after="0" break-before="0">
-        <param select="'P'"/>
-      </rule>
-    </xsl:if>-->
-<!--     <xsl:if test="not($avoid-space-before-para)"><xsl:text>&#xa;</xsl:text></xsl:if>-->
   </template>
   
   <template context="/*/*[self::dbk:appendix
@@ -2112,6 +2094,7 @@
                      |*:table/dbk:textobject">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
        <param/>
+       <text select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/>
      </rule>
      <!-- A11Y? -->
    </template>
@@ -2396,13 +2379,13 @@
         <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
         <xsl:text>\par&#xa;</xsl:text>
       </xsl:if>
-      <text select="tr:add-cca('Start', 'P'), *[not(self::dbk:title or self::dbk:attribution)], tr:add-cca('End', 'P')"/>
+      <text select="(:tr:add-cca('Start', 'P'), :)*[not(self::dbk:title or self::dbk:attribution)](:, tr:add-cca('End', 'P'):)"/>
     </rule>
   </template>
   
   <template context="dbk:blockquote[matches(@role, $verse-centered-style)]">
     <rule name="versecentered" type="env" break-after="1" break-before="1">
-      <text select="tr:add-cca('Start', 'P'), *[not(self::dbk:title or self::dbk:attribution)], tr:add-cca('End', 'P')"/>
+      <text select="(:tr:add-cca('Start', 'P'), :)*[not(self::dbk:title or self::dbk:attribution)](:, tr:add-cca('End', 'P'):)"/>
     </rule>
   </template>
 
@@ -2447,7 +2430,7 @@
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <xsl:if test="following-sibling::*[1][self::dbk:para]"><text>\\</text>
         <text>&#xa;</text>
       </xsl:if>
@@ -2461,7 +2444,7 @@
                              ]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>&#xa;</text>
     </rule>
     <!-- A11Y? -->
@@ -2496,7 +2479,7 @@
   
   <template context="dbk:para[matches(@role, $letter-para-style)]">
     <rule break-after="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>\tpBreak</text>
     </rule>
     <!-- A11Y? -->
@@ -2504,7 +2487,7 @@
 
   <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
     <rule break-after="1">
-      <text/>
+     <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
     <!-- A11Y? -->
   </template>
@@ -2519,7 +2502,7 @@
   
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]]">
     <rule break-after="1" break-before="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <xsl:if test="following-sibling::*[1][self::dbk:para[matches(@role, $letter-para-style)]]">
         <text>\\</text>
       </xsl:if>
@@ -2531,7 +2514,7 @@
   <template context="dbk:para[matches(@role, $letter-para-style)]
                              [following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
     <rule break-after="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
     <!-- A11Y? -->
   </template>
@@ -2577,7 +2560,7 @@
   
   <template context="dbk:para[matches(@role, $box-heading-style)]">
     <rule break-after="0">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
     <!-- A11Y -->
   </template>
@@ -2588,7 +2571,7 @@
   
   <template context="dbk:para[matches(@role, $author-desc-style)]">
     <rule name="authorbio" break-after="1" break-before="1" type="env">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
     <!-- A11Y -->
   </template>
@@ -2602,7 +2585,7 @@
                   select="if (matches(@role, '\d$')) then replace(@role, '^.+(\d)$', '$1') else '1'"/>
     <rule name="tpNewPar" break-after="2" break-before="0" type="cmd">
     <option select="concat($line-count-str, '\baselineskip')"/>
-    <text/>
+    <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]], node(), tr:add-cca('End', 'P')[current()[normalize-space()]] "/>
     </rule>
   </template>
   
