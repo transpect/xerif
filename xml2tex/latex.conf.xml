@@ -799,7 +799,7 @@
       </xsl:param>
     <!--\ccaStructStart{P}-->
       <rule break-before="0" break-after="0">
-        <text select="$cca-start[not($suppress-cca) and not($already-structured)], node(), $cca-end[not($suppress-cca) and not($already-structured)]"/>
+        <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)], node(), tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       </rule>
   
     <!--<xsl:if test="not($suppress-cca) and not($already-structured)">
@@ -2075,7 +2075,7 @@
                                                                                                                                             'caption-number', 'caption-numtext-separator')]])]" 
                       as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
-        <param select="$cca-start, $caption-nodes-without-num, $cca-end"/>
+        <param select="tr:add-cca('Start', 'P'), $caption-nodes-without-num, tr:add-cca('End', 'P')"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
                                                                       [@xml:id = $link-refs]
@@ -2396,13 +2396,13 @@
         <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
         <xsl:text>\par&#xa;</xsl:text>
       </xsl:if>
-      <text select="$cca-start, *[not(self::dbk:title or self::dbk:attribution)], $cca-end"/>
+      <text select="tr:add-cca('Start', 'P'), *[not(self::dbk:title or self::dbk:attribution)], tr:add-cca('End', 'P')"/>
     </rule>
   </template>
   
   <template context="dbk:blockquote[matches(@role, $verse-centered-style)]">
     <rule name="versecentered" type="env" break-after="1" break-before="1">
-      <text select="$cca-start, *[not(self::dbk:title or self::dbk:attribution)], $cca-end"/>
+      <text select="tr:add-cca('Start', 'P'), *[not(self::dbk:title or self::dbk:attribution)], tr:add-cca('End', 'P')"/>
     </rule>
   </template>
 
@@ -2431,7 +2431,7 @@
     </xsl:if>
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:phrase[@role = 'speaker']"/>
-      <text select="$cca-start, node() except dbk:phrase[@role = 'speaker'], $cca-end "/>
+      <text select="tr:add-cca('Start', 'P'), node() except dbk:phrase[@role = 'speaker'], tr:add-cca('End', 'P') "/>
     </rule>
     <!-- A11Y? -->
   </template>
@@ -2549,7 +2549,7 @@
   <template context="dbk:para[dbk:personname[@role eq 'speaker']]">
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:personname[@role eq 'speaker']/normalize-space(string-join(node(), ''))"/>
-      <text select="$cca-start, node() except dbk:personname[@role eq 'speaker'], $cca-end"/>
+      <text select="tr:add-cca('Start', 'P'), node() except dbk:personname[@role eq 'speaker'], tr:add-cca('End', 'P')"/>
     </rule>
   </template>
   
