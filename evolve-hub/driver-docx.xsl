@@ -1600,7 +1600,6 @@
   </xsl:template>
   
   <!-- (4) static index -->
-  
   <!-- but first: cleaning of indexparas and see/seealso phrases -->
   
   <!--    move see indicator from phrase, like
@@ -1636,16 +1635,16 @@
     <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
       <xsl:apply-templates select="$para-atts" mode="#current"/>
-        <xsl:sequence select="tr:create-static-index(.)"/>
-      </xsl:element>
+      <xsl:sequence select="tr:create-static-index(.)"/>
+    </xsl:element>
   </xsl:template>
-  
+ 
   <xsl:function name="tr:create-static-index">
     <xsl:param name="para" as="element()*"/>
     <xsl:variable name="para-with-see-pi" as="element()*">
       <xsl:apply-templates select="$para" mode="custom-1-index"/>
-      </xsl:variable>
-  <xsl:variable name="para-with-see" as="item()*">
+    </xsl:variable>
+    <xsl:variable name="para-with-see" as="item()*">
       <xsl:for-each-group select="$para-with-see-pi/node()" 
                           group-starting-with="processing-instruction()">
         
@@ -1692,7 +1691,7 @@
     <xsl:analyze-string select="." regex="{$index-see-also-regex}">
       <xsl:matching-substring>
         <xsl:processing-instruction name="seealso"/>
-      <xsl:value-of select="replace(.,$index-see-also-regex,'')"/>
+        <xsl:value-of select="replace(.,$index-see-also-regex,'')"/>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
         <xsl:analyze-string select="." regex="{$index-see-regex}">
@@ -2438,7 +2437,10 @@
   <xsl:template match="*[self::phrase|self::para][matches(@role, $pi-style-regex, 'i')]" mode="hub:split-at-tab">
     <xsl:processing-instruction name="{$pi-xml-name}">
       <xsl:apply-templates mode="#current"/>
-    <xsl:text>&#x20;</xsl:text>
+      <xsl:if test="    not(matches(string-join(., ''), '[\p{Zs}\p{P}%]$')) 
+                    and not(matches(following-sibling::node()[1], '^[\p{Zs}\p{P}%]'))">
+        <xsl:text>&#x20;</xsl:text>
+      </xsl:if>
     </xsl:processing-instruction>
   </xsl:template>
   
