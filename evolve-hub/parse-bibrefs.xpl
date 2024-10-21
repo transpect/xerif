@@ -136,7 +136,7 @@
       </p:otherwise>
     </p:choose>
     
-  <tr:store-debug name="debug-hub-bib">
+    <tr:store-debug name="debug-hub-bib">
       <p:with-option name="pipeline-step" select="concat('parse-bibrefs/bib-', $bib-index, '/08_hub-bib')"/>
       <p:with-option name="active" select="'yes'"/>
       <p:with-option name="base-uri" select="$debug-dir-uri"/>
