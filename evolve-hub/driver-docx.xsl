@@ -1835,7 +1835,8 @@
                          'denaryie')"/>
   
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
-    <xsl:param name="level"/>
+    <xsl:param name="level" />
+
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
                           then $primary-secondary-etc[xs:integer($level)]
                           else $primary-secondary-etc[1]"/>

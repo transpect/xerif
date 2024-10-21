@@ -239,7 +239,7 @@
   <xsl:template match="*:profileDesc" mode="hub2tei:tidy">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-        <xsl:apply-templates select="//*:argument[@rend = 'abstract']" mode="meta"/>
+      <xsl:apply-templates select="//*:argument[@rend = 'abstract']" mode="meta"/>
     </xsl:copy>  
   </xsl:template>
 
@@ -247,8 +247,16 @@
     <abstract>
       <xsl:if test="@xml:lang"><xsl:attribute name="xml:lang" select="@xml:lang"/></xsl:if>
       <xsl:attribute name="corresp" select="concat('#', ancestor::*:div[@type = ('article', 'chapter')][1]/@xml:id)"/>
-      <xsl:apply-templates select="node() except *:head" mode="hub2tei:tidy"/>
+      <xsl:apply-templates select="node() except *:head" mode="hub2tei:tidy">
+        <xsl:with-param name="modify-ids" select="true()" as="xs:boolean" tunnel="yes"/>
+      </xsl:apply-templates>
     </abstract>
+  </xsl:template>
+  
+  <xsl:template match="*:argument[@rend = 'abstract']//@xml:id" mode="hub2tei:tidy">
+    <xsl:param name="modify-ids" as="xs:boolean?" tunnel="yes"/>
+    <!-- https://redmine.le-tex.de/issues/17609 -->
+    <xsl:attribute name="{name()}" select="concat(., '_a'[$modify-ids])"/>
   </xsl:template>
 
   <xsl:template match="*:keywords[not(parent::*[self::*:textClass])] | dbk:biblioset" mode="hub2tei:tidy">
