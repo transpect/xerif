@@ -53,10 +53,11 @@
   
   <xsl:param name="run-local" as="xs:string"/>
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
-  <xsl:param name="a11y" as="xs:boolean" select="true()"/>
   
+  <xsl:param name="a11y" as="xs:boolean" select="false()"/>
+
   <!-- keys -->
-  
+
   <xsl:key name="item-by-linkend" match="*[@linkend]" use="@linkend"/>
   
   <!-- paths -->
@@ -76,8 +77,6 @@
                 select="xs:string(xs:integer($numbering-depth) - 1)"/>
   <xsl:variable name="letter-spacing-def" select="''" as="xs:string?"/>
   <xsl:variable name="create-TocAuthorNames-by-style" select="false()"/>
-
-
 
   <!-- see the wiki link below for details
        https://redmine.le-tex.de/projects/transpect-typesetter/wiki/Titelei -->
@@ -797,7 +796,7 @@
     <xsl:param name="avoid-space-before-para" as="xs:boolean?" tunnel="yes">
         <!-- if a select language was made: avoid breaks before (esp. with cca tagging) -->
       </xsl:param>
-      <rule break-before="0" break-after="0">
+    <rule break-before="0" break-after="0">
         <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)], node(), tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       </rule>
   </template>
@@ -1870,7 +1869,6 @@
       <text> \tpBreak </text>
     </rule>
     <!--https://redmine.le-tex.de/issues/15354#note-14-->
-    <!-- change to A11Y -->
   </template>
 
  
@@ -2094,9 +2092,7 @@
                      |*:table/dbk:textobject">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
        <param/>
-       <text select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/>
-     </rule>
-     <!-- A11Y? -->
+     <text select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/></rule>
    </template>
   
   <template context="dbk:figure/dbk:caption 
@@ -2385,7 +2381,7 @@
   
   <template context="dbk:blockquote[matches(@role, $verse-centered-style)]">
     <rule name="versecentered" type="env" break-after="1" break-before="1">
-      <text select="*[not(self::dbk:title or self::dbk:attribution)]"/>
+      <text select="*"/>
     </rule>
   </template>
 
@@ -2416,7 +2412,6 @@
       <option select="dbk:phrase[@role = 'speaker']"/>
       <text select="tr:add-cca('Start', 'P'), node() except dbk:phrase[@role = 'speaker'], tr:add-cca('End', 'P') "/>
     </rule>
-    <!-- A11Y? -->
   </template>
   
   <!-- letters -->
@@ -2435,7 +2430,6 @@
         <text>&#xa;</text>
       </xsl:if>
     </rule>
-    <!-- A11Y? -->
   </template>
 
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]
@@ -2447,7 +2441,6 @@
       <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>&#xa;</text>
     </rule>
-    <!-- A11Y? -->
   </template>
 
  <!-- example:
@@ -2482,14 +2475,12 @@
       <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>\tpBreak</text>
     </rule>
-    <!-- A11Y? -->
   </template>
 
   <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
     <rule break-after="1">
-     <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
-    <!-- A11Y? -->
   </template>
   
   <template context=" dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para[position() eq last()] 
@@ -2508,7 +2499,6 @@
       </xsl:if>
     </rule>
     <!-- do not create item because margin is generated via letter-environment. handle as normal letter para -->
-    <!-- A11Y? -->
   </template>
 
   <template context="dbk:para[matches(@role, $letter-para-style)]
@@ -2516,7 +2506,6 @@
     <rule break-after="1">
       <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
-    <!-- A11Y? -->
   </template>
   
   <!--  *
@@ -2562,7 +2551,6 @@
     <rule break-after="0">
       <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
-    <!-- A11Y -->
   </template>
   
   <!--  *
@@ -2573,7 +2561,6 @@
     <rule name="authorbio" break-after="1" break-before="1" type="env">
       <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
-    <!-- A11Y -->
   </template>
   
   <!--  *
@@ -2857,7 +2844,7 @@
       <param regex-group="1"/>
     </rule>
   </regex>-->
-
+  
   <!--  regexes for script languages -->
   
   <regex regex="([&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+([\p{Zs}\p{P}]+[&#12288;-&#12351;&#x3002;&#x4e00;-&#x9fff;]+)*[…]?)">
@@ -3313,7 +3300,7 @@
         <xsl:text>\newpage%&#xa;</xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text>\vadjust{\newpage}%&#xa;</xsl:text>
+        <xsl:text>&#x20;\vadjust{\newpage}%&#xa;</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
   </template>
