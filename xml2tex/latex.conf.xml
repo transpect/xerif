@@ -2379,13 +2379,13 @@
         <xsl:apply-templates select="dbk:title/node()" mode="#current"/>
         <xsl:text>\par&#xa;</xsl:text>
       </xsl:if>
-      <text select="(:tr:add-cca('Start', 'P'), :)*[not(self::dbk:title or self::dbk:attribution)](:, tr:add-cca('End', 'P'):)"/>
+      <text select="*[not(self::dbk:title or self::dbk:attribution)]"/>
     </rule>
   </template>
   
   <template context="dbk:blockquote[matches(@role, $verse-centered-style)]">
     <rule name="versecentered" type="env" break-after="1" break-before="1">
-      <text select="(:tr:add-cca('Start', 'P'), :)*[not(self::dbk:title or self::dbk:attribution)](:, tr:add-cca('End', 'P'):)"/>
+      <text select="*[not(self::dbk:title or self::dbk:attribution)]"/>
     </rule>
   </template>
 
