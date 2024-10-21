@@ -54,8 +54,10 @@
   <xsl:param name="run-local" as="xs:string"/>
   <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
   
+  <xsl:param name="a11y" as="xs:boolean" select="false()"/>
+
   <!-- keys -->
-  
+
   <xsl:key name="item-by-linkend" match="*[@linkend]" use="@linkend"/>
   
   <!-- paths -->
@@ -236,6 +238,7 @@
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
                                ',withcoltitles'[$running-header eq 'yes'],
+                               ',a11y'[$a11y],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
                                '}&#xa;')"/>
@@ -785,6 +788,17 @@
                     |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
+  </template>
+  
+  <template context="dbk:para" priority="2">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="avoid-space-before-para" as="xs:boolean?" tunnel="yes">
+        <!-- if a select language was made: avoid breaks before (esp. with cca tagging) -->
+      </xsl:param>
+    <rule break-before="0" break-after="0">
+        <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)], node(), tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      </rule>
   </template>
   
   <template context="/*/*[self::dbk:appendix
@@ -1951,7 +1965,7 @@
   </template>
 
   <template context="dbk:informalfigure[@css:display eq 'grid']/dbk:figure">
-    <rule name="tpSubFloat" type="env" break-after="0" break-before="0">
+    <rule name="tpSubFloat" type="env" break-after="0" break-before="1">
       <text select="dbk:title,
                     dbk:caption,
                     dbk:info[dbk:legalnotice],
@@ -2041,7 +2055,7 @@
                                                                                                                                             'caption-number', 'caption-numtext-separator')]])]" 
                       as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
-        <param select="$caption-nodes-without-num"/>
+        <param select="tr:add-cca('Start', 'P'), $caption-nodes-without-num, tr:add-cca('End', 'P')"/>
       </rule>
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
                                                                       [@xml:id = $link-refs]
@@ -2078,7 +2092,7 @@
                      |*:table/dbk:textobject">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
        <param/>
-     </rule>
+     <text select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/></rule>
    </template>
   
   <template context="dbk:figure/dbk:caption 
@@ -2396,7 +2410,7 @@
     </xsl:if>
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:phrase[@role = 'speaker']"/>
-      <text select="node() except dbk:phrase[@role = 'speaker']"/>
+      <text select="tr:add-cca('Start', 'P'), node() except dbk:phrase[@role = 'speaker'], tr:add-cca('End', 'P') "/>
     </rule>
   </template>
   
@@ -2411,7 +2425,7 @@
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <xsl:if test="following-sibling::*[1][self::dbk:para]"><text>\\</text>
         <text>&#xa;</text>
       </xsl:if>
@@ -2424,7 +2438,7 @@
                              ]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>&#xa;</text>
     </rule>
   </template>
@@ -2458,14 +2472,14 @@
   
   <template context="dbk:para[matches(@role, $letter-para-style)]">
     <rule break-after="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <text>\tpBreak</text>
     </rule>
   </template>
 
   <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
     <rule break-after="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
   </template>
   
@@ -2474,11 +2488,12 @@
     <rule>
       <text/>
     </rule>
+    <!-- A11Y? -->
   </template>
   
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]]">
     <rule break-after="1" break-before="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
       <xsl:if test="following-sibling::*[1][self::dbk:para[matches(@role, $letter-para-style)]]">
         <text>\\</text>
       </xsl:if>
@@ -2489,7 +2504,7 @@
   <template context="dbk:para[matches(@role, $letter-para-style)]
                              [following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
     <rule break-after="1">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
   </template>
   
@@ -2506,7 +2521,7 @@
   <template context="dbk:para[dbk:personname[@role eq 'speaker']]">
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:personname[@role eq 'speaker']/normalize-space(string-join(node(), ''))"/>
-      <text select="node() except dbk:personname[@role eq 'speaker']"/>
+      <text select="tr:add-cca('Start', 'P'), node() except dbk:personname[@role eq 'speaker'], tr:add-cca('End', 'P')"/>
     </rule>
   </template>
   
@@ -2532,9 +2547,9 @@
     </rule>
   </template>
   
-    <template context="dbk:para[matches(@role, $box-heading-style)]">
+  <template context="dbk:para[matches(@role, $box-heading-style)]">
     <rule break-after="0">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
   </template>
   
@@ -2544,7 +2559,7 @@
   
   <template context="dbk:para[matches(@role, $author-desc-style)]">
     <rule name="authorbio" break-after="1" break-before="1" type="env">
-      <text/>
+      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
     </rule>
   </template>
   
@@ -2557,7 +2572,7 @@
                   select="if (matches(@role, '\d$')) then replace(@role, '^.+(\d)$', '$1') else '1'"/>
     <rule name="tpNewPar" break-after="2" break-before="0" type="cmd">
     <option select="concat($line-count-str, '\baselineskip')"/>
-    <text/>
+    <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]], node(), tr:add-cca('End', 'P')[current()[normalize-space()]] "/>
     </rule>
   </template>
   
@@ -2845,7 +2860,7 @@
   </regex>
   
   <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
-    <rule type="cmd" name="foreignlanguage{hebrew}"  protect="true">
+    <rule type="cmd" name="foreignlanguage{hebrew}" protect="true">
       <param regex-group="1"/>
     </rule>
   </regex>
@@ -3367,6 +3382,12 @@
     <xsl:value-of select="$remove-whitespace-before-pagebreaks"/>
   </xsl:template>
 
+  <xsl:function name="tr:suppress-structure" as="xs:boolean">
+    <xsl:param name="elt" as="element()"/>
+    <!-- add conditions to not generate structure. if outcome is true: no structure will be added.  -->
+    <xsl:sequence select="if ($a11y) then exists($elt[parent::*[self::*:legalnotice|self::*:blockquote[matches(@role,'verse')]]]) else true()"/>
+  </xsl:function>
+  
   <charmap ignore-imported-charmaps="true">
     <!--SOFT HYPHEN -->
     <char character="&#xad;" string="\-"/>
