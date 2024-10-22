@@ -2056,7 +2056,7 @@
                       as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
         <param select="tr:add-cca('Start', 'P'), $caption-nodes-without-num, tr:add-cca('End', 'P')"/>
-      </rule>
+      </rule><xsl:message select="'a11y:',  $a11y"/>
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
                                                                       [@xml:id = $link-refs]
                                              or descendant::dbk:link[@linkend]">
@@ -2091,8 +2091,8 @@
                      |dbk:informaltable/dbk:caption
                      |*:table/dbk:textobject">
      <rule name="tpLegend" break-before="1" break-after="0" type="cmd">
-       <param/>
-     <text select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/></rule>
+       <param select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/>
+     </rule>
    </template>
   
   <template context="dbk:figure/dbk:caption 
@@ -2100,7 +2100,7 @@
                     |*:table/dbk:info/dbk:legalnotice
                     |dbk:informaltable/dbk:info/dbk:legalnotice">
     <rule name="tpSource" break-before="1" break-after="0" type="cmd" >
-      <param/>
+      <param select="tr:add-cca('Start', 'P')[current()[self::dbk:para|dbk:textobject]], node(), tr:add-cca('End', 'P')[current()[self::dbk:para|dbk:textobject]]"/>
     </rule>
     <xsl:if test="descendant::*[dbk:link[@linkend]|dbk:footnote]">
     <!-- https://redmine.le-tex.de/issues/16801#note-6-->
