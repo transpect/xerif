@@ -797,8 +797,10 @@
         <!-- if a select language was made: avoid breaks before (esp. with cca tagging) -->
       </xsl:param>
     <rule break-before="0" break-after="0">
-        <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)], node(), tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
-      </rule>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
+    </rule>
   </template>
   
   <template context="/*/*[self::dbk:appendix
@@ -1778,7 +1780,7 @@
   </xsl:function>
 
 
-  <xsl:function name="xml2tex:generate-clear-after-p" as="xs:string?">
+  <xsl:function name="xml2tex:generate-clear-after-p" as="xs:string?">  
     <xsl:param name="context" as="element()"/>
     <xsl:if test="$context[matches(tr:determine-float-pos(.), 'float-pos=t?p') 
                            and not(following-sibling::*[1][xml2tex:is-float-object(.)])
@@ -2425,7 +2427,9 @@
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P') "/>
       <xsl:if test="following-sibling::*[1][self::dbk:para]"><text>\\</text>
         <text>&#xa;</text>
       </xsl:if>
@@ -2438,7 +2442,9 @@
                              ]">
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')"/>
+      <text />
+      <text select="tr:add-cca('End', 'P')"/>
       <text>&#xa;</text>
     </rule>
   </template>
