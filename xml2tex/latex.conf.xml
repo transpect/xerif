@@ -2865,7 +2865,7 @@
     </rule>
   </regex>
   
-  <regex regex="([\p{Po}\p{Pd}\p{Pc}\p{Pi}\p{Pf}\(\)\[\]]?[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
+  <regex regex="([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
     <rule type="cmd" name="foreignlanguage{hebrew}" protect="true">
       <param regex-group="1"/>
     </rule>
