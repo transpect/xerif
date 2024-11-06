@@ -909,8 +909,9 @@
   <template context="*[not(self::dbk:book
                           |self::dbk:hub)]/dbk:info/dbk:title">
     <xsl:apply-templates select="dbk:phrase[@role eq 'hub:identifier']" mode="#current"/>
+    <xsl:variable name="lang" select="if (@xml:lang) then concat('\protect\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{') else ()"/>
     <rule name="tpTitle" type="cmd" break-before="1">
-      <param select="node()[not(@role eq 'hub:identifier')]"/>
+      <param select="$lang[normalize-space()], node()[not(@role eq 'hub:identifier')], '}'[$lang[normalize-space()]]"/>
     </rule>
     <xsl:call-template name="create-bookmark-content"/>
   </template>
@@ -1210,8 +1211,9 @@
         <xsl:call-template name="customer-toctitles"/>
       </xsl:when>
       <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
+        <xsl:variable name="lang" select="if (dbk:title/@xml:lang) then concat('\protect\foreignlanguage{', xml2tex:lang-to-babel-lang(dbk:title/@xml:lang), '}{') else ()"/>
         <rule name="tpTocTitle" type="cmd" break-before="1">
-          <param select="node()[not(@role = ('identifier', 'hub:identifier'))]">
+          <param select="$lang[normalize-space()], node()[not(@role = ('identifier', 'hub:identifier'))],'}'[$lang[normalize-space()]]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
@@ -1251,12 +1253,13 @@
         </rule>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:variable name="lang" select="if (dbk:title/@xml:lang) then concat('\protect\foreignlanguage{', xml2tex:lang-to-babel-lang(dbk:title/@xml:lang), '}{') else ()"/>
         <rule name="tpTocTitle" type="cmd" break-after="0" break-before="1">
-      <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
-        <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
-      </param>
+          <param select="$lang[normalize-space()], dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])], '}'[$lang[normalize-space()]]">
+            <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
+          </param>
     </rule>
     <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
       <rule name="tpTocNumber" type="cmd" break-after="0" break-before="1">
@@ -1268,8 +1271,9 @@
       </rule>
     </xsl:if>
     <xsl:if test="dbk:subtitle">
+      <xsl:variable name="lang" select="if (dbk:subtitle/@xml:lang) then concat('\protect\foreignlanguage{', xml2tex:lang-to-babel-lang(dbk:subtitle/@xml:lang), '}{') else ()"/>
       <rule name="tpTocSubtitle" type="cmd" break-after="0" break-before="1">
-        <param select="dbk:subtitle/node()">
+        <param select="$lang[normalize-space()], dbk:subtitle/node(), '}'[$lang[normalize-space()]]">
           <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
           <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
@@ -1490,8 +1494,9 @@
         * -->
   
   <template context="dbk:info/dbk:subtitle">
+    <xsl:variable name="lang" select="if (@xml:lang) then concat('\protect\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{') else ()"/>
     <rule name="tpSubtitle" type="cmd" break-before="1" break-after="1">
-      <param/>
+       <param select="$lang[normalize-space()], node(), '}'[$lang[normalize-space()]]"/>
     </rule>
   </template>
   
