@@ -2400,6 +2400,8 @@
   </template>
   
   <template context="dbk:div[@role = 'transcription'][dbk:para[dbk:phrase[@role = 'speaker']]]/dbk:para" priority="400">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <!-- https://redmine.le-tex.de/issues/16281 -->
     <xsl:variable name="previous-line-number" select="preceding-sibling::*[self::dbk:para][1]/@annotations"/>
     <xsl:variable name="line-number" select="@annotations"/>
@@ -2479,15 +2481,23 @@
     -->
   
   <template context="dbk:para[matches(@role, $letter-para-style)]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="1">
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <text>\tpBreak</text>
     </rule>
   </template>
 
-  <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">  
+  <template context="dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="1">
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
@@ -2500,8 +2510,12 @@
   </template>
   
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)][. is ../*[1]]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="1" break-before="1">
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <xsl:if test="following-sibling::*[1][self::dbk:para[matches(@role, $letter-para-style)]]">
         <text>\\</text>
       </xsl:if>
@@ -2511,6 +2525,8 @@
 
   <template context="dbk:para[matches(@role, $letter-para-style)]
                              [following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="1">
       <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <text/>
@@ -2529,6 +2545,8 @@
   </template>
   
   <template context="dbk:para[dbk:personname[@role eq 'speaker']]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:personname[@role eq 'speaker']/normalize-space(string-join(node(), ''))"/>
       <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
@@ -2560,6 +2578,8 @@
   </template>
   
   <template context="dbk:para[matches(@role, $box-heading-style)]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="0">
       <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <text/>
@@ -2582,13 +2602,15 @@
         * -->
   
   <template context="dbk:para[matches(@role, $empty-line-style)]" priority="900">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <xsl:variable name="line-count-str" as="xs:string?" 
                   select="if (matches(@role, '\d$')) then replace(@role, '^.+(\d)$', '$1') else '1'"/>
     <rule name="tpNewPar" break-after="2" break-before="0" type="cmd">
     <option select="concat($line-count-str, '\baselineskip')"/>
-      <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]]"/>
+      <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]][not($suppress-cca) and not($already-structured)]"/>
       <text/> 
-      <text select="tr:add-cca('End', 'P')[current()[normalize-space()]] "/>
+      <text select="tr:add-cca('End', 'P')[current()[normalize-space()]][not($suppress-cca) and not($already-structured)] "/>
     </rule>
   </template>
   
