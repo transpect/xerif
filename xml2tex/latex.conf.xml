@@ -2412,7 +2412,9 @@
     </xsl:if>
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:phrase[@role = 'speaker']"/>
-      <text select="tr:add-cca('Start', 'P'), node() except dbk:phrase[@role = 'speaker'], tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text select="node() except dbk:phrase[@role = 'speaker']"/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
@@ -2510,7 +2512,9 @@
   <template context="dbk:para[matches(@role, $letter-para-style)]
                              [following-sibling::*[1][self::dbk:para[matches(@role, $letter-spacing-para-style)]]]">
     <rule break-after="1">
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
@@ -2527,7 +2531,9 @@
   <template context="dbk:para[dbk:personname[@role eq 'speaker']]">
     <rule name="item" type="cmd" break-before="1">
       <option select="dbk:personname[@role eq 'speaker']/normalize-space(string-join(node(), ''))"/>
-      <text select="tr:add-cca('Start', 'P'), node() except dbk:personname[@role eq 'speaker'], tr:add-cca('End', 'P')"/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text select="node() except dbk:personname[@role eq 'speaker']"/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
@@ -2555,7 +2561,9 @@
   
   <template context="dbk:para[matches(@role, $box-heading-style)]">
     <rule break-after="0">
-      <text select="tr:add-cca('Start', 'P'), node(), tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
@@ -2578,7 +2586,9 @@
                   select="if (matches(@role, '\d$')) then replace(@role, '^.+(\d)$', '$1') else '1'"/>
     <rule name="tpNewPar" break-after="2" break-before="0" type="cmd">
     <option select="concat($line-count-str, '\baselineskip')"/>
-    <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]], node(), tr:add-cca('End', 'P')[current()[normalize-space()]] "/>
+      <text select="tr:add-cca('Start', 'P')[current()[normalize-space()]]"/>
+      <text/> 
+      <text select="tr:add-cca('End', 'P')[current()[normalize-space()]] "/>
     </rule>
   </template>
   
