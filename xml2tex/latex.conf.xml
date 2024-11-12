@@ -922,7 +922,7 @@
                               |self::dbk:br
                               |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
                               |self::dbk:tab
-                              |self::dbk:anchor)])
+                              |self::dbk:anchor)] or @xml:lang)
                   and 
                   exists(dbk:phrase[@role = ('identifier', 'hub:identifier')])">
       <!-- if title contains markup, create \tpBM-Makros. if \tpBMTitle is created, also a \tpNumber is generated. empty or -->
@@ -936,7 +936,7 @@
     <xsl:if test="exists(*[not(self::dbk:footnote
                               |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
                               |self::dbk:tab
-                              |self::dbk:anchor)])
+                              |self::dbk:anchor)] or @xml:lang)
                   or 
                   matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;&#xAE;]')">
       <rule name="tpBMTitle" type="cmd" break-before="1">
@@ -962,7 +962,7 @@
                       [descendant::dbk:personname/dbk:othername/*[not(self::dbk:footnote
                                                          |self::dbk:br
                                                          |self::dbk:tab
-                                                         |self::dbk:anchor)]]">
+                                                         |self::dbk:anchor)] or @xml:lang]">
       <rule name="tpBMAuthorNameList" type="cmd" break-before="1">
           <xsl:variable name="content">
             <xsl:apply-templates select="../(dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername" mode="bookmark-contents"/>
@@ -973,7 +973,7 @@
     <xsl:if test="../*[self::dbk:subtitle][*[not(self::dbk:footnote
                                                 |self::dbk:br
                                                 |self::dbk:tab
-                                                |self::dbk:anchor)]]">
+                                                |self::dbk:anchor)] or @xml:lang]">
       <rule name="tpBMSubtitle" type="cmd" break-before="1">
           <xsl:variable name="content">
             <xsl:apply-templates select="../*[self::dbk:subtitle]" mode="bookmark-contents"/>
@@ -2429,11 +2429,13 @@
   </template>
 
   <template context="dbk:para[matches(@role, $letter-spacing-para-style)]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text select="tr:add-cca('Start', 'P')"/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <text/>
-      <text select="tr:add-cca('End', 'P') "/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <xsl:if test="following-sibling::*[1][self::dbk:para]"><text>\\</text>
         <text>&#xa;</text>
       </xsl:if>
@@ -2444,11 +2446,13 @@
                              [following-sibling::*[1]
                                                   [self::dbk:para[matches(@role, $letter-spacing-para-style)]]
                              ]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule name="item" type="cmd" break-after="0">
       <text> </text>
-      <text select="tr:add-cca('Start', 'P')"/>
-      <text />
-      <text select="tr:add-cca('End', 'P')"/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
+      <text/>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <text>&#xa;</text>
     </rule>
   </template>
