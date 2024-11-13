@@ -713,7 +713,7 @@
     <xsl:text>}</xsl:text>
   </xsl:template>
   
-  <xsl:template match="dbk:br" mode="strip-meta" priority="6">
+  <xsl:template match="*:br" mode="strip-meta" priority="6">
     <xsl:text>\tpBreak </xsl:text>
   </xsl:template>
 
@@ -721,12 +721,18 @@
     <xsl:apply-templates select="." mode="xml2tex"/>
   </xsl:template>
   
-  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = ('cbold', 'fett', 'bold')]" mode="strip-meta" priority="6">
+  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = ('cbold', 'fett', 'bold')]" mode="strip-meta" priority="5">
     <xsl:text>\textbf{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
   </xsl:template>
 
+  <xsl:template match="dbk:phrase[@css:text-decoration = 'underline']" mode="strip-meta" priority="4.5">
+    <xsl:text>\uline{</xsl:text>
+    <xsl:next-match/>
+    <xsl:text>}</xsl:text>
+  </xsl:template>
+  
   <xsl:template match="dbk:superscript | dbk:subscript" mode="strip-meta" priority="6">
     <xsl:value-of select="if(self::dbk:superscript) 
                           then '\textsuperscript{' 
@@ -2058,7 +2064,8 @@
                       as="node()*"/>
       <rule name="tpCaption" type="cmd" break-before="1" break-after="1">
         <param select="tr:add-cca('Start', 'P'), $caption-nodes-without-num, tr:add-cca('End', 'P')"/>
-      </rule><xsl:message select="'a11y:',  $a11y"/>
+      </rule>
+      <!--<xsl:message select="'a11y:',  $a11y"/>-->
       <xsl:if test="descendant::dbk:footnote or descendant::dbk:anchor[@role eq 'start' or not(@role)]
                                                                       [@xml:id = $link-refs]
                                              or descendant::dbk:link[@linkend]">
