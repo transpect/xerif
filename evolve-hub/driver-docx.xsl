@@ -565,6 +565,7 @@
                 select="concat('(',
                                string-join(
                                            ($figure-image-role-regex, 
+                                            $figure-alt-role-regex, 
                                             $figure-caption-role-regex, 
                                             $figure-source-role-regex,
                                             $figure-link-role-regex
@@ -670,6 +671,11 @@
                            [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
+      <xsl:if test="following-sibling::para[matches(@role, $figure-alt-role-regex, 'i')]">
+        <alt>
+          <xsl:apply-templates select="following-sibling::para[matches(@role, $figure-alt-role-regex, 'i')]/node()" mode="#current"/>
+        </alt>
+      </xsl:if>
       <imageobject>
         <imagedata role="archive" fileref="{encode-for-uri(normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i')))}"/>
       </imageobject>

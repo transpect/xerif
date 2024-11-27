@@ -157,6 +157,9 @@
   <xsl:variable name="fig-legend-para-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}figurelegend$'"/>
   
+  <xsl:variable name="figure-alt-role-regex" as="xs:string"
+                select="'^[a-z]{1,3}figurealt$'" />
+  
   <xsl:variable name="figure-caption-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figurecaption$'" />
   
