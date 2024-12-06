@@ -1676,8 +1676,6 @@
     </rule>
   </template>
   
-  <xsl:variable name="motto-style" select="'^[a-z]{1,3}motto$'" as="xs:string"/>
-  <xsl:variable name="motto-source-style" select="'^[a-z]{1,3}mottosource$'" as="xs:string"/>
 <!--
   <template context="dbk:info/dbk:blockquote/dbk:para[matches(@role, $motto-style)] | dbk:info/dbk:epigraph/dbk:para[matches(@role, $motto-style)]">
     <rule name="quote" type="cmd" break-before="1">
@@ -2300,8 +2298,8 @@
   
   <template context="dbk:info/dbk:epigraph/dbk:attribution">
     <rule name="tpQuoteSource" type="cmd" break-before="1">
-        <param/>
-      </rule>
+      <param/>
+    </rule>
   </template>
   
   <template context="dbk:info/dbk:epigraph">

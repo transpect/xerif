@@ -260,6 +260,17 @@
   <xsl:variable name="info-subtitle-role" as="xs:string"
                 select="'^[a-z]{1,3}(subheading\d|journalreviewsubheading)$'"/>
   
+  <!-- motto-style and info-blockquote-roles as well 
+       as motto-source-style and info-blockquote-source-roles 
+       share the same semantic. Perhaps we should stick to 
+       'info-blockquote' or 'epigraph' as 'motto' is German. 
+       Perhaps we need two different environemnts for headings? -->
+  <xsl:variable name="motto-style" as="xs:string" 
+                select="'^[a-z]{1,3}motto$'"/>
+  
+  <xsl:variable name="motto-source-style" as="xs:string"
+                select="'^[a-z]{1,3}mottosource$'"/>
+  
   <xsl:variable name="info-blockquote-roles" as="xs:string"
                 select="'^[a-z]{1,3}(motto-zitat|motto|epigraph)$'"/>
   
