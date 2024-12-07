@@ -437,11 +437,14 @@
   </xsl:template>
     
   <xsl:template match="para[matches(@role, $info-blockquote-source-roles)]
+                           [preceding-sibling::*[1][self::para[matches(@role, $info-blockquote-roles)]
+                                                              [not(parent::blockquote)]]]
                       |*[self::bibliomixed|self::para]/node()[1][self::br]
                       |*[self::bibliomixed|self::para]/br[every $p in preceding-sibling::node() 
                                                           satisfies $p[   not(matches(., '\P{Zs}')) 
                                                                        or empty(.)]]" 
-                mode="hub:clean-hub"/>
+                mode="hub:clean-hub">
+  </xsl:template>
 
   <xsl:template match="*[part]" mode="hub:clean-hub">
     <xsl:copy>
@@ -1260,8 +1263,9 @@
 
   <xsl:template match="para[not(node())][not(matches(@role, $empty-line-style))]
                       |part/title[not(node())]
-                      |blockquote[every $i in * 
-                                  satisfies $i[not(node())]]" mode="hub:clean-hub" priority="5"/>
+                      |blockquote[    not(node()) 
+                                  and (every $i in * 
+                                       satisfies $i[not(node())])]" mode="hub:clean-hub" priority="5"/>
   
   <!-- remove width attributes from table cells for htmltabs -->
   
