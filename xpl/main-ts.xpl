@@ -377,7 +377,7 @@
       <p:pipe port="result" step="get-paths"/>
     </p:input>
     <p:input port="meta">
-      <p:pipe port="result" step="load-meta-wrapper"/>
+      <p:pipe port="result" step="insert-meta"/>
     </p:input>
     <p:with-option name="out-dir-uri" select="$out-dir-uri"/>
     <p:with-option name="debug" select="$debug"/>
