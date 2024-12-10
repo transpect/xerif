@@ -281,7 +281,7 @@
                 select="'^[a-z]{1,3}abbreviations$'"/>
   
   <xsl:variable name="create-index-at-general-headings" 
-                select="false()"/>
+                select="true()"/>
   
   <xsl:variable name="index-text-regex" as="xs:string" 
                 select="'^[a-z]{1,3}index\s?text'"/>
@@ -381,8 +381,6 @@
   
 
   <xsl:variable name="hub:subtitle-role-regex" as="xs:string" select="'tssubheading[1-5]'" /> 
-
-  <xsl:variable name="hub:general-heading-main-name-regex" select="'tsheading(numerated)?([1-5]|part)'" as="xs:string"/>
   <xsl:variable name="hub:tabs-are-allowed-in-this-para" select="'tslist|tsheading|tsfigurecaption|tstablecaption|tsfootnote'" as="xs:string"/>
   <xsl:variable name="hub:list-role-regex" as="xs:string" select="'tslist$'" >
     <!-- for schematron purposes mainly, but also to determine that ohub:tabs-are-allowed-in-this-paranly these paras are handled by list handler via function  -->

@@ -1472,13 +1472,13 @@
                         |self::section
                         |self::appendix]
                         [info/title[matches(@role, $index-heading-regex)]
-                          |title[matches(@role, $index-heading-regex)]]
-                     | *[self::index]     
-                     | *[self::part
+                        |title[matches(@role, $index-heading-regex)]]
+                      |*[self::index]     
+                      |*[self::part
                         |self::chapter
                         |self::section
                         |self::appendix]
-                        [title[matches(@role, $hub:general-heading-main-name-regex)]]
+                        [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
                         [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
@@ -1501,7 +1501,6 @@
       </xsl:if>
       <!-- if existing, group static index entries -->
       <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
-        
         <xsl:choose>
           <xsl:when test="current-grouping-key()">
             <xsl:for-each-group select="current-group()" 
@@ -1846,7 +1845,6 @@
   
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
     <xsl:param name="level" />
-
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
                           then $primary-secondary-etc[xs:integer($level)]
                           else $primary-secondary-etc[1]"/>
