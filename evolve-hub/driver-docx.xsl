@@ -406,7 +406,9 @@
        https://redmine.le-tex.de/issues/13193 -->
   
   <xsl:template match="blockquote[not(   para[matches(@role, $info-blockquote-roles)]
-                                      or para[matches(@role, $info-blockquote-source-roles)])]
+                                      or para[matches(@role, $info-blockquote-source-roles)]
+                                      or para[matches(@role, $dialogue-role-regex)]
+                                  )]
                                  [not(count(*) eq 1)]" mode="hub:clean-hub">
     <xsl:variable name="role" select="@role" as="attribute(role)?"/>
     <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex) or not(@role))

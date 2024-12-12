@@ -48,6 +48,7 @@
   <css:rule layout-type="para" native-name="tslistof_endnotes" name="tsliterature" regex="^[a-z]{1,3}tslistof(endnotes|figures|tables)$"/>
   <css:rule layout-type="para" native-name="ts_quotation" name="tsquotation" regex="^[a-z]{1,3}quotation$"/>
   <css:rule layout-type="para" native-name="ts_dialogue" name="tsdialogue" regex="^[a-z]{1,3}dialogue$"/>
+  <css:rule layout-type="para" native-name="ts_dialogue-action" name="tsdialogue-action" regex="^[a-z]{1,3}dialogue-action$"/>
   <css:rule layout-type="para" native-name="ts_footnote" name="tsfootnote" regex="^[a-z]{1,3}footnote$"/>
   <css:rule layout-type="para" native-name="ts_ded" name="tsded" regex="^[a-z]{1,3}ded$"/>
   <css:rule layout-type="para" native-name="ts_dedication" name="tsdedication" regex="^[a-z]{1,3}dedication$"/>
