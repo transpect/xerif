@@ -2714,12 +2714,16 @@
   
   <template context="dbk:bibliomixed
                     |dbk:bibliography[not(@role = ('Citavi', 'Citavi-formatted', 'CSL', 'CSL-formatted'))]/dbk:biblioentry[dbk:abstract[@role eq 'rendered']]">
+    <xsl:param name="suppress-cca" select="tr:suppress-structure(.)" tunnel="yes" as="xs:boolean?"/>
+    <xsl:param name="already-structured" tunnel="yes" as="xs:boolean?"/>
     <rule break-after="2" type="cmd" name="bibitem">
       <option select="concat('a(', position(), ')')"/>
       <param select="(@xreflabel, concat('bib-', index-of($bibitem-ids, generate-id())))[1]"/>
+      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
       <xsl:if test="@xml:lang"><xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{')"/></xsl:if>
       <text select="if(dbk:abstract[@role eq 'rendered']) then dbk:abstract[@role eq 'rendered']/dbk:para/node() else node()"/>
-      <xsl:if test="@xml:lang"><xsl:value-of select="'}'"/></xsl:if>  
+      <xsl:if test="@xml:lang"><xsl:value-of select="'}'"/></xsl:if>
+      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
     </rule>
   </template>
   
