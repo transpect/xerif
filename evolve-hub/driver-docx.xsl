@@ -2369,6 +2369,10 @@
   
   <xsl:template match="annotation" mode="hub:clean-hub"/>
   
+  <xsl:template match="link[matches(., '^\p{Zs}+$')]" mode="hub:clean-hub">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="text()[parent::phrase]
                              [(matches(., '^(\s+).+') and ../node()[1][not(self::anchor | self::index-term)][self::text()]) or (matches(., '.+(\s+)$') and ../node()[not(self::anchor | self::index-term)][last()][self::text()])] (: leading or trailing whitespace :)
                              [string-length(normalize-space(.)) gt 0]
