@@ -753,7 +753,7 @@
     <xsl:variable name="content" select="xml2tex:escape-for-tex(replace( ., '\\', '\\textbackslash ' ))" as="xs:string"/>
     <xsl:value-of select="if (ancestor::*[self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink']]) 
                           then $content
-                          else replace($content, '/(\p{L})', '{\\slash}$1')"/>
+                          else replace($content, '/(\p{Lu})', '{\\slash}$1')"/>
     <!--   / → {\slash} -->
   </xsl:template>
   
