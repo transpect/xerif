@@ -273,13 +273,14 @@
   </xsl:template>
   
   <!-- expand xml:lang attributes from styles -->
-
+  <xsl:variable name="expand-lang-from-style" select="true()"/>
+  
   <xsl:template match="*[not(@xml:lang)]
                         [node()]/@srcpath" mode="hub:dissolve-sidebars-without-purpose" priority="10">
     <xsl:variable name="first-child-lang" as="attribute(xml:lang)?" select="../*[@xml:lang][1]/@xml:lang"/>
     <xsl:next-match/>
     <!-- expand lang from styles or pull up lang from children -->
-    <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang, 
+    <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang[$expand-lang-from-style], 
                                   if (every $child in ../node()[not(self::anchor|self::indexterm|self::tab)] satisfies 
                                       $child[@xml:lang[. = $first-child-lang]
                                              or matches(.,'^[\p{Zs}\.,;!\?]+$')
