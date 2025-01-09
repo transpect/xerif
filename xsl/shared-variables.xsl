@@ -147,10 +147,13 @@
                 select="'^[a-z]+_?verse.*$'" />
   
   <xsl:variable name="letter-para-style" as="xs:string" 
-                select="'ts_letter$'"/>
+                select="'[a-z]{1,3}_letter$'"/>
+  
+  <xsl:variable name="no-hyphen-style" as="xs:string"
+                select="'^[a-z]{1,3}nohyphen$'"/>
   
   <xsl:variable name="letter-spacing-para-style" as="xs:string" 
-                select="'ts_letter_spacing$'"/>
+                select="'[a-z]{1,3}_letter_spacing$'"/>
   
   <!-- role for para that contains image or file reference, first 
        regex group identifies class, second group represents position -->

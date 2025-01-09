@@ -3079,8 +3079,6 @@
   
   <!-- suppress hyphenation -->
   
-  <xsl:variable name="no-hyphen-style" select="'^[a-z]{1,3}nohyphen$'" as="xs:string"/>
-  
   <template context="dbk:phrase[matches(@role, $no-hyphen-style)]">
     <rule name="mbox" type="cmd">
       <param/>
