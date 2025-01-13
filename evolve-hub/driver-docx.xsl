@@ -1096,34 +1096,38 @@
         * dialogue
         * -->
   
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/text()[matches(., $dialogue-speaker-delimiter-regex)][1]" mode="hub:clean-hub">
+    <xsl:analyze-string select="." regex="{$dialogue-speaker-delimiter-regex}">
+      <xsl:matching-substring>
+        <delimiter char="{.}"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter]" mode="custom-1">
+    <xsl:copy>
+      <xsl:for-each-group select="node()" group-adjacent="not(local-name() = 'delimiter')">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key() and position() eq 1">
+            <personname role="speaker">
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </personname>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]" mode="custom-1">
     <xsl:copy>
       <xsl:attribute name="role" select="'dialogue'"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $dialogue-role-regex)][not(phrase[@role eq 'hub:identifier'])]/text()[following-sibling::tab]
-                      |para[matches(@role, $dialogue-role-regex)]/phrase[@role eq 'hub:identifier']" mode="custom-1">
-    <personname role="speaker">
-      <xsl:value-of select="."/>
-    </personname>
-  </xsl:template>
-  
-  <xsl:template match="para[matches(@role, $dialogue-role-regex)]
-                           [not(tab or phrase[@role eq 'hub:identifier'])]" mode="custom-1">
-    <xsl:copy>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:analyze-string select="." regex="^(\p{{L}}+)(\s\p{{L}}+)*:">
-        <xsl:matching-substring>        
-          <personname role="speaker">
-            <xsl:value-of select="."/>
-          </personname>
-        </xsl:matching-substring>
-        <xsl:non-matching-substring>
-          <xsl:value-of select="."/>
-        </xsl:non-matching-substring>
-      </xsl:analyze-string>
     </xsl:copy>
   </xsl:template>
   

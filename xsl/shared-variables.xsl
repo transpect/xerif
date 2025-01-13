@@ -131,6 +131,9 @@
   <xsl:variable name="dialogue-action-role-regex" as="xs:string"
                 select="'^[a-z]+dialogue-action$'"/>
   
+  <xsl:variable name="dialogue-speaker-delimiter-regex" as="xs:string" 
+                select="':'"/>
+  
   <xsl:variable name="poem-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
   
