@@ -1107,7 +1107,7 @@
     </xsl:analyze-string>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
     <xsl:variable name="delimiter" select="delimiter/@char" as="xs:string"/>
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
