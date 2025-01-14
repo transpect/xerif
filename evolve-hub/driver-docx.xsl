@@ -1108,15 +1108,13 @@
   </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
-    <xsl:variable name="delimiter" select="delimiter/@char" as="xs:string"/>
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="node()" group-adjacent="not(local-name() = 'delimiter')">
+      <xsl:for-each-group select="node()" group-ending-with="delimiter">
         <xsl:choose>
-          <xsl:when test="current-grouping-key() and position() eq 1">
+          <xsl:when test="position() eq 1">
             <personname role="speaker">
               <xsl:apply-templates select="current-group()" mode="#current"/>
-              <xsl:value-of select="$delimiter"/>
             </personname>
           </xsl:when>
           <xsl:otherwise>
@@ -1127,7 +1125,9 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/delimiter" mode="custom-1"/>
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/delimiter" mode="custom-1">
+    <xsl:value-of select="@char"/>
+  </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]" mode="custom-1">
     <xsl:copy>
