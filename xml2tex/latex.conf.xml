@@ -3081,7 +3081,9 @@
   
   <template context="dbk:phrase[matches(@role, $no-hyphen-style)]">
     <rule name="mbox" type="cmd">
-      <param/>
+      <param>
+        <xsl:next-match/>
+      </param>
     </rule>
   </template>
   
