@@ -580,8 +580,7 @@
                                ')')" />
   
   <xsl:template match="*[   para[.//mediaobject]
-                         or para[matches(@role, $figure-image-role-regex, 'i')]]
-                                [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]" mode="hub:split-at-tab">
+                         or para[matches(@role, $figure-image-role-regex, 'i')]]" mode="hub:split-at-tab">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
@@ -682,8 +681,9 @@
           <xsl:apply-templates select="following-sibling::para[matches(@role, $figure-alt-role-regex, 'i')]/node()" mode="#current"/>
         </alt>
       </xsl:if>
+      <xsl:variable name="figure-name" select="replace(normalize-space(string-join(descendant::text(),'')),concat($pi-mark, '[a-z]+'), '', 'i')"/>
       <imageobject>
-        <imagedata role="archive" fileref="{encode-for-uri(normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i')))}"/>
+        <imagedata role="archive" fileref="{encode-for-uri(normalize-space($figure-name))}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>
