@@ -275,7 +275,7 @@
           <xsl:for-each select="reverse($s9y-paths)">
             <xsl:variable name="path" select="." as="xs:string"/>
             <xsl:choose>
-              <xsl:when test="position() eq last()">
+              <xsl:when test="position() eq 1">
                 <xsl:variable name="custom-hyphenations-path" as="xs:string" 
                               select="concat($path, 'tex/', $basename, '-', $lang-code, '.hyph.txt')"/>
                 <xsl:if test="unparsed-text-available($custom-hyphenations-path)">
@@ -3034,6 +3034,7 @@
   
   
   <xsl:variable name="italic-style" select="'^[a-z]{1,3}italic$'" as="xs:string"/>
+  <xsl:variable name="bold-style" select="'^[a-z]{1,3}bold$'" as="xs:string"/>
   <xsl:variable name="emph-style" select="'^[a-z]{1,3}emph$'" as="xs:string"/>
   <xsl:variable name="strikethrough-style" select="'(^(typografisch_)?|_-_)?durchgestrichen($|_)'" as="xs:string"/>
   <xsl:variable name="underline-style" select="'(^(typografisch_)?|_-_)?unter($|_)'" as="xs:string"/>
@@ -3046,7 +3047,19 @@
     <xsl:text>}</xsl:text>
   </template>
   
-  <xsl:variable name="bold-style" select="'^[a-z]{1,3}bold$'" as="xs:string"/>
+  <xsl:template match="dbk:phrase[matches(@role, concat($italic-style, '|','$bold-style'))]
+                                 [following-sibling::node()[1][self::dbk:indexterm]]" mode="escape-bad-chars" priority="10">
+        
+    <xsl:copy>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:copy-of select="following-sibling::*:indexterm[1]"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="dbk:indexterm[preceding-sibling::node()[1]
+                                                              [self::dbk:phrase[matches(@role, concat($italic-style, '|', $bold-style))]]
+                                                              
+                                    ]" mode="escape-bad-chars" priority="10"/>
   
   <template context="dbk:phrase[matches(@role, $bold-style)]
                                [not(@css:font-weight = 'bold')]
