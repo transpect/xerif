@@ -275,7 +275,7 @@
           <xsl:for-each select="reverse($s9y-paths)">
             <xsl:variable name="path" select="." as="xs:string"/>
             <xsl:choose>
-              <xsl:when test="position() eq 1">
+              <xsl:when test="position() eq last()">
                 <xsl:variable name="custom-hyphenations-path" as="xs:string" 
                               select="concat($path, 'tex/', $basename, '-', $lang-code, '.hyph.txt')"/>
                 <xsl:if test="unparsed-text-available($custom-hyphenations-path)">
@@ -3048,6 +3048,8 @@
   </template>
   
   <xsl:template match="dbk:phrase[matches(@role, $bold-style)]
+                                 [following-sibling::node()[1][self::dbk:indexterm]] |
+                       dbk:phrase[matches(@role, $italic-style)]
                                  [following-sibling::node()[1][self::dbk:indexterm]]" mode="escape-bad-chars" priority="10">
         
     <xsl:copy>
