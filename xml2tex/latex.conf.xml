@@ -3047,7 +3047,7 @@
     <xsl:text>}</xsl:text>
   </template>
   
-  <xsl:template match="dbk:phrase[matches(@role, concat($italic-style, '|','$bold-style'))]
+  <xsl:template match="dbk:phrase[matches(@role, $bold-style)]
                                  [following-sibling::node()[1][self::dbk:indexterm]]" mode="escape-bad-chars" priority="10">
         
     <xsl:copy>
