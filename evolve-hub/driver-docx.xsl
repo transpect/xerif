@@ -164,19 +164,18 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[not(self::blockquote)][para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]" 
+  <xsl:template match="*[not(self::blockquote)][para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]]" 
                 name="build-blockquotes" 
                 mode="hub:blockquotes" xmlns="http://docbook.org/ns/docbook">
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*|processing-instruction()" group-adjacent="self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))] 
-                                                                              or
-                                                                              self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]] 
-                                                                                                             and
-                                                                                                             following-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]]">
-
-
+      <xsl:for-each-group select="*|processing-instruction()" 
+                          group-adjacent="self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')] 
+                                          or
+                                          self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]] 
+                                                                         and
+                                                                         following-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]]]">
         <!-- all blockquote paras -->
           <xsl:choose>
             <xsl:when test="current-grouping-key()">
@@ -185,14 +184,14 @@
                                                                   = substring(preceding-sibling::*[1][self::para]/@role, 1, 6))]
                                                                  [normalize-space()] 
                                                          or
-                                                         self::para[matches(@role,$hub:blockquote-role-regex)]
-                                                                   [preceding-sibling::*[1][self::para[matches(@role,$hub:blockquote-source-role-regex)]]]
+                                                         self::para[matches(@role,$hub:blockquote-role-regex, 'i')]
+                                                                   [preceding-sibling::*[1][self::para[matches(@role, $hub:blockquote-source-role-regex, 'i')]]]
                                                          ]">
-               <xsl:variable name="blockquote-source" as="element(dbk:para)*" select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
+                <xsl:variable name="blockquote-source" as="element(dbk:para)*" select="current-group()[matches(@role, $hub:blockquote-source-role-regex, 'i')]"/>
                 <!-- splitted in different blockquote-types: '^([a-z]{1,3}motto|[a-z]{1,3}dialogue|[a-z]{1,3}quotation)$' -->
                 <xsl:element name="blockquote">
-                  <xsl:apply-templates select="current-group()[matches(@role, $hub:blockquote-role-regex)][1]/@role" mode="#current"/>
-                  <xsl:if test="current-group()[1]/preceding-sibling::*[1]/self::para[matches(@role, $hub:blockquote-heading-role-regex)]">
+                  <xsl:apply-templates select="current-group()[matches(@role, $hub:blockquote-role-regex, 'i')][1]/@role" mode="#current"/>
+                  <xsl:if test="current-group()[1]/preceding-sibling::*[1]/self::para[matches(@role, $hub:blockquote-heading-role-regex, 'i')]">
                     <title>
                       <xsl:apply-templates select="current-group()[1]/preceding-sibling::node()[1]/node()" mode="#current"/>
                     </title>
@@ -202,7 +201,7 @@
                       <xsl:apply-templates select="$blockquote-source/@*, $blockquote-source/node()" mode="#current"/>
                     </attribution>
                   </xsl:if>
-                  <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex))]
+                  <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex, 'i'))]
                                                               [normalize-space() or processing-instruction()]" mode="#current"/>
                 </xsl:element>
               </xsl:for-each-group>
@@ -1096,15 +1095,18 @@
         * dialogue
         * -->
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/text()[matches(., $dialogue-speaker-delimiter-regex)][1]" mode="hub:clean-hub">
-    <xsl:analyze-string select="." regex="{$dialogue-speaker-delimiter-regex}">
-      <xsl:matching-substring>
-        <delimiter char="{.}"/>
-      </xsl:matching-substring>
-      <xsl:non-matching-substring>
-        <xsl:value-of select="."/>
-      </xsl:non-matching-substring>
-    </xsl:analyze-string>
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/node()[matches(., $dialogue-speaker-delimiter-regex)][1]" mode="hub:clean-hub">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:analyze-string select="." regex="{$dialogue-speaker-delimiter-regex}">
+        <xsl:matching-substring>
+          <delimiter char="{.}"/>
+        </xsl:matching-substring>
+        <xsl:non-matching-substring>
+          <xsl:value-of select="."/>
+        </xsl:non-matching-substring>
+      </xsl:analyze-string>
+    </xsl:copy>
   </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
@@ -1123,6 +1125,12 @@
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/node()[1][self::phrase[delimiter]]" mode="custom-1">
+    <personname role="speaker">
+      <xsl:apply-templates mode="#current"/>
+    </personname>
   </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/delimiter" mode="custom-1">

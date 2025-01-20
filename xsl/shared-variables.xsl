@@ -35,13 +35,13 @@
                 select="'^toctitle$'"/>
 
   <xsl:variable name="hub:blockquote-role-regex" as="xs:string" 
-    select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue|quotation|verse|transcription|codeblock[a-z0-9]+)(_-_.+)?$'"/>
+                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue[a-z]?(-action)?|quotation|verse|transcription|codeblock[a-z0-9]+)(_-_.+)?$'"/>
   
   <xsl:variable name="hub:blockquote-source-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue|quotation|verse)-?source$'"/>
+                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue[a-z]?|quotation|verse)-?source$'"/>
   
   <xsl:variable name="hub:list-by-indent-exception-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}_?(literature|body|dedication|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula|indexstatic|indexlist|codeblock[a-z0-9]+)'"/>  
+                select="'^[a-z]{1,3}_?(literature|body|dedication|motto|dialogue[a-z]?(-action)?|quotation|figurecaption|figuresource|tablecaption|tablesource|formula|indexstatic|indexlist|codeblock[a-z0-9]+)'"/>  
 
   <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^[a-z]{1,3}_?box(grey|border)$|^transcription$'"/>
   
@@ -126,7 +126,7 @@
                 select="'^[a-z]{1,3}codeblock[a-z0-9]+$'"/>
   
   <xsl:variable name="dialogue-role-regex" as="xs:string"
-                select="'^[a-z]{1,3}dialogue(-action)?$'"/>
+                select="'^[a-z]{1,3}dialogue(-action)?[a-z]?$'"/>
   
   <xsl:variable name="dialogue-action-role-regex" as="xs:string"
                 select="'^[a-z]+dialogue-action$'"/>
