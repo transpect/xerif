@@ -2550,13 +2550,13 @@
         * dialogue
         * -->
   
-  <template context="dbk:blockquote[@role='dialogue' or @role[matches(., $dialogue-role-regex)]]">
+  <template context="dbk:blockquote[@role='dialogue' or @role[matches(., $dialogue-role-regex, 'i')]]">
     <rule name="dialog" type="env">
       <text/>
     </rule>
   </template>
   
-  <template context="dbk:blockquote[@role='dialogue' or @role[matches(., $dialogue-role-regex)]]/dbk:para[matches(@role, $dialogue-action-role-regex)]">
+  <template context="dbk:blockquote[@role='dialogue' or @role[matches(., $dialogue-role-regex, 'i')]]/dbk:para[matches(@role, $dialogue-action-role-regex, 'i')]">
     <rule name="action" type="cmd" break-before="1">
       <text>&#x20;</text>
       <text/>

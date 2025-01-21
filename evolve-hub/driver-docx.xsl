@@ -1095,7 +1095,7 @@
         * dialogue
         * -->
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/node()[matches(., $dialogue-speaker-delimiter-regex)][1]" mode="hub:clean-hub">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/node()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:analyze-string select="." regex="{$dialogue-speaker-delimiter-regex}">
@@ -1109,7 +1109,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="node()" group-ending-with="delimiter">
@@ -1127,17 +1127,17 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/node()[1][self::phrase[delimiter]]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/node()[1][self::phrase[delimiter]]" mode="custom-1">
     <personname role="speaker">
       <xsl:apply-templates mode="#current"/>
     </personname>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]/para/delimiter" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/delimiter" mode="custom-1">
     <xsl:value-of select="@char"/>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]" mode="custom-1">
     <xsl:copy>
       <xsl:attribute name="role" select="'dialogue'"/>
       <xsl:apply-templates select="@*, node()" mode="#current"/>
