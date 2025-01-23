@@ -1516,7 +1516,6 @@
           <xsl:apply-templates select="info/title, title" mode="#current"/>
         </info>
       </xsl:if>
-      <xsl:message select="'ddd'"></xsl:message>
       <!-- if existing, group static index entries -->
       <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
         <xsl:choose>
