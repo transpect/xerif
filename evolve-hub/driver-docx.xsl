@@ -1499,7 +1499,7 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], 
@@ -1691,6 +1691,13 @@
                                              except self::processing-instruction()[matches(name(), $index-see-pi-name)]" 
                                    mode="custom-1-index"/>
             </seeie>
+          </xsl:when>
+          <xsl:when test="current-group()[self::tab]">
+            <xsl:variable name="pagenums" select="current-group()[preceding-sibling::tab]"/>
+            <xsl:variable name="indexentry" select="current-group()[following-sibling::tab]"/>
+            <xsl:sequence select="$indexentry" />
+            <xsl:element name="tab"/>
+            <xsl:sequence select="tr:pagenums-to-xref(string-join($pagenums,''))" />
           </xsl:when>
           <xsl:otherwise>
             <xsl:for-each select="current-group()" >
