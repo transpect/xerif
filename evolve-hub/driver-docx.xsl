@@ -1095,18 +1095,15 @@
         * dialogue
         * -->
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/node()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/phrase[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:analyze-string select="." regex="{$dialogue-speaker-delimiter-regex}">
-        <xsl:matching-substring>
-          <delimiter char="{.}"/>
-        </xsl:matching-substring>
-        <xsl:non-matching-substring>
-          <xsl:value-of select="."/>
-        </xsl:non-matching-substring>
-      </xsl:analyze-string>
+      <xsl:sequence select="tr:insert-delimiter(., $dialogue-speaker-delimiter-regex)"/>
     </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/text()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
+    <xsl:sequence select="tr:insert-delimiter(., $dialogue-speaker-delimiter-regex)"/>
   </xsl:template>
   
   <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
@@ -2609,6 +2606,19 @@
                                         'hub:no-pdf-bm'[$pis[matches(., $no-pdf-bookmarks-suffix, 'i')]]
         ), ' ')"/>
     </xsl:if>
+  </xsl:function>
+  
+  <xsl:function name="tr:insert-delimiter" as="node()*">
+    <xsl:param name="string" as="xs:string"/>
+    <xsl:param name="delimiter-regex" as="xs:string"/>
+    <xsl:analyze-string select="$string" regex="{$delimiter-regex}">
+      <xsl:matching-substring>
+        <delimiter char="{.}"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
   </xsl:function>
   
 </xsl:stylesheet>
