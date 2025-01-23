@@ -1496,7 +1496,7 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()] or self::title]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], 
@@ -1516,6 +1516,7 @@
           <xsl:apply-templates select="info/title, title" mode="#current"/>
         </info>
       </xsl:if>
+      <xsl:message select="'ddd'"></xsl:message>
       <!-- if existing, group static index entries -->
       <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
         <xsl:choose>
