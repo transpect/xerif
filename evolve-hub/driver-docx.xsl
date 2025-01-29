@@ -1689,16 +1689,13 @@
                                    mode="custom-1-index"/>
             </seeie>
           </xsl:when>
-          <xsl:when test="current-group()[self::tab]">
-            <xsl:variable name="pagenums" select="current-group()[preceding-sibling::tab]"/>
-            <xsl:variable name="indexentry" select="current-group()[following-sibling::tab]"/>
-            <xsl:sequence select="$indexentry" />
-            <xsl:element name="tab"/>
-            <xsl:sequence select="tr:pagenums-to-xref(string-join($pagenums,''))" />
-          </xsl:when>
           <xsl:otherwise>
+            <xsl:variable name="index-term" select="current-group()[following-sibling::*[self::tab]]"/>
             <xsl:for-each select="current-group()" >
               <xsl:choose>
+                <xsl:when test="current() intersect $index-term">
+                  <xsl:apply-templates select="current()"/>
+                </xsl:when>
                 <xsl:when test="matches(string-join(current(),''),'(^|,?\s)(([\d]+)(–([\d]+))?)+') and current()[self::*]">
                   <xsl:copy>
                     <xsl:apply-templates select="@*"/>
