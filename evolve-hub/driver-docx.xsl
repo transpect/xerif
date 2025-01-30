@@ -1484,7 +1484,7 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:variable name="pi-allowed-in-index" select="'IndexLetter'"/>  
+  <xsl:variable name="pi-allowed-in-index" select="'IndexLetters'"/>  
   
   <xsl:template match="*[self::part
                         |self::chapter
