@@ -1317,7 +1317,7 @@
   
   <!-- drop phrases without any text -->
   
-  <xsl:template match="phrase[*][not(normalize-space())]" mode="custom-2">
+  <xsl:template match="phrase[*[not(self::xref)]][not(normalize-space())]" mode="custom-2">
     <xsl:apply-templates/>
   </xsl:template>
   
@@ -1484,6 +1484,8 @@
     </xsl:copy>
   </xsl:template>
   
+  <xsl:variable name="pi-allowed-in-index" select="'IndexLetter'"/>  
+  
   <xsl:template match="*[self::part
                         |self::chapter
                         |self::section
@@ -1496,7 +1498,7 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()[matches(.,$pi-allowed-in-index)]] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], 
