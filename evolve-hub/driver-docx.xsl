@@ -715,11 +715,18 @@
       <xsl:if test="$one-caption-for-multiple-images">
         <xsl:attribute name="role" select="parent::para/@role"/>
       </xsl:if>
-      <xsl:apply-templates select="@* except @role, node()" mode="hub:split-at-tab"/>
+      <xsl:apply-templates select="@* except @role" mode="hub:split-at-tab"/>
+      <xsl:call-template name="alt-texts"/>
+      <xsl:apply-templates select="node() except alt" mode="hub:split-at-tab"/>
     </xsl:copy>
   </xsl:template>
   
-  <!-- explicitely markup inline images so that they don't get accidentally 
+  <xsl:template name="alt-texts">
+    <xsl:apply-templates select="alt" mode="hub:split-at-tab"/>
+    <!-- you could also use paras as alt here -->
+  </xsl:template>
+    
+  <!-- explicitly markup inline images so that they don't get accidentally 
        removed or rendered as display image later -->
   
   <xsl:template match="mediaobject[not(parent::figure)]
@@ -727,7 +734,9 @@
                                   [not(ancestor::para[.//processing-instruction()[name() eq $pi-xml-name]])]
                                   [ancestor::para[normalize-space(.)]]" mode="hub:split-at-tab">
     <inlinemediaobject>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:call-template name="alt-texts"/>
+      <xsl:apply-templates select="node() except alt" mode="#current"/>
     </inlinemediaobject>
   </xsl:template>
   
@@ -796,7 +805,7 @@
   <!-- remove paras and phrases that interfere with caption evaluation -->
   
   <xsl:template match="para[preceding-sibling::*[1][self::para][mediaobject]][not(normalize-space())]
-                      |para[matches(@role, '[a-z]{2,3}figurecaption')][matches(., '^[\p{Zs}]+$')]" mode="hub:split-at-tab" priority="100000">
+                      |para[matches(@role, '[a-z]{2,3}(figurecaption|figurealt)')][matches(., '^[\p{Zs}]+$')]" mode="hub:split-at-tab" priority="100000">
   </xsl:template>
   
   <xsl:template match="phrase[@css:color eq '#000000'][@srcpath][count(@*) eq 2]" mode="hub:split-at-tab">
@@ -1628,6 +1637,7 @@
   </xsl:template>
   
   <!-- (4) static index -->
+  
   <!-- but first: cleaning of indexparas and see/seealso phrases -->
   
   <!--    move see indicator from phrase, like
