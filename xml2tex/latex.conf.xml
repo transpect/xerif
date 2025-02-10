@@ -3006,17 +3006,6 @@
       <xsl:next-match/>
     <xsl:text>}</xsl:text>
   </template>
-  
-  <!-- hyperref and soul package interfere with each other -->
-  <template context="dbk:title//dbk:phrase[matches(@role, $strikethrough-style)]
-                    |dbk:title//dbk:phrase[@css:text-decoration-line eq 'line-through']">
-    <rule name="texorpdfstring" type="cmd">
-      <text>{\sout{</text>
-      <text/>
-      <text>}}</text>
-      <param/>
-    </rule>
-  </template>
 
   <!-- underline -->
 
