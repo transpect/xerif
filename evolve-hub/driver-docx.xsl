@@ -1111,7 +1111,8 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/text()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/text()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]
+                                                                                              [not(preceding-sibling::phrase[matches(., $dialogue-speaker-delimiter-regex)])]" mode="hub:clean-hub">
     <xsl:sequence select="tr:insert-delimiter(., $dialogue-speaker-delimiter-regex)"/>
   </xsl:template>
   
