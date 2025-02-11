@@ -675,9 +675,9 @@
                            [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
-      <xsl:if test="following-sibling::para[matches(@role, $figure-alt-role-regex, 'i')]">
+      <xsl:if test="following-sibling::*[1][self::para[matches(@role, $figure-alt-role-regex, 'i')]]">
         <alt>
-          <xsl:apply-templates select="following-sibling::para[matches(@role, $figure-alt-role-regex, 'i')]/node()" mode="#current"/>
+          <xsl:apply-templates select="following-sibling::*[1][self::para[matches(@role, $figure-alt-role-regex, 'i')]]/node()" mode="#current"/>
         </alt>
       </xsl:if>
       <xsl:variable name="figure-name" select="replace(normalize-space(string-join(descendant::text(),'')),concat($pi-mark, '[a-z]+'), '', 'i')"/>
