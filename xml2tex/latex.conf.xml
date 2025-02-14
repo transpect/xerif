@@ -876,7 +876,7 @@
                                   [not(ancestor::*[self::dbk:chapter])]
                       )
                       and 
-                      ($context[$notes-type eq 'endnotes' and $notes-per-chapter eq 'yes']
+                      ($context[$notes-type eq 'endnotes' and $notes-per-chapter eq 'yes' and not($endnotes-with-chapter eq 'yes')]
                                [.//dbk:footnote]
                                [not(.//dbk:para[matches(@role, $endnotes-heading-style)])]
                                [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]
@@ -889,7 +889,7 @@
       </xsl:when>
       <!-- Endnoten am Buchende -->
       <xsl:when test="$context[. is /*]
-                              [$notes-type eq 'endnotes' and $notes-per-chapter ne 'yes']
+                              [$notes-type eq 'endnotes' and ($notes-per-chapter ne 'yes' or $endnotes-with-chapter eq 'yes')]
                               [.//dbk:footnote]">
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="'chapter'"/>
@@ -2322,15 +2322,15 @@
                 <rule name="tpQuoteText" type="cmd" break-before="1">
                   <xsl:text>{</xsl:text>
                     <xsl:for-each select="current-group()">
+                      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
                       <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
                         <xsl:value-of select="concat('\foreignlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}{')"/>
                       </xsl:if>
-                      <text select="tr:add-cca('Start', 'P')[not($suppress-cca) and not($already-structured)]"/>
                       <xsl:apply-templates select="./node()" mode="#current"/>
-                      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
                       <xsl:if test="current()/@xml:lang and not($suppress-select-lang)">
                         <xsl:value-of select="'}'"/>
                       </xsl:if>
+                      <text select="tr:add-cca('End', 'P')[not($suppress-cca) and not($already-structured)]"/>
                       <xsl:if test="not(. is $cg[position() = last()])"><xsl:value-of select="$motto-linebreak-content"/></xsl:if>
                     </xsl:for-each>
                   <xsl:text>}</xsl:text>
