@@ -589,7 +589,7 @@
   
   <back>
     <xsl:if test="    $notes-type eq 'endnotes' 
-                  and not($notes-per-chapter eq 'yes')
+                  and (not($notes-per-chapter eq 'yes') or $endnotes-with-chapter eq 'yes')
                   and not(//*[self::dbk:para|self::dbk:title]
                              [matches(@role, $endnotes-heading-style)])
                   and not(//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])">
@@ -889,8 +889,11 @@
       </xsl:when>
       <!-- Endnoten am Buchende -->
       <xsl:when test="$context[. is /*]
-                              [$notes-type eq 'endnotes' and ($notes-per-chapter ne 'yes' or $endnotes-with-chapter eq 'yes')]
-                              [.//dbk:footnote]">
+                              [$notes-type eq 'endnotes']
+                              [not($notes-per-chapter eq 'yes') or $endnotes-with-chapter eq 'yes']
+                              [.//dbk:footnote]
+                              [not(.//dbk:para[matches(@role, $endnotes-heading-style)])]]
+                              [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]">
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="'chapter'"/>
           <text select="concat('\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
