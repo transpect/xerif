@@ -316,6 +316,9 @@
   <xsl:variable name="index-static-level-regex" as="xs:string" 
                 select="concat('(', string-join($index-static-level, '|'), ')?')"/>
   
+  <xsl:variable name="index-static-page-range-separator" as="xs:string" 
+                select="'&#x2013;'" />
+  
   <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
                 select="'(see|siehe)'"/>

@@ -1758,7 +1758,9 @@
           <!-- range-->
           <xsl:when test="regex-group(4)">
             <xsl:value-of select="regex-group(1)"/>
-            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>-<xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
+            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>
+            <xsl:value-of select="$index-static-page-range-separator"/>
+            <xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
           </xsl:when>
           <xsl:otherwise>
               <xsl:value-of select="regex-group(1)"/>
