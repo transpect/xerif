@@ -3014,8 +3014,8 @@
   <xsl:variable name="strikethrough-style" select="'^[a-z]{1,3}strikethrough$'" as="xs:string"/>
   
   <template context="dbk:phrase[matches(@role, $strikethrough-style)]
-                               [not(@css:text-decoration-line = 'line-through')] 
-                               [empty(key('style', @role)[@css:text-decoration-line = 'line-through'])]">
+                               [not(matches(@css:text-decoration-line, 'line-through'))] 
+                               [empty(key('style', @role)[matches(@css:text-decoration-line, 'line-through')])]">
     <xsl:text>\sout{</xsl:text>
       <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -3026,8 +3026,8 @@
   <xsl:variable name="underline-style" select="'^[a-z]{1,3}underline$'" as="xs:string"/>
   
   <template context="dbk:phrase[matches(@role, $underline-style)]
-                               [not(@css:text-decoration-line = 'underline')] 
-                               [empty(key('style', @role)[@css:text-decoration-line eq 'underline'])]">
+                               [not(matches(@css:text-decoration-line, 'underline'))] 
+                               [empty(key('style', @role)[matches(@css:text-decoration-line, 'underline')])]">
         <!-- if thithose other conditions are true the template in docx2tex/conf.xml will match and create the uline. 
           if no restraints were set, nested \ulines would be generated-->
         <xsl:text>\uline{</xsl:text>
@@ -3082,10 +3082,10 @@
 
   <!-- override from docx2tex for arabic and chinese -->
   
-  <template context="dbk:phrase[@css:text-decoration-line ne 'none']
-                               [(@css:text-decoration-line[. eq 'underline'] 
-                                or exists(for $i in ./@role 
-                                          return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name][@css:text-decoration-line eq 'underline']))]
+  <template context="dbk:phrase[not(matches(@css:text-decoration-line, 'none'))]
+                               [(matches(@css:text-decoration-line, 'underline') 
+                                 or exists(for $i in ./@role 
+                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name][matches(@css:text-decoration-line, 'underline')]))]
                                [not(@role eq 'Hyperlink')] 
                                [not(parent::dbk:link)]
                                [not(.//dbk:link)]
