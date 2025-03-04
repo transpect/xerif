@@ -1647,9 +1647,9 @@
                            /phrase[matches(.,
                                      concat(
                                        $index-see-also-regex, 
-                                       '?'
+                                       '?$'
                                      )
-                                   )]" mode="hub:clean-hub">
+                                   )]" mode="hub:clean-hub" priority="3">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:sequence select="replace(., concat($index-see-also-regex, '?'), '')"/>
@@ -1658,6 +1658,18 @@
                             concat('.*', $index-see-also-regex, '?(\p{Zs})?.*' ), 
                             '$1$2$4'
                           )"/>
+  </xsl:template>
+  
+  <!-- dissolve textstylings around see also entrys (done by tex later)  -->
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(@role,'italic|kursiv')]
+                                  [matches(.,
+                                     concat('^',
+                                       $index-see-also-regex, 
+                                       '?.+$'
+                                     )
+                                   )]" mode="hub:clean-hub">
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
@@ -1743,7 +1755,15 @@
             <xsl:value-of select="replace(.,$index-see-regex,'')"/>
           </xsl:matching-substring>
           <xsl:non-matching-substring>
-            <xsl:value-of select="."/>
+            <xsl:analyze-string select="." regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
+              <xsl:matching-substring>
+                <xsl:processing-instruction name="pages"/>
+                <xsl:value-of select="."/>
+              </xsl:matching-substring>
+              <xsl:non-matching-substring>
+                <xsl:value-of select="."/>
+              </xsl:non-matching-substring>
+            </xsl:analyze-string>
           </xsl:non-matching-substring>
         </xsl:analyze-string>
       </xsl:non-matching-substring>
@@ -1773,6 +1793,8 @@
       </xsl:non-matching-substring>
     </xsl:analyze-string>
   </xsl:function>
+  
+  <xsl:template match="processing-instruction()[matches(name(), 'pages')]" mode="custom-2"/>
   
   <xsl:template match="*[self::*[local-name() = $primary-secondary-etc]]
                         [*:seealsoie or *:seeie]"  
