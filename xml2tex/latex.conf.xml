@@ -3426,9 +3426,9 @@
     <xsl:param name="bm-override" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="run-override" as="xs:boolean?" tunnel="yes"/>
     <!-- in \tpTocTitle etc. some characters cannot be displayed properly and therefore have to be escaped. 
-          Example: A no-break Space has to be mapped to a tilde (https://redmine.le-tex.de/issues/13715) otherwise no space is displayed-->
-    <xsl:choose>
-      <xsl:when test="$toc-override eq true() or $bm-override eq true() or $run-override eq true()">
+          Example: A no-break Space has to be mapped to a tilde (https://redmine.le-tex.de/issues/13715, https://redmine.le-tex.de/issues/18364) otherwise no space is displayed-->
+  <!--  <xsl:choose>
+      <xsl:when test="$toc-override eq true() or $bm-override eq true() or $run-override eq true()">-->
         <xsl:variable name="regex" select="'([&amp;&#x9;&#xa0;&#x2000;-&#x200a;]+)'" as="xs:string"/>
         <xsl:analyze-string select="." regex="{$regex}">
           <xsl:matching-substring>
@@ -3448,11 +3448,11 @@
            <xsl:apply-templates select="$text/node()" mode="#current"/>
           </xsl:non-matching-substring>
         </xsl:analyze-string>
-      </xsl:when>
+<!--      </xsl:when>
       <xsl:otherwise>
         <xsl:next-match/>
       </xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>-->
     
   </xsl:template>
   
