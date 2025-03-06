@@ -790,8 +790,10 @@
 
   <template context="/*/*[self::dbk:part|self::dbk:chapter|self::dbk:section]
                          [empty(preceding-sibling::dbk:para)][1]
+                         [empty(preceding-sibling::dbk:figure)][1]
                          [not(preceding-sibling::dbk:toc)]
-                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]" priority="3001">
+                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]
+                    |/*/dbk:figure[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
