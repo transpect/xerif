@@ -837,7 +837,7 @@
   <template context="*[not(self::dbk:book|self::dbk:hub|self::dbk:figure)]
                       [not(@role = ('alternative-title', 'keywords'))]
                       [dbk:info]
-                      [@xml:lang]
+                      [xml2tex:lang-to-babel-lang(@xml:lang)[normalize-space()]]
                       [@xml:lang ne /*/@xml:lang]
                       [not(../@xml:lang = current()/@xml:lang)]" priority="800">
     <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
@@ -2035,6 +2035,7 @@
         <xsl:sequence select="if($elt[   dbk:title 
                                       or dbk:info 
                                       or dbk:caption
+                                      or self::dbk:figure[@floatstyle]
                                       or self::dbk:informaltable
                                       or self::*:table
                                       or preceding-sibling::*[1][matches(., ':\p{Zs}*$')]
@@ -2284,14 +2285,16 @@
         * -->
   
   <xsl:template match="*[self::dbk:div]
-                        [@xml:lang[not(. = ../ancestor::*[@xml:lang][1]/@xml:lang)]]" priority="5000" mode="xml2tex">
+                        [@xml:lang[not(. = ../ancestor::*[@xml:lang][1]/@xml:lang)]
+                                  [xml2tex:lang-to-babel-lang(.)[normalize-space()]]
+                        ]" priority="5000" mode="xml2tex">
     <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
     <!-- add selectlanguage -->
-    <xsl:if test="@xml:lang and not($suppress-select-lang) and not(preceding-sibling::*[1][self::dbk:para|self::dbk:blockquote][@xml:lang = current/@xml:lang])">
+    <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not($suppress-select-lang) and not(preceding-sibling::*[1][self::dbk:para|self::dbk:blockquote][@xml:lang = current/@xml:lang])">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
     </xsl:if>
     <xsl:next-match/>
-    <xsl:if test="@xml:lang and not(following-sibling::*[1][@xml:lang]) and not($suppress-select-lang)">
+    <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not(following-sibling::*[1][@xml:lang]) and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
     </xsl:if>
   </xsl:template>
@@ -2301,7 +2304,7 @@
     <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
     <xsl:param name="keep" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="(self::dbk:epigraph and $keep) or self::dbk:blockquote">
-     <xsl:if test="@xml:lang and not($suppress-select-lang)">
+     <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
     </xsl:if>
     <rule name="quote" type="env" break-before="1">
@@ -2312,7 +2315,7 @@
       </xsl:if>
       <text select="* except dbk:attribution"/>
     </rule>
-    <xsl:if test="@xml:lang and not(following-sibling::*[1][not(self::dbk:div)][@xml:lang]) and not($suppress-select-lang)">
+    <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not(following-sibling::*[1][not(self::dbk:div)][@xml:lang]) and not($suppress-select-lang)">
       <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang($main-lang), '}')"/>
     </xsl:if>
    </xsl:if>
