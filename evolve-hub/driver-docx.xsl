@@ -713,7 +713,7 @@
     <xsl:param name="one-caption-for-multiple-images" as="xs:boolean" select="false()"/>
     <xsl:copy>
       <xsl:if test="$one-caption-for-multiple-images">
-        <xsl:attribute name="role" select="parent::para/@role"/>
+        <xsl:attribute name="role" select="ancestor::para[1]/@role"/>
       </xsl:if>
       <xsl:apply-templates select="@* except @role" mode="hub:split-at-tab"/>
       <xsl:call-template name="alt-texts"/>
