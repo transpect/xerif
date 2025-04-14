@@ -19,8 +19,8 @@
   
   <pattern id="contrib">
     <rule context="book-meta/contrib-group">
-      <assert test="contrib[@contrib-type = 'author']" role="error" id="no-author">
-        There is no author in <code xmlns="http://www.w3.org/1999/xhtml">&lt;contrib-group/></code>.
+      <assert test="contrib[@contrib-type = ('editor','author')]" role="error" id="no-author">
+        There is no author or editor in <code xmlns="http://www.w3.org/1999/xhtml">&lt;contrib-group/></code>.
       </assert>
     </rule>
   </pattern>

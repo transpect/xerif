@@ -164,19 +164,18 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*[not(self::blockquote)][para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]" 
+  <xsl:template match="*[not(self::blockquote)][para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]]" 
                 name="build-blockquotes" 
                 mode="hub:blockquotes" xmlns="http://docbook.org/ns/docbook">
     <xsl:param name="wrapper-element-name" select="name()" as="xs:string" tunnel="no"/>
     <xsl:element name="{$wrapper-element-name}">
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*|processing-instruction()" group-adjacent="self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))] 
-                                                                              or
-                                                                              self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]] 
-                                                                                                             and
-                                                                                                             following-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex))]]]">
-
-
+      <xsl:for-each-group select="*|processing-instruction()" 
+                          group-adjacent="self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')] 
+                                          or
+                                          self::processing-instruction()[preceding-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]] 
+                                                                         and
+                                                                         following-sibling::*[1][self::para[matches(@role, concat($hub:blockquote-role-regex,'|',$hub:blockquote-source-role-regex), 'i')]]]">
         <!-- all blockquote paras -->
           <xsl:choose>
             <xsl:when test="current-grouping-key()">
@@ -185,14 +184,14 @@
                                                                   = substring(preceding-sibling::*[1][self::para]/@role, 1, 6))]
                                                                  [normalize-space()] 
                                                          or
-                                                         self::para[matches(@role,$hub:blockquote-role-regex)]
-                                                                   [preceding-sibling::*[1][self::para[matches(@role,$hub:blockquote-source-role-regex)]]]
+                                                         self::para[matches(@role,$hub:blockquote-role-regex, 'i')]
+                                                                   [preceding-sibling::*[1][self::para[matches(@role, $hub:blockquote-source-role-regex, 'i')]]]
                                                          ]">
-               <xsl:variable name="blockquote-source" as="element(dbk:para)*" select="current-group()[matches(@role, $hub:blockquote-source-role-regex)]"/>
+                <xsl:variable name="blockquote-source" as="element(dbk:para)*" select="current-group()[matches(@role, $hub:blockquote-source-role-regex, 'i')]"/>
                 <!-- splitted in different blockquote-types: '^([a-z]{1,3}motto|[a-z]{1,3}dialogue|[a-z]{1,3}quotation)$' -->
                 <xsl:element name="blockquote">
-                  <xsl:apply-templates select="current-group()[matches(@role, $hub:blockquote-role-regex)][1]/@role" mode="#current"/>
-                  <xsl:if test="current-group()[1]/preceding-sibling::*[1]/self::para[matches(@role, $hub:blockquote-heading-role-regex)]">
+                  <xsl:apply-templates select="current-group()[matches(@role, $hub:blockquote-role-regex, 'i')][1]/@role" mode="#current"/>
+                  <xsl:if test="current-group()[1]/preceding-sibling::*[1]/self::para[matches(@role, $hub:blockquote-heading-role-regex, 'i')]">
                     <title>
                       <xsl:apply-templates select="current-group()[1]/preceding-sibling::node()[1]/node()" mode="#current"/>
                     </title>
@@ -202,7 +201,7 @@
                       <xsl:apply-templates select="$blockquote-source/@*, $blockquote-source/node()" mode="#current"/>
                     </attribution>
                   </xsl:if>
-                  <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex))]
+                  <xsl:apply-templates select="current-group()[not(matches(@role, $hub:blockquote-source-role-regex, 'i'))]
                                                               [normalize-space() or processing-instruction()]" mode="#current"/>
                 </xsl:element>
               </xsl:for-each-group>
@@ -273,13 +272,14 @@
   </xsl:template>
   
   <!-- expand xml:lang attributes from styles -->
-
+  <xsl:variable name="expand-lang-from-style" select="true()"/>
+  
   <xsl:template match="*[not(@xml:lang)]
                         [node()]/@srcpath" mode="hub:dissolve-sidebars-without-purpose" priority="10">
     <xsl:variable name="first-child-lang" as="attribute(xml:lang)?" select="../*[@xml:lang][1]/@xml:lang"/>
     <xsl:next-match/>
     <!-- expand lang from styles or pull up lang from children -->
-    <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang, 
+    <xsl:apply-templates select="key('hub:style-by-role', ../@role)/@xml:lang[$expand-lang-from-style], 
                                   if (every $child in ../node()[not(self::anchor|self::indexterm|self::tab)] satisfies 
                                       $child[@xml:lang[. = $first-child-lang]
                                              or matches(.,'^[\p{Zs}\.,;!\?]+$')
@@ -406,7 +406,9 @@
        https://redmine.le-tex.de/issues/13193 -->
   
   <xsl:template match="blockquote[not(   para[matches(@role, $info-blockquote-roles)]
-                                      or para[matches(@role, $info-blockquote-source-roles)])]
+                                      or para[matches(@role, $info-blockquote-source-roles)]
+                                      or para[matches(@role, $dialogue-role-regex)]
+                                  )]
                                  [not(count(*) eq 1)]" mode="hub:clean-hub">
     <xsl:variable name="role" select="@role" as="attribute(role)?"/>
     <xsl:for-each-group select="*" group-adjacent="if(matches(@role, $hub:blockquote-source-role-regex) or not(@role))
@@ -437,11 +439,14 @@
   </xsl:template>
     
   <xsl:template match="para[matches(@role, $info-blockquote-source-roles)]
+                           [preceding-sibling::*[1][self::para[matches(@role, $info-blockquote-roles)]
+                                                              [not(parent::blockquote)]]]
                       |*[self::bibliomixed|self::para]/node()[1][self::br]
                       |*[self::bibliomixed|self::para]/br[every $p in preceding-sibling::node() 
                                                           satisfies $p[   not(matches(., '\P{Zs}')) 
                                                                        or empty(.)]]" 
-                mode="hub:clean-hub"/>
+                mode="hub:clean-hub">
+  </xsl:template>
 
   <xsl:template match="*[part]" mode="hub:clean-hub">
     <xsl:copy>
@@ -565,6 +570,7 @@
                 select="concat('(',
                                string-join(
                                            ($figure-image-role-regex, 
+                                            $figure-alt-role-regex, 
                                             $figure-caption-role-regex, 
                                             $figure-source-role-regex,
                                             $figure-link-role-regex
@@ -573,8 +579,7 @@
                                ')')" />
   
   <xsl:template match="*[   para[.//mediaobject]
-                         or para[matches(@role, $figure-image-role-regex, 'i')]]
-                                [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]" mode="hub:split-at-tab">
+                         or para[matches(@role, $figure-image-role-regex, 'i')]]" mode="hub:split-at-tab">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
@@ -670,8 +675,14 @@
                            [normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i'))]
                            [not(exists(.//mediaobject))]" mode="figures">
     <mediaobject>
+      <xsl:if test="following-sibling::*[1][self::para[matches(@role, $figure-alt-role-regex, 'i')]]">
+        <alt>
+          <xsl:apply-templates select="following-sibling::*[1][self::para[matches(@role, $figure-alt-role-regex, 'i')]]/node()" mode="#current"/>
+        </alt>
+      </xsl:if>
+      <xsl:variable name="figure-name" select="replace(normalize-space(string-join(descendant::text(),'')),concat($pi-mark, '[a-z]+'), '', 'i')"/>
       <imageobject>
-        <imagedata role="archive" fileref="{encode-for-uri(normalize-space(replace(., concat($pi-mark, '[a-z]+'), '', 'i')))}"/>
+        <imagedata role="archive" fileref="{encode-for-uri(normalize-space($figure-name))}"/>
       </imageobject>
     </mediaobject>
   </xsl:template>
@@ -702,13 +713,20 @@
     <xsl:param name="one-caption-for-multiple-images" as="xs:boolean" select="false()"/>
     <xsl:copy>
       <xsl:if test="$one-caption-for-multiple-images">
-        <xsl:attribute name="role" select="parent::para/@role"/>
+        <xsl:attribute name="role" select="ancestor::para[1]/@role"/>
       </xsl:if>
-      <xsl:apply-templates select="@* except @role, node()" mode="hub:split-at-tab"/>
+      <xsl:apply-templates select="@* except @role" mode="hub:split-at-tab"/>
+      <xsl:call-template name="alt-texts"/>
+      <xsl:apply-templates select="node() except alt" mode="hub:split-at-tab"/>
     </xsl:copy>
   </xsl:template>
   
-  <!-- explicitely markup inline images so that they don't get accidentally 
+  <xsl:template name="alt-texts">
+    <xsl:apply-templates select="alt" mode="hub:split-at-tab"/>
+    <!-- you could also use paras as alt here -->
+  </xsl:template>
+    
+  <!-- explicitly markup inline images so that they don't get accidentally 
        removed or rendered as display image later -->
   
   <xsl:template match="mediaobject[not(parent::figure)]
@@ -716,7 +734,9 @@
                                   [not(ancestor::para[.//processing-instruction()[name() eq $pi-xml-name]])]
                                   [ancestor::para[normalize-space(.)]]" mode="hub:split-at-tab">
     <inlinemediaobject>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:call-template name="alt-texts"/>
+      <xsl:apply-templates select="node() except alt" mode="#current"/>
     </inlinemediaobject>
   </xsl:template>
   
@@ -785,7 +805,7 @@
   <!-- remove paras and phrases that interfere with caption evaluation -->
   
   <xsl:template match="para[preceding-sibling::*[1][self::para][mediaobject]][not(normalize-space())]
-                      |para[matches(@role, '[a-z]{2,3}figurecaption')][matches(., '^[\p{Zs}]+$')]" mode="hub:split-at-tab" priority="100000">
+                      |para[matches(@role, '[a-z]{2,3}(figurecaption|figurealt)')][matches(., '^[\p{Zs}]+$')]" mode="hub:split-at-tab" priority="100000">
   </xsl:template>
   
   <xsl:template match="phrase[@css:color eq '#000000'][@srcpath][count(@*) eq 2]" mode="hub:split-at-tab">
@@ -1084,34 +1104,50 @@
         * dialogue
         * -->
   
-  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex)]]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/phrase[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]" mode="hub:clean-hub">
     <xsl:copy>
-      <xsl:attribute name="role" select="'dialogue'"/>
-      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:sequence select="tr:insert-delimiter(., $dialogue-speaker-delimiter-regex)"/>
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $dialogue-role-regex)][not(phrase[@role eq 'hub:identifier'])]/text()[following-sibling::tab]
-                      |para[matches(@role, $dialogue-role-regex)]/phrase[@role eq 'hub:identifier']" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/text()[matches(., $dialogue-speaker-delimiter-regex, 'i')][1]
+                                                                                              [not(preceding-sibling::phrase[matches(., $dialogue-speaker-delimiter-regex)])]" mode="hub:clean-hub">
+    <xsl:sequence select="tr:insert-delimiter(., $dialogue-speaker-delimiter-regex)"/>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para[delimiter[following-sibling::node()]]" mode="custom-1">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="node()" group-ending-with="delimiter">
+        <xsl:choose>
+          <xsl:when test="position() eq 1">
+            <personname role="speaker">
+              <xsl:apply-templates select="current-group()" mode="#current"/>
+            </personname>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/node()[1][self::phrase[delimiter]]" mode="custom-1">
     <personname role="speaker">
-      <xsl:value-of select="."/>
+      <xsl:apply-templates mode="#current"/>
     </personname>
   </xsl:template>
   
-  <xsl:template match="para[matches(@role, $dialogue-role-regex)]
-                           [not(tab or phrase[@role eq 'hub:identifier'])]" mode="custom-1">
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]/para/delimiter" mode="custom-1">
+    <xsl:value-of select="@char"/>
+  </xsl:template>
+  
+  <xsl:template match="blockquote[para[matches(@role, $dialogue-role-regex, 'i')]]" mode="custom-1">
     <xsl:copy>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:analyze-string select="." regex="^(\p{{L}}+)(\s\p{{L}}+)*:">
-        <xsl:matching-substring>        
-          <personname role="speaker">
-            <xsl:value-of select="."/>
-          </personname>
-        </xsl:matching-substring>
-        <xsl:non-matching-substring>
-          <xsl:value-of select="."/>
-        </xsl:non-matching-substring>
-      </xsl:analyze-string>
+      <xsl:attribute name="role" select="'dialogue'"/>
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
   
@@ -1254,8 +1290,9 @@
 
   <xsl:template match="para[not(node())][not(matches(@role, $empty-line-style))]
                       |part/title[not(node())]
-                      |blockquote[every $i in * 
-                                  satisfies $i[not(node())]]" mode="hub:clean-hub" priority="5"/>
+                      |blockquote[    not(node()) 
+                                  and (every $i in * 
+                                       satisfies $i[not(node())])]" mode="hub:clean-hub" priority="5"/>
   
   <!-- remove width attributes from table cells for htmltabs -->
   
@@ -1290,7 +1327,7 @@
   
   <!-- drop phrases without any text -->
   
-  <xsl:template match="phrase[*][not(normalize-space())]" mode="custom-2">
+  <xsl:template match="phrase[*[not(self::xref)]][not(normalize-space())]" mode="custom-2">
     <xsl:apply-templates/>
   </xsl:template>
   
@@ -1457,19 +1494,21 @@
     </xsl:copy>
   </xsl:template>
   
+  <xsl:variable name="pi-allowed-in-index" select="'IndexLetters'"/>  
+  
   <xsl:template match="*[self::part
                         |self::chapter
                         |self::section
                         |self::appendix]
                         [info/title[matches(@role, $index-heading-regex)]
-                          |title[matches(@role, $index-heading-regex)]]
-                     | *[self::index]     
-                     | *[self::part
+                        |title[matches(@role, $index-heading-regex)]]
+                      |*[self::index]     
+                      |*[self::part
                         |self::chapter
                         |self::section
                         |self::appendix]
-                        [title[matches(@role, $hub:general-heading-main-name-regex)]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::title]]
+                        [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
+                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()[matches(.,$pi-allowed-in-index)]] or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], 
@@ -1491,7 +1530,6 @@
       </xsl:if>
       <!-- if existing, group static index entries -->
       <xsl:for-each-group select="* except (info, title)" group-adjacent="matches(@role, concat($index-static-regex,$index-static-level-regex,'$'))">
-        
         <xsl:choose>
           <xsl:when test="current-grouping-key()">
             <xsl:for-each-group select="current-group()" 
@@ -1600,6 +1638,7 @@
   </xsl:template>
   
   <!-- (4) static index -->
+  
   <!-- but first: cleaning of indexparas and see/seealso phrases -->
   
   <!--    move see indicator from phrase, like
@@ -1608,9 +1647,9 @@
                            /phrase[matches(.,
                                      concat(
                                        $index-see-also-regex, 
-                                       '?'
+                                       '?$'
                                      )
-                                   )]" mode="hub:clean-hub">
+                                   )]" mode="hub:clean-hub" priority="3">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:sequence select="replace(., concat($index-see-also-regex, '?'), '')"/>
@@ -1619,6 +1658,18 @@
                             concat('.*', $index-see-also-regex, '?(\p{Zs})?.*' ), 
                             '$1$2$4'
                           )"/>
+  </xsl:template>
+  
+  <!-- dissolve textstylings around see also entrys (done by tex later)  -->
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(@role,'italic|kursiv')]
+                                  [matches(.,
+                                     concat('^',
+                                       $index-see-also-regex, 
+                                       '?.+$'
+                                     )
+                                   )]" mode="hub:clean-hub">
+    <xsl:apply-templates select="node()" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
@@ -1664,8 +1715,12 @@
             </seeie>
           </xsl:when>
           <xsl:otherwise>
+            <xsl:variable name="index-term" select="current-group()[following-sibling::*[self::tab]]"/>
             <xsl:for-each select="current-group()" >
               <xsl:choose>
+                <xsl:when test="current() intersect $index-term">
+                  <xsl:apply-templates select="current()"/>
+                </xsl:when>
                 <xsl:when test="matches(string-join(current(),''),'(^|,?\s)(([\d]+)(–([\d]+))?)+') and current()[self::*]">
                   <xsl:copy>
                     <xsl:apply-templates select="@*"/>
@@ -1700,7 +1755,15 @@
             <xsl:value-of select="replace(.,$index-see-regex,'')"/>
           </xsl:matching-substring>
           <xsl:non-matching-substring>
-            <xsl:value-of select="."/>
+            <xsl:analyze-string select="." regex="(^|,?\s)(([\d]+)(–([\d]+))?)+">
+              <xsl:matching-substring>
+                <xsl:processing-instruction name="pages"/>
+                <xsl:value-of select="."/>
+              </xsl:matching-substring>
+              <xsl:non-matching-substring>
+                <xsl:value-of select="."/>
+              </xsl:non-matching-substring>
+            </xsl:analyze-string>
           </xsl:non-matching-substring>
         </xsl:analyze-string>
       </xsl:non-matching-substring>
@@ -1715,7 +1778,9 @@
           <!-- range-->
           <xsl:when test="regex-group(4)">
             <xsl:value-of select="regex-group(1)"/>
-            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>-<xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
+            <xref xlink:href="page-{regex-group(3)}" annotations="start-of-range"/>
+            <xsl:value-of select="$index-static-page-range-separator"/>
+            <xref xlink:href="page-{regex-group(5)}" annotations="end-of-range"/>
           </xsl:when>
           <xsl:otherwise>
               <xsl:value-of select="regex-group(1)"/>
@@ -1728,6 +1793,8 @@
       </xsl:non-matching-substring>
     </xsl:analyze-string>
   </xsl:function>
+  
+  <xsl:template match="processing-instruction()[matches(name(), 'pages')]" mode="custom-2"/>
   
   <xsl:template match="*[self::*[local-name() = $primary-secondary-etc]]
                         [*:seealsoie or *:seeie]"  
@@ -1836,7 +1903,6 @@
   
   <xsl:function name="hub:index-entry-element-name" as="xs:string">
     <xsl:param name="level" />
-
     <xsl:sequence select="if(exists($level) and $level castable as xs:integer) 
                           then $primary-secondary-etc[xs:integer($level)]
                           else $primary-secondary-etc[1]"/>
@@ -2307,7 +2373,7 @@
   <!-- https://redmine.le-tex.de/issues/14883
        resolve biblioset that is interfering with xml2tex matching patterns
   -->
-  <xsl:template match="info/biblioset[every $child in * satisfies $child[self::abstract]]" mode="custom-2">
+  <xsl:template match="info/biblioset[every $child in * satisfies $child[self::abstract or self::person or self::orgname]]" mode="custom-2">
     <!-- preserve biblioset with DOIs, license info etc. if only an abstract is contained, dissolve it-->
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
@@ -2358,6 +2424,10 @@
   <!-- https://redmine.le-tex.de/issues/17480 -->
   
   <xsl:template match="annotation" mode="hub:clean-hub"/>
+  
+  <xsl:template match="link[matches(., '^\p{Zs}+$')]" mode="hub:clean-hub">
+    <xsl:apply-templates select="node()" mode="#current"/>
+  </xsl:template>
   
   <xsl:template match="text()[parent::phrase]
                              [(matches(., '^(\s+).+') and ../node()[1][not(self::anchor | self::index-term)][self::text()]) or (matches(., '.+(\s+)$') and ../node()[not(self::anchor | self::index-term)][last()][self::text()])] (: leading or trailing whitespace :)
@@ -2570,6 +2640,19 @@
                                         'hub:no-pdf-bm'[$pis[matches(., $no-pdf-bookmarks-suffix, 'i')]]
         ), ' ')"/>
     </xsl:if>
+  </xsl:function>
+  
+  <xsl:function name="tr:insert-delimiter" as="node()*">
+    <xsl:param name="string" as="xs:string"/>
+    <xsl:param name="delimiter-regex" as="xs:string"/>
+    <xsl:analyze-string select="$string" regex="{$delimiter-regex}">
+      <xsl:matching-substring>
+        <delimiter char="{.}"/>
+      </xsl:matching-substring>
+      <xsl:non-matching-substring>
+        <xsl:value-of select="."/>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
   </xsl:function>
   
 </xsl:stylesheet>

@@ -35,13 +35,13 @@
                 select="'^toctitle$'"/>
 
   <xsl:variable name="hub:blockquote-role-regex" as="xs:string" 
-    select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue|quotation|verse|transcription|codeblock[a-z0-9]+)(_-_.+)?$'"/>
+                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue[a-z]?(-action)?|quotation|verse|transcription|codeblock[a-z0-9]+)(_-_.+)?$'"/>
   
   <xsl:variable name="hub:blockquote-source-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue|quotation|verse)-?source$'"/>
+                select="'^[a-z]{1,3}_?(motto|dedication|epigraph|dialogue[a-z]?|quotation|verse)-?source$'"/>
   
   <xsl:variable name="hub:list-by-indent-exception-role-regex" as="xs:string" 
-                select="'^[a-z]{1,3}_?(literature|body|dedication|motto|dialogue|quotation|figurecaption|figuresource|tablecaption|tablesource|formula|indexstatic|indexlist|codeblock[a-z0-9]+)'"/>  
+                select="'^[a-z]{1,3}_?(literature|body|dedication|motto|dialogue[a-z]?(-action)?|quotation|figurecaption|figuresource|tablecaption|tablesource|formula|indexstatic|indexlist|codeblock[a-z0-9]+)'"/>  
 
   <xsl:variable name="tei:floatingTexts-role" as="xs:string" select="'^[a-z]{1,3}_?box(grey|border)$|^transcription$'"/>
   
@@ -126,7 +126,13 @@
                 select="'^[a-z]{1,3}codeblock[a-z0-9]+$'"/>
   
   <xsl:variable name="dialogue-role-regex" as="xs:string"
-                select="'^[a-z]{1,3}dialogue$'"/>
+                select="'^[a-z]{1,3}dialogue(-action)?[a-z]?$'"/>
+  
+  <xsl:variable name="dialogue-action-role-regex" as="xs:string"
+                select="'^[a-z]+dialogue-action$'"/>
+  
+  <xsl:variable name="dialogue-speaker-delimiter-regex" as="xs:string" 
+                select="':'"/>
   
   <xsl:variable name="poem-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}(verse|poem).*$'"/>
@@ -144,10 +150,13 @@
                 select="'^[a-z]+_?verse.*$'" />
   
   <xsl:variable name="letter-para-style" as="xs:string" 
-                select="'ts_letter$'"/>
+                select="'[a-z]{1,3}_letter$'"/>
+  
+  <xsl:variable name="no-hyphen-style" as="xs:string"
+                select="'^[a-z]{1,3}nohyphen$'"/>
   
   <xsl:variable name="letter-spacing-para-style" as="xs:string" 
-                select="'ts_letter_spacing$'"/>
+                select="'[a-z]{1,3}_letter_spacing$'"/>
   
   <!-- role for para that contains image or file reference, first 
        regex group identifies class, second group represents position -->
@@ -156,6 +165,9 @@
   
   <xsl:variable name="fig-legend-para-style-regex" as="xs:string" 
                 select="'^[a-z]{1,3}figurelegend$'"/>
+  
+  <xsl:variable name="figure-alt-role-regex" as="xs:string"
+                select="'^[a-z]{1,3}figurealt$'" />
   
   <xsl:variable name="figure-caption-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figurecaption$'" />
@@ -257,6 +269,17 @@
   <xsl:variable name="info-subtitle-role" as="xs:string"
                 select="'^[a-z]{1,3}(subheading\d|journalreviewsubheading)$'"/>
   
+  <!-- motto-style and info-blockquote-roles as well 
+       as motto-source-style and info-blockquote-source-roles 
+       share the same semantic. Perhaps we should stick to 
+       'info-blockquote' or 'epigraph' as 'motto' is German. 
+       Perhaps we need two different environemnts for headings? -->
+  <xsl:variable name="motto-style" as="xs:string" 
+                select="'^[a-z]{1,3}motto$'"/>
+  
+  <xsl:variable name="motto-source-style" as="xs:string"
+                select="'^[a-z]{1,3}mottosource$'"/>
+  
   <xsl:variable name="info-blockquote-roles" as="xs:string"
                 select="'^[a-z]{1,3}(motto-zitat|motto|epigraph)$'"/>
   
@@ -267,7 +290,7 @@
                 select="'^[a-z]{1,3}abbreviations$'"/>
   
   <xsl:variable name="create-index-at-general-headings" 
-                select="false()"/>
+                select="true()"/>
   
   <xsl:variable name="index-text-regex" as="xs:string" 
                 select="'^[a-z]{1,3}index\s?text'"/>
@@ -293,15 +316,14 @@
   <xsl:variable name="index-static-level-regex" as="xs:string" 
                 select="concat('(', string-join($index-static-level, '|'), ')?')"/>
   
+  <xsl:variable name="index-static-page-range-separator" as="xs:string" 
+                select="'&#x2013;'" />
+  
   <!-- please do not remove the tailing and leading regex group -->
   <xsl:variable name="index-see-regex" as="xs:string" 
                 select="'(see|siehe)'"/>
   <xsl:variable name="index-see-also-regex" as="xs:string" 
                 select="concat($index-see-regex, '(\p{Zs}(also|auch))')"/>
-  <xsl:variable name="index-see-pi-name" as="xs:string" 
-                select="'see'"/>
-  <xsl:variable name="index-see-also-pi-name" as="xs:string" 
-                select="'seealso'"/>
   
   <xsl:variable name="bibliography-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}literature$'"/>
@@ -320,8 +342,6 @@
                 select="concat($hub:abstract-role-regex, '|', $hub:keywords-role-regex, '|', $hub:trans-title-role-regex)"/>
 
   <xsl:variable name="empty-line-style" select="'^[a-z]{1,3}(lineskip(\d)?|codeblock[a-z0-9]+)$'" as="xs:string"/>
-
-  <xsl:variable name="dialogue-style" select="'^[a-z]+dialogue'" as="xs:string"/>
 
   <!-- the following variables are mainly for the idml conversion and checking pipelines -->
 
@@ -366,8 +386,6 @@
   
 
   <xsl:variable name="hub:subtitle-role-regex" as="xs:string" select="'tssubheading[1-5]'" /> 
-
-  <xsl:variable name="hub:general-heading-main-name-regex" select="'tsheading(numerated)?([1-5]|part)'" as="xs:string"/>
   <xsl:variable name="hub:tabs-are-allowed-in-this-para" select="'tslist|tsheading|tsfigurecaption|tstablecaption|tsfootnote'" as="xs:string"/>
   <xsl:variable name="hub:list-role-regex" as="xs:string" select="'tslist$'" >
     <!-- for schematron purposes mainly, but also to determine that ohub:tabs-are-allowed-in-this-paranly these paras are handled by list handler via function  -->

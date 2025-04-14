@@ -7,6 +7,7 @@
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:functx="http://www.functx.com"
   xmlns:xml2tex="http://transpect.io/xml2tex"
+  xmlns:tr="http://transpect.io"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes="xs xhtml"
   version="2.0">
@@ -45,6 +46,11 @@
     </xsl:if>
   </xsl:template>
   
+  <xsl:function name="tr:create-newpage" as="xs:boolean">
+    <xsl:param name="table" as="element()"/>
+    <xsl:sequence select="if ($table/@role eq 'tablerotated') then false() else true()"/>
+  </xsl:function>
+  
   <xsl:template name="xml2tex:split-table">
     <xsl:param name="table" as="element()"/>
     <xsl:variable name="table-split" as="node()+">
@@ -53,7 +59,7 @@
                                   )/dbk:row" 
                           group-starting-with="dbk:row[dbk:entry//processing-instruction()[name() eq 'latex']
                                                       [matches(., functx:escape-for-regex($xml2tex:split-table-pi))]]">
-        <xsl:if test="not(position() eq 1)">
+        <xsl:if test="not(position() eq 1) and tr:create-newpage($table)">
           <xsl:processing-instruction name="latex" select="'{\newpage}%&#xa;'"/>
         </xsl:if>
         <xsl:element name="{$table/name()}">

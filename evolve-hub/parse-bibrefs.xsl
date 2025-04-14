@@ -150,6 +150,12 @@
     </publishername>
   </xsl:template>
   
+  <xsl:template match="url">
+    <bibliosource>
+      <xsl:apply-templates/>
+    </bibliosource>
+  </xsl:template>
+  
   <xsl:template match="@* | * | processing-instruction()">
     <xsl:copy>
       <xsl:apply-templates select="@*, node()"/>

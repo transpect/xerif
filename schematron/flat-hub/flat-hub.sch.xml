@@ -19,6 +19,8 @@
   <let name="base-dir" value="/*/dbk:info/dbk:keywordset[@role eq 'hub']/dbk:keyword[@role eq 'source-dir-uri']"/>
   <let name="fake-table-invisible-footnote" value="'Tabellenfussnote_ZifferUnsichbar'"/>
   <let name="fake-table-manual-footnote-in-table" value="'Tabellenfussnote_unecht'"/>
+  <let name="heading-roles" value="string-join($hub:hierarchy-role-regexes-x, '|')"/>
+  
   <ns prefix="schematron" uri="http://purl.oclc.org/dsdl/schematron" />
 
   <pattern id="flat-hub_multi_para_captions">
@@ -48,7 +50,7 @@
   </pattern>
   
   <pattern id="flat-hub_multi_para_heading">  
-    <rule context="dbk:para[matches(@role, $hub:general-heading-main-name-regex)][not(matches(., '^\s*$'))]">
+    <rule context="dbk:para[matches(@role, $heading-roles)][not(matches(., '^\s*$'))]">
       <let name="role" value="replace(@role, '^(.+?)(_-_.+)?$', '$1')"/>
       <report test="replace(following-sibling::*[1]/self::dbk:para/@role, '^(.+?)(_-_.+)?$', '$1') = $role" id="multi_para_heading" role="error"
         diagnostics="multi_para_heading_de">
