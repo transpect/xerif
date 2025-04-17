@@ -8,6 +8,7 @@
   xmlns:functx="http://www.functx.com"
   xmlns:xml2tex="http://transpect.io/xml2tex"
   xmlns:tr="http://transpect.io"
+  xmlns:mml="http://www.w3.org/1998/Math/MathML"
   xmlns="http://docbook.org/ns/docbook" 
   xpath-default-namespace="http://docbook.org/ns/docbook"
   exclude-result-prefixes="xs hub dbk xlink functx xml2tex" 
@@ -2553,7 +2554,7 @@
     
   <xsl:template match="text()[normalize-space()]
                              [matches(., '-')]
-                             [not(ancestor::*[self::*:link|self::keywordset|self::biblioset[@role = 'chunk-metadata']])]
+                             [not(ancestor::*[self::*:link|self::keywordset|self::mml:math|self::biblioset[@role = 'chunk-metadata']])]
                              [not(exists(ancestor::*[matches(@role, $hub:prevent-normalization-style-regex)]))]" mode="preprocess-hyphens">
     <xsl:value-of select="hub:replace-hyphens(.)"/>
   </xsl:template>
