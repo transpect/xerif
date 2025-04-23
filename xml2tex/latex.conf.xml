@@ -128,7 +128,7 @@
   <xsl:variable name="publisher-location" as="element(dbk:keyword)?"
                 select="$metadata/dbk:keyword[@role eq 'Verlagsort']"/>
   <xsl:variable name="publisher-website" as="element(dbk:keyword)?"
-                select="$metadata/dbk:keyword[@role eq 'transcript-Website']"/>
+                select="$metadata/dbk:keyword[@role eq 'Website']"/>
   <!-- publication meta -->
   <xsl:variable name="doi" as="element(dbk:keyword)?"
                 select="$metadata/dbk:keyword[@role eq 'DOI']"/>
@@ -836,7 +836,7 @@
 
   <template context="*[not(self::dbk:book|self::dbk:hub|self::dbk:figure)]
                       [not(@role = ('alternative-title', 'keywords'))]
-                      [dbk:info]
+                      [dbk:info or self::dbk:phrase[ancestor::*[self::dbk:div[@role = 'transcription']]]]
                       [xml2tex:lang-to-babel-lang(@xml:lang)[normalize-space()]]
                       [@xml:lang ne /*/@xml:lang]
                       [not(../@xml:lang = current()/@xml:lang)]" priority="800">
@@ -3230,8 +3230,8 @@
       <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]
                                  [not(..[self::dbk:figure|self::*:table])]"/>
       <xsl:when test="key('item-by-linkend', @xml:id)[@role = 'page']">
-        <!-- pageref, https://redmine.le-tex.de/issues/14169 -->
-        <xsl:value-of select="concat('\tpPageLabel{', $label, '}')"/>
+        <!-- pageref, https://redmine.le-tex.de/issues/14169, https://redmine.le-tex.de/issues/18621 -->
+        <xsl:value-of select="concat('\protect'[current()/ancestor::*[self::dbk:figure|self::*:table]],'\tpPageLabel{', $label, '}')"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/>
