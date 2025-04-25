@@ -2388,7 +2388,7 @@
 
   <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]" mode="hub:repair-hierarchy">
     <!-- move line number to para to allow def-list creation from speakers-->
-   <xsl:variable name="line-num-separator" select="tab[preceding-sibling::node()[1][matches(., '\d')]]" as="element(tab)?"/>
+   <xsl:variable name="line-num-separator" select="tab[preceding-sibling::node()[1][matches(., '\d')]][1]" as="element(tab)?"/>
    <xsl:copy>
      <xsl:apply-templates select="@*" mode="#current"/>
      <xsl:if test="exists($line-num-separator)"><xsl:attribute name="annotations" select="node()[. &lt;&lt; $line-num-separator]">
@@ -2411,7 +2411,7 @@
   <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/tab " mode="hub:clean-hub"/>
   
   
-  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/node()[1][contains(., ':')][following-sibling::node()[1][self::tab]]" mode="hub:clean-hub">
+  <xsl:template match="para[matches(@role, $hub:transcription-role-regex-x)]/(node()[not(self::anchor)])[1][contains(., ':')][following-sibling::node()[1][self::tab]]" mode="hub:clean-hub">
     <phrase role="speaker"><xsl:sequence select="."/></phrase>
   </xsl:template>
   
