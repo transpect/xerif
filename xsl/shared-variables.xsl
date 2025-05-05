@@ -330,6 +330,8 @@
   <xsl:variable name="index-see-also-pi-name" as="xs:string" 
                 select="'seealso'"/>
   
+  <xsl:variable name="hub:seealso-indexentry-text-regex" select="'\s*[sS]iehe\p{Zs}+auch|\s*[Ss]ee\p{Zs}+also'"/>
+  
   <xsl:variable name="bibliography-role-regex" as="xs:string" 
                 select="'^[a-z]{1,3}literature$'"/>
   
