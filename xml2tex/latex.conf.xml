@@ -2793,7 +2793,7 @@
        escape ! in indexterms (makeindex has no issues with escaped 
        exclamation mark "! but xindy does ) -->
   
-  <template context="dbk:see|dbk:seealso">
+  <template context="dbk:see">
     <rule>
       <text select="concat(
                       '|',
@@ -2803,6 +2803,21 @@
                             xml2tex:utf2tex(., ., $charmap, (), $texregex), ''
                           ), '!', '{&quot;!}'
                         ), '^((see|voir|véase|vedi|ver|siehe|请参阅|ראה|انظر|참조)\s+)?(.+)$', 'see{$3}', 'i'
+                      )
+                    )"/>
+    </rule>
+  </template>
+  
+  <template context="dbk:seealso">
+    <rule>
+      <text select="concat(
+                      '|',
+                      replace(
+                        replace(
+                          string-join(
+                            xml2tex:utf2tex(., ., $charmap, (), $texregex), ''
+                          ), '!', '{&quot;!}'
+                        ), '^((see also|voir|véase|vedi|ver|siehe auch|请参阅|ראה|انظر|참조)\s+)?(.+)$', 'seealso{$3}', 'i'
                       )
                     )"/>
     </rule>
