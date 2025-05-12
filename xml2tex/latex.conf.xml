@@ -3004,6 +3004,12 @@
     </rule>
   </regex>
   
+  <regex regex="([&#x400;-&#x4ff;&#x500;-&#x52f;]+)" context="not(self::*:phrase[@xml:lang='ru'])">
+    <rule type="cmd" name="foreignlanguage{russian}" protect="true">
+      <param regex-group="1"/>
+    </rule>
+  </regex>
+  
   <!-- unichar for font change in sans-serif non-latin text #7115 -->
  
   <xsl:variable name="non-latin-style" select="'^[a-z]{1,3}nonlatin$'" as="xs:string"/>
