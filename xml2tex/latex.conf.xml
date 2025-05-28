@@ -726,7 +726,9 @@
   </xsl:template>
 
   <xsl:template match="dbk:link | dbk:ulink" mode="strip-meta" priority="6">
+    
     <xsl:apply-templates select="." mode="xml2tex"/>
+    
   </xsl:template>
   
   <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = ('cbold', 'fett', 'bold')]" mode="strip-meta" priority="5">
@@ -2291,7 +2293,7 @@
     <xsl:param name="suppress-select-lang" as="xs:boolean" select="false()"/>
     <!-- add selectlanguage -->
     <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not($suppress-select-lang) and not(preceding-sibling::*[1][self::dbk:para|self::dbk:blockquote][@xml:lang = current/@xml:lang])">
-      <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%')"/>
+      <xsl:value-of select="concat('\selectlanguage{', xml2tex:lang-to-babel-lang(@xml:lang), '}%&#xa;')"/>
     </xsl:if>
     <xsl:next-match/>
     <xsl:if test="@xml:lang[xml2tex:lang-to-babel-lang(.)[normalize-space()]] and not(following-sibling::*[1][@xml:lang]) and not($suppress-select-lang)">
@@ -3255,7 +3257,7 @@
         <xsl:value-of select="concat('\protect'[current()/ancestor::*[self::dbk:figure|self::*:table]],'\tpPageLabel{', $label, '}')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="concat('\hypertarget{', $label, '}{}')"/>
+        <xsl:value-of select="concat('\protect'[current()/ancestor::*[self::dbk:figure|self::*:table]],'\hypertarget{', $label, '}{}')"/>
       </xsl:otherwise>
     </xsl:choose>
   </template>
