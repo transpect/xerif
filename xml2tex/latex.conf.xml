@@ -529,6 +529,8 @@
     </xsl:if>
   </xsl:variable>
   
+  <xsl:variable name="name-divider" select="' '"/>
+  
   <xsl:template name="contributor-name" as="xs:string">
     <xsl:variable name="content">
       <xsl:choose>
@@ -544,17 +546,17 @@
         <xsl:when test="self::dbk:keyword and matches(.,',')">
           <xsl:variable name="given-name" select="normalize-space(replace(tokenize(., ',')[2],'(†|&#x271d;|\((.*)\)?)',''))" as="xs:string"/>
           <xsl:variable name="surname" select="normalize-space(tokenize(replace(., '(†|&#x271d;|\((.*)\)?)', ''), ',')[1])" as="xs:string"/>
-          <xsl:value-of select="concat('&#xa;\tpFullName{', $given-name, ' ', $surname, '}')"/>
+          <xsl:value-of select="concat('&#xa;\tpFullName{', $given-name, $name-divider, $surname, '}')"/>
         </xsl:when>
         <xsl:otherwise>
           <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(.), '}')"/>
         </xsl:otherwise>  
       </xsl:choose>
       <xsl:value-of select="concat('&#xa;\tpPDFInfoName{', if (dbk:personname/dbk:firstname and dbk:personname/dbk:surname) 
-                                                           then concat(xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), ' ', xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname))
+                                                           then concat(xml2tex:meta-remove-links-etc(dbk:personname/dbk:firstname), $name-divider, xml2tex:meta-remove-links-etc(dbk:personname/dbk:surname))
                                                            else 
                                                               if (self::dbk:keyword and matches(.,',')) 
-                                                              then concat(normalize-space(replace(tokenize(., ',')[2],'(†|&#x271d;|\((.*)\)?)','')), ' ', normalize-space(tokenize(replace(., '(†|&#x271d;|\((.*)\)?)', ''), ',')[1]) )
+                                                              then concat(normalize-space(replace(tokenize(., ',')[2],'(†|&#x271d;|\((.*)\)?)','')), $name-divider, normalize-space(tokenize(replace(., '(†|&#x271d;|\((.*)\)?)', ''), ',')[1]) )
                                                               else xml2tex:meta-remove-links-etc(.), '}')">
         <!-- https://redmine.le-tex.de/issues/16215-->
       </xsl:value-of>
