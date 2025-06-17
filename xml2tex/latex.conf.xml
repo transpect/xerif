@@ -541,7 +541,7 @@
                                              ))"/>
         </xsl:when>
         <xsl:when test="dbk:personname/dbk:othername">
-          <xsl:value-of select="concat('&#xa;\tpFullName{', xml2tex:meta-remove-links-etc(dbk:personname/dbk:othername), '}')"/>
+          <xsl:value-of select="concat('&#xa;\tpFullName{', replace(xml2tex:meta-remove-links-etc(dbk:personname/dbk:othername) ,' ', $name-divider), '}')"/>
         </xsl:when>
         <xsl:when test="self::dbk:keyword and matches(.,',')">
           <xsl:variable name="given-name" select="replace(normalize-space(replace(tokenize(., ',')[2],'(†|&#x271d;|\((.*)\)?)','')), ' ',$name-divider)" as="xs:string"/>
