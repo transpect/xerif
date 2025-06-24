@@ -53,7 +53,8 @@
         This paragraph has been formatted with the figure caption style but includes an image. Please verify whether the image belongs to the caption or to the figure. 
         For the latter, please ensure that the image is placed in a paragraph above the caption and formatted with the figure style (regex: <value-of select="$figure-image-role-regex"/>).
       </assert>
-      <assert test="preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')]" role="error" id="isolated-figure-caption" diagnostics="isolated-figure-caption_de">
+      <assert test="preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')]
+        or (preceding-sibling::*[1][self::dbk:para][matches(@role, $figure-alt-role-regex, 'i')] and preceding-sibling::*[2][self::dbk:para][matches(@role, $figure-image-role-regex, 'i')])" role="error" id="isolated-figure-caption" diagnostics="isolated-figure-caption_de">
         This paragraph has been formatted with the figure caption style but the paragraph above has the style: '<value-of select="preceding-sibling::*[1]/@role"/>'.
       </assert>
     </rule>
@@ -71,7 +72,7 @@
       </assert>
     </rule>
     <rule context="dbk:para[matches(@role, $table-caption-role-regex)]">
-      <assert test="not(following-sibling::*[1][self::dbk:informaltable])" role="error" id="isolated-table-caption" diagnostics="isolated-table-caption_de">
+      <assert test="following-sibling::*[1][self::dbk:informaltable]" role="error" id="isolated-table-caption" diagnostics="isolated-table-caption_de">
         This paragraph has been formatted with the table caption style but it is not placed above the table.
       </assert>
     </rule>
@@ -158,7 +159,7 @@
       Dieser Absatz ist mit dem Absatzformat für eine gedrehte Tabelle ausgezeichnet, ist aber nicht über einer Tabelle platziert. 
     </diagnostic>
     <diagnostic id="isolated-table-caption_de" xml:lang="de">
-      Dieser Absatz ist als Tabellen-Legende ausgezeichnet, aber der Absatz darüber ist nicht über einer Tabelle platziert.
+      Dieser Absatz ist als Tabellen-Legende ausgezeichnet, ist aber nicht über einer Tabelle platziert.
       Bitte beachten Sie die korrekte Reihenfolge der Absatzformate für Tabelle, Legende und Quelle.
     </diagnostic>
     <diagnostic id="isolated-table-source_de" xml:lang="de">
