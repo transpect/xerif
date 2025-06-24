@@ -323,7 +323,7 @@
       <xsl:text>&#xa;\end{tpSeriesEditor}&#xa;</xsl:text>
     </xsl:for-each>
     <xsl:if test="normalize-space($title) or normalize-space($title-for-running-head)">
-      <xsl:value-of select="concat('&#xa;\tpTitle{', ($title, $title-for-running-head)[1], '}&#xa;')"/>
+      <xsl:value-of select="concat('&#xa;\tpTitle{', xml2tex:meta-remove-links-etc(($title, $title-for-running-head)[1]), '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="$title-for-running-head">
       <xsl:value-of select="concat('&#xa;\tpRunTitle{', $title-for-running-head, '}&#xa;')"/>
