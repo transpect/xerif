@@ -21,7 +21,7 @@
     </p:documentation>
   </p:input>
   
-  <p:input port="meta" primary="false">
+  <p:input port="meta" primary="false" sequence="true">
     <p:documentation>
       Expects the metadata
     </p:documentation>
@@ -34,8 +34,9 @@
   </p:input>
   <p:output port="result" primary="true">
     <p:documentation>
-      Hub document with updated filerefs
+      XMP document
     </p:documentation>
+    <p:pipe port="result" step="generate-xmp"/>
   </p:output>
   
   <p:option name="debug" required="false" select="'no'"/>
@@ -63,4 +64,5 @@
     </p:input>
   </tr:dynamic-transformation-pipeline>
   
+  <p:sink/>
 </p:declare-step>
