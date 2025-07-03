@@ -22,15 +22,27 @@
   <xsl:output indent="yes"/>
   
   <xsl:template match="/cx:documents">
-    <x:xmpmeta>
-      <rdf:RDF>
-        <rdf:Description rdf:about="">
-          <!-- necessary metadata -->
-          <pdfaid:part>3</pdfaid:part>
-          <pdfaid:conformance>U</pdfaid:conformance>
+    <x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.4-c005 78.147326, 2012/08/23-13:03:03        ">
+      <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+        <rdf:Description rdf:about=""
+          xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:xmp="http://ns.adobe.com/xap/1.0/"
+          xmlns:pdf="http://ns.adobe.com/pdf/1.3/"
+          xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"
+          xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/"
+          xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/"
+          xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/"
+          xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#"
+          xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#"
+          xmlns:pdfaType="http://www.aiim.org/pdfa/ns/type#"
+          xmlns:pdfaField="http://www.aiim.org/pdfa/ns/field#"
+          >
           <pdfuaid:part>1</pdfuaid:part>
-          <dc:format>application/pdf</dc:format>
-          <!-- author -->
+          <pdf:Producer>le-tex xerif with CoCoTeX</pdf:Producer>
+          <xmp:CreatorTool>MS Word</xmp:CreatorTool>
+          <xmp:ModifyDate>PLACEHOLDER</xmp:ModifyDate>
+          <xmp:CreateDate>PLACEHOLDER</xmp:CreateDate>
+          <!-- INSERT METADATA HERE AND REMOVE COMMENT -->
           <dc:creator>
             <rdf:Seq>
               <xsl:for-each select="ONIXmessage/product/contributor[b035 eq 'A32']">
@@ -59,39 +71,34 @@
               </xsl:for-each>
             </rdf:Alt>
           </dc:title>
+          <dc:publisher>
+            <rdf:Bag>
+              <rdf:li><xsl:value-of select="ONIXmessage/product/publisher/b081"/></rdf:li>
+            </rdf:Bag>
+          </dc:publisher>
           <dc:rights>
             <rdf:Alt>
               <rdf:li xml:lang="x-default"><xsl:value-of select="ONIXmessage/product/publisher/b081"/></rdf:li>
             </rdf:Alt>
           </dc:rights>
-          <!--<dc:rights>
-            <rdf:Alt>
-              <rdf:li xml:lang="x-default">TBD</rdf:li>
-            </rdf:Alt>
-          </dc:rights>
           <dc:subject>
             <rdf:Bag>
-              <rdf:li>TBD</rdf:li>
-              <rdf:li>...</rdf:li>
+              <xsl:for-each select="ONIXmessage/product/subject[b067 eq '20']/b070">
+                <rdf:li>
+                  <xsl:value-of select="."/>
+                </rdf:li>  
+              </xsl:for-each>
             </rdf:Bag>
-          </dc:subject>-->
-          <xmp:CreateDate><xsl:value-of select="current-dateTime()"/></xmp:CreateDate>
-          <xmp:CreatorTool>LaTeX with hyperref</xmp:CreatorTool>
-          <xmp:ModifyDate><xsl:value-of select="current-dateTime()"/></xmp:ModifyDate>
-          <xmp:MetadataDate><xsl:value-of select="current-dateTime()"/></xmp:MetadataDate>
-          <pdf:Producer>le-tex xerif</pdf:Producer>
-          <pdf:Keywords>
+          </dc:subject>
+          <!--        <pdf:Producer>le-tex xerif</pdf:Producer>
+            <pdf:Keywords>
             <xsl:value-of select="string-join(ONIXmessage/product/subject[b067 eq '20']/b070, ', ')"/>
-          </pdf:Keywords>
-          <pdf:Copyright>
+            </pdf:Keywords>
+            <pdf:Copyright>
             <xsl:value-of select="format-date(current-date(), '[Y]')"/>
             <xsl:text> Copyright by </xsl:text>
             <xsl:value-of select="ONIXmessage/product/publisher/b081"/>
-          </pdf:Copyright>
-          <xmpMM:DocumentID>uuid:0a260816-6fd8-456e-bdcc-1f7db1176b0e</xmpMM:DocumentID>
-          <xmpMM:InstanceID>uuid:d689337d-78a1-4a0d-a88f-39319e1396c6</xmpMM:InstanceID>
-          <xmpRights:Marked>True</xmpRights:Marked>
-          <xmpRights:WebStatement>https://creativecommons.org/licenses/by/4.0</xmpRights:WebStatement>
+            </pdf:Copyright>-->
           <pdfaExtension:schemas>
             <rdf:Bag>
               <rdf:li rdf:parseType="Resource">
@@ -177,6 +184,7 @@
         </rdf:Description>
       </rdf:RDF>
     </x:xmpmeta>
+  
   </xsl:template>
   
 </xsl:stylesheet>
