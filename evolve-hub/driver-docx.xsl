@@ -2582,6 +2582,29 @@
     <xsl:apply-templates select="dbk:listitem/dbk:variablelist/dbk:varlistentry" mode="#current"/>
   </xsl:template>
   
+<!--  <cases>
+   <case id="1" char="‑">(inhaltlich-)thematischen</case> 
+   <case id="2" char="‑">Privatisierungsbefürwortern und -befürworterinnen </case> 
+   <case id="3" char="‑">Kranken-, Kinder- und …</case> 
+   <case id="4" char="‑">ÖPP-Beschleunigungsgesetz</case> 
+   <case id="5" char="‑">α-Strahlung</case> 
+   <case id="6" char="‐">bitter-süß</case> 
+   <case id="7" char="‐">SPD-Führung</case>
+   <case id="8" char="‐">EU-Bürger- und Bürgerinnen</case>
+   <case id="9" char="‐"><phrase role="citalic">Apax</phrase>-Vorstand</case>
+   <case id="10" char="‑">Covid-19-Infizierte ICE-3</case>
+   <case id="10b" char="">450-Euro-Jobs</case>
+   <case id="11" char="‐"><phrase role="citalic" srcpath="tei_d334e496">Zeit-</phrase>Verlagsgruppe</case>
+   <case id="12" char="‐">»Schoolwork«-Gefüge ›Code your Life‹-Initiative</case>
+   <case id="13" char="‐">Foto-Sharing-<link>…</link></case>
+   <case id="14" char="‑">DFB-&amp;-McDonald’s</case>
+   <case id="15" char="‐">Bertelsmann-»Studien«</case>
+   <case id="16" char="">CDU-/CSU-Bundestagsfraktion</case>
+   <case id="17" char="‐">401(k)-Fondsmodell</case>
+   <case id="18" char="–">S. 1-7 (200-203)</case>
+   <case id="19" char="–">Die Bahn baut die Rheintalstrecke aus - und ist wohl 2041 fertig</case>
+  </cases>-->
+  
   <xsl:function name="hub:replace-hyphens" as="xs:string">
     <xsl:param name="text" as="xs:string"/>
     <xsl:variable name="regex" as="xs:string" select="'([\p{L}](-)[\),/\]\d])|((-).(-))|(\s(-)\p{L})|((^|\s)[\p{L}&#120576;-&#120777;]{1,2}(-)\p{L})|((^|[\p{L}‹«\d\)])(-)([\p{L}\s»›]|$))|((\p{Zs}|^)[\(\[]?\d+(-)\d+([^-]|$))|((\s-)\s)'"/>
