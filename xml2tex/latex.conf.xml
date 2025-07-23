@@ -329,10 +329,10 @@
       <xsl:value-of select="concat('&#xa;\tpRunTitle{', $title-for-running-head, '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($subtitle)">
-      <xsl:value-of select="concat('&#xa;\tpSubtitle{', $subtitle, '}&#xa;')"/>
+      <xsl:value-of select="concat('&#xa;\tpSubtitle{', xml2tex:meta-remove-links-etc($subtitle), '}&#xa;')"/>
     </xsl:if>
     <xsl:if test="normalize-space($shorttitle)">
-      <xsl:value-of select="concat('&#xa;\tpShortTitle{', $shorttitle, '}&#xa;')"/>
+      <xsl:value-of select="concat('&#xa;\tpShortTitle{', xml2tex:meta-remove-links-etc($shorttitle), '}&#xa;')"/>
     </xsl:if>
     <!-- cover image -->
     <xsl:if test="normalize-space($cover-href)">
@@ -717,7 +717,7 @@
     <!-- allow matching of regexes for example creating \foreignlanguage makros in \tpMeta items-->
   </xsl:template>
 
-  <xsl:template match="dbk:phrase[@css:font-style = 'italic' or @role = ('citalic', 'italic', 'kursiv')]" mode="strip-meta" priority="6">
+  <xsl:template match="dbk:phrase[@css:font-style = 'italic' or matches(@role, concat('c?italic|kursiv|',$italic-style))]" mode="strip-meta" priority="6">
     <xsl:text>\textit{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -733,7 +733,7 @@
     
   </xsl:template>
   
-  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or @role = ('cbold', 'fett', 'bold')]" mode="strip-meta" priority="5">
+  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or matches(@role, concat('?bold|fett|',$bold-style))]" mode="strip-meta" priority="5">
     <xsl:text>\textbf{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
