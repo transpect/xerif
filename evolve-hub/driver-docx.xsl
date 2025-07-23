@@ -688,6 +688,32 @@
     </mediaobject>
   </xsl:template>
   
+  <xsl:template match="inlineequation[following-sibling::*[1][self::phrase[matches(@role, $formula_alt_role_regex)]]]/@role |
+                       equation[../following-sibling::*[1][self::para][empty(inlineequation)][phrase[matches(@role, $formula_alt_role_regex)]]]/@role" mode="hub:split-at-tab">
+    <!-- https://redmine.le-tex.de/issues/13166 -->
+    <xsl:next-match/>
+
+    <alt>
+      <xsl:apply-templates select="if (..[self::inlineequation]) 
+        then ../following-sibling::*[1][self::phrase[matches(@role, $formula_alt_role_regex)]] 
+        else ../../following-sibling::*[1]/phrase[matches(@role, $formula_alt_role_regex)]" mode="text-only"/>
+    </alt>
+  </xsl:template>
+  
+  <xsl:template match="*" mode="text-only" priority="1.5">
+    <xsl:apply-templates select="node()" mode="text-only"/>
+  </xsl:template>
+  
+  <xsl:template match="text()" mode="text-only"  priority="2">
+    <xsl:copy-of select="."/>
+  </xsl:template>
+  
+  <xsl:template match="@*|indexterm|anchor|footnote" mode="text-only" priority="2"/>
+  
+  <xsl:template match="phrase[matches(@role, $formula_alt_role_regex)][preceding-sibling::*[1][self::inlineequation]] | 
+                       phrase[matches(@role, $formula_alt_role_regex)][..[self::para][empty(inlineequation)]
+                                                                      [preceding-sibling::*[1][self::para[equation]]]]" mode="hub:split-at-tab"/>
+  
   <xsl:template match="para[matches(@role, $figure-image-role-regex, 'i')][.//mediaobject]" mode="figures">
     <xsl:apply-templates select=".//mediaobject" mode="#current"/>
   </xsl:template>

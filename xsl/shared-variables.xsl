@@ -169,6 +169,9 @@
   <xsl:variable name="figure-alt-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figurealt$'" />
   
+  <xsl:variable name="formula_alt_role_regex" as="xs:string" 
+                select="'^[a-z]{1,3}formulaalt$'"/>
+  
   <xsl:variable name="figure-caption-role-regex" as="xs:string"
                 select="'^[a-z]{1,3}figurecaption$'" />
   
