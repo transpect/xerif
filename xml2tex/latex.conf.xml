@@ -907,6 +907,7 @@
                               [not($notes-per-chapter eq 'yes') or $endnotes-with-chapter eq 'yes']
                               [.//dbk:footnote]
                               [not(.//dbk:para[matches(@role, $endnotes-heading-style)])]
+                              [not(.//dbk:title[matches(@role, $endnotes-heading-style)])]
                               [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]">
         <rule name="heading" type="env" break-after="2" break-before="2">
           <param select="'chapter'"/>
@@ -915,8 +916,7 @@
         <rule name="printnotes" type="cmd" break-before="1"/>
       </xsl:when>
       <!-- Endnoten an der Position des Absatzes mit Endnotenüberschrift -->
-      <xsl:when test="$context[self::dbk:chapter
-                              |self::dbk:section]
+      <xsl:when test="$context[self::dbk:chapter|self::dbk:section|self::dbk:appendix]
                               [dbk:info/dbk:title/@role[matches(., $endnotes-heading-style)]]">
         <rule name="printnotes" type="cmd" break-before="1"/>                              
       </xsl:when>
@@ -3498,7 +3498,7 @@
                     |dbk:equation[ancestor::dbk:table or ancestor::dbk:informaltable]">
     <rule>
       <text select="'\('"/>
-      <text/>
+      <text select="node() except dbk:alt, dbk:alt"/>
       <text select="'\)'"/>
     </rule>
   </template>
