@@ -1543,6 +1543,7 @@
                            $index-type-default-name
                            )[. ne ''][1]"/>
     <index>
+      <xsl:sequence select="(hub:renderas-from-xml-pi(@renderas, *[self::info/title or self::title]//processing-instruction()[name() = $pi-xml-name]), hub:renderas-from-role-suffix(@renderas, title[1]/@role))[1]"/>
       <!-- check if there are static index entries present (static index) or if the type 
            matches any real indexterm elements (dynamic index with index headline). sometimes
            users assign a index type to a headline but not to the index terms -->
@@ -1959,6 +1960,7 @@
       <xsl:apply-templates mode="#current"/>
     </index>
   </xsl:template>
+  
   
   <xsl:template match="para[not(parent::div[@role eq 'hub:index'])][matches(@role, $index-heading-regex, 'i')]" mode="custom-2"/>
   
