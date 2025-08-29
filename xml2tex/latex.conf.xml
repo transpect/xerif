@@ -2094,7 +2094,7 @@
                                                                       [@xml:id = $link-refs]
                                              or descendant::dbk:link[@linkend]">
         <rule name="tpListofCaption" type="cmd" break-before="0" break-after="1">
-          <param select="$caption-nodes-without-num">
+          <param select="tr:add-cca('Start', 'P'), $caption-nodes-without-num, tr:add-cca('End', 'P')">
             <with-param name="remove-footnote" select="true()" as="xs:boolean" tunnel="yes"/>
             <with-param name="remove-ref-target" select="true()" as="xs:boolean" tunnel="yes"/>
             <with-param name="dissolve-hyperlink" select="true()" as="xs:boolean" tunnel="yes"/>
