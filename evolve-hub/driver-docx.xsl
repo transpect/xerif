@@ -1547,7 +1547,7 @@
       <!-- check if there are static index entries present (static index) or if the type 
            matches any real indexterm elements (dynamic index with index headline). sometimes
            users assign a index type to a headline but not to the index terms -->
-      <xsl:if test="para or ($index-type = $index-types)">
+      <xsl:if test="para[matches(@role,concat($index-static-regex,$index-static-level-regex,'$'))] or ($index-type = $index-types)">
         <xsl:attribute name="type" select="$index-type"/>
       </xsl:if>
       <xsl:apply-templates select="@xml:id|@role" mode="#current"/>
