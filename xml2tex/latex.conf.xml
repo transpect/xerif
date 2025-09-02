@@ -238,7 +238,7 @@
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
                                ',withcoltitles'[$running-header eq 'yes'],
-                               ',a11y'[$a11y],
+                               ',pdf-standard=UA-1'[$a11y],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
                                '}&#xa;')"/>
@@ -792,6 +792,10 @@
   <xsl:variable name="xerif" as="xs:boolean" select="true()">
   <!-- overrides some next-matches in docx2tex  -->
   </xsl:variable>
+  
+  <xsl:variable name="create-mainmatter" as="xs:boolean" select="true()">
+  <!-- overrides some next-matches for mainmatter creation  -->
+  </xsl:variable>
 
   <xsl:template match="/" priority="1000" mode="xml2tex">
     <xsl:next-match>
@@ -804,8 +808,9 @@
                          [empty(preceding-sibling::dbk:para)][1]
                          [empty(preceding-sibling::dbk:figure)][1]
                          [not(//dbk:toc)]
-                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]
-                    |/*/dbk:figure[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]]" priority="3001">
+                         [$create-mainmatter]
+                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]][$create-mainmatter]
+                    |/*/dbk:figure[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]][$create-mainmatter]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
@@ -941,11 +946,12 @@
   </template>
   
   <template name="create-bookmark-content">
-    <xsl:if test="exists(*[not(self::dbk:footnote
+    <xsl:if test="(exists(*[not(self::dbk:footnote
                               |self::dbk:br
                               |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
                               |self::dbk:tab
-                              |self::dbk:anchor)] or @xml:lang)
+                              |self::dbk:anchor)])
+                   or @xml:lang)
                   and 
                   exists(dbk:phrase[@role = ('identifier', 'hub:identifier')])">
       <!-- if title contains markup, create \tpBM-Makros. if \tpBMTitle is created, also a \tpNumber is generated. empty or -->
@@ -959,8 +965,9 @@
     <xsl:if test="exists(*[not(self::dbk:footnote
                               |self::dbk:phrase[@role = ('identifier', 'hub:identifier')]
                               |self::dbk:tab
-                              |self::dbk:anchor)] or @xml:lang)
-                  or 
+                              |self::dbk:anchor)])
+                  or @xml:lang
+                  or
                   matches(., '[&amp;&#x9;&#xa0;&#x2000;-&#x200a;&#xAE;]')">
       <rule name="tpBMTitle" type="cmd" break-before="1">
         <!-- Newlines in title items are discarded by default (remove-newline). 
@@ -1288,40 +1295,40 @@
       </xsl:when>
       <xsl:otherwise>
         <rule name="tpTocTitle" type="cmd" break-after="0" break-before="1">
-      <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
-        <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
-        <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
-      </param>
-    </rule>
-    <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
-      <rule name="tpTocNumber" type="cmd" break-after="0" break-before="1">
-        <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/node()">
-          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
-        </param>
-      </rule>
-    </xsl:if>
-    <xsl:if test="dbk:subtitle">
-      <rule name="tpTocSubtitle" type="cmd" break-after="0" break-before="1">
-        <param select="dbk:subtitle/node()">
-          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
-        </param>
-      </rule>
-    </xsl:if>
-    <xsl:if test="(dbk:author or dbk:authorgroup/dbk:author) and not($create-TocAuthorNames-by-style)">
-      <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
-        <param select="if ((dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername[@role[contains(., 'notoc')]]) 
-                       then '' 
-                       else (dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
-          <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
-          <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
-        </param>
-      </rule>
-    </xsl:if>
+          <param select="dbk:title/node()[not(self::dbk:phrase[@role = ('identifier', 'hub:identifier')])]">
+            <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+            <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
+          </param>
+        </rule>
+        <xsl:if test="dbk:title[dbk:phrase[@role = ('identifier', 'hub:identifier')]]">
+          <rule name="tpTocNumber" type="cmd" break-after="0" break-before="1">
+            <param select="dbk:title/dbk:phrase[@role = ('identifier', 'hub:identifier')]/node()">
+              <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
+            </param>
+          </rule>
+        </xsl:if>
+        <xsl:if test="dbk:subtitle">
+          <rule name="tpTocSubtitle" type="cmd" break-after="0" break-before="1">
+            <param select="dbk:subtitle/node()">
+              <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="remove-textcolor" select="$remove-textcolor-for-runningtitles" as="xs:boolean?" tunnel="yes"/>
+            </param>
+          </rule>
+        </xsl:if>
+        <xsl:if test="(dbk:author or dbk:authorgroup/dbk:author) and not($create-TocAuthorNames-by-style)">
+          <rule name="tpTocAuthorNameList" type="cmd" break-after="0" break-before="1">
+            <param select="if ((dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername[@role[contains(., 'notoc')]]) 
+              then '' 
+              else (dbk:author|dbk:authorgroup/dbk:author)/dbk:personname/dbk:othername/node()">
+              <with-param name="suppress-foreign-lang" select="true()" as="xs:boolean" tunnel="yes"/>
+              <with-param name="toc-override" select="true()" as="xs:boolean" tunnel="yes"/>
+            </param>
+          </rule>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
   </template>
@@ -3525,16 +3532,16 @@
     <!--  https://redmine.le-tex.de/issues/14615-->
     <char character="&#xAE;" string="\textregistered{}"/>
     <char character="&#x7e;" string="{\string~}"/>
-    <char character="&#x7e;" string="${\sim}$" context="*[not(self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink'])]"/>
+    <char character="&#x7e;" string="\({\sim}\)" context="*[not(self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink'])]"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
-    <char character="&#x2c6f;" string="$\forall$"/>
-    <char character="&#x2200;" string="$\forall$"/>
+    <char character="&#x2c6f;" string="\(\forall\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
+    <char character="&#x2200;" string="\(\forall\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
 
-    <char character="&#x2229;" string="$\cap$"/>
-    <char character="&#x21d2;" string="$\Rightarrow$"/>
-    <char character="&#x2208;" string="$\in$"/>
-    <char character="&#x220a;" string="$\in$"/>
-    <char character="&#x2115;" string="$\mathbb{N}$"/>
+    <char character="&#x2229;" string="\(\cap\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
+    <char character="&#x21d2;" string="\(\Rightarrow\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
+    <char character="&#x2208;" string="\(\in\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
+    <char character="&#x220a;" string="\(\in\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
+    <char character="&#x2115;" string="\(\mathbb{N}\)" context="text()[not(ancestor::*[self::dbk:mathphrase or self::dbk:inlineequation])]"/>
 
     <char character="&#xe4;" string="ä"/>
     <char character="&#xf6;" string="ö"/>
