@@ -1535,7 +1535,10 @@
                         |self::section
                         |self::appendix]
                         [title[matches(@role, string-join($hub:hierarchy-role-regexes-x, '|'))]]
-                        [para][every $p in * satisfies $p[self::para[matches(@role,$index-static-regex)] or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()[matches(.,$pi-allowed-in-index)]] or self::title]]
+                        [para[matches(@role,concat($index-static-regex,$index-static-level-regex,'$'))]]
+                                [every $p in * satisfies $p[self::para[matches(@role,concat($index-static-regex,$index-static-level-regex,'$'))]
+                                                            or self::para[matches(@role,$index-text-regex)] or self::para[processing-instruction()[matches(.,$pi-allowed-in-index)]] 
+                                                            or self::title]]
                         [$create-index-at-general-headings]" mode="custom-1" priority="3">
     <xsl:variable name="index-type" as="xs:string" 
                   select="(@type[..[self::index]], 
