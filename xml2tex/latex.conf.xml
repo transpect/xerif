@@ -238,7 +238,7 @@
                                xml2tex:determine-footnote-options($pubtype, $notes-type, $notes-per-chapter, $endnotes-with-chapter),
                                xml2tex:foreign-scripts(root()),
                                ',withcoltitles'[$running-header eq 'yes'],
-                               ',pdf-standard=UA-1'[$a11y],
+                               ',a11y'[$a11y],
                                ']{', 
                                if ($cocotex) then 'cocotex' else 'transpect',
                                '}&#xa;')"/>
@@ -2973,7 +2973,7 @@
     </rule>
   </regex>
   
-  <regex regex="([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(self::*:phrase[@xml:lang='he'])">
+  <regex regex="([&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+([\p{Zs}\p{P}]+[&#x590;-&#x5ff;&#xfb1d;-&#xfb4f;]+)*)" normalize-unicode="false" context="not(ancestor-or-self::*[@xml:lang='he'])">
     <rule type="cmd" name="foreignlanguage{hebrew}" protect="true">
       <param regex-group="1"/>
     </rule>
