@@ -52,7 +52,6 @@
   <!-- other params -->
   
   <xsl:param name="run-local" as="xs:string"/>
-  <xsl:param name="cocotex" as="xs:boolean" select="false()"/>
   
   <xsl:param name="a11y" as="xs:boolean" select="false()"/>
 
@@ -240,7 +239,7 @@
                                ',withcoltitles'[$running-header eq 'yes'],
                                ',a11y'[$a11y],
                                ']{', 
-                               if ($cocotex) then 'cocotex' else 'transpect',
+                               'cocotex',
                                '}&#xa;')"/>
   <xsl:variable name="doc-pkg"       as="xs:string*">
     <xsl:text>\usepackage{htmltabs}&#xa;</xsl:text>
@@ -1559,14 +1558,10 @@
                                                       |self::dbk:editor
                                                       |self::dbk:othercredit]">
     <xsl:choose>
-      <xsl:when test="$cocotex 
-                      and 
-                      (
-                       (    dbk:personname/dbk:surname 
-                        and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]
+      <xsl:when test="(    dbk:personname/dbk:surname 
+                       and dbk:personname/*[self::dbk:givenname|self::dbk:firstname]
                        ) 
-                       or exists(*[not(self::dbk:personname)])
-                      )">
+                       or exists(*[not(self::dbk:personname)])">
         <!-- if author contains only name → tpAuthorNamelist. If name is structured though 
              or if other metadata is present generate environment -->
         <rule name="tpAuthor" type="env" break-after="0" break-before="1">
