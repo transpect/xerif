@@ -2963,7 +2963,7 @@
     </rule>
   </regex>
 
-  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(self::*:phrase[@xml:lang='el'])">
+  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(ancestor-or-self::*[self::*:phrase[@xml:lang='el'] or self::*:mathphrase])">
     <rule type="cmd" name="foreignlanguage{greek}" protect="true">
       <param regex-group="1"/>
     </rule>
