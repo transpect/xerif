@@ -2962,7 +2962,7 @@
     </rule>
   </regex>
 
-  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(ancestor-or-self::*[self::*:phrase[@xml:lang='el'] or self::*:mathphrase])">
+  <regex regex="([&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+([\p{Zs}\p{P}&#x300;-&#x36F;]+[&#x370;-&#x3ff;&#7936;-&#8191;&#x263;]+)*[…:;,\.]?)" context="not(ancestor-or-self::*[self::*:phrase[@xml:lang='el'] or self::*:phrase[matches(@role,$mathphrase-role)]])">
     <rule type="cmd" name="foreignlanguage{greek}" protect="true">
       <param regex-group="1"/>
     </rule>
@@ -3019,6 +3019,7 @@
   <!-- unichar for font change in sans-serif non-latin text #7115 -->
  
   <xsl:variable name="non-latin-style" select="'^[a-z]{1,3}nonlatin$'" as="xs:string"/>
+  <xsl:variable name="mathphrase-role" select="'^[a-z]{1,3}math$'" as="xs:string"/>
   
   <template context="dbk:phrase[matches(@role, $non-latin-style)]
                                [not(matches(., concat(
