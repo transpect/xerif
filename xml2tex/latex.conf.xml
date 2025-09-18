@@ -2880,7 +2880,6 @@
                                       )
                                     ),
                                     '|')"/>
-    <xsl:message select="$regex"></xsl:message>
     <xsl:analyze-string select="." regex="{$regex}">
       <xsl:matching-substring>
         <!-\- order of languages must match the order in $script var -\->
@@ -3153,7 +3152,7 @@
     <xsl:param name="nodes" as="node()*"/>
      <xsl:for-each select="$nodes">
        <xsl:choose>
-         <xsl:when test=".[self::text()]"><xsl:sequence select="xml2tex:add-tactical-break-chars-in-linktext(.)"/></xsl:when>
+         <xsl:when test=".[self::text()]"><xsl:sequence select="xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(.))"/></xsl:when>
          <xsl:when test=".[self::dbk:indexterm | self::dbk:footnote]"><xsl:sequence select="."/></xsl:when>
          <xsl:otherwise>
            <xsl:apply-templates select="." mode="copy">
