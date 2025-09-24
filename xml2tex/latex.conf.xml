@@ -732,7 +732,7 @@
     
   </xsl:template>
   
-  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or matches(@role, concat('?bold|fett|',$bold-style))]" mode="strip-meta" priority="5">
+  <xsl:template match="dbk:phrase[@css:font-weight = 'bold' or matches(@role, concat('c?bold|fett|',$bold-style))]" mode="strip-meta" priority="5">
     <xsl:text>\textbf{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
