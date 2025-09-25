@@ -3498,7 +3498,8 @@
   </xsl:template>
   
   <template context="dbk:inlineequation[not(ancestor::dbk:superscript or ancestor::dbk:subscript )]
-                    |dbk:equation[ancestor::dbk:table or ancestor::dbk:informaltable]">
+                    |dbk:equation[ancestor::dbk:table or ancestor::dbk:informaltable]
+                    |dbk:informalequation[ancestor::dbk:table or ancestor::dbk:informaltable]">
     <rule>
       <text select="'\('"/>
       <text select="node() except dbk:alt, dbk:alt"/>
