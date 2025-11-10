@@ -243,7 +243,7 @@
                                '}&#xa;')"/>
   <xsl:variable name="doc-pkg"       as="xs:string*">
     <xsl:text>\usepackage{htmltabs}&#xa;</xsl:text>
-    <xsl:if test="//*[@css:letter-spacing or exists(key('style', @role)[@css:letter-spacing])] and $letter-spacing-def[normalize-space()]">
+    <xsl:if test="//*[@css:letter-spacing or exists(key('style', @role, $root)[@css:letter-spacing])] and $letter-spacing-def[normalize-space()]">
       <xsl:value-of select="concat('\usepackage{', $letter-spacing-def,'}&#xa;')"/>
     </xsl:if>
     <xsl:for-each select="xml2tex:rgb-to-tex-color( $colors)">
@@ -3059,7 +3059,7 @@
   
   <template context="dbk:phrase[matches(@role, $strikethrough-style)]
                                [not(matches(@css:text-decoration-line, 'line-through'))] 
-                               [empty(key('style', @role)[matches(@css:text-decoration-line, 'line-through')])]">
+                               [empty(key('style', @role, $root)[matches(@css:text-decoration-line, 'line-through')])]">
     <xsl:text>\sout{</xsl:text>
       <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -3071,7 +3071,7 @@
   
   <template context="dbk:phrase[matches(@role, $underline-style)]
                                [not(matches(@css:text-decoration-line, 'underline'))] 
-                               [empty(key('style', @role)[matches(@css:text-decoration-line, 'underline')])]">
+                               [empty(key('style', @role, $root)[matches(@css:text-decoration-line, 'underline')])]">
         <!-- if thithose other conditions are true the template in docx2tex/conf.xml will match and create the uline. 
           if no restraints were set, nested \ulines would be generated-->
         <xsl:text>\uline{</xsl:text>
@@ -3088,7 +3088,7 @@
 
   <template context="dbk:phrase[matches(@role, $italic-style)]
                                [not(@css:font-style = 'italic')]
-                               [empty(key('style', @role)[@css:font-style eq 'italic'])]">
+                               [empty(key('style', @role, $root)[@css:font-style eq 'italic'])]">
     <xsl:text>\textit{</xsl:text>
       <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -3112,7 +3112,7 @@
   
   <template context="dbk:phrase[matches(@role, $bold-style)]
                                [not(@css:font-weight = 'bold')]
-                               [empty(key('style', @role)[@css:font-weight eq 'bold'])]">
+                               [empty(key('style', @role, $root)[@css:font-weight eq 'bold'])]">
     <xsl:text>\textbf{</xsl:text>
     <xsl:next-match/>
     <xsl:text>}</xsl:text>
@@ -3129,7 +3129,7 @@
   <template context="dbk:phrase[not(matches(@css:text-decoration-line, 'none'))]
                                [(matches(@css:text-decoration-line, 'underline') 
                                  or exists(for $i in ./@role 
-                                           return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name][matches(@css:text-decoration-line, 'underline')]))]
+                                           return $root/dbk:hub/dbk:info/css:rules/css:rule[$i eq @name][matches(@css:text-decoration-line, 'underline')]))]
                                [not(@role eq 'Hyperlink')] 
                                [not(parent::dbk:link)]
                                [not(.//dbk:link)]
@@ -3317,14 +3317,14 @@
   <template context="dbk:superscript[not(dbk:footnote)]
                     |dbk:subscript
                     |dbk:phrase[not(dbk:footnote)][exists(for $i in ./@role 
-                                                          return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
+                                                          return $root/dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
                                                                                                      [@remap = ('superscript', 
                                                                                                                 'subscript')]
                                                           )
                                                   ]">
     <xsl:value-of select="if(   self::dbk:superscript 
                              or self::dbk:phrase[exists(for $i in ./@role 
-                                                          return /dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
+                                                          return $root/dbk:hub/dbk:info/css:rules/css:rule[$i eq @name]
                                                                                                      [@remap = 'superscript']
                                                         )
                                                 ]
