@@ -1712,7 +1712,7 @@
   
   <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
-                  select="matches(., concat('(^|[\P{L}])', $index-see-regex))(:avoid matching of Tennessee:)"/>
+                  select="matches(., concat('(^|[\P{L}])', $index-see-regex, '($|\P{L})'))(:avoid matching of Tennessee:)"/>
     <xsl:variable name="index-level" select="index-of( $index-static-level, replace(@role, concat($index-static-regex,$index-static-level-regex), '$1'))"/>
     <xsl:variable name="para-atts" select="@*" as="attribute()*"/>
     <xsl:element name="{hub:index-entry-element-name($index-level)}">
@@ -1774,13 +1774,14 @@
   </xsl:function>
   
   <xsl:template match="text()[matches(.,concat('(^|[\P{L}])',$index-see-also-regex,'?'))]" mode="custom-1-index">
+    <xsl:variable name="see-safety-regex" select="concat($index-see-regex, '($|\P{L})')(:avoid several PIs in 'siehe Museen':)"/>
     <xsl:analyze-string select="." regex="{$index-see-also-regex}">
       <xsl:matching-substring>
         <xsl:processing-instruction name="seealso"/>
         <xsl:value-of select="replace(.,$index-see-also-regex,'')"/>
       </xsl:matching-substring>
       <xsl:non-matching-substring>
-        <xsl:analyze-string select="." regex="{$index-see-regex}">
+        <xsl:analyze-string select="." regex="{$see-safety-regex}">
           <xsl:matching-substring>
             <xsl:processing-instruction name="see"/>
             <xsl:value-of select="replace(.,$index-see-regex,'')"/>
