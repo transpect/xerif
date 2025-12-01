@@ -1710,6 +1710,21 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
+  <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]
+                           /phrase[matches(.,
+                                     concat('^\p{Zs}*', $index-see-also-regex, '?\p{Zs}\p{L}')
+                                   )]" mode="hub:clean-hub" priority="2">
+    <!-- pull out siehe <phrase css:font-style="italic">siehe Institutionenregister</phrase>-->
+      <xsl:sequence select="replace(., 
+                             concat('(^\p{Zs}*)', $index-see-also-regex, '?(\p{Zs})*.*$' ), 
+                            '$1$2$3$5'
+                          )"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:sequence select="replace(., concat('\p{Zs}*', $index-see-also-regex, '?(\p{Zs})*'), '')"/>
+    </xsl:copy>
+  </xsl:template>
+  
   <xsl:template match="para[matches(@role, concat($index-static-regex, $index-static-level-regex))]" mode="custom-1">
     <xsl:variable name="see-exists" as="xs:boolean"
                   select="matches(., concat('(^|[\P{L}])', $index-see-regex, '($|\P{L})'))(:avoid matching of Tennessee:)"/>
