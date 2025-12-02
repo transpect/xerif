@@ -1492,8 +1492,10 @@
   <!-- (1) create index container and include index headlines -->
   
   <xsl:variable name="index-types" as="xs:string*"
-                select="for $index-type in distinct-values((//indexterm[not(@type)]/($index-type-default-name), //indexterm/@type))
-                        return hub:normalize-index-type($index-type)"/>
+                select="distinct-values(
+                            for $index-type in distinct-values((//indexterm[not(@type)]/($index-type-default-name), //indexterm/@type))
+                            return hub:normalize-index-type($index-type)
+                            )(:to omit results that have same type after normalization:)"/>
   
   <xsl:template match="/*[.//indexterm]" mode="custom-2">
     <xsl:variable name="doc" select="." as="element()"/>
@@ -1917,7 +1919,7 @@
   <xsl:template match="index[not(indexentry)]" mode="custom-2">
     <xsl:variable name="index-type" as="xs:string" 
                   select="hub:normalize-index-type((@type, $index-type-default-name)[1])"/>
-<!--    <xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>-->
+    <xsl:message select="'index-type: ', $index-type, ' index-types: ', $index-types, ' static-index-sections: ', count($static-index-sections)"></xsl:message>
     <xsl:variable name="index-index" as="xs:integer" 
                   select="count($static-index-sections) + index-of($index-types, $index-type)"/>
     <xsl:copy>
