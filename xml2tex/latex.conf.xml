@@ -1256,7 +1256,7 @@
       </xsl:when>
       <xsl:when test="dbk:title[descendant::*[self::dbk:footnote | self::dbk:br | self::dbk:indexterm]]">
         <rule name="tpTocTitle" type="cmd" break-before="1">
-          <param select="node()[not(@role = ('identifier', 'hub:identifier'))]">
+          <param select="dbk:title/node()[not(@role = ('identifier', 'hub:identifier'))]">
             <with-param name="remove-footnote" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-newline" select="true()" as="xs:boolean?" tunnel="yes"/>
             <with-param name="remove-indexterm" select="true()" as="xs:boolean?" tunnel="yes"/>
