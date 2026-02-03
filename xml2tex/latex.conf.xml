@@ -763,12 +763,14 @@
     <xsl:value-of select="."/>
   </xsl:template>
 
+  <!-- The \slash macro is required in running text because TeX does
+       not hyphenate after a standard slash character. However, it
+       should not be used in link URLs, as doing so will break the link. -->
   <xsl:template match="text()[matches(., '/[\p{Lu}]')]" mode="escape-bad-chars" priority="30">
     <xsl:variable name="content" select="xml2tex:escape-for-tex(replace( ., '\\', '\\textbackslash ' ))" as="xs:string"/>
     <xsl:value-of select="if (ancestor::*[self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink']]) 
                           then $content
                           else replace($content, '/(\p{Lu})', '{\\slash}$1')"/>
-    <!--   / → {\slash} -->
   </xsl:template>
   
   <template context="/dbk:*/dbk:colophon[@role = 'dedication']
@@ -975,19 +977,23 @@
         <!-- Newlines in title items are discarded by default (remove-newline). 
              If they are preserved in your project remove '|self::dbk:br' from if-condition. 
              Special characters like ampersands are not displayed correctly in bookmarks 
-             and therefore have to be escaped, https://redmine.le-tex.de/issues/11930 -->
+             and therefore have to be escaped, 
+             https://redmine.le-tex.de/issues/11930 
+             https://redmine.le-tex.de/issues/19840 -->
         <xsl:variable name="content">
           <xsl:apply-templates select="node() except dbk:phrase[@role = ('identifier', 'hub:identifier')]" mode="bookmark-contents"/>
         </xsl:variable>
         <param select="replace(
+                         replace(
+                           replace(
+                             replace(
                                replace(
-                                       replace(string-join($content, ''), '\s+$', ''),
-                                       '\\(&amp;)',
-                                       '\\string$1'
-                                       ),
-                               '\p{Zs}',
-                               '&#x20;'
-                               )"/>
+                                string-join($content, ''), '\s+$',        ''
+                               ),                          '\\(&amp;)',   '\\string$1'
+                             ),                            '\p{Zs}',      '&#x20;'
+                           ),                              '\{\\slash\}', '/'
+                         ),                                '\\#',         '{\\texthashchar}'
+                       )"/>
       </rule>
     </xsl:if>
     <xsl:if test="../*[self::dbk:author|self::dbk:authorgroup[dbk:author]]
