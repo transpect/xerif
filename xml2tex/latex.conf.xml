@@ -2946,6 +2946,15 @@
       <param/>
     </rule>
   </regex>
+  
+  <!-- map technical symbols to Noto Mono font
+       https://redmine.le-tex.de/issues/19887 -->
+  
+  <regex regex="[&#x2500;-&#x25ff;]">
+    <rule name="texttt" type="cmd">
+      <param/>
+    </rule>
+  </regex>
 
   <!-- medieval font (junicode) -->
   <!-- use following regexes in your adaptations if medieval characters appear. map character ranges to your customer's font -->
