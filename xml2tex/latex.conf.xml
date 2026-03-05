@@ -3243,13 +3243,25 @@
                           )"/>
   </xsl:function>
   
-  <template context="dbk:link[@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
+  <!-- for this @lupino will create \tpHref[↩]{https://www.iubh-university.de/forschung}{https://www.↩Linktext}, later.
+       rationale: you may have links with a link text that looks like a URL but does not match the actual link target -->
+  
+  <template context="dbk:link[@xlink:href != .][@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
     <!-- this only works if option 'collect-all-xsl' on xml2tex is set to yes. otherwise templates matching the same elements in different modes will not be considered -->
     <rule name="href" type="cmd">
       <param select="replace(xml2tex:optionally-encode-uri((@url, @xlink:href)[1]), '(%|#|_|\\)', '\\$1' )"/>
       <param select="xml2tex:replace-recursive-linktext(node())"/>
     </rule>
-  </template>  
+  </template>
+  
+  <!-- URLs where the URL matches the link text -->
+  
+  <template context="dbk:link[@xlink:href = .][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
+    <rule name="tpBurl" type="cmd">
+      <option select="$xml2tex:tactical-break-character-for-urls"/>
+      <param select="xml2tex:replace-recursive-linktext(node())"/>
+    </rule>
+  </template>
 
   <xsl:function name="xml2tex:optionally-encode-uri">
     <!--if href contains non ascii characters for instance arabic characters it has to be encoded, https://redmine.le-tex.de/issues/14419-->
