@@ -688,16 +688,15 @@
     </mediaobject>
   </xsl:template>
   
-  <xsl:template match="inlineequation[following-sibling::*[1][self::phrase[matches(@role, $formula_alt_role_regex)]]]/@role |
-                       equation[../following-sibling::*[1][self::para][empty(inlineequation)][phrase[matches(@role, $formula_alt_role_regex)]]]/@role" mode="hub:split-at-tab">
+  <xsl:template match="*:inlineequation[following-sibling::*[1][self::*:phrase[matches(@role, $formula_alt_role_regex)]]]/*[1] |
+                       *:equation[../following-sibling::*[1][self::*:para][empty(*:inlineequation)][*:phrase[matches(@role, $formula_alt_role_regex)]]]/*[1]" mode="hub:split-at-tab" priority="5">
     <!-- https://redmine.le-tex.de/issues/13166 -->
-    <xsl:next-match/>
-
     <alt>
       <xsl:apply-templates select="if (..[self::inlineequation]) 
         then ../following-sibling::*[1][self::phrase[matches(@role, $formula_alt_role_regex)]] 
         else ../../following-sibling::*[1]/phrase[matches(@role, $formula_alt_role_regex)]" mode="text-only"/>
     </alt>
+    <xsl:next-match/>
   </xsl:template>
   
   <xsl:template match="*" mode="text-only" priority="1.5">
