@@ -456,4 +456,16 @@
   <!-- add pagecounter if not title pages are included. -->
   <xsl:variable name="xml2tex:set-pagecounter-without-titlepage" select="'\setcounter{page}{5}&#xa;'"/>
   
+  <!-- whether to include chapter-wise in the table of contents or not -->
+  <xsl:variable name="xml2tex:show-chapter-endnotes-headings-in-toc" select="true()" as="xs:boolean"/>
+  
+  <!-- whether to include chapter-wise in the pdf bookmarks or not -->
+  <xsl:variable name="xml2tex:show-chapter-endnotes-headings-in-pdf-bookmarks" select="true()" as="xs:boolean"/>
+  
+  <!-- whether to include endnotes at the end of the book in the table of contents or not -->
+  <xsl:variable name="xml2tex:show-book-endnotes-heading-in-toc" select="true()" as="xs:boolean"/>
+  
+  <!-- whether to include endnotes at the end of the book in the pdf bookmarks or not -->
+  <xsl:variable name="xml2tex:show-book-endnotes-heading-in-pdf-bookmarks" select="true()" as="xs:boolean"/>
+  
 </xsl:stylesheet>

@@ -905,6 +905,16 @@
                                [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]
                       )">
         <rule name="heading" type="env" break-after="2" break-before="2">
+          <xsl:if test="   not($xml2tex:show-chapter-endnotes-headings-in-toc) 
+                        or not($xml2tex:show-chapter-endnotes-headings-in-pdf-bookmarks)">
+            <xsl:text>[</xsl:text>
+            <xsl:sequence select="string-join(
+                                    ('notoc'[not($xml2tex:show-chapter-endnotes-headings-in-toc)],
+                                      'noBM'[not($xml2tex:show-chapter-endnotes-headings-in-pdf-bookmarks)]
+                                    ), ','
+                                  )"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
           <param select="if ($context[self::dbk:chapter]) then 'section' else tr:heading-level($context)"/>
           <text select="concat('&#xa;\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
         </rule>
@@ -919,6 +929,16 @@
                               [not(.//dbk:title[matches(@role, $endnotes-heading-style)])]
                               [not(.//processing-instruction()[name() = ($name-for-Tex-PI, 'latex')][. = '\printnotes'])]">
         <rule name="heading" type="env" break-after="2" break-before="2">
+          <xsl:if test="   not($xml2tex:show-book-endnotes-heading-in-toc) 
+                        or not($xml2tex:show-book-endnotes-heading-in-pdf-bookmarks)">
+            <xsl:text>[</xsl:text>
+            <xsl:sequence select="string-join(
+                                    ('notoc'[not($xml2tex:show-book-endnotes-heading-in-toc)],
+                                      'noBM'[not($xml2tex:show-book-endnotes-heading-in-pdf-bookmarks)]
+                                     ), ','
+                                   )"/>
+            <xsl:text>]</xsl:text>
+          </xsl:if>
           <param select="'chapter'"/>
           <text select="concat('\tpTitle{', ('Anmerkungen', 'Notes', 'Notes')[index-of(('de', 'en', 'fr'), $main-lang)], '}')"/>
         </rule>
