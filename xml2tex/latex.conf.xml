@@ -2022,7 +2022,7 @@
     <xsl:param name="render-alt-text" select="false()" as="xs:boolean" tunnel="yes"/>
     <xsl:if test="$render-alt-text">   
       <rule name="tpAltText" type="cmd" break-before="1" break-after="0">
-        <param/>
+        <param select="replace(., '(^|[^\\])([\{\}%])', '$1\\$2')"/>
       </rule>
     </xsl:if>
     <!-- https://redmine.le-tex.de/issues/14731 -->
