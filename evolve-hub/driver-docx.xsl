@@ -681,7 +681,7 @@
           <xsl:apply-templates select="following-sibling::*[1][self::para[matches(@role, $figure-alt-role-regex, 'i')]]/node()" mode="#current"/>
         </alt>
       </xsl:if>
-      <xsl:variable name="figure-name" select="replace(normalize-space(string-join(descendant::text(),'')),concat($pi-mark, '[a-z]+'), '', 'i')"/>
+      <xsl:variable name="figure-name" select="replace(normalize-space(string-join(descendant::text()[not(ancestor::annotation)],'')),concat($pi-mark, '[a-z]+'), '', 'i')"/>
       <imageobject>
         <imagedata role="archive" fileref="{encode-for-uri(normalize-space($figure-name))}"/>
       </imageobject>
