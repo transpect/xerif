@@ -125,7 +125,7 @@
         <p:input port="models">
           <p:inline>
             <c:models>
-              <c:model href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
+              <c:model href="http://jats.nlm.nih.gov/extensions/bits/2.1/rng/BITS-book2-1.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"/>
             </c:models>
           </p:inline>
         </p:input>

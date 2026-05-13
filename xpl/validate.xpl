@@ -124,7 +124,7 @@
       
       <tr:validate-with-rng-svrl name="validate-bits-schema">
         <p:input port="schema">
-          <p:document href="http://jats.nlm.nih.gov/extensions/bits/2.0/rng/BITS-book2.rng"/>
+          <p:document href="http://jats.nlm.nih.gov/extensions/bits/2.1/rng/BITS-book2-1.rng"/>
         </p:input>
         <p:with-option name="debug" select="$debug"/>
         <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
