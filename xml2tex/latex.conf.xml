@@ -3227,7 +3227,7 @@
     <xsl:param name="url" as="xs:string"/>
     <xsl:variable select="string-join(
                             tr:tokenize-strings-by-string-length(
-                              tokenize($url, $xml2tex:tactical-break-character-for-urls),
+                              if ($xml2tex:tactical-break-character-for-urls[normalize-space()]) then tokenize($url, $xml2tex:tactical-break-character-for-urls) else $url,
                               $xml2tex:url-part-character-limit
                             ),
                             $xml2tex:tactical-break-character-for-urls
