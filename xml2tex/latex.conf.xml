@@ -3277,7 +3277,9 @@
   
   <!-- URLs where the URL matches the link text -->
   
-  <template context="dbk:link[contains(@xlink:href,replace(text(),'\\([_#%])','$1'))][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
+  <template context="dbk:link[matches(@xlink:href,concat('^', replace(text(),'\\([_#%])','$1'), '$'))]
+                             [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
+                             [not(dbk:phrase)(:no styling inside allowed:)]">
     <rule name="tpBurl" type="cmd">
       <option select="$xml2tex:tactical-break-character-for-urls"/>
       <param select="xml2tex:replace-recursive-linktext(node())"/>
