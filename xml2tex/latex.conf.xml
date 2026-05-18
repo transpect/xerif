@@ -3281,7 +3281,7 @@
                              [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
                              [not(dbk:phrase)(:no styling inside allowed:)]">
     <rule name="tpBurl" type="cmd">
-      <option select="$xml2tex:tactical-break-character-for-urls"/>
+      <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()]"><option select="$xml2tex:tactical-break-character-for-urls"/></xsl:if>
       <param select="xml2tex:replace-recursive-linktext(node())"/>
     </rule>
   </template>
