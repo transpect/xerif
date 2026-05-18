@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+11;rgb:2828/2a2a/3636<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
   xmlns:c="http://www.w3.org/ns/xproc-step" 
   xmlns:cx="http://xmlcalabash.com/ns/extensions"
   xmlns:tr="http://transpect.io"
@@ -160,8 +160,6 @@
     <p:with-option name="epubfile-path" select="/c:result/@os-path">
       <p:pipe port="epub-file-uri" step="validate"/>
     </p:with-option>
-    <p:with-option name="interface" select="'commandline'"/>
-    <!--<p:with-option name="epubcheck-version" select="'4.2.2'"/>--><!-- always use the latest version -->
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
