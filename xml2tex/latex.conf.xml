@@ -3278,7 +3278,7 @@
   
   <!-- URLs where the URL matches the link text -->
   
-  <template context="dbk:link[matches(@xlink:href,concat('^', replace(text(),'\\([_#%])','$1'), '$'))]
+  <template context="dbk:link[@*:href = replace(.,'\\([#%_])','$1')]
                              [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
                              [not(matches(@xlink:href, 'mailto:|@'))(:mail address:)]
                              [not(dbk:phrase)(:no styling inside allowed:)]">
