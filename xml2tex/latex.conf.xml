@@ -3267,7 +3267,8 @@
   <!-- for this @lupino will create \tpHref[↩]{https://www.iubh-university.de/forschung}{https://www.↩Linktext}, later.
        rationale: you may have links with a link text that looks like a URL but does not match the actual link target -->
   
-  <template context="dbk:link[@xlink:href != .][@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]">
+  <template context="dbk:link[@xlink:href != .][@xlink:href][matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]|
+                     dbk:link[matches(@xlink:href, 'mailto:|@')]">
     <!-- this only works if option 'collect-all-xsl' on xml2tex is set to yes. otherwise templates matching the same elements in different modes will not be considered -->
     <rule name="href" type="cmd">
       <param select="replace(xml2tex:optionally-encode-uri((@url, @xlink:href)[1]), '(%|#|_|\\)', '\\$1' )"/>
@@ -3279,6 +3280,7 @@
   
   <template context="dbk:link[matches(@xlink:href,concat('^', replace(text(),'\\([_#%])','$1'), '$'))]
                              [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
+                             [not(matches(@xlink:href, 'mailto:|@'))(:mail address:)]
                              [not(dbk:phrase)(:no styling inside allowed:)]">
     <rule name="tpBurl" type="cmd">
       <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()]"><option select="$xml2tex:tactical-break-character-for-urls"/></xsl:if>
