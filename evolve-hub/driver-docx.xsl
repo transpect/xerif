@@ -1382,7 +1382,9 @@
         <xsl:value-of select="replace($url, '[&#x200b;-&#x200d;]', '')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="replace(replace($url, '[&#x200b;-&#x200d;]', ''), $xml2tex:tactical-break-character-for-urls, '')"/>
+        <xsl:value-of select="if ($xml2tex:tactical-break-character-for-urls[normalize-space()]) 
+                              then replace(replace($url, '[&#x200b;-&#x200d;]', ''), $xml2tex:tactical-break-character-for-urls, '') 
+                              else replace($url, '[&#x200b;-&#x200d;]', '')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
