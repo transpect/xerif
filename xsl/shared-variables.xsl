@@ -418,6 +418,10 @@
 
   <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
   <xsl:variable name="xml2tex:tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
+
+  <xsl:variable name="xml2tex:break-links-anywhere" as="xs:boolean" select="false()">
+    <!-- avoids adding break characters to \tpBurl makro. will only add them as fallback for \href makro if defined in xml2tex:tactical-break-character-for-urls variable-->
+  </xsl:variable>
   
   <!-- character limit of url parts until tactical line breaks are inserted -->
   <xsl:variable name="xml2tex:url-part-character-limit" as="xs:integer" select="40"/>

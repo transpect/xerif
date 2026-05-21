@@ -3247,7 +3247,8 @@
                           )"/>
   </xsl:function>
   
-  <xsl:function name="xml2tex:add-tactical-break-chars-in-linktext">
+  <xsl:function name=
+    "xml2tex:add-tactical-break-chars-in-linktext">
     <xsl:param name="url" as="xs:string"/>
     <xsl:value-of select="replace(
                             replace(
@@ -3278,13 +3279,15 @@
   
   <!-- URLs where the URL matches the link text -->
   
-  <template context="dbk:link[@*:href = replace(.,'\\([#%_])','$1')]
+  <template context="dbk:link[@xlink:href = replace(.,'\\([#%_])','$1')]
                              [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
                              [not(matches(@xlink:href, 'mailto:|@'))(:mail address:)]
                              [not(dbk:phrase)(:no styling inside allowed:)]">
     <rule name="tpBurl" type="cmd">
-      <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()]"><option select="$xml2tex:tactical-break-character-for-urls"/></xsl:if>
-      <param select="xml2tex:replace-recursive-linktext(node())"/>
+      <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()] and not($xml2tex:break-links-anywhere)">
+        <option select="$xml2tex:tactical-break-character-for-urls"/>
+      </xsl:if>
+      <param select="if ($xml2tex:break-links-anywhere) then @xlink:href else xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(@xlink:href))"/>
     </rule>
   </template>
 
