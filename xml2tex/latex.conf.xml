@@ -3282,7 +3282,7 @@
   <template context="dbk:link[@xlink:href = replace(.,'\\([#%_])','$1')]
                              [matches(@xlink:href, '^(https?|ftp):') or matches(., '^(https?|ftp):')]
                              [not(matches(@xlink:href, 'mailto:|@'))(:mail address:)]
-                             [not(dbk:phrase)(:no styling inside allowed:)]">
+                             [not(dbk:phrase) or dbk:phrase[@role = 'Hyperlink'](:no styling inside allowed:)]">
     <rule name="tpBurl" type="cmd">
       <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()] and not($xml2tex:break-links-anywhere)">
         <option select="$xml2tex:tactical-break-character-for-urls"/>
