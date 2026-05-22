@@ -3287,7 +3287,7 @@
       <xsl:if test="$xml2tex:tactical-break-character-for-urls[normalize-space()] and not($xml2tex:break-links-anywhere)">
         <option select="$xml2tex:tactical-break-character-for-urls"/>
       </xsl:if>
-      <param select="if ($xml2tex:break-links-anywhere) then @xlink:href else xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(@xlink:href))"/>
+      <param select="if ($xml2tex:break-links-anywhere) then replace(@xlink:href, '\\?([%#])', '\\$1') else xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(@xlink:href))"/>
     </rule>
   </template>
 
