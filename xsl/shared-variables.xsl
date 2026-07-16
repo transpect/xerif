@@ -5,6 +5,7 @@
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:tr="http://transpect.io"
   xmlns:idml2xml="http://transpect.io/idml2xml"
+  xmlns:hub2tei="http://transpect.io/hub2tei"
   xmlns:schematron="http://purl.oclc.org/dsdl/schematron"
   xmlns:tei="http://www.tei-c.org/ns/1.0"
   xmlns:tei2html="http://transpect.io/tei2html"
@@ -384,6 +385,34 @@
   <xsl:variable name="idml2xml:discard-para-regex" as="xs:string" select="'tsheadline'"/>
 
   <xsl:variable name="hub:discard-para-regex" select="'tsheadline'" as="xs:string"/>
+
+  <!-- START: variables that were used but nowhere in xerif declared -->
+
+  <xsl:variable name="hub:endnote-style-regex" as="xs:string" select="'^letex_endnote'"/>
+  
+  <xsl:variable name="hub:endnote-marker-style-regex" as="xs:string" select="'Endnote_marker'"/>
+  
+  <xsl:variable name="hub:anonymous-chapter-regex" as="xs:string" select="'p_h_anonymous|Kapitelanfang_anonym'" />
+  
+  <xsl:variable name="hub:chapter-preface-role" as="xs:string" select="'_Abstract|GT_Vorspann|Motto_vor_U(_Quelle)?(_-_.+?)?$'"/>
+ 
+  <xsl:variable name="hub:toc-para-style-regex" select="'Inhaltsverzeichnis_Inhalt'" as="xs:string"/>
+  
+  <xsl:variable name="hub:impress-para-regex" select="'Titelei_Impr(_-_.+)?$'" as="xs:string"/>
+  
+  <xsl:variable name="hub:marginalia-role-regex-x" select="'_Marg'" as="xs:string"/>
+  
+  <xsl:variable name="hub:marginal-note-container-style-regex" as="xs:string" select="'^Marginalie(_-_.+)?$'"/>
+  
+  <xsl:variable name="hub:title-start-regex" select="'Titelei'" as="xs:string"/>
+  
+  <xsl:variable name="hub2tei:drama-speaker-phrase-style-role-regex" as ="xs:string" select="'^(semantisch_)?Sprecher(_[1-3])?(_-_.+?)?$'"/>
+  
+  <xsl:variable name="hub2tei:drama-speaker-style-role-regex" as ="xs:string" select="'^Hauptteil_Dramensatz_Drama_Sprecher(_-_.+?)?$'"/>
+  
+  <xsl:variable name="hub:poetry-role-regex" as="xs:string" select="'(Gedicht_Ged(_GT|_Verf)|p_poem(line|source|dedication))'"/>
+  
+  <!-- END -->
  
   <xsl:variable name="hub:table-rotated-role-regex" as="xs:string" select="'^[a-z]{1,3}tablerotated$'"/>
   
@@ -415,6 +444,10 @@
   <xsl:variable name="tei:box-type-role" select="'box'" as="xs:string"/>
 
   <xsl:variable name="tei2html:no-toc-style-regex" as="xs:string" select="'notoc'"/>
+
+  <!-- * 
+       * xml2tex-specific variables
+       * -->
 
   <!-- &#x200b; or &#x21a9; add chars after possible break points. only char on real break is displayed . -->
   <xsl:variable name="xml2tex:tactical-break-character-for-urls" as="xs:string?" select="'&#x21a9;'"/>
