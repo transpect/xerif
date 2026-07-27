@@ -12,26 +12,34 @@ sophisticated layouts.
 
 ## Overview
 
-A typical xerif workflow looks like this:
+A typical transpect pipeline including xerif would look like this:
 
 ```
 Manuscript
    |
    | Word / XML / TeX / Markdown
    v
-transpect conversion pipelines
+transpect conversion
    |
    v
-Hub XML
+   +--> Hub XML
+   +--> HTML
+   +--> XML (client-specific)
    |
    v
-CocoTeX / TeX generation
+transpect conversion (xml2tex)
    |
    v
-LuaTeX typesetting
+   +--> TeX (CoCoTeX)
    |
-   +--> PDF
-   +--> XML
+   v
+typesetting (LuaTeX)
+   |
+   +--> PDF/X/UA
+   |
+   v
+Validation (XML with Schematron x RelaxNG, PDF/UA with VeraPDF)
+   |
    +--> HTML report
 ```
 
