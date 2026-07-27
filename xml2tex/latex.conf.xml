@@ -755,9 +755,10 @@
     <xsl:text>}</xsl:text>
   </xsl:template>
 
-  <xsl:template match="text()[ancestor::*[self::dbk:keyword[matches(., 'file:|http|www|(\.(png|PNG|jpe?g|pdf|JPE?G|PDF|eps|EPS)\p{Zs}*$)')] | 
-                                          self::dbk:*[@role[matches(., '^[a-z]{1,3}pi$', 'i')]] |
-                                          self::dbk:alt
+  <xsl:template match="text()[ancestor::*[self::dbk:keyword[matches(., 'file:|http|www|(\.(png|PNG|jpe?g|pdf|JPE?G|PDF|eps|EPS)\p{Zs}*$)')]
+                                         |self::dbk:*[@role[matches(., '^[a-z]{1,3}pi$', 'i')]]
+                                         |self::dbk:alt
+                                         |ancestor::*/local-name() = $no-char-escape-elements
                                          ]
                              ]" mode="escape-bad-chars" priority="300">
     <!-- prevent filename replacement in keywords an PIs, do not replace characters in alt texts -->

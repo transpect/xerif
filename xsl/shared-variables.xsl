@@ -296,6 +296,10 @@
   <xsl:variable name="create-index-at-general-headings" 
                 select="true()"/>
   
+  <!-- comma-separated list of element names as strings where TeX control characters will not be escaped -->
+  <xsl:variable name="no-char-escape-elements" as="xs:string*" 
+                select="()"/>
+  
   <xsl:variable name="index-text-regex" as="xs:string" 
                 select="'^[a-z]{1,3}index\s?text'"/>
   
