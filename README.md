@@ -38,7 +38,7 @@ typesetting (LuaTeX)
    +--> PDF/X/UA
    |
    v
-Validation (XML with Schematron x RelaxNG, PDF/UA with VeraPDF)
+Validation (XML with Schematron/RelaxNG, PDF/UA with VeraPDF)
    |
    +--> HTML report
 ```
