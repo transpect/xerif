@@ -1,0 +1,220 @@
+<?xpacket begin="" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 5.4-c005 78.147326, 2012/08/23-13:03:03        ">
+  <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <rdf:Description rdf:about=""
+		     xmlns:pdf="http://ns.adobe.com/pdf/1.3/"
+		     xmlns:xmpRights="http://ns.adobe.com/xap/1.0/rights/"
+		     xmlns:dc="http://purl.org/dc/elements/1.1/"
+		     xmlns:xmp="http://ns.adobe.com/xap/1.0/"
+		     xmlns:xmpMM="http://ns.adobe.com/xap/1.0/mm/"
+		     xmlns:pdfaid="http://www.aiim.org/pdfa/ns/id/"
+		     xmlns:pdfuaid="http://www.aiim.org/pdfua/ns/id/"
+		     xmlns:pdfx="http://ns.adobe.com/pdfx/1.3/"
+    		     xmlns:pdfxid="http://www.npes.org/pdfx/ns/id/"
+		     xmlns:prism="http://prismstandard.org/namespaces/basic/3.0/"
+		     xmlns:pdfaExtension="http://www.aiim.org/pdfa/ns/extension/"
+    		     xmlns:pdfaSchema="http://www.aiim.org/pdfa/ns/schema#"
+    		     xmlns:pdfaProperty="http://www.aiim.org/pdfa/ns/property#"
+    		     xmlns:pdfaType="http://www.aiim.org/pdfa/ns/type#"
+    		     xmlns:pdfaField="http://www.aiim.org/pdfa/ns/field#"
+		     >
+      <dc:format>application/pdf</dc:format>
+      <pdf:Producer>le-tex xerif with CoCoTeX</pdf:Producer>
+      <xmp:CreatorTool>MS Word</xmp:CreatorTool>
+      <xmp:ModifyDate>PLACEHOLDER</xmp:ModifyDate>
+      <xmp:CreateDate>PLACEHOLDER</xmp:CreateDate>
+      <!-- INSERT METADATA HERE AND REMOVE COMMENT -->
+      <pdfaExtension:schemas>
+	<rdf:Bag>
+	  <rdf:li rdf:parseType="Resource">
+	    <pdfaSchema:schema>XMP Media Management Schema</pdfaSchema:schema>
+	    <pdfaSchema:prefix>xmpMM</pdfaSchema:prefix>
+	    <pdfaSchema:namespaceURI>http://ns.adobe.com/xap/1.0/mm/</pdfaSchema:namespaceURI>
+	    <pdfaSchema:property>
+	      <rdf:Seq>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>OriginalDocumentID</pdfaProperty:name>
+		  <pdfaProperty:valueType>URI</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>The common identifier for all versions and renditions of a document.</pdfaProperty:description>
+		</rdf:li>
+	      </rdf:Seq>
+	    </pdfaSchema:property>
+	  </rdf:li>
+	  <rdf:li rdf:parseType="Resource">
+	    <pdfaSchema:schema>PDF/A Identification Schema</pdfaSchema:schema>
+	    <pdfaSchema:prefix>pdfaid</pdfaSchema:prefix>
+	    <pdfaSchema:namespaceURI>http://www.aiim.org/pdfa/ns/id/</pdfaSchema:namespaceURI>
+	    <pdfaSchema:property>
+	      <rdf:Seq>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>year</pdfaProperty:name>
+		  <pdfaProperty:valueType>Integer</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>Year of standard</pdfaProperty:description>
+		</rdf:li>
+	      </rdf:Seq>
+	    </pdfaSchema:property>
+	  </rdf:li>
+	  <rdf:li rdf:parseType="Resource">
+	    <pdfaSchema:schema>PDF/UA Universal Accessibility Schema</pdfaSchema:schema>
+	    <pdfaSchema:prefix>pdfuaid</pdfaSchema:prefix>
+	    <pdfaSchema:namespaceURI>http://www.aiim.org/pdfua/ns/id/</pdfaSchema:namespaceURI>
+	    <pdfaSchema:property>
+	      <rdf:Seq>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>part</pdfaProperty:name>
+		  <pdfaProperty:valueType>Integer</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>Part of ISO 14289 standard</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>rev</pdfaProperty:name>
+		  <pdfaProperty:valueType>Integer</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>Revision of ISO 14289 standard</pdfaProperty:description>
+		</rdf:li>
+	      </rdf:Seq>
+	    </pdfaSchema:property>
+	  </rdf:li>
+	  <rdf:li rdf:parseType="Resource">
+	    <pdfaSchema:schema>PDF/X ID Schema</pdfaSchema:schema>
+	    <pdfaSchema:prefix>pdfxid</pdfaSchema:prefix>
+	    <pdfaSchema:namespaceURI>http://www.npes.org/pdfx/ns/id/</pdfaSchema:namespaceURI>
+	    <pdfaSchema:property>
+	      <rdf:Seq>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>GTS_PDFXVersion</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>ID of PDF/X standard</pdfaProperty:description>
+		</rdf:li>
+	      </rdf:Seq>
+	    </pdfaSchema:property>
+	  </rdf:li>
+	  <rdf:li rdf:parseType="Resource">
+	    <pdfaSchema:schema>PRISM Basic Metadata</pdfaSchema:schema>
+	    <pdfaSchema:prefix>prism</pdfaSchema:prefix>
+	    <pdfaSchema:namespaceURI>http://prismstandard.org/namespaces/basic/3.0/</pdfaSchema:namespaceURI>
+	    <pdfaSchema:property>
+	      <rdf:Seq>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>complianceProfile</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>PRISM specification compliance profile to which this document adheres</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>publicationName</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Publication name</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>aggregationType</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Publication type</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>bookEdition</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Edition of the book in which the document was published</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>volume</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Publication volume number</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>number</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Publication issue number within a volume</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>pageRange</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Page range for the document within the print version of its publication</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>issn</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>ISSN for the printed publication in which the document was published</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>eIssn</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>ISSN for the electronic publication in which the document was published</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>isbn</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>ISBN for the publication in which the document was published</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>doi</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Digital Object Identifier for the document</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>url</pdfaProperty:name>
+		  <pdfaProperty:valueType>URL</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>URL at which the document can be found</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>byteCount</pdfaProperty:name>
+		  <pdfaProperty:valueType>Integer</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>Approximate file size in octets</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>pageCount</pdfaProperty:name>
+		  <pdfaProperty:valueType>Integer</pdfaProperty:valueType>
+		  <pdfaProperty:category>internal</pdfaProperty:category>
+		  <pdfaProperty:description>Number of pages in the print version of the document</pdfaProperty:description>
+		</rdf:li>
+		<rdf:li rdf:parseType="Resource">
+		  <pdfaProperty:name>subtitle</pdfaProperty:name>
+		  <pdfaProperty:valueType>Text</pdfaProperty:valueType>
+		  <pdfaProperty:category>external</pdfaProperty:category>
+		  <pdfaProperty:description>Document's subtitle</pdfaProperty:description>
+		</rdf:li>
+	      </rdf:Seq>
+	    </pdfaSchema:property>
+	  </rdf:li>
+	</rdf:Bag>
+      </pdfaExtension:schemas>
+    </rdf:Description>
+  </rdf:RDF>
+</x:xmpmeta>
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+                                                                                                                                                                                                        
+<?xpacket end="w"?>
