@@ -34,9 +34,9 @@
   </p:input>
   <p:output port="result" primary="true">
     <p:documentation>
-      XMP document
+      XMP document. with wrapper (wrap-with-pis) that has to be unwrapped before storing. Without wrapper the dtp will discard the PIs.
     </p:documentation>
-    <p:pipe port="result" step="generate-xmp"/>
+<!--    <p:pipe port="result" step="unwrap"/>-->
   </p:output>
   
   <p:option name="debug" required="false" select="'no'"/>
@@ -63,6 +63,15 @@
       <p:empty/>
     </p:input>
   </tr:dynamic-transformation-pipeline>
+
+    <p:sink/>
+      <p:identity>
+    <p:input port="source">
+      <p:pipe port="result" step="generate-xmp"/>
+    </p:input>
+  </p:identity>
   
-  <p:sink/>
+    <p:unwrap name="unwrap" match="/wrap-pis"/>
+
+<!--    <p:sink/>-->
 </p:declare-step>
