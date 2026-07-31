@@ -13,7 +13,7 @@
   name="generate-xmp">
   
   <p:documentation>
-    Wraps source and metadata document together and generate XMP file from it.
+    Wraps source and metadata document together and generate XMP with wrapper wrap-with-pis file from it.
   </p:documentation>
   
   <p:input port="source" primary="true"/>
@@ -43,6 +43,8 @@
       <p:pipe port="parameters" step="generate-xmp"/>
     </p:input>
   </p:xslt>
+  
+  <p:wrap name="wrap-with-pis" wrapper="wrap-pis" match="/"/>
   
   <tr:store-debug name="debug-after-generate-xmp" pipeline-step="generate-xmp/04_final">
     <p:with-option name="active" select="$debug"/>
