@@ -3312,10 +3312,16 @@
     <xsl:variable name="label" select="concat('ref-', string-join(for $i in (string-length(xs:string($index)) to $anchor-digits) return '0', ''), $index)" as="xs:string"/>
     <xsl:choose>
       <xsl:when test="$remove-ref-target"><!-- in figure/table captions: discard in \tpListofCaption--></xsl:when>
-      <xsl:when test="$as-title-param"><xsl:value-of select="$label"/></xsl:when>
+      <xsl:when test="$as-title-param"><!-- could it be also neccessary to aff pagelabel?-->
+        <xsl:value-of select="$label"/>
+      </xsl:when>
       <xsl:when test="ancestor::*[local-name() = ('title', 'author', 'titleabbrev') or self::dbk:phrase[@role = 'hub:identifier']]
                                  [not(..[self::dbk:figure|self::*:table])]"/>
       <xsl:when test="key('item-by-linkend', @xml:id)[@role = 'page']">
+        <!-- a page label anchor may additionally be referenced as a crossref, see https://redmine.le-tex.de/issues/20583 -->
+        <xsl:if test="some $k in key('item-by-linkend', @xml:id) satisfies $k[not(@role = 'page')]">
+          <xsl:value-of select="concat('\protect'[current()/ancestor::*[self::dbk:figure|self::*:table]],'\hypertarget{', $label, '}{}')"/>
+        </xsl:if>
         <!-- pageref, https://redmine.le-tex.de/issues/14169, https://redmine.le-tex.de/issues/18621 -->
         <xsl:value-of select="concat('\protect'[current()/ancestor::*[self::dbk:figure|self::*:table]],'\tpPageLabel{', $label, '}')"/>
       </xsl:when>
