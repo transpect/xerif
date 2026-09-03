@@ -47,6 +47,10 @@
   <p:output port="hub-rich" primary="false">
     <p:pipe port="result" step="evolve-hub-dyn"/>
   </p:output>
+  
+  <p:output port="hub-inlibra" primary="false">
+    <p:pipe port="result" step="flat2inlibra"/>
+  </p:output>
 
   <p:output port="epub-path" primary="false">
     <p:pipe port="result" step="tei2epub"/>
@@ -55,6 +59,7 @@
   <p:serialization port="tex" method="text" media-type="text/plain" encoding="utf8"/>
   <p:serialization port="hub-flat" indent="true"/>
   <p:serialization port="hub-rich" indent="true"/>
+  <p:serialization port="hub-inlibra" indent="true"/>
   <p:serialization port="result" omit-xml-declaration="false"/>
   <p:serialization port="html" method="xhtml"/>
   <p:serialization port="htmlreport" method="xhtml"/>
@@ -250,6 +255,20 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </tx:copy-images>
   
+  <p:sink/>
+  
+  <p:xslt name="flat2inlibra">
+    <p:input port="source">
+      <p:pipe port="result" step="docx2hub"/>
+    </p:input>
+    <p:input port="parameters">
+      <p:pipe port="result" step="get-paths"/> 
+    </p:input>
+    <p:input port="stylesheet">
+      <p:document href="http://this.transpect.io/a9s/ts/xsl/flat2inlibra.xsl"/>
+    </p:input>
+  </p:xslt>
+
   <p:sink/>
 
   <!-- mk: commented, because tex-preprocessing is now 
