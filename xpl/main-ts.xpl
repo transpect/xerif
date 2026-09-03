@@ -59,7 +59,7 @@
   <p:serialization port="tex" method="text" media-type="text/plain" encoding="utf8"/>
   <p:serialization port="hub-flat" indent="true"/>
   <p:serialization port="hub-rich" indent="true"/>
-  <p:serialization port="hub-inlibra" indent="true"/>
+  <p:serialization port="hub-inlibra" indent="false"/>
   <p:serialization port="result" omit-xml-declaration="false"/>
   <p:serialization port="html" method="xhtml"/>
   <p:serialization port="htmlreport" method="xhtml"/>
