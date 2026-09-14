@@ -260,6 +260,7 @@
   <p:xslt name="flat2inlibra">
     <p:input port="source">
       <p:pipe port="result" step="docx2hub"/>
+       <p:pipe port="result" step="evolve-hub-dyn"/>
     </p:input>
     <p:input port="parameters">
       <p:pipe port="result" step="get-paths"/> 
