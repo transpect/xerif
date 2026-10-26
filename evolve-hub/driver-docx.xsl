@@ -2505,12 +2505,12 @@
     </xsl:if>
   </xsl:template>
   
-    <xsl:template match="phrase[string-length(normalize-space(.)) eq 0][not(@role eq 'cr')][not(xref[@xlink:href[starts-with(., 'page-')]])]" 
+  <xsl:template match="phrase[string-length(normalize-space(.)) eq 0][not(@role eq 'cr')][not(xref[@xlink:href[starts-with(., 'page-')]])]" 
                 mode="preprocess-whitespaces" priority="1">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="phrase[matches(., '^\s+$')]" mode="preprocess-whitespaces">
+  <xsl:template match="phrase[matches(., '^\s+$')][not(@role eq 'cr')][not(xref[@xlink:href[starts-with(., 'page-')]])]" mode="preprocess-whitespaces">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
