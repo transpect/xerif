@@ -2505,7 +2505,7 @@
     </xsl:if>
   </xsl:template>
   
-    <xsl:template match="phrase[string-length(normalize-space(.)) eq 0][not(@role eq 'cr')]" 
+    <xsl:template match="phrase[string-length(normalize-space(.)) eq 0][not(@role eq 'cr')][not(xref[@xlink:href[starts-with(., 'page-')]])]" 
                 mode="preprocess-whitespaces" priority="1">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
