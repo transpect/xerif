@@ -3199,9 +3199,13 @@
          <xsl:when test=".[self::text()]"><xsl:sequence select="xml2tex:add-tactical-breaks-by-string-length(xml2tex:add-tactical-break-chars-in-linktext(.))"/></xsl:when>
          <xsl:when test=".[self::dbk:indexterm | self::dbk:footnote]"><xsl:sequence select="."/></xsl:when>
          <xsl:otherwise>
-           <xsl:apply-templates select="." mode="copy">
-             <xsl:with-param name="replace-linktext" as="xs:boolean" select="true()" tunnel="yes"/>
-           </xsl:apply-templates>
+           <xsl:variable name="replacement">
+             <xsl:copy-of select="root(.)//css:rules"/>
+             <xsl:apply-templates select="." mode="copy">
+               <xsl:with-param name="replace-linktext" as="xs:boolean" select="true()" tunnel="yes"/>
+             </xsl:apply-templates>
+           </xsl:variable>
+           <xsl:sequence select="$replacement/node() except $replacement/css:rules"/>
          </xsl:otherwise>
        </xsl:choose>
      </xsl:for-each>
