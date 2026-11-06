@@ -809,13 +809,17 @@
     <!-- delete index terms to avoid TeX errors if no index is created but indexterms are contained in document.-->
   </xsl:template>
 
-  <template context="/*/*[self::dbk:part|self::dbk:chapter|self::dbk:section]
-                         [empty(preceding-sibling::dbk:para)][1]
-                         [empty(preceding-sibling::dbk:figure)][1]
-                         [not(//dbk:toc)]
-                         [$create-mainmatter]
-                    |/*/dbk:para[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]][$create-mainmatter]
-                    |/*/dbk:figure[1][following-sibling::*[self::dbk:part|self::dbk:chapter|self::dbk:section]][$create-mainmatter]" priority="3001">
+  <template context="/*/*[self::dbk:part| self::dbk:chapter| self::dbk:section]
+                    [empty(preceding-sibling::dbk:para[1])]
+                    [empty(preceding-sibling::*[self::dbk:part| self::dbk:chapter|
+                    self::dbk:section] [1])] [empty(preceding-sibling::dbk:figure[1])]
+                    [not(//dbk:toc)] [$create-mainmatter] |
+                    /*/dbk:para[empty(preceding-sibling::dbk:para[1])]
+                    [following-sibling::*[self::dbk:part| self::dbk:chapter| self::dbk:section]]
+                    [$create-mainmatter] |
+                    /*/dbk:figure[empty(preceding-sibling::dbk:figure[1])]
+                    [following-sibling::*[self::dbk:part| self::dbk:chapter| self::dbk:section]]
+                    [$create-mainmatter]" priority="3001">
     <xsl:text>&#xa;\mainmatter&#xa;</xsl:text>
     <xsl:next-match/>
   </template>
@@ -833,11 +837,13 @@
     </rule>
   </template>
   
-  <template context="/*/*[self::dbk:appendix
-                         |self::dbk:index
-                         |self::dbk:bibliography]
-                         [matches((@role, descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)][1]
-                         [not(//processing-instruction()[contains(., '\backmatter')])]" priority="302">
+  <template context="/*/*[self::dbk:appendix | self::dbk:index | self::dbk:bibliography]
+                    [matches((@role, descendant::dbk:title[1]/@role)[1],
+                    $backmatter-heading-role-regex)]
+                    [empty(preceding-sibling::*[self::dbk:appendix| self::dbk:index|
+                    self::dbk:bibliography]  [matches((@role,
+                    descendant::dbk:title[1]/@role)[1], $backmatter-heading-role-regex)] [1])]
+                    [not(//processing-instruction()[contains(., '\backmatter')])]" priority="302">
     <xsl:if test="not(preceding::*[self::dbk:appendix
                                   |self::dbk:index
                                   |self::dbk:bibliography]
@@ -2576,8 +2582,10 @@
     </rule>
   </template>
   
-  <template context=" dbk:blockquote[matches(@role, $verse-misc-style)]/dbk:para[position() eq last()] 
-                    | dbk:para[matches(@role, $letter-para-style)][position() eq last()]">
+  <template context="dbk:blockquote [matches(@role,
+                    $verse-misc-style)]/dbk:para[not(following-sibling::dbk:para)] |  dbk:para
+                    [matches(@role, $letter-para-style)] [not(following-sibling::dbk:para
+                    [matches(@role, $letter-para-style)])]">
     <rule>
       <text/>
     </rule>
