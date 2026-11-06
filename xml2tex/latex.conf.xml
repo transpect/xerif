@@ -3404,7 +3404,9 @@
         <xsl:value-of select="string-join(('\textit{', xml2tex:utf2tex(.., ., $charmap, (), $texregex), '}'))"/>
       </xsl:when>
       <xsl:when test="@css:font-weight eq 'bold' and @css:font-style eq 'italic'">
-        <xsl:value-of select="string-join(('\textit\textbf{', xml2tex:utf2tex(.., ., $charmap, (), $texregex), '}}'))"/>
+        <xsl:value-of select="string-join(('\textit{\textbf{',
+                                               xml2tex:utf2tex(.., ., $charmap, (), $texregex),
+                                               '}}'))"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates mode="#current"/>
