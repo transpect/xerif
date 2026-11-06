@@ -3597,7 +3597,12 @@
     <!--  https://redmine.le-tex.de/issues/14615-->
     <char character="&#xAE;" string="\textregistered{}"/>
     <char character="&#x7e;" string="{\string~}"/>
-    <char character="&#x7e;" string="\({\sim}\ccaAddAltText{Tilde}\)" context="*[not(self::dbk:link|self::dbk:ulink|self::dbk:phrase[@role = 'pseudolink'])]"/>
+    <char character="&#x7e;" string="\({\sim}\)"
+          context="*[not(self::dbk:link | self::dbk:ulink |
+                         self::dbk:phrase[@role = 'pseudolink'])][not($a11y)]"/>
+    <char character="&#x7e;" string="\({\sim}\ccaAddAltText{Tilde}\)"
+          context="*[not(self::dbk:link | self::dbk:ulink |
+                         self::dbk:phrase[@role = 'pseudolink'])][$a11y]"/>
     <char character="&#x5e;" string="\textasciicircum{}"/>
     <char character="&#x2c6f;" string="\(\forall\)" />
     <char character="&#x2200;" string="\(\forall\)" />
