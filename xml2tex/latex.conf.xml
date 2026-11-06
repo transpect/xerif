@@ -875,15 +875,11 @@
     </xsl:if>
   </template>
 
-  <template context="/dbk:hub/*[self::dbk:chapter[not(@renderas='subhead')]
-                               |self::dbk:appendix
-                               |self::dbk:preface]
-                    |/dbk:hub/*[self::dbk:part
-                               |self::dbk:chapter[@renderas='subhead']
-                               |self::dbk:appendix]/*[ self::dbk:chapter
-                                                      |self::dbk:appendix
-                                                      |dbk:preface
-                                                      |self::dbk:section]" priority="300">
+  <template context="*[self::dbk:chapter[not(@renderas='subhead')]| self::dbk:appendix|
+                    self::dbk:preface] [parent::dbk:hub[parent::document-node()]] |
+                    *[self::dbk:chapter| self::dbk:appendix| dbk:preface| self::dbk:section]
+                    [parent::*[self::dbk:part| self::dbk:chapter[@renderas='subhead']|
+                    self::dbk:appendix] [parent::dbk:hub[parent::document-node()]]]" priority="300">
     <xsl:next-match/>
     <xsl:call-template name="create-printnotes">
       <xsl:with-param name="context" as="element(*)" select="."/>
