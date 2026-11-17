@@ -93,6 +93,7 @@
   
   <xsl:template name="main">
     <html>
+      <xsl:apply-templates select="$htmlinput[1]/html:html/@*" mode="#current"/>
       <head>
         <xsl:call-template name="htmltitle"/>
         <xsl:apply-templates select="$ebook_meta" mode="meta"/>
@@ -335,7 +336,7 @@
   <!-- title of the html document-->
   <xsl:template name="htmltitle" as="element(html:title)">
     <title>
-      <xsl:value-of select="string-join($htmlinput[1]/html:html/html:body//html:div[matches(@class, 'title-page')][1]/html:p[matches(@class, 'HT_Titel')][1]//text(), '')"/>
+      <xsl:value-of select="string-join(($htmlinput[1]/html:html/html:head/html:title[normalize-space()],$htmlinput[1]/html:html/html:body//html:div[matches(@class, 'title-page')][1]/html:p[matches(@class, 'HT_Titel')])[1]//text(), '')"/>
     </title>
   </xsl:template>
 
