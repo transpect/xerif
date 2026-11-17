@@ -37,17 +37,17 @@
   
   <!-- gui parameters -->
   
-  <xsl:param name="layout" as="xs:string"/>
-  <xsl:param name="pubtype" as="xs:string"/>
+  <xsl:param name="layout" as="xs:string?"/>
+  <xsl:param name="pubtype" as="xs:string?"/>
   <xsl:param name="format" as="xs:string*"/>
-  <xsl:param name="toc-depth" as="xs:string"/>
-  <xsl:param name="numbering-depth" as="xs:string"/>
-  <xsl:param name="title-pages" as="xs:string"/>
-  <xsl:param name="notes-type" as="xs:string"/>
-  <xsl:param name="notes-per-chapter" as="xs:string"/>
-  <xsl:param name="notes-per-chapter-notoc" as="xs:string"/>
-  <xsl:param name="endnotes-with-chapter" as="xs:string"/>
-  <xsl:param name="running-header" as="xs:string"/>
+  <xsl:param name="toc-depth" as="xs:string?"/>
+  <xsl:param name="numbering-depth" as="xs:string?"/>
+  <xsl:param name="title-pages" as="xs:string?"/>
+  <xsl:param name="notes-type" as="xs:string?"/>
+  <xsl:param name="notes-per-chapter" as="xs:string?"/>
+  <xsl:param name="notes-per-chapter-notoc" as="xs:string?"/>
+  <xsl:param name="endnotes-with-chapter" as="xs:string?"/>
+  <xsl:param name="running-header" as="xs:string?"/>
   
   <!-- other params -->
   
